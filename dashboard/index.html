@@ -205,7 +205,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v10 · 검색엔진 자동등록</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v11 · 최신성 자동 재작성</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -839,6 +839,7 @@ function render(){
         ${a.quality==="보류"?`<span class="badge b-err" title="${escAttr(a.quality_reason||'')}">⚠️ 품질보류</span>`:""}
         ${a.ongoing?`<span class="badge ${a.ongoing==="종료"?"b-err":(a.ongoing==="진행중"?"b-ok":"b-wait")}">${a.ongoing==="진행중"?"🟢 진행중":a.ongoing==="종료"?"⛔ 종료":a.ongoing==="예정"?"🕓 예정":"❔ 확인필요"}</span>`:""}
         ${a.accuracy==="stale"?`<span class="badge b-err">🕰️ 옛정보 의심</span>`:(a.accuracy==="warn"?`<span class="badge b-wait">🔎 확인권장</span>`:"")}
+        ${a.revised?`<span class="badge b-lang">✏️ 최신화 재작성</span>`:""}
         ${pub&&a.post_url?`<a class="badge b-ok" href="${a.post_url}" target="_blank">글 보기 ↗</a>`:""}
       </div>
       ${a.quality==="보류"?`<div class="qnote">⚠️ 자동 품질 검사 미달(${escAttr(a.quality_reason||"")}). 애드센스 정책 보호를 위해 발행에서 제외됐습니다. 내용을 보완한 뒤 수동 발행하세요.</div>`:(a.status==="초안저장됨"?`<div class="qnote ok">📝 초안으로 저장됨. 워드프레스에서 검토 후 발행하세요(대량 자동발행 방지).</div>`:"")}
