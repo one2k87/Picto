@@ -132,3 +132,50 @@ def check(article, chat, llm_cfg, safety, today=None):
     hold = (mode == "strict" and (fresh == "stale" or stale))
     summary = fresh + (f"·{ongoing}" if ongoing else "") + (f" ({'; '.join(issues[:3])})" if issues else "")
     return hold, summary
+
+
+def revise(article, chat, llm_cfg, today=None):
+    """
+    최신성 점검에서 나온 문제(issues/fix)를 반영해 '본문 HTML을 실제로 다시 쓴다'.
+    구조·태그는 유지하고 오래됐거나 불확실한 서술만 최신 기준으로 고침.
+    성공 시 article['html'] 교체하고 True 반환, 실패/불필요 시 False.
+    """
+    today = today or date.today()
+    issues = article.get("accuracy_issues") or []
+    fix = article.get("accuracy_fix") or ""
+    html = article.get("html", "") or ""
+    if not html or (not issues and article.get("accuracy") == "ok"):
+        return False
+
+    issue_txt = "\n".join(f"- {i}" for i in issues) or "- 최신성/정확성 표현 보완"
+    prompt = f"""오늘은 {today.year}년 {today.month}월입니다. 아래 블로그 글(HTML)을 '최신성·정확성'만 고쳐서 다시 쓰세요.
+
+[고칠 점]
+{issue_txt}
+{("[개선 방향] " + fix) if fix else ""}
+
+[반드시 지킬 규칙]
+- HTML 구조·태그(<h2>,<p>,<ul>,<table>,<figure>,<script>,광고/이미지 자리 등)는 그대로 유지. 새 섹션을 통째로 추가/삭제하지 말 것.
+- 오래된 연도·수치를 {today.year}년 기준으로 바로잡거나, '○○년 기준'처럼 기준 시점을 명시.
+- 제도/지원금/이벤트는 지금도 진행 중인지(진행중/종료/예정)를 분명히.
+- 확실치 않으면 단정하지 말고 "공식 사이트에서 최신 정보 확인" 식으로 표현.
+- 이미 들어있는 '정보 기준일/면책/투자위험' 안내 문단, <script type="application/ld+json"> 는 그대로 둔다.
+- 사실을 지어내지 말 것. 모르면 범위/여지를 남긴다.
+
+원문 HTML:
+\"\"\"{html}\"\"\"
+
+수정된 '완성 HTML 본문'만 출력하세요(설명·코드블록 표시 없이, <로 시작)."""
+    try:
+        out = chat(prompt, llm_cfg, max_tokens=6000, temperature=0.3)
+        out = (out or "").strip()
+        out = re.sub(r"^```[a-zA-Z]*\s*|\s*```$", "", out).strip()
+        # 안전장치: HTML 형태이고, 원문의 절반 이상 길이일 때만 채택(붕괴 방지)
+        if out.startswith("<") and len(out) >= max(300, int(len(html) * 0.5)):
+            article["html"] = out
+            article["revised"] = True
+            return True
+        print("[accuracy] 재작성 결과가 부실해 원문 유지")
+    except Exception as e:
+        print(f"[accuracy] 재작성 실패(원문 유지): {e}")
+    return False
