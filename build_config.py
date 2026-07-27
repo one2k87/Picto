@@ -61,6 +61,7 @@ def _safety_block():
         "max_keyword_density": envf("QUALITY_MAX_DENSITY", 0.03),
         "max_similarity": envf("QUALITY_MAX_SIMILARITY", p["max_similarity"]),
         "verify_accuracy": envs("VERIFY_ACCURACY", p["verify_accuracy"]),
+        "auto_revise": b("AUTO_REVISE", True),
         "relink_old": b("RELINK_OLD", False),
         "blocklist_extra": [w.strip() for w in envs("BLOCKLIST_EXTRA", "").split(",") if w.strip()],
     }
