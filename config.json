@@ -24,10 +24,11 @@
     "max_keyword_density": 0.03,
     "max_similarity": 0.5,
     "verify_accuracy": "flag",
+    "auto_revise": true,
     "relink_old": false,
     "blocklist_extra": []
   },
-  "_safety_설명": "애드센스 안전장치. strength=강도 프리셋(느슨/표준/엄격). force_draft=자동발행 대신 초안 저장(검토 후 발행). 품질 미달(분량·소제목·키워드도배·중복)은 발행 보류. verify_accuracy=최신성검증(off/flag/strict, flag=메모만·strict=옛정보면 보류). relink_old=새 글이 예전 글을 대체하면 예전 글에 최신글 링크 배너 자동 추가. blocklist_extra=추가 금지어",
+  "_safety_설명": "애드센스 안전장치. strength=강도 프리셋(느슨/표준/엄격). force_draft=자동발행 대신 초안 저장(검토 후 발행). 품질 미달(분량·소제목·키워드도배·중복)은 발행 보류. verify_accuracy=최신성검증(off/flag/strict). auto_revise=최신성 문제 발견 시 '글을 자동으로 다시 씀'(true). relink_old=새 글이 예전 글을 대체하면 예전 글에 최신글 링크 배너 자동 추가. blocklist_extra=추가 금지어",
 
   "traffic_ratio": 30,
   "_traffic_ratio_설명": "검색량 우선 비율(0~100). 0=상위노출 잘되는 것만, 100=검색량 큰 것만, 30=상위노출 위주+검색량 약간. 나머지는 상위노출 몫",
