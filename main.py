@@ -316,15 +316,28 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
         ok, reason = quality.check(a, others, safety)
         a["quality"] = "통과" if ok else "보류"
         a["quality_reason"] = reason
-        # 최신성·정확성 검증(연도/진행상태/불확실 주장) — strict면 보류로 승격
+        # 최신성·정확성 검증(연도/진행상태/불확실 주장) → 문제 있으면 '글을 다시 씀'
         try:
             hold, summ = accuracy.check(a, chat, cfg.get("llm", {}), safety)
             a["accuracy_summary"] = summ
+            # 점검에서 끝내지 않고 실제 재작성(자동). safety.auto_revise=false면 표시만.
+            auto_revise = safety.get("auto_revise", True) and str(safety.get("verify_accuracy", "flag")).lower() != "off"
+            if auto_revise and (a.get("accuracy") in ("warn", "stale") or a.get("accuracy_issues")):
+                if accuracy.revise(a, chat, cfg.get("llm", {})):
+                    print(f"  · 최신성 재작성 완료: {a['keyword']}")
+                    # 재작성 후 다시 점검해 상태 갱신
+                    hold, summ = accuracy.check(a, chat, cfg.get("llm", {}), safety)
+                    a["accuracy_summary"] = summ
+                    # 재작성으로 분량 등이 바뀌었을 수 있어 품질도 재확인
+                    others2 = [b["html"] for b in generated if b is not a]
+                    ok2, reason2 = quality.check(a, others2, safety)
+                    a["quality"] = "통과" if ok2 else "보류"
+                    a["quality_reason"] = reason2
             if hold and a["quality"] == "통과":
                 a["quality"] = "보류"
                 a["quality_reason"] = (a.get("quality_reason") or "") + ("; " if a.get("quality_reason") else "") + "최신성 문제(" + summ + ")"
         except Exception as e:
-            print(f"  · 정확도 검증 건너뜀: {e}")
+            print(f"  · 정확도 검증/재작성 건너뜀: {e}")
 
     out = []
     for a in generated:
