@@ -35,12 +35,16 @@
 
 
   "images": {
-    "provider": "gemini",
+    "provider": "free",
+    "_provider_설명": "free=무료(스톡→코드썸네일, 비용0·권장) · stock=무료스톡만 · thumbnail=코드썸네일만 · gemini/openai=유료 · none=끔",
+    "pexels_key": "",
+    "unsplash_key": "",
+    "_key_설명": "무료 스톡용 키(택1). pexels.com/api 또는 unsplash.com/developers 에서 무료 발급. 없으면 코드 썸네일로 자동 대체",
     "model": "imagen-4.0-fast-generate-001",
     "size": "1024x1024",
     "max_per_run": 20,
     "_max_per_run_설명": "실행 1회당 이미지 생성 최대 개수(비용 상한). 초과분은 자리표시로 대체",
-    "_model_설명": "Fast=저가(장당 약 $0.02). 예산 위해 이미지 개수 제한",
+    "_model_설명": "유료 provider일 때만 사용. Fast=저가(장당 약 $0.02)",
     "api_key": ""
   },
 
