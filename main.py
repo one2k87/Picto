@@ -345,13 +345,28 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
         except Exception as e:
             print(f"  · 정확도 검증/재작성 건너뜀: {e}")
 
+    drip_hours = float(safety.get("drip_hours", 0) or 0)   # 드립 발행 간격(시간). 0=즉시
+    drip_i = 0
     out = []
     for a in generated:
         if auto_publish and a["quality"] == "통과":
             # 초안 강제: 사람이 검토 후 발행(대량 자동 발행 방지)
             wp = dict(wp_cfg, status="draft") if force_draft else wp_cfg
+            scheduled = False
+            if not force_draft and drip_hours > 0:
+                from datetime import datetime as _dt, timedelta as _td
+                a["_schedule_date"] = (_dt.now() + _td(hours=drip_hours * drip_i)).isoformat()
+                scheduled = drip_i > 0      # 첫 글은 즉시, 이후는 예약
+                drip_i += 1
             url = publish_to_wordpress(a, wp)
-            a["status"] = ("초안저장됨" if force_draft else "게시됨") if url else "게시실패"
+            if not url:
+                a["status"] = "게시실패"
+            elif force_draft:
+                a["status"] = "초안저장됨"
+            elif scheduled:
+                a["status"] = "예약발행"
+            else:
+                a["status"] = "게시됨"
             a["post_url"] = url or ""
         elif auto_publish and a["quality"] == "보류":
             a["status"] = "품질보류"      # 발행 안 함(검토 필요)

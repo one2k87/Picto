@@ -65,6 +65,7 @@ def _safety_block():
         "relink_old": b("RELINK_OLD", False),
         "refresh_days": envi("REFRESH_DAYS", 0),
         "refresh_max_per_run": envi("REFRESH_MAX_PER_RUN", 2),
+        "drip_hours": envf("DRIP_HOURS", 0),
         "blocklist_extra": [w.strip() for w in envs("BLOCKLIST_EXTRA", "").split(",") if w.strip()],
     }
 

@@ -154,6 +154,10 @@ def publish_to_wordpress(article, wp_cfg):
         "status": wp_cfg.get("status", "draft"),   # 기본 draft = 안전
         "excerpt": article.get("meta", ""),         # 메타 설명(검색 스니펫)
     }
+    # 드립(예약) 발행: 미래 시각이 지정되면 'future'로 예약
+    if article.get("_schedule_date"):
+        payload["date"] = article["_schedule_date"]
+        payload["status"] = "future"
     if article.get("slug"):
         payload["slug"] = article["slug"]           # SEO 친화 URL
     if tag_ids:

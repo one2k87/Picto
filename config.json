@@ -29,6 +29,8 @@
     "refresh_days": 0,
     "refresh_max_per_run": 2,
     "_refresh_설명": "오래된 글 자동 최신화 주기(일). 0=끔, 7/14/30 등. 실행마다 refresh_max_per_run편씩 옛 정보를 현재 기준으로 다시 씀",
+    "drip_hours": 0,
+    "_drip_설명": "드립(예약) 발행 간격(시간). 즉시발행(force_draft=false)일 때만 적용. 0=한번에, 2=2시간 간격으로 나눠 예약 발행(애드센스 안전)",
     "blocklist_extra": []
   },
   "_safety_설명": "애드센스 안전장치. strength=강도 프리셋(느슨/표준/엄격). force_draft=자동발행 대신 초안 저장(검토 후 발행). 품질 미달(분량·소제목·키워드도배·중복)은 발행 보류. verify_accuracy=최신성검증(off/flag/strict). auto_revise=최신성 문제 발견 시 '글을 자동으로 다시 씀'(true). relink_old=새 글이 예전 글을 대체하면 예전 글에 최신글 링크 배너 자동 추가. blocklist_extra=추가 금지어",

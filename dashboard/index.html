@@ -179,11 +179,39 @@
   📲 <b>홈 화면에 설치</b>하면 앱처럼 쓸 수 있어요. 사파리 하단 <b>공유</b> 버튼 → <b>홈 화면에 추가</b>.
 </div>
 
+<!-- 온보딩 위저드 (첫 실행) -->
+<div id="obBg" style="display:none;position:fixed;inset:0;background:rgba(6,4,14,.75);z-index:60"></div>
+<div id="obCard" style="display:none;position:fixed;z-index:61;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(92vw,420px);background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px">
+  <div id="obBody"></div>
+</div>
+
 <div class="filters" id="catFilters"></div>
 <div class="filters">
   <span class="chip active" data-f="all">전체 <b id="c-all">0</b></span>
   <span class="chip" data-f="long">🎯 저경쟁 롱테일 <b id="c-long">0</b></span>
   <span class="chip" data-f="season">🗓️ 시즌 선점 <b id="c-season">0</b></span>
+</div>
+
+<div class="toolbar" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 16px 0">
+  <input id="fSearch" placeholder="🔎 제목·키워드 검색" style="flex:1;min-width:140px;padding:8px 10px;
+    border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--txt);font-size:13px">
+  <select id="fStatus" style="padding:8px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--txt);font-size:13px">
+    <option value="all">상태: 전체</option>
+    <option value="게시됨">게시됨</option>
+    <option value="초안저장됨">초안</option>
+    <option value="품질보류">품질보류</option>
+    <option value="복붙대기">복붙대기</option>
+  </select>
+  <select id="fSort" style="padding:8px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--txt);font-size:13px">
+    <option value="default">정렬: 기본</option>
+    <option value="volume">검색량↓</option>
+    <option value="title">제목순</option>
+    <option value="category">카테고리순</option>
+  </select>
+  <select id="archiveSel" title="지난 실행 기록" style="padding:8px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--txt);font-size:13px">
+    <option value="">📅 최근 실행</option>
+  </select>
 </div>
 
 <div class="bulkbar">
@@ -203,6 +231,8 @@
   border-radius:12px;background:var(--card);font-size:13px"></div>
 <div id="insightPanel" style="display:none;margin:8px 16px;padding:12px 14px;border:1px solid var(--line);
   border-radius:12px;background:var(--card);font-size:13px"></div>
+<div id="trendPanel" style="display:none;margin:8px 16px;padding:12px 14px;border:1px solid var(--line);
+  border-radius:12px;background:var(--card);font-size:13px"></div>
 
 <div id="grid" class="grid"></div>
 <div id="empty" class="empty" style="display:none"></div>
@@ -210,7 +240,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v13 · 성과연동·수익·글리프레시</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v14 · 온보딩·검색·트렌드·드립</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -275,6 +305,16 @@
       <option value="30">30일마다</option>
     </select>
     <div class="hint">발행한 지 오래된 글을 자동으로 다시 점검해 최신 기준으로 고쳐 씁니다(실행마다 소수 편).</div>
+  </div>
+  <div class="field">
+    <label>드립(예약) 발행 간격</label>
+    <select id="cfgDrip" style="width:100%">
+      <option value="0">한 번에 발행</option>
+      <option value="1">1시간 간격</option>
+      <option value="2">2시간 간격</option>
+      <option value="3">3시간 간격</option>
+    </select>
+    <div class="hint">즉시발행(초안강제 끔) 상태에서만 적용. 여러 글을 시간차로 나눠 예약 발행해 애드센스 안전성을 높입니다.</div>
   </div>
   <div class="field">
     <label>최신성·정확성 검증</label>
@@ -507,7 +547,7 @@
 
 <script>
 const LS="adsense_blog_cfg";
-let DATA=null, fKind="all", fLang="all", fCat="all";
+let DATA=null, fKind="all", fLang="all", fCat="all", fSearch="", fStatus="all", sortMode="default";
 let CFG=loadCfg();
 
 function loadCfg(){try{return JSON.parse(localStorage.getItem(LS))||{}}catch(e){return {}}}
@@ -698,8 +738,17 @@ async function clip(t,msg){try{await navigator.clipboard.writeText(t);toast(msg)
   catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);
     ta.select();document.execCommand("copy");ta.remove();toast(msg);}}
 
-function visible(){return (DATA?.articles||[]).filter(a=>
-  (fKind==="all"||a.kind===fKind)&&(fCat==="all"||a.category===fCat));}
+function visible(){
+  const q=(fSearch||"").trim().toLowerCase();
+  let list=(DATA?.articles||[]).filter(a=>
+    (fKind==="all"||a.kind===fKind)&&(fCat==="all"||a.category===fCat)&&
+    (fStatus==="all"||a.status===fStatus)&&
+    (!q || ((a.title||"")+" "+(a.keyword||"")+" "+(a.focus_keyword||"")+" "+(a.tags||[]).join(" ")).toLowerCase().includes(q)));
+  if(sortMode==="volume") list=[...list].sort((x,y)=>(y.volume||0)-(x.volume||0));
+  else if(sortMode==="title") list=[...list].sort((x,y)=>(x.title||"").localeCompare(y.title||"","ko"));
+  else if(sortMode==="category") list=[...list].sort((x,y)=>(x.category||"").localeCompare(y.category||"","ko"));
+  return list;
+}
 
 function renderCatFilters(){
   const cats=[...new Set((DATA?.articles||[]).map(a=>a.category).filter(Boolean))];
@@ -882,6 +931,11 @@ function c(id,v){document.getElementById(id).textContent=v;}
 document.querySelectorAll(".chip[data-f]").forEach(ch=>ch.onclick=()=>{
   document.querySelectorAll(".chip[data-f]").forEach(x=>x.classList.remove("active"));
   ch.classList.add("active");fKind=ch.dataset.f;render();});
+// 검색·상태·정렬
+document.getElementById("fSearch").addEventListener("input",e=>{fSearch=e.target.value;render();});
+document.getElementById("fStatus").addEventListener("change",e=>{fStatus=e.target.value;render();});
+document.getElementById("fSort").addEventListener("change",e=>{sortMode=e.target.value;render();});
+document.getElementById("archiveSel").addEventListener("change",e=>loadArchive(e.target.value));
 
 // 설정 시트
 // ---- 플랜/카테고리 UI ----
@@ -944,6 +998,7 @@ function openSheet(){
   document.getElementById("cfgRelink").checked=!!sf.relink_old;
   document.getElementById("cfgVerify").value=sf.verify_accuracy||"flag";
   document.getElementById("cfgRefresh").value=String(sf.refresh_days!=null?sf.refresh_days:0);
+  document.getElementById("cfgDrip").value=String(sf.drip_hours!=null?sf.drip_hours:0);
   document.getElementById("cfgMinChars").value=sf.min_chars||"";
   document.getElementById("cfgMaxSim").value=(sf.max_similarity!=null?sf.max_similarity:"");
   document.getElementById("cfgData").value=CFG.dataUrl||"";
@@ -998,6 +1053,7 @@ document.getElementById("cfgSave").onclick=()=>{
     relink_old:document.getElementById("cfgRelink").checked,
     verify_accuracy:document.getElementById("cfgVerify").value,
     refresh_days:parseInt(document.getElementById("cfgRefresh").value,10)||0,
+    drip_hours:parseInt(document.getElementById("cfgDrip").value,10)||0,
     min_chars:parseInt(document.getElementById("cfgMinChars").value,10)||undefined,
     max_similarity:parseFloat(document.getElementById("cfgMaxSim").value)||undefined
   });
@@ -1227,6 +1283,7 @@ async function loadData(force){
   const url=(CFG.dataUrl&&CFG.dataUrl.length)?CFG.dataUrl:"./data/latest.json";
   loadStatus(url,force);   // 운영 상태(헬스·비용) 함께 로드
   loadInsights(url,force);  // 성과·수익 실측
+  loadTrend(url,force);     // 주제 트렌드 + 지난 실행 기록 목록
   try{const r=await fetch(url,{cache:force?"reload":"no-store"});
     if(r.ok){DATA=await r.json();render();return;}}catch(e){}
   DATA=SAMPLE;render();
@@ -1302,6 +1359,107 @@ async function loadInsights(dataUrl,force){
   box.style.display="block"; box.innerHTML=html;
 }
 
+// 주제 트렌드 패널 + 지난 실행 기록 드롭다운 (history.json 기반)
+let ARCH_BASE="./data/";
+async function loadTrend(dataUrl,force){
+  const hurl=(dataUrl||"./data/latest.json").replace(/latest\.json.*$/,"history.json");
+  ARCH_BASE=(dataUrl||"./data/latest.json").replace(/latest\.json.*$/,"");
+  const box=document.getElementById("trendPanel"); if(!box) return;
+  let h=null;
+  try{const r=await fetch(hurl,{cache:force?"reload":"no-store"}); if(r.ok) h=await r.json();}catch(e){}
+  const arts=(h&&h.articles)||[];
+  if(!arts.length){ box.style.display="none"; return; }
+  // 최근 30일 카테고리 분포
+  const cutoff=new Date(Date.now()-30*864e5).toISOString().slice(0,10);
+  const recent=arts.filter(a=>String(a.date||"")>=cutoff);
+  const byCat={}; recent.forEach(a=>{const c=a.category||"기타";byCat[c]=(byCat[c]||0)+1;});
+  const max=Math.max(1,...Object.values(byCat));
+  const colors={"금융":"#7c5cff","재테크":"#7c5cff","건강":"#2eb37f","생활":"#2eb37f","경제":"#ff8a4c","IT":"#4aa3ff"};
+  const col=c=>{for(const k in colors)if(c.includes(k))return colors[k];return "#8a7cff";};
+  const bars=Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`
+    <div style="display:flex;align-items:center;gap:8px;margin:3px 0">
+      <span style="width:80px;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c}</span>
+      <span style="flex:1;background:rgba(255,255,255,.06);border-radius:5px;height:10px;overflow:hidden">
+        <span style="display:block;height:100%;width:${Math.round(n/max*100)}%;background:${col(c)}"></span></span>
+      <span style="font-size:12px;color:var(--txt)">${n}</span></div>`).join("");
+  // 최근 작성 주제(키워드) 12개
+  const last=arts.slice(-12).reverse().map(a=>`<span style="display:inline-block;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0;
+    font-size:12px;background:rgba(124,92,255,.10);color:#b3a4ff">${escAttr(a.keyword||a.title||"")}</span>`).join("");
+  box.style.display="block";
+  box.innerHTML=`<div style="margin-bottom:8px"><b style="color:var(--txt)">🧭 주제 트렌드</b>
+      <span style="color:var(--muted);font-size:12px"> · 최근 30일 ${recent.length}편</span></div>
+    ${bars}
+    <div style="color:var(--muted);margin:8px 0 4px;font-size:12px">📝 최근 작성 주제</div>${last}`;
+  // 지난 실행 기록 드롭다운 채우기(히스토리의 날짜들)
+  const dates=[...new Set(arts.map(a=>a.date).filter(Boolean))].sort().reverse().slice(0,20);
+  const sel=document.getElementById("archiveSel");
+  if(sel){ sel.innerHTML=`<option value="">📅 최근 실행</option>`+
+    dates.map(d=>`<option value="${d}">${d} 실행</option>`).join(""); }
+}
+async function loadArchive(date){
+  if(!date){ loadData(true); return; }
+  try{
+    const r=await fetch(ARCH_BASE+date+".json",{cache:"no-store"});
+    if(r.ok){ DATA=await r.json(); render(); toast(date+" 실행 기록 표시 중"); return; }
+  }catch(e){}
+  toast("그 날짜 기록을 못 찾았어요",1);
+}
+
+// ===== 온보딩 위저드 (첫 실행 1회) =====
+const OB_CATS=["금융/재테크","건강/생활","경제/IT","반려동물","여행","자기계발","육아","IT/기기"];
+let _obStep=0, _obPick=[];
+function maybeOnboard(){ if(!CFG.onboarded && isLoggedIn()) showOnboard(0); }
+function showOnboard(step){
+  _obStep=step;
+  const bg=document.getElementById("obBg"), card=document.getElementById("obCard"), body=document.getElementById("obBody");
+  bg.style.display="block"; card.style.display="block";
+  if(step===0){
+    body.innerHTML=`<h2 style="margin:0 0 8px">👋 Scripto에 오신 걸 환영해요</h2>
+      <p style="color:var(--muted);font-size:14px;line-height:1.6">매일 자동으로 수익형 블로그 글을 만들고 올려주는 앱이에요.
+      3단계만 설정하면 시작합니다.</p>
+      <div class="actions" style="margin-top:16px;justify-content:flex-end">
+        <button class="btn sm" onclick="finishOnboard()">건너뛰기</button>
+        <button class="btn primary sm" onclick="showOnboard(1)">시작하기 →</button></div>`;
+  } else if(step===1){
+    _obPick=(CFG.categories||[]).map(c=>c.name);
+    const lim=catLimit();
+    body.innerHTML=`<h2 style="margin:0 0 6px">① 관심 카테고리</h2>
+      <p style="color:var(--muted);font-size:13px">글을 만들 분야를 고르세요(최대 ${lim>=9999?"무제한":lim}개). 고단가 3종을 추천해요.</p>
+      <div id="obCatWrap" style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">
+        ${OB_CATS.map(c=>`<span class="obchip" data-c="${c}" style="cursor:pointer;border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:13px;${_obPick.includes(c)?"background:var(--accent);color:#fff":""}">${c}</span>`).join("")}
+      </div>
+      <div class="actions" style="justify-content:space-between">
+        <button class="btn sm" onclick="showOnboard(0)">← 뒤로</button>
+        <button class="btn primary sm" onclick="obSaveCats()">다음 →</button></div>`;
+    body.querySelectorAll(".obchip").forEach(ch=>ch.onclick=()=>{
+      const c=ch.dataset.c, i=_obPick.indexOf(c);
+      if(i>=0){_obPick.splice(i,1);} else { if(_obPick.length>=catLimit()){toast("플랜 한도까지 선택했어요",1);return;} _obPick.push(c);}
+      ch.style.background=_obPick.includes(c)?"var(--accent)":""; ch.style.color=_obPick.includes(c)?"#fff":"";
+    });
+  } else if(step===2){
+    body.innerHTML=`<h2 style="margin:0 0 6px">② 연결하기</h2>
+      <p style="color:var(--muted);font-size:13px;line-height:1.6">이제 <b>GitHub</b>(자동 실행)와 <b>워드프레스</b>(발행)를 연결하면 끝이에요.
+      설정 화면에서 안내에 따라 입력하세요.</p>
+      <div class="actions" style="justify-content:space-between;margin-top:16px">
+        <button class="btn sm" onclick="showOnboard(1)">← 뒤로</button>
+        <button class="btn primary sm" onclick="finishOnboard(true)">설정 열기 →</button></div>
+      <div style="text-align:center;margin-top:8px"><a href="#" onclick="finishOnboard();return false" style="color:var(--muted);font-size:12px">나중에 할게요</a></div>`;
+  }
+}
+function obSaveCats(){
+  if(_obPick.length){
+    CFG.categories=_obPick.map(n=>({name:n,desc:"",wp_category:n.split("/")[0]}));
+    saveCfg();
+  }
+  showOnboard(2);
+}
+function finishOnboard(openSettings){
+  CFG.onboarded=true; saveCfg();
+  document.getElementById("obBg").style.display="none";
+  document.getElementById("obCard").style.display="none";
+  if(openSettings) openSheet();
+}
+
 // iOS 설치 안내 (홈화면 미설치 + 사파리일 때만)
 (function(){
   const standalone=window.navigator.standalone||window.matchMedia("(display-mode: standalone)").matches;
@@ -1361,6 +1519,7 @@ if(needLock()) faceUnlock();   // 잠금 상태면 진입하자마자 Face ID �
 
 applyPlanUI();
 loadData();
+setTimeout(maybeOnboard, 800);   // 첫 실행이면 온보딩 위저드
 </script>
 </body>
 </html>
