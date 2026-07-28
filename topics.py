@@ -37,9 +37,15 @@ def season_focus(today=None):
     return nxt, _SEASON_HINT.get(nxt, "")
 
 
-def build_topic_prompt(category, category_desc, kind, count, exclude=None, today=None):
+def build_topic_prompt(category, category_desc, kind, count, exclude=None, today=None, winners=None):
     exclude = exclude or []
     ex_text = "\n".join(f"- {t}" for t in exclude[:60]) or "(없음)"
+    winners = winners or []
+    win_text = ""
+    if winners:
+        win_text = ("\n[성과 피드백 — 최근 실제 유입이 많았던 검색어]\n"
+                    + "\n".join(f"- {w}" for w in winners[:8])
+                    + "\n→ 위와 '비슷한 각도/의도'의 주제를 우대하되, 똑같이 베끼지는 말고 새로운 세부 주제로 확장한다.\n")
 
     common = f"""당신은 '{category}' 카테고리에 집중하는 애드센스 수익형 블로그의 주제 기획자입니다.
 이 블로그는 '{category}' 미니사이트로 운영되며, 아래 세부 분야를 다룹니다:
@@ -87,7 +93,7 @@ def build_topic_prompt(category, category_desc, kind, count, exclude=None, today
   (나쁜 예: 너무 좁아 아무도 안 찾는 "○○동 △△은행 무직자 소액대출 후기" 류)
 """
 
-    return common + extra + f"""
+    return common + win_text + extra + f"""
 출력은 줄바꿈으로 구분된 한국어 주제 문장 정확히 {count}개만. 번호/설명/따옴표 없이.
 각 주제는 그대로 블로그 제목 키워드로 쓸 수 있게 구체적으로."""
 

@@ -26,6 +26,10 @@ on:
         description: "안전/품질 강도: 느슨 | 표준 | 엄격 (앱 설정에서 전달)"
         default: ""
         required: false
+      refresh_days:
+        description: "오래된 글 자동 최신화 주기(일). 0=끔 (앱 설정에서 전달)"
+        default: ""
+        required: false
 
 permissions:
   contents: write   # 결과 latest.json 을 저장소에 커밋하기 위함
@@ -92,6 +96,12 @@ jobs:
           INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SC_SITE_URL: ${{ secrets.SC_SITE_URL }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          ADSENSE_ACCOUNT: ${{ secrets.ADSENSE_ACCOUNT }}
+          REFRESH_DAYS: ${{ github.event.inputs.refresh_days != '' && github.event.inputs.refresh_days || secrets.REFRESH_DAYS }}
+          REFRESH_MAX_PER_RUN: ${{ secrets.REFRESH_MAX_PER_RUN }}
           SAFETY_STRENGTH: ${{ github.event.inputs.strength != '' && github.event.inputs.strength || secrets.SAFETY_STRENGTH }}
           FORCE_DRAFT: ${{ secrets.FORCE_DRAFT }}
           QUALITY_MIN_CHARS: ${{ secrets.QUALITY_MIN_CHARS }}

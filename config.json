@@ -26,6 +26,9 @@
     "verify_accuracy": "flag",
     "auto_revise": true,
     "relink_old": false,
+    "refresh_days": 0,
+    "refresh_max_per_run": 2,
+    "_refresh_설명": "오래된 글 자동 최신화 주기(일). 0=끔, 7/14/30 등. 실행마다 refresh_max_per_run편씩 옛 정보를 현재 기준으로 다시 씀",
     "blocklist_extra": []
   },
   "_safety_설명": "애드센스 안전장치. strength=강도 프리셋(느슨/표준/엄격). force_draft=자동발행 대신 초안 저장(검토 후 발행). 품질 미달(분량·소제목·키워드도배·중복)은 발행 보류. verify_accuracy=최신성검증(off/flag/strict). auto_revise=최신성 문제 발견 시 '글을 자동으로 다시 씀'(true). relink_old=새 글이 예전 글을 대체하면 예전 글에 최신글 링크 배너 자동 추가. blocklist_extra=추가 금지어",
@@ -84,5 +87,13 @@
     "telegram_token": "",
     "telegram_chat_id": ""
   },
+
+  "insights": {
+    "service_account_json": "",
+    "sc_site_url": "",
+    "ga4_property_id": "",
+    "adsense_account": ""
+  },
+  "_insights_설명": "성과·수익 실측(무료). 구글 서비스계정 JSON + Search Console 속성주소(sc_site_url) + GA4 속성ID + (선택)애드센스 계정. 시크릿 GOOGLE_SERVICE_ACCOUNT_JSON·SC_SITE_URL·GA4_PROPERTY_ID·ADSENSE_ACCOUNT 로 입력. 비우면 예상치 그대로",
   "_notify_설명": "실행 완료/실패를 텔레그램으로 자동 알림. @BotFather로 봇 만들어 토큰, @userinfobot로 chat id 확인 후 GitHub 시크릿 TELEGRAM_TOKEN·TELEGRAM_CHAT_ID에 입력. 비우면 알림만 꺼짐"
 }

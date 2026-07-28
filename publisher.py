@@ -198,6 +198,40 @@ def publish_to_wordpress(article, wp_cfg):
 _BANNER_MARK = "data-updatelink"
 
 
+def get_post(wp_cfg, post_id):
+    """기존 글의 제목·본문(raw)·링크를 가져온다(리프레시용). 실패 시 None."""
+    base = wp_cfg["site_url"].rstrip("/")
+    headers = _auth_header(wp_cfg["username"], wp_cfg["app_password"])
+    try:
+        r = requests.get(f"{base}/wp-json/wp/v2/posts/{post_id}?context=edit",
+                         headers=headers, timeout=30)
+        if r.status_code == 200:
+            d = r.json()
+            return {"title": (d.get("title", {}) or {}).get("raw", ""),
+                    "html": (d.get("content", {}) or {}).get("raw", ""),
+                    "link": d.get("link", "")}
+    except Exception as e:
+        print(f"[wp] 글 조회 실패({post_id}): {e}")
+    return None
+
+
+def update_post_content(wp_cfg, post_id, html):
+    """기존 글 본문을 교체(리프레시). 성공 True."""
+    base = wp_cfg["site_url"].rstrip("/")
+    headers = _auth_header(wp_cfg["username"], wp_cfg["app_password"])
+    headers["Content-Type"] = "application/json"
+    try:
+        r = requests.post(f"{base}/wp-json/wp/v2/posts/{post_id}",
+                          json={"content": html}, headers=headers, timeout=30)
+        if r.status_code in (200, 201):
+            print(f"[wp] 글 #{post_id} 최신화 완료")
+            return True
+        print(f"[wp] 글 최신화 실패 {r.status_code}: {r.text[:150]}")
+    except Exception as e:
+        print(f"[wp] 글 최신화 예외: {e}")
+    return False
+
+
 def add_update_banner(wp_cfg, post_id, new_url, new_title):
     """예전 글(post_id) 상단에 '최신 업데이트 글' 배너를 추가(중복 시 건너뜀).
     반환: True(추가/이미 있음) / False(실패)."""

@@ -201,6 +201,8 @@
 
 <div id="statusPanel" style="display:none;margin:8px 16px;padding:12px 14px;border:1px solid var(--line);
   border-radius:12px;background:var(--card);font-size:13px"></div>
+<div id="insightPanel" style="display:none;margin:8px 16px;padding:12px 14px;border:1px solid var(--line);
+  border-radius:12px;background:var(--card);font-size:13px"></div>
 
 <div id="grid" class="grid"></div>
 <div id="empty" class="empty" style="display:none"></div>
@@ -208,7 +210,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v12 · 운영 안전망(알림·헬스·비용)</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v13 · 성과연동·수익·글리프레시</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -263,6 +265,16 @@
     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:8px">
       <input type="checkbox" id="cfgRelink" style="width:auto"> 예전 글이 대체되면 <b>예전 글에 최신글 링크</b> 자동 추가
     </label>
+  </div>
+  <div class="field">
+    <label>오래된 글 자동 최신화 주기</label>
+    <select id="cfgRefresh" style="width:100%">
+      <option value="0">끔</option>
+      <option value="7">7일마다</option>
+      <option value="14">14일마다</option>
+      <option value="30">30일마다</option>
+    </select>
+    <div class="hint">발행한 지 오래된 글을 자동으로 다시 점검해 최신 기준으로 고쳐 씁니다(실행마다 소수 편).</div>
   </div>
   <div class="field">
     <label>최신성·정확성 검증</label>
@@ -931,6 +943,7 @@ function openSheet(){
   document.getElementById("cfgForceDraft").checked=(sf.force_draft!==false);
   document.getElementById("cfgRelink").checked=!!sf.relink_old;
   document.getElementById("cfgVerify").value=sf.verify_accuracy||"flag";
+  document.getElementById("cfgRefresh").value=String(sf.refresh_days!=null?sf.refresh_days:0);
   document.getElementById("cfgMinChars").value=sf.min_chars||"";
   document.getElementById("cfgMaxSim").value=(sf.max_similarity!=null?sf.max_similarity:"");
   document.getElementById("cfgData").value=CFG.dataUrl||"";
@@ -984,6 +997,7 @@ document.getElementById("cfgSave").onclick=()=>{
     force_draft:document.getElementById("cfgForceDraft").checked,
     relink_old:document.getElementById("cfgRelink").checked,
     verify_accuracy:document.getElementById("cfgVerify").value,
+    refresh_days:parseInt(document.getElementById("cfgRefresh").value,10)||0,
     min_chars:parseInt(document.getElementById("cfgMinChars").value,10)||undefined,
     max_similarity:parseFloat(document.getElementById("cfgMaxSim").value)||undefined
   });
@@ -1019,6 +1033,7 @@ function runInputs(withImg){
   if(cats.length) inp.categories=JSON.stringify(cats);
   if(CFG.trafficRatio!=null) inp.ratio=String(CFG.trafficRatio);   // 검색량 우선 비율
   if(CFG.safety&&CFG.safety.strength) inp.strength=CFG.safety.strength; // 안전/품질 강도
+  if(CFG.safety&&CFG.safety.refresh_days!=null) inp.refresh_days=String(CFG.safety.refresh_days); // 리프레시 주기
   return inp;
 }
 function ghHeaders(){return {"Authorization":"Bearer "+CFG.ghToken,
@@ -1211,6 +1226,7 @@ document.getElementById("stWpCount").onclick=async()=>{
 async function loadData(force){
   const url=(CFG.dataUrl&&CFG.dataUrl.length)?CFG.dataUrl:"./data/latest.json";
   loadStatus(url,force);   // 운영 상태(헬스·비용) 함께 로드
+  loadInsights(url,force);  // 성과·수익 실측
   try{const r=await fetch(url,{cache:force?"reload":"no-store"});
     if(r.ok){DATA=await r.json();render();return;}}catch(e){}
   DATA=SAMPLE;render();
@@ -1253,6 +1269,37 @@ async function loadStatus(dataUrl,force){
       <span>🔢 오늘 호출 ${llmToday}/${llmMax}</span>
     </div>
     ${bad?`<div style="margin-top:8px;color:#ff6b4a">🔴 점검필요: ${(L.health_bad||[]).join(", ")}</div>`:""}`;
+}
+
+// 성과·수익 실측 패널(insights.json): 유입 상위 글/검색어 + 실제 애드센스 수익
+async function loadInsights(dataUrl,force){
+  const url=(dataUrl||"./data/latest.json").replace(/latest\.json.*$/,"insights.json");
+  const box=document.getElementById("insightPanel"); if(!box) return;
+  let s=null;
+  try{const r=await fetch(url,{cache:force?"reload":"no-store"}); if(r.ok) s=await r.json();}catch(e){}
+  if(!s){ box.style.display="none"; return; }
+  const sc=s.search_console||{}, ga=s.ga4||{}, ad=s.adsense||{};
+  let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <b style="color:var(--txt)">📈 성과·수익 (실측)</b>
+      <span style="color:var(--muted)">최근 28일</span></div>`;
+  if(ad&&ad.earnings!=null){
+    html+=`<div style="margin-bottom:8px">💰 애드센스 수익 <b style="color:#33c27f">${ad.earnings} ${ad.currency||""}</b>
+      · 노출 ${(+ad.impressions||0).toLocaleString()} · 클릭 ${ad.clicks||0}</div>`;
+  }
+  const qs=(sc.queries||[]).slice(0,5);
+  if(qs.length){
+    html+=`<div style="color:var(--muted);margin-bottom:4px">🔎 유입 검색어</div>
+      <div style="margin-bottom:8px">${qs.map(q=>`<span style="display:inline-block;background:var(--chip,rgba(124,92,255,.12));
+        color:#b3a4ff;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0;font-size:12px">${escAttr(q.query)} ·${Math.round(q.clicks)}</span>`).join("")}</div>`;
+  }
+  const pg=(sc.pages||[]).slice(0,3);
+  if(pg.length){
+    html+=`<div style="color:var(--muted);margin-bottom:4px">🏆 유입 상위 글</div>
+      ${pg.map((p,i)=>`<div style="font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+        ${i+1}. <a href="${p.page}" target="_blank" style="color:#8ea2ff">${escAttr(p.page)}</a> · 클릭 ${Math.round(p.clicks)}</div>`).join("")}`;
+  }
+  if(!ad.earnings && !qs.length && !pg.length){ box.style.display="none"; return; }
+  box.style.display="block"; box.innerHTML=html;
 }
 
 // iOS 설치 안내 (홈화면 미설치 + 사파리일 때만)

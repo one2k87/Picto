@@ -17,6 +17,9 @@ ddgs>=6.0
 gspread>=6.0
 google-auth>=2.30
 
+# 성과·수익 실측 연동(Search Console·GA4·AdSense, 선택)
+google-api-python-client>=2.100
+
 # 검색량 '꾸준함(상록성)' 측정 (선택, metrics.provider=trends 또는 use_trends_steadiness)
 pytrends>=4.9
 

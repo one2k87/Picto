@@ -28,9 +28,11 @@ import quality
 import accuracy
 import monitor
 import notify
+import insights
 from llm import chat
 from generator import generate_article, generate_series
-from publisher import publish_to_wordpress, upload_media, add_update_banner, submit_indexnow
+from publisher import (publish_to_wordpress, upload_media, add_update_banner,
+                       submit_indexnow, get_post, update_post_content)
 from sheets import log_rows
 
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -83,7 +85,8 @@ def collect_lane(cfg, cat, lane, n_slots, exclude):
     measured = mcfg.get("provider", "none") not in ("none", None)
     pool = max(3, n_slots + 2)
 
-    raw = chat(topics.build_topic_prompt(cat["name"], cat["desc"], lane, pool, exclude=exclude),
+    raw = chat(topics.build_topic_prompt(cat["name"], cat["desc"], lane, pool, exclude=exclude,
+                                         winners=cfg.get("_insight_hints")),
                cfg["llm"], max_tokens=900, temperature=0.9)
     cand = topics.parse_topics(raw, pool)
     # 금지·위험 주제 필터(성인/도박/과장의료/저작권/전쟁 등 자동 제외)
@@ -477,6 +480,44 @@ def _save_status_and_notify(cfg, all_articles, start_t, ok=True, error=""):
     return status
 
 
+def _refresh_old_posts(cfg, hist, wp_cfg):
+    """오래된 발행글을 주기적으로 최신화(옛 정보 → 현재 기준으로 다시 씀)."""
+    from datetime import datetime as _dt
+    safety = cfg.get("safety", {}) or {}
+    days = int(safety.get("refresh_days", 0) or 0)
+    if days <= 0:
+        return
+    maxn = int(safety.get("refresh_max_per_run", 2) or 2)
+    today = _dt.now().date()
+    cands = []
+    for h in hist.get("articles", []):
+        if not h.get("post_id"):
+            continue
+        # 마지막 최신화(또는 최초 발행)로부터 days 이상 지난 글
+        base = h.get("last_refreshed") or h.get("date")
+        try:
+            d0 = _dt.strptime(str(base)[:10], "%Y-%m-%d").date()
+        except Exception:
+            continue
+        if (today - d0).days >= days:
+            cands.append(h)
+    cands = cands[:maxn]
+    done = 0
+    for h in cands:
+        post = get_post(wp_cfg, h["post_id"])
+        if not post or not post.get("html"):
+            continue
+        art = {"html": post["html"], "title": post.get("title", ""),
+               "focus_keyword": h.get("keyword", "")}
+        accuracy.check(art, chat, cfg.get("llm", {}), safety)
+        if accuracy.revise(art, chat, cfg.get("llm", {})):
+            if update_post_content(wp_cfg, h["post_id"], art["html"]):
+                h["last_refreshed"] = today.strftime("%Y-%m-%d")
+                done += 1
+    if done:
+        print(f"  · 오래된 글 {done}편 최신화 완료(주기 {days}일)")
+
+
 def run():
     start_t = time.time()
     cfg = load_config()
@@ -505,6 +546,19 @@ def run():
 
     hist = load_history()
 
+    # 성과·수익 실측 연동(선택) → insights.json 저장 + 잘 되는 주제를 다음 주제 선정에 반영
+    try:
+        ins = insights.collect(cfg)
+        if ins:
+            os.makedirs(DASH_DATA, exist_ok=True)
+            with open(os.path.join(DASH_DATA, "insights.json"), "w", encoding="utf-8") as f:
+                json.dump(ins, f, ensure_ascii=False, indent=2)
+            cfg["_insight_hints"] = insights.winner_topics(ins)
+            if cfg["_insight_hints"]:
+                print(f"[insights] 성과 피드백 반영: {cfg['_insight_hints'][:5]}")
+    except Exception as e:
+        print(f"[insights] 건너뜀: {e}")
+
     # 이미지 비용 상한: 실행 1회당 최대 개수(카테고리 합산)
     img_budget = {"used": 0, "max": int(cfg.get("images", {}).get("max_per_run", 10 ** 9))}
 
@@ -522,6 +576,13 @@ def run():
     # 예전글 → 최신글 링크: 이번에 발행한 글이 과거 글을 대체하면 옛 글 상단에 배너 추가
     if cfg.get("safety", {}).get("relink_old") and auto_publish:
         _relink_old_posts(all_articles, hist, wp_cfg)
+
+    # 오래된 글 정기 리프레시(주기 설정 시): 옛 정보를 현재 기준으로 다시 씀
+    if auto_publish:
+        try:
+            _refresh_old_posts(cfg, hist, wp_cfg)
+        except Exception as e:
+            print(f"  · 글 리프레시 건너뜀: {e}")
 
     today = datetime.now().strftime("%Y-%m-%d")
     for a in all_articles:

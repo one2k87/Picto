@@ -63,6 +63,8 @@ def _safety_block():
         "verify_accuracy": envs("VERIFY_ACCURACY", p["verify_accuracy"]),
         "auto_revise": b("AUTO_REVISE", True),
         "relink_old": b("RELINK_OLD", False),
+        "refresh_days": envi("REFRESH_DAYS", 0),
+        "refresh_max_per_run": envi("REFRESH_MAX_PER_RUN", 2),
         "blocklist_extra": [w.strip() for w in envs("BLOCKLIST_EXTRA", "").split(",") if w.strip()],
     }
 
@@ -138,6 +140,12 @@ cfg = {
     "notify": {
         "telegram_token": envs("TELEGRAM_TOKEN", ""),      # 실행 완료/실패 알림(무료)
         "telegram_chat_id": envs("TELEGRAM_CHAT_ID", ""),
+    },
+    "insights": {                                          # 성과·수익 실측(무료 API)
+        "service_account_json": envs("GOOGLE_SERVICE_ACCOUNT_JSON", ""),
+        "sc_site_url": envs("SC_SITE_URL", envs("WP_SITE", "")),
+        "ga4_property_id": envs("GA4_PROPERTY_ID", ""),
+        "adsense_account": envs("ADSENSE_ACCOUNT", ""),
     },
     "perf": {
         "workers": envi("WORKERS", 4),      # 유료 등급이면 4~6 권장(빠름)
