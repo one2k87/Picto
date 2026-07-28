@@ -90,6 +90,8 @@ jobs:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           WP_STATUS: ${{ secrets.WP_STATUS }}
           INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           SAFETY_STRENGTH: ${{ github.event.inputs.strength != '' && github.event.inputs.strength || secrets.SAFETY_STRENGTH }}
           FORCE_DRAFT: ${{ secrets.FORCE_DRAFT }}
           QUALITY_MIN_CHARS: ${{ secrets.QUALITY_MIN_CHARS }}

@@ -41,7 +41,14 @@ def chat(prompt, cfg, system=None, max_tokens=4000, temperature=0.7, retries=3):
     for model in avail:
         for attempt in range(retries):
             try:
-                return _call(provider, prompt, cfg, model, system, max_tokens, temperature)
+                out = _call(provider, prompt, cfg, model, system, max_tokens, temperature)
+                try:
+                    import monitor
+                    monitor.bump_llm()
+                    monitor.mark(provider if provider != "google" else "gemini")
+                except Exception:
+                    pass
+                return out
             except Exception as e:
                 last = e
                 msg = str(e)

@@ -135,6 +135,10 @@ cfg = {
         "indexnow_key": envs("INDEXNOW_KEY", ""),   # 네이버·빙 자동 등록 키
     },
     "sheets": {"enabled": False},
+    "notify": {
+        "telegram_token": envs("TELEGRAM_TOKEN", ""),      # 실행 완료/실패 알림(무료)
+        "telegram_chat_id": envs("TELEGRAM_CHAT_ID", ""),
+    },
     "perf": {
         "workers": envi("WORKERS", 4),      # 유료 등급이면 4~6 권장(빠름)
         "classify": b("CLASSIFY", True),

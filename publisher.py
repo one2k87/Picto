@@ -45,6 +45,11 @@ def submit_indexnow(urls, key, site_url):
             if r.status_code in (200, 202):
                 print(f"[indexnow] 등록 요청 성공 → {ep} ({len(urls)}개)")
                 ok = True
+                try:
+                    import monitor
+                    monitor.mark("indexnow")
+                except Exception:
+                    pass
             else:
                 print(f"[indexnow] {ep} 응답 {r.status_code}: {r.text[:120]}")
         except Exception as e:
@@ -177,6 +182,11 @@ def publish_to_wordpress(article, wp_cfg):
         if r.status_code in (200, 201):
             data = r.json()
             article["post_id"] = data.get("id")     # 나중에 '최신글 링크' 배너용
+            try:
+                import monitor
+                monitor.mark("wordpress")
+            except Exception:
+                pass
             print(f"[wp] 게시 성공({payload['status']}): {data.get('link')}")
             return data.get("link")
         print(f"[wp] 게시 실패 {r.status_code}: {r.text[:300]}")

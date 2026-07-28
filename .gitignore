@@ -1,0 +1,39 @@
+# === 비밀/민감 정보 (절대 올리면 안 됨) ===
+# 실제 키·비밀번호는 GitHub Secrets에만 두세요.
+.env
+.env.*
+*secret*
+*credentials*
+service_account.json
+*.key
+*.pem
+
+# config.json 에 실제 키를 직접 넣어 로컬 테스트한다면 아래 주석 해제로 로컬본 제외
+# config.json
+
+# === 실행 산출물 / 캐시 ===
+output/
+run.log
+*.log
+
+# 대시보드 데이터(latest.json 등)는 자동 실행이 커밋하므로 여기서 제외하지 않음
+# (원치 않으면 아래 주석 해제)
+# dashboard/data/*.json
+
+# === 파이썬 ===
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# === OS / 에디터 ===
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# === 임시 이미지 생성물 ===
+*.tmp
+img_*.png

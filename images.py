@@ -49,6 +49,13 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category=""):
     if not data:
         return None
 
+    # 사용량/비용 집계(유료 provider만 비용 발생)
+    try:
+        import monitor
+        monitor.bump_image(paid=provider in ("openai", "gemini", "imagen", "google"))
+    except Exception:
+        pass
+
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, f"img_{int(time.time()*1000)}_{idx}.png")
     with open(path, "wb") as f:

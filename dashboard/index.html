@@ -199,13 +199,16 @@
   <div id="adSlotArea">[ 광고 영역 · Pro/Max로 업그레이드하면 사라집니다 ]</div>
 </div>
 
+<div id="statusPanel" style="display:none;margin:8px 16px;padding:12px 14px;border:1px solid var(--line);
+  border-radius:12px;background:var(--card);font-size:13px"></div>
+
 <div id="grid" class="grid"></div>
 <div id="empty" class="empty" style="display:none"></div>
 
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v11 · 최신성 자동 재작성</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v12 · 운영 안전망(알림·헬스·비용)</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1207,10 +1210,50 @@ document.getElementById("stWpCount").onclick=async()=>{
 // 데이터 로드
 async function loadData(force){
   const url=(CFG.dataUrl&&CFG.dataUrl.length)?CFG.dataUrl:"./data/latest.json";
+  loadStatus(url,force);   // 운영 상태(헬스·비용) 함께 로드
   try{const r=await fetch(url,{cache:force?"reload":"no-store"});
     if(r.ok){DATA=await r.json();render();return;}}catch(e){}
   DATA=SAMPLE;render();
   toast("샘플 표시 중 — 설정에서 데이터 주소를 넣으세요");}
+
+// 운영 안전망 패널: 연동 헬스체크 + 최근 실행 + 이번 달 예상비용
+async function loadStatus(dataUrl,force){
+  const url=(dataUrl||"./data/latest.json").replace(/latest\.json.*$/,"status.json");
+  const box=document.getElementById("statusPanel"); if(!box) return;
+  let s=null;
+  try{const r=await fetch(url,{cache:force?"reload":"no-store"}); if(r.ok) s=await r.json();}catch(e){}
+  if(!s || !s.last_run){ box.style.display="none"; return; }
+  const H=s.health||{}, L=s.last_run||{}, U=s.usage||{};
+  const names={gemini:"글생성",naver:"네이버",wordpress:"워드프레스",indexnow:"검색등록"};
+  const today=(s.updated_at||"").slice(0,10);
+  const dots=Object.keys(names).map(k=>{
+    const ok=H[k]&&String(H[k].last_ok||"").startsWith(today);
+    const seen=H[k]?String(H[k].last_ok||"").slice(5,16).replace("T"," "):"기록없음";
+    const color=H[k]?(ok?"#33c27f":"#ffb020"):"#7a8291";
+    return `<span title="마지막 성공: ${seen}" style="display:inline-flex;align-items:center;gap:4px;margin-right:10px">
+      <span style="width:9px;height:9px;border-radius:50%;background:${color};display:inline-block"></span>${names[k]}</span>`;
+  }).join("");
+  const bad=(L.health_bad||[]).length;
+  const runIcon=L.ok?"✅":"⚠️";
+  const runAt=(L.at||"").slice(5,16).replace("T"," ");
+  const cost=U.est_cost_krw||0;
+  const llmToday=U.llm_today||0, llmMax=U.free_llm_daily||1000;
+  const costColor=cost>0?"#ffd479":"#33c27f";
+  box.style.display="block";
+  box.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <b style="color:var(--txt)">🛡️ 운영 상태</b>
+      <span style="color:var(--muted)">${runIcon} 최근 실행 ${runAt||"기록없음"}</span>
+    </div>
+    <div style="margin-bottom:8px">${dots}</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;color:var(--muted)">
+      <span>📝 생성 ${L.articles||0} · 게시 ${L.published||0} · 초안 ${L.draft||0} · 보류 ${L.held||0}</span>
+      <span>⏱ ${L.duration_s||0}초</span>
+      <span>💸 이번 달 예상 <b style="color:${costColor}">₩${(cost||0).toLocaleString()}</b></span>
+      <span>🔢 오늘 호출 ${llmToday}/${llmMax}</span>
+    </div>
+    ${bad?`<div style="margin-top:8px;color:#ff6b4a">🔴 점검필요: ${(L.health_bad||[]).join(", ")}</div>`:""}`;
+}
 
 // iOS 설치 안내 (홈화면 미설치 + 사파리일 때만)
 (function(){

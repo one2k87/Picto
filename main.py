@@ -16,6 +16,7 @@ main.py - 카테고리 집중 애드센스 수익형 파이프라인 (한국어 
 
 import os
 import json
+import time
 import html as html_mod
 from datetime import datetime
 
@@ -25,6 +26,8 @@ import metrics
 import images
 import quality
 import accuracy
+import monitor
+import notify
 from llm import chat
 from generator import generate_article, generate_series
 from publisher import publish_to_wordpress, upload_media, add_update_banner, submit_indexnow
@@ -394,7 +397,88 @@ def _relink_old_posts(new_articles, hist, wp_cfg):
         print(f"  · 예전글 {done}건에 최신글 링크 배너 추가")
 
 
+STATUS_FILE = os.path.join(DASH_DATA, "status.json")
+FREE_LLM_DAILY = 1000        # 무료 티어 하루 호출 여유(대략)
+USD_KRW = 1400               # 대략 환율(예상비용 표시용)
+IMAGEN_USD = 0.02            # 유료 이미지 1장(Imagen Fast)
+
+
+def _save_status_and_notify(cfg, all_articles, start_t, ok=True, error=""):
+    """헬스체크 + 사용량/비용 집계를 status.json 에 병합 저장하고 텔레그램 알림."""
+    from datetime import date
+    snap = monitor.snapshot()
+    # 기존 status 로드(누적 유지)
+    prev = {}
+    try:
+        with open(STATUS_FILE, encoding="utf-8") as f:
+            prev = json.load(f)
+    except Exception:
+        prev = {}
+
+    # 헬스: 이전 성공시각 + 이번 성공시각 병합
+    health = dict(prev.get("health", {}))
+    for name, ts in snap["marks"].items():
+        health[name] = {"last_ok": ts}
+
+    # 사용량 월 누적(월 바뀌면 리셋)
+    month = date.today().strftime("%Y-%m")
+    usage = prev.get("usage", {})
+    if usage.get("month") != month:
+        usage = {"month": month, "llm_calls": 0, "image_paid": 0, "image_free": 0}
+    usage["llm_calls"] += snap["llm_calls"]
+    usage["image_paid"] += snap["image_paid"]
+    usage["image_free"] += snap["image_free"]
+    cost_krw = int(usage["image_paid"] * IMAGEN_USD * USD_KRW)   # 텍스트는 무료 티어 가정=0
+
+    # 어떤 연동이 '오늘 기대됐는데 실패'인지
+    today = monitor.now_kst()[:10]
+    expected = ["gemini"]
+    if str(cfg.get("metrics", {}).get("provider")) == "naver":
+        expected.append("naver")
+    if cfg.get("wordpress", {}).get("enabled"):
+        expected.append("wordpress")
+    health_bad = [n for n in expected
+                  if not str(health.get(n, {}).get("last_ok", "")).startswith(today)]
+
+    published = sum(1 for a in all_articles if a.get("status") == "게시됨")
+    draft = sum(1 for a in all_articles if a.get("status") == "초안저장됨")
+    held = sum(1 for a in all_articles if a.get("quality") == "보류")
+    stats = {
+        "at": monitor.now_kst(), "ok": ok and not error,
+        "articles": len(all_articles), "published": published, "draft": draft,
+        "held": held, "failed": 0 if ok else 1,
+        "duration_s": int(time.time() - start_t),
+        "cost": {"month_krw": cost_krw, "llm_calls": usage["llm_calls"]},
+        "health_bad": health_bad,
+    }
+
+    status = {
+        "updated_at": monitor.now_kst(),
+        "last_run": stats,
+        "health": health,
+        "usage": {**usage, "est_cost_krw": cost_krw,
+                  "free_llm_daily": FREE_LLM_DAILY,
+                  "llm_today": snap["llm_calls"]},
+    }
+    try:
+        os.makedirs(DASH_DATA, exist_ok=True)
+        with open(STATUS_FILE, "w", encoding="utf-8") as f:
+            json.dump(status, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"[status] 저장 실패: {e}")
+
+    # 텔레그램 알림
+    if error:
+        notify.send(cfg, f"⛔ <b>Scripto 실행 실패</b>\n🕖 {monitor.now_kst()}\n{str(error)[:400]}")
+    else:
+        notify.send(cfg, notify.run_summary(cfg, stats))
+    if snap["llm_calls"] >= FREE_LLM_DAILY * 0.8:
+        notify.send(cfg, f"⚠️ 오늘 LLM 호출 {snap['llm_calls']}회 — 무료 한도({FREE_LLM_DAILY}) 근접")
+    return status
+
+
 def run():
+    start_t = time.time()
     cfg = load_config()
     wp_cfg = cfg.get("wordpress", {})
     auto_publish = wp_cfg.get("enabled", False)
@@ -481,6 +565,22 @@ def run():
     print(f"\n=== 완료: 카테고리 {len(cats)}개 · 실제 글 {len(all_articles)}편"
           f"(시리즈 {n_series}개) · 전체 누적 {len(hist['articles'])}편 ===")
 
+    # 운영 안전망: 헬스체크·비용 저장 + 텔레그램 알림
+    _save_status_and_notify(cfg, all_articles, start_t, ok=True)
+
 
 if __name__ == "__main__":
-    run()
+    _start = time.time()
+    try:
+        run()
+    except SystemExit:
+        raise
+    except Exception as e:
+        # 예기치 못한 실패도 텔레그램으로 알림
+        import traceback
+        traceback.print_exc()
+        try:
+            _save_status_and_notify(load_config(), [], _start, ok=False, error=str(e))
+        except Exception:
+            pass
+        raise

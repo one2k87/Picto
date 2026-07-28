@@ -78,5 +78,11 @@
   },
   "_indexnow_설명": "네이버·빙 자동 즉시 등록 키(IndexNow). 아무 영숫자 32자 정도. 사이트 루트에 '<키>.txt' 파일(내용=키)을 올려야 작동. 구글은 서치콘솔+사이트맵으로 별도 등록",
 
-  "sheets": { "enabled": false, "service_account_file": "service_account.json", "spreadsheet_id": "" }
+  "sheets": { "enabled": false, "service_account_file": "service_account.json", "spreadsheet_id": "" },
+
+  "notify": {
+    "telegram_token": "",
+    "telegram_chat_id": ""
+  },
+  "_notify_설명": "실행 완료/실패를 텔레그램으로 자동 알림. @BotFather로 봇 만들어 토큰, @userinfobot로 chat id 확인 후 GitHub 시크릿 TELEGRAM_TOKEN·TELEGRAM_CHAT_ID에 입력. 비우면 알림만 꺼짐"
 }

@@ -76,6 +76,11 @@ def naver_volumes(hints, ncfg):
                 "volume": pc + mo, "pc": pc, "mobile": mo,
                 "comp": it.get("compIdx", ""), "source": "naver",
             }
+        try:
+            import monitor
+            monitor.mark("naver")            # 헬스체크: 네이버 성공
+        except Exception:
+            pass
     except Exception as e:
         print(f"[metrics] 네이버 API 실패: {e}")
     return out
