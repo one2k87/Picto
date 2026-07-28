@@ -1,5 +1,7 @@
 # 핵심
 requests>=2.31
+# 무료 코드 썸네일 이미지 생성(비용 0)
+Pillow>=10.0
 
 # LLM + 이미지: 기본이 Gemini 이므로 반드시 설치
 google-generativeai>=0.7
