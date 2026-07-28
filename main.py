@@ -603,7 +603,7 @@ def run():
     for a in all_articles:
         hist["articles"].append({
             "title": a["title"], "slug": a.get("slug", ""), "url": a.get("post_url", ""),
-            "post_id": a.get("post_id"),
+            "post_id": a.get("post_id"), "status": a.get("status", ""),
             "kind": a["kind"], "keyword": a["keyword"], "category": a.get("category", ""),
             "date": today, "series_id": a.get("series_id", ""),
         })

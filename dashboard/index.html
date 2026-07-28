@@ -249,7 +249,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v15 · 모바일 UI 개선</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v16 · 수익 계산 정정(발행분만)·실측</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1194,8 +1194,19 @@ let HISTCOUNTS=null;
 async function loadHistoryCounts(){
   const base=(CFG.dataUrl&&CFG.dataUrl.length?CFG.dataUrl:"./data/latest.json").replace(/latest\.json.*$/,"history.json");
   try{const r=await fetch(base,{cache:"no-store"});if(r.ok){const h=await r.json();
-    const c={};(h.articles||[]).forEach(a=>{if(a.category)c[a.category]=(c[a.category]||0)+1});
-    return {byCat:c,total:(h.articles||[]).length};}}catch(e){}
+    const arts=h.articles||[];
+    const isPub=s=>s==="게시됨"||s==="예약발행";   // 초안·보류·복붙대기는 수익 계산에서 제외
+    const c={};   // 카테고리별 '공개 발행' 글 수
+    let published=0;
+    arts.forEach(a=>{ if(isPub(a.status)){ published++; if(a.category)c[a.category]=(c[a.category]||0)+1; } });
+    return {byCat:c, total:arts.length, published:published};}}catch(e){}
+  return null;
+}
+// 성과·수익 실측(insights.json) 로드 — 실제 애드센스 수익이 있으면 우선 표시
+let INS=null;
+async function loadInsightsData(){
+  const base=(CFG.dataUrl&&CFG.dataUrl.length?CFG.dataUrl:"./data/latest.json").replace(/latest\.json.*$/,"insights.json");
+  try{const r=await fetch(base,{cache:"no-store"});if(r.ok)return await r.json();}catch(e){}
   return null;
 }
 function won(n){return "₩"+Math.round(n).toLocaleString();}
@@ -1211,7 +1222,19 @@ async function openStats(){
   document.getElementById("statsBg").classList.add("open");
   document.getElementById("statsSheet").classList.add("open");
   HISTCOUNTS=await loadHistoryCounts();
+  INS=await loadInsightsData();
+  // 워드프레스에 실제 '공개 발행'된 글 수 자동 조회(초안 제외) → 수익 기준
+  await fetchWpPublished();
   computeStats();
+}
+async function fetchWpPublished(){
+  if(!CFG.site||!CFG.user||!CFG.pass) return;
+  try{
+    const base=CFG.site.replace(/\/+$/,"");const auth="Basic "+btoa(CFG.user+":"+CFG.pass);
+    const r=await fetch(base+"/wp-json/wp/v2/posts?per_page=1&status=publish",{headers:{Authorization:auth}});
+    const total=r.headers.get("X-WP-Total");
+    if(total!=null) CFG.wpPublished=parseInt(total,10);
+  }catch(e){}
 }
 function closeStats(){document.getElementById("statsBg").classList.remove("open");
   document.getElementById("statsSheet").classList.remove("open");}
@@ -1233,28 +1256,39 @@ function computeQuota(arts){
 function computeStats(){
   const arts=DATA?.articles||[];
   computeQuota(arts);
-  const perCatToday={}; arts.forEach(a=>{if(a.category)perCatToday[a.category]=(perCatToday[a.category]||0)+1});
-  const cum = HISTCOUNTS?HISTCOUNTS.byCat:perCatToday;
-  const totalPosts = HISTCOUNTS?HISTCOUNTS.total:(DATA?.total_all||arts.length);
+  const cum = HISTCOUNTS?HISTCOUNTS.byCat:{};          // '공개 발행'된 글만(초안 제외)
+  const totalGen = HISTCOUNTS?HISTCOUNTS.total:(DATA?.total_all||arts.length);  // 생성 누적(참고)
+  // 수익 기준 = 실제 공개 발행 글 수: 워드프레스 실측 우선, 없으면 히스토리의 게시됨 수
+  const publishedPosts = (CFG.wpPublished!=null && CFG.wpPublished!=="") ? parseInt(CFG.wpPublished,10)
+                         : (HISTCOUNTS?HISTCOUNTS.published:0);
 
   const vpp=parseFloat(CFG.stViews)||300;
   const rpm=parseFloat(CFG.stRpm)||5000;
   const realViews=parseFloat(CFG.stRealViews)||0;
   const realRev=parseFloat(CFG.stRealRev)||0;
 
-  const estViews = realViews>0 ? realViews : totalPosts*vpp;
-  const estRev = realRev>0 ? realRev : (estViews/1000*rpm);
+  // 실측 애드센스 수익(연동됐으면 최우선)
+  const ad = INS && INS.adsense;
+  const adRev = ad && ad.earnings ? parseFloat(String(ad.earnings).replace(/[^0-9.]/g,""))||0 : 0;
+
+  const estViews = realViews>0 ? realViews : publishedPosts*vpp;
+  const estRev = adRev>0 ? adRev : realRev>0 ? realRev : (estViews/1000*rpm);
+  const basis = adRev>0?"(애드센스 실측 · 최근 28일)":realRev>0?"(실제 입력값)":realViews>0?"(실제 조회수 기반)":"(가정값 기반 추정)";
 
   document.getElementById("statsSummary").innerHTML=
     `<div class="metrics">
-      <span class="mchip m-vol">📝 누적 글 <b>${totalPosts}</b></span>
+      <span class="mchip m-vol">📢 공개 발행 <b>${publishedPosts}</b></span>
+      <span class="mchip">🗂 생성 누적 <b>${totalGen}</b></span>
       <span class="mchip">👁 예상 월조회 <b>${(estViews).toLocaleString()}</b></span>
-      <span class="mchip m-steady">💰 예상 월수익 <b>${won(estRev)}</b></span>
+      <span class="mchip m-steady">💰 ${adRev>0?"실측":"예상"} ${adRev>0?"수익(28일)":"월수익"} <b>${won(estRev)}</b></span>
      </div>
-     <div class="hint" style="margin-top:6px">연 환산 약 <b style="color:var(--ok)">${won(estRev*12)}</b>
-       ${realRev>0?"(실제 입력값)":realViews>0?"(실제 조회수 기반)":"(가정값 기반 추정)"}</div>`;
+     <div class="hint" style="margin-top:6px">
+       ${adRev>0?`실제 애드센스 수익 <b style="color:var(--ok)">${won(estRev)}</b> ${basis}`
+                :`연 환산 약 <b style="color:var(--ok)">${won(estRev*12)}</b> ${basis}`}
+       <br>※ <b>초안·품질보류 글은 수익 계산에서 제외</b>됩니다(공개 발행된 글만 반영).
+       ${publishedPosts===0?`<br><span style="color:var(--warn)">아직 공개 발행된 글이 0개예요. 워드프레스에서 초안을 발행하면 반영됩니다.</span>`:""}</div>`;
 
-  // 카테고리별
+  // 카테고리별(공개 발행만)
   const rows=Object.keys(cum).map(c=>{
     const posts=cum[c];const v=posts*vpp;const rev=v/1000*rpm;
     return `<tr><td style='padding:6px 4px'>${c}</td>
@@ -1283,7 +1317,8 @@ document.getElementById("stWpCount").onclick=async()=>{
     const base=CFG.site.replace(/\/+$/,"");const auth="Basic "+btoa(CFG.user+":"+CFG.pass);
     const r=await fetch(base+"/wp-json/wp/v2/posts?per_page=1&status=publish",{headers:{Authorization:auth}});
     const total=r.headers.get("X-WP-Total");
-    el.innerHTML=total?`WordPress 실제 발행(게시완료) 글: <b>${total}</b>개`:"헤더를 읽지 못했습니다(서버 CORS 설정 필요).";
+    if(total!=null){ CFG.wpPublished=parseInt(total,10); saveCfg(); computeStats(); }
+    el.innerHTML=total!=null?`WordPress 실제 발행(게시완료) 글: <b>${total}</b>개 · 수익 계산에 반영됨`:"헤더를 읽지 못했습니다(서버 CORS 설정 필요).";
   }catch(e){el.textContent="조회 실패(네트워크/CORS).";}
 };
 
