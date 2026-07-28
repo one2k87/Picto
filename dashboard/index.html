@@ -55,11 +55,16 @@
   .btn.ok{background:var(--ok);border-color:var(--ok);color:#06281a}
   .btn.sm{padding:7px 11px;font-size:12px}
 
-  .filters{display:flex;gap:8px;padding:12px 16px 4px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* iOS: 입력창 탭 시 자동 확대 방지(글꼴 16px 이상이면 확대 안 함) */
+  input,textarea,select{font-size:16px !important}
+  .filters{display:flex;gap:5px;padding:5px 12px 3px;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .filters::-webkit-scrollbar{display:none}
-  .chip{padding:7px 13px;border-radius:20px;border:1px solid var(--line);white-space:nowrap;
-    background:var(--card);cursor:pointer;font-size:13px;color:var(--muted);flex:0 0 auto}
+  .chip{padding:3px 9px;border-radius:14px;border:1px solid var(--line);white-space:nowrap;
+    background:var(--card);cursor:pointer;font-size:11px;color:var(--muted);flex:0 0 auto}
+  .chip b{font-weight:700}
   .chip.active{color:#fff;border-color:var(--accent);background:#241f3d}
+  /* 섹션 구분선 */
+  .sec-div{height:1px;background:var(--line);margin:8px 16px;opacity:.7}
 
   .bulkbar{display:flex;gap:8px;padding:6px 16px 2px;flex-wrap:wrap;align-items:center}
   .cardchk{width:22px;height:22px;flex:0 0 auto;accent-color:var(--accent);margin:0}
@@ -193,6 +198,8 @@
   <span class="chip" data-f="season">🗓️ 시즌 선점 <b id="c-season">0</b></span>
 </div>
 
+<div class="sec-div"></div>
+
 <div class="toolbar" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 16px 0">
   <input id="fSearch" placeholder="🔎 제목·키워드 검색" style="flex:1;min-width:140px;padding:8px 10px;
     border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--txt);font-size:13px">
@@ -213,6 +220,8 @@
     <option value="">📅 최근 실행</option>
   </select>
 </div>
+
+<div class="sec-div"></div>
 
 <div class="bulkbar">
   <button class="btn sm" onclick="selectAllVisible()">☑ 전체선택</button>
@@ -240,7 +249,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v14 · 온보딩·검색·트렌드·드립</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v15 · 모바일 UI 개선</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
