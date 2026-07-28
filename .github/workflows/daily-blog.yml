@@ -100,6 +100,9 @@ jobs:
           SC_SITE_URL: ${{ secrets.SC_SITE_URL }}
           GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
           ADSENSE_ACCOUNT: ${{ secrets.ADSENSE_ACCOUNT }}
+          ADSENSE_REFRESH_TOKEN: ${{ secrets.ADSENSE_REFRESH_TOKEN }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           REFRESH_DAYS: ${{ github.event.inputs.refresh_days != '' && github.event.inputs.refresh_days || secrets.REFRESH_DAYS }}
           REFRESH_MAX_PER_RUN: ${{ secrets.REFRESH_MAX_PER_RUN }}
           SAFETY_STRENGTH: ${{ github.event.inputs.strength != '' && github.event.inputs.strength || secrets.SAFETY_STRENGTH }}

@@ -146,6 +146,9 @@ cfg = {
         "sc_site_url": envs("SC_SITE_URL", envs("WP_SITE", "")),
         "ga4_property_id": envs("GA4_PROPERTY_ID", ""),
         "adsense_account": envs("ADSENSE_ACCOUNT", ""),
+        "adsense_refresh_token": envs("ADSENSE_REFRESH_TOKEN", ""),  # 애드센스는 OAuth
+        "oauth_client_id": envs("GOOGLE_OAUTH_CLIENT_ID", ""),
+        "oauth_client_secret": envs("GOOGLE_OAUTH_CLIENT_SECRET", ""),
     },
     "perf": {
         "workers": envi("WORKERS", 4),      # 유료 등급이면 4~6 권장(빠름)

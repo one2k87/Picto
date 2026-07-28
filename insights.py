@@ -98,7 +98,27 @@ def ga4(cfg, creds, days=28, top=10):
         return {}
 
 
+def _adsense_creds(cfg):
+    """애드센스는 서비스계정 사용자 추가가 안 되므로 OAuth 리프레시 토큰을 쓴다."""
+    rt = cfg.get("adsense_refresh_token") or os.getenv("ADSENSE_REFRESH_TOKEN")
+    cid = cfg.get("oauth_client_id") or os.getenv("GOOGLE_OAUTH_CLIENT_ID")
+    cs = cfg.get("oauth_client_secret") or os.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
+    if not (rt and cid and cs):
+        return None
+    try:
+        from google.oauth2.credentials import Credentials
+        return Credentials(
+            None, refresh_token=rt, client_id=cid, client_secret=cs,
+            token_uri="https://oauth2.googleapis.com/token",
+            scopes=["https://www.googleapis.com/auth/adsense.readonly"])
+    except Exception as e:
+        print(f"[insights] 애드센스 OAuth 자격 생성 실패: {e}")
+        return None
+
+
 def adsense(cfg, creds, days=28):
+    if creds is None:
+        return {}
     try:
         svc = _build("adsense", "v2", creds)
         acct = cfg.get("adsense_account")
@@ -134,17 +154,16 @@ def adsense(cfg, creds, days=28):
 def collect(cfg):
     """설정된 소스만 모아 dict 반환. 아무것도 없으면 {} (조용히)."""
     icfg = (cfg or {}).get("insights", {}) or {}
-    creds = _creds(icfg)
-    if not creds:
-        return {}
+    creds = _creds(icfg)                    # Search Console·GA4용 서비스계정
     out = {"updated_at": date.today().isoformat()}
-    sc = search_console(icfg, creds)
-    if sc:
-        out["search_console"] = sc
-    g = ga4(icfg, creds)
-    if g:
-        out["ga4"] = g
-    a = adsense(icfg, creds)
+    if creds:
+        sc = search_console(icfg, creds)
+        if sc:
+            out["search_console"] = sc
+        g = ga4(icfg, creds)
+        if g:
+            out["ga4"] = g
+    a = adsense(icfg, _adsense_creds(icfg))  # 애드센스는 OAuth 리프레시 토큰
     if a:
         out["adsense"] = a
     return out if len(out) > 1 else {}
