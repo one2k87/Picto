@@ -40,6 +40,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: 한글 폰트 설치 (코드 썸네일용)
+        run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+
       - name: 의존성 설치
         run: |
           python -m pip install --upgrade pip
@@ -75,6 +78,8 @@ jobs:
           IMAGE_PROVIDER: ${{ secrets.IMAGE_PROVIDER }}
           IMAGE_API_KEY: ${{ secrets.IMAGE_API_KEY }}
           IMAGE_ENABLED: ${{ github.event.inputs.images }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
           METRICS_PROVIDER: ${{ secrets.METRICS_PROVIDER }}
           NAVER_API_KEY: ${{ secrets.NAVER_API_KEY }}
           NAVER_SECRET_KEY: ${{ secrets.NAVER_SECRET_KEY }}
@@ -84,6 +89,7 @@ jobs:
           WP_USER: ${{ secrets.WP_USER }}
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           WP_STATUS: ${{ secrets.WP_STATUS }}
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
           SAFETY_STRENGTH: ${{ github.event.inputs.strength != '' && github.event.inputs.strength || secrets.SAFETY_STRENGTH }}
           FORCE_DRAFT: ${{ secrets.FORCE_DRAFT }}
           QUALITY_MIN_CHARS: ${{ secrets.QUALITY_MIN_CHARS }}
@@ -91,6 +97,7 @@ jobs:
           QUALITY_MAX_DENSITY: ${{ secrets.QUALITY_MAX_DENSITY }}
           QUALITY_MAX_SIMILARITY: ${{ secrets.QUALITY_MAX_SIMILARITY }}
           VERIFY_ACCURACY: ${{ secrets.VERIFY_ACCURACY }}
+          AUTO_REVISE: ${{ secrets.AUTO_REVISE }}
           RELINK_OLD: ${{ secrets.RELINK_OLD }}
           BLOCKLIST_EXTRA: ${{ secrets.BLOCKLIST_EXTRA }}
         run: python build_config.py
