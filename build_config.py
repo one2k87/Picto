@@ -96,12 +96,14 @@ cfg = {
                       else {"rankable": 0, "traffic": 100, "balanced": 30}.get(
                           envs("KEYWORD_STRATEGY", "balanced"), 30)),
     "images": {
-        # 폰/수동 실행에서 images=false 를 넘기면 이미지 생성 끔
+        # 폰/수동 실행에서 images=false 를 넘기면 이미지 생성 끔. 기본은 무료(free)
         "provider": ("none" if str(os.getenv("IMAGE_ENABLED", "")).strip().lower() == "false"
-                     else envs("IMAGE_PROVIDER", "gemini")),
-        "model": envs("IMAGE_MODEL", "imagen-4.0-fast-generate-001"),  # Fast=저가
+                     else envs("IMAGE_PROVIDER", "free")),
+        "pexels_key": envs("PEXELS_API_KEY", ""),         # 무료 스톡(택1)
+        "unsplash_key": envs("UNSPLASH_ACCESS_KEY", ""),  # 무료 스톡(택1)
+        "model": envs("IMAGE_MODEL", "imagen-4.0-fast-generate-001"),  # 유료 provider일 때만
         "size": envs("IMAGE_SIZE", "1024x1024"),
-        "max_per_run": envi("IMAGE_MAX_PER_RUN", 20),                   # 비용 상한
+        "max_per_run": envi("IMAGE_MAX_PER_RUN", 20),                   # 비용 상한(유료)
         "api_key": envs("IMAGE_API_KEY", ""),
     },
     "llm": {
