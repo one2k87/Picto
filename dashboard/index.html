@@ -188,6 +188,13 @@
   📲 <b>홈 화면에 설치</b>하면 앱처럼 쓸 수 있어요. 사파리 하단 <b>공유</b> 버튼 → <b>홈 화면에 추가</b>.
 </div>
 
+<!-- 매일 자동 생성 온/오프 (메인 상단, 항상 보임) -->
+<div id="autoGenBar" style="margin:8px 16px 0;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card)">
+  <span style="font-size:13px;color:var(--txt)">⏱️ 매일 자동 생성</span>
+  <button class="btn sm" id="autoGenToggle" onclick="togglePause()">불러오는 중…</button>
+</div>
+
 <!-- 온보딩 위저드 (첫 실행) -->
 <div id="obBg" style="display:none;position:fixed;inset:0;background:rgba(6,4,14,.75);z-index:60"></div>
 <div id="obCard" style="display:none;position:fixed;z-index:61;left:50%;top:50%;transform:translate(-50%,-50%);
@@ -258,7 +265,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v18 · 패널 탭 + 누적 리셋</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v19 · 자동생성 토글 메인 노출</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1158,13 +1165,16 @@ function ghHeaders(){return {"Authorization":"Bearer "+CFG.ghToken,
 function ghGet(path){return fetch("https://api.github.com/repos/"+CFG.ghOwner+"/"+CFG.ghRepo+path,
   {headers:ghHeaders(),cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null);}
 
-// ⏸️ 매일 자동 생성 스위치
+// ⏸️ 매일 자동 생성 스위치 (설정 버튼 + 메인 토글 공용)
 function refreshPauseBtn(){
-  const b=document.getElementById("pauseBtn"); if(!b) return;
   const on = !CFG.paused;   // 켜짐=자동 생성 함
-  b.textContent = on ? "🟢 자동 생성 켜짐 (누르면 멈춤)" : "⏸️ 자동 생성 멈춤 (누르면 켬)";
-  b.style.background = on ? "" : "rgba(255,107,74,.15)";
-  b.style.color = on ? "" : "#ffb59e";
+  const b=document.getElementById("pauseBtn");
+  if(b){ b.textContent = on ? "🟢 자동 생성 켜짐 (누르면 멈춤)" : "⏸️ 자동 생성 멈춤 (누르면 켬)";
+    b.style.background = on ? "" : "rgba(255,107,74,.15)"; b.style.color = on ? "" : "#ffb59e"; }
+  const t=document.getElementById("autoGenToggle");
+  if(t){ t.textContent = on ? "🟢 켜짐" : "⏸️ 멈춤";
+    t.style.background = on ? "rgba(51,194,127,.15)" : "rgba(255,107,74,.15)";
+    t.style.color = on ? "#7ee0b0" : "#ffb59e"; }
 }
 async function setPausedVar(val){
   // 스케줄(매일 실행)까지 반영하려면 GitHub 저장소 변수(PAUSED)를 갱신
@@ -1172,21 +1182,21 @@ async function setPausedVar(val){
   const base="https://api.github.com/repos/"+CFG.ghOwner+"/"+CFG.ghRepo+"/actions/variables";
   const body=JSON.stringify({name:"PAUSED", value: val?"true":"false"});
   try{
-    // 있으면 PATCH, 없으면 POST
     let r=await fetch(base+"/PAUSED",{method:"PATCH",headers:ghHeaders(),body:JSON.stringify({value:val?"true":"false"})});
     if(r.status===404) r=await fetch(base,{method:"POST",headers:ghHeaders(),body});
     return {ok:(r.status===204||r.status===201), status:r.status};
   }catch(e){ return {ok:false, reason:"net"}; }
 }
-document.getElementById("pauseBtn").onclick=async()=>{
+async function togglePause(){
   CFG.paused=!CFG.paused; saveCfg(); refreshPauseBtn();
-  const b=document.getElementById("pauseBtn"); const prev=b.textContent; b.textContent="변경 중…";
+  const t=document.getElementById("autoGenToggle"); if(t) t.textContent="변경 중…";
   const res=await setPausedVar(CFG.paused);
   refreshPauseBtn();
-  if(res.ok) toast(CFG.paused?"자동 생성 멈춤 ✓ (스케줄까지 반영)":"자동 생성 켜짐 ✓ (스케줄까지 반영)");
+  if(res.ok) toast(CFG.paused?"매일 자동 생성 멈춤 ✓ (스케줄까지 반영)":"매일 자동 생성 켜짐 ✓ (스케줄까지 반영)");
   else if(res.reason==="no-gh") toast((CFG.paused?"자동 생성 멈춤":"자동 생성 켜짐")+" — 이 기기에만 반영(스케줄 반영하려면 GitHub 정보 입력)",1);
   else toast("스케줄 반영 실패("+(res.status||res.reason)+") — 토큰에 'Variables 쓰기' 권한 필요",1);
-};
+}
+document.getElementById("pauseBtn").onclick=togglePause;
 function setRing(pct){
   pct=Math.max(0,Math.min(100,pct));
   document.getElementById("ringFg").style.strokeDashoffset=(RING_LEN*(1-pct/100)).toFixed(1);
@@ -1666,6 +1676,7 @@ gate();
 if(needLock()) faceUnlock();   // 잠금 상태면 진입하자마자 Face ID 시도
 
 applyPlanUI();
+refreshPauseBtn();               // 메인 상단 '매일 자동 생성' 토글 상태 표시
 loadData();
 setTimeout(maybeOnboard, 800);   // 첫 실행이면 온보딩 위저드
 </script>
