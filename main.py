@@ -536,6 +536,16 @@ def _refresh_old_posts(cfg, hist, wp_cfg):
 def run():
     start_t = time.time()
     cfg = load_config()
+
+    # 일시정지: 매일 자동 생성을 꺼둔 상태면 아무것도 하지 않고 종료(초안 안 쌓임, API 호출 0)
+    if cfg.get("paused"):
+        print("⏸️ 자동 생성 일시정지 상태 — 오늘 생성을 건너뜁니다.")
+        try:
+            notify.send(cfg, "⏸️ Scripto 일시정지 상태 — 오늘 자동 생성을 건너뛰었습니다.")
+        except Exception:
+            pass
+        return
+
     wp_cfg = cfg.get("wordpress", {})
     auto_publish = wp_cfg.get("enabled", False)
     cats = get_categories(cfg)

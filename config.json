@@ -1,4 +1,6 @@
 {
+  "paused": false,
+  "_paused_설명": "true면 매일 자동 생성을 멈춤(초안이 안 쌓임). 애드센스 심사 중 등에 사용. 앱의 '매일 자동 생성' 스위치로 켜고 끔",
   "blog_url": "https://your-blog.com",
   "categories": [
     { "name": "금융/재테크", "wp_category": "금융", "wp_slug": "finance", "desc": "신용카드, 대출, 정부지원금, 연금, 세금, 청약, 재테크, 주식/ETF 등 고단가 금융 주제" },

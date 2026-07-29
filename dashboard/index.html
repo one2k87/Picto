@@ -249,7 +249,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v16 · 수익 계산 정정(발행분만)·실측</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v17 · 자동 생성 일시정지 스위치</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -374,6 +374,12 @@
       <input type="checkbox" id="cfgGenImages" style="width:auto"> 이 실행에서 이미지도 함께 생성
     </label>
     <div class="hint">체크 해제하면 ▶ 실행 시 이미지 없이 글만 생성합니다(비용/시간 절약).</div>
+  </div>
+  <div class="field">
+    <label>⏸️ 매일 자동 생성</label>
+    <button class="btn sm" id="pauseBtn" style="width:100%">불러오는 중…</button>
+    <div class="hint">끄면 <b>매일 자동 생성이 멈춥니다</b>(초안이 안 쌓임). 애드센스 심사 중에 유용해요.
+      끈 상태에서도 ▶ 버튼으로 수동 생성은 됩니다. <b>스케줄까지 반영</b>하려면 GitHub 정보(위)가 입력돼 있어야 합니다.</div>
   </div>
 
   <div class="divider"></div>
@@ -1015,6 +1021,7 @@ function openSheet(){
   document.getElementById("cfgGhRepo").value=CFG.ghRepo||"";
   document.getElementById("cfgGhToken").value=CFG.ghToken||"";
   document.getElementById("cfgGenImages").checked=(CFG.genImages!==false);
+  refreshPauseBtn();
   document.getElementById("cfgSite").value=CFG.site||"";
   document.getElementById("cfgUser").value=CFG.user||"";
   document.getElementById("cfgPass").value=CFG.pass||"";
@@ -1099,12 +1106,43 @@ function runInputs(withImg){
   if(CFG.trafficRatio!=null) inp.ratio=String(CFG.trafficRatio);   // 검색량 우선 비율
   if(CFG.safety&&CFG.safety.strength) inp.strength=CFG.safety.strength; // 안전/품질 강도
   if(CFG.safety&&CFG.safety.refresh_days!=null) inp.refresh_days=String(CFG.safety.refresh_days); // 리프레시 주기
+  inp.paused = CFG.paused ? "true" : "false";   // 일시정지 상태(수동 실행에도 반영)
   return inp;
 }
 function ghHeaders(){return {"Authorization":"Bearer "+CFG.ghToken,
   "Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"};}
 function ghGet(path){return fetch("https://api.github.com/repos/"+CFG.ghOwner+"/"+CFG.ghRepo+path,
   {headers:ghHeaders(),cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null);}
+
+// ⏸️ 매일 자동 생성 스위치
+function refreshPauseBtn(){
+  const b=document.getElementById("pauseBtn"); if(!b) return;
+  const on = !CFG.paused;   // 켜짐=자동 생성 함
+  b.textContent = on ? "🟢 자동 생성 켜짐 (누르면 멈춤)" : "⏸️ 자동 생성 멈춤 (누르면 켬)";
+  b.style.background = on ? "" : "rgba(255,107,74,.15)";
+  b.style.color = on ? "" : "#ffb59e";
+}
+async function setPausedVar(val){
+  // 스케줄(매일 실행)까지 반영하려면 GitHub 저장소 변수(PAUSED)를 갱신
+  if(!CFG.ghOwner||!CFG.ghRepo||!CFG.ghToken) return {ok:false, reason:"no-gh"};
+  const base="https://api.github.com/repos/"+CFG.ghOwner+"/"+CFG.ghRepo+"/actions/variables";
+  const body=JSON.stringify({name:"PAUSED", value: val?"true":"false"});
+  try{
+    // 있으면 PATCH, 없으면 POST
+    let r=await fetch(base+"/PAUSED",{method:"PATCH",headers:ghHeaders(),body:JSON.stringify({value:val?"true":"false"})});
+    if(r.status===404) r=await fetch(base,{method:"POST",headers:ghHeaders(),body});
+    return {ok:(r.status===204||r.status===201), status:r.status};
+  }catch(e){ return {ok:false, reason:"net"}; }
+}
+document.getElementById("pauseBtn").onclick=async()=>{
+  CFG.paused=!CFG.paused; saveCfg(); refreshPauseBtn();
+  const b=document.getElementById("pauseBtn"); const prev=b.textContent; b.textContent="변경 중…";
+  const res=await setPausedVar(CFG.paused);
+  refreshPauseBtn();
+  if(res.ok) toast(CFG.paused?"자동 생성 멈춤 ✓ (스케줄까지 반영)":"자동 생성 켜짐 ✓ (스케줄까지 반영)");
+  else if(res.reason==="no-gh") toast((CFG.paused?"자동 생성 멈춤":"자동 생성 켜짐")+" — 이 기기에만 반영(스케줄 반영하려면 GitHub 정보 입력)",1);
+  else toast("스케줄 반영 실패("+(res.status||res.reason)+") — 토큰에 'Variables 쓰기' 권한 필요",1);
+};
 function setRing(pct){
   pct=Math.max(0,Math.min(100,pct));
   document.getElementById("ringFg").style.strokeDashoffset=(RING_LEN*(1-pct/100)).toFixed(1);

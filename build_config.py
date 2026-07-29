@@ -81,6 +81,7 @@ except Exception:
     categories = DEFAULT_CATS
 
 cfg = {
+    "paused": b("PAUSED", False),          # 매일 자동 생성 일시정지
     "blog_url": envs("BLOG_URL", envs("WP_SITE", "")),
     "categories": categories,
     "counts": {

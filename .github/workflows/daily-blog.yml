@@ -30,6 +30,10 @@ on:
         description: "오래된 글 자동 최신화 주기(일). 0=끔 (앱 설정에서 전달)"
         default: ""
         required: false
+      paused:
+        description: "일시정지: true면 생성 건너뜀 (앱 스위치에서 전달)"
+        default: ""
+        required: false
 
 permissions:
   contents: write   # 결과 latest.json 을 저장소에 커밋하기 위함
@@ -105,6 +109,7 @@ jobs:
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           REFRESH_DAYS: ${{ github.event.inputs.refresh_days != '' && github.event.inputs.refresh_days || secrets.REFRESH_DAYS }}
           REFRESH_MAX_PER_RUN: ${{ secrets.REFRESH_MAX_PER_RUN }}
+          PAUSED: ${{ github.event.inputs.paused != '' && github.event.inputs.paused || vars.PAUSED }}
           SAFETY_STRENGTH: ${{ github.event.inputs.strength != '' && github.event.inputs.strength || secrets.SAFETY_STRENGTH }}
           FORCE_DRAFT: ${{ secrets.FORCE_DRAFT }}
           QUALITY_MIN_CHARS: ${{ secrets.QUALITY_MIN_CHARS }}
