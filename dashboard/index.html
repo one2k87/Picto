@@ -171,6 +171,9 @@
     <div class="sub" id="genat">로드 중…</div>
   </div>
   <div class="spacer"></div>
+  <button id="autoGenDot" onclick="togglePause()" title="매일 자동 생성 (초록=켜짐 · 빨강=멈춤 · 누르면 전환)"
+    style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.25);
+    cursor:pointer;flex:0 0 auto;margin-right:6px;padding:0;background:#7a8291"></button>
   <button class="icon-btn" id="statsBtn" title="조회·수익">📊</button>
   <div class="run-wrap" id="runWrap" title="지금 생성 실행">
     <svg class="run-ring" viewBox="0 0 44 44" aria-hidden="true">
@@ -186,13 +189,6 @@
 
 <div class="install-bar" id="installBar">
   📲 <b>홈 화면에 설치</b>하면 앱처럼 쓸 수 있어요. 사파리 하단 <b>공유</b> 버튼 → <b>홈 화면에 추가</b>.
-</div>
-
-<!-- 매일 자동 생성 온/오프 (메인 상단, 항상 보임) -->
-<div id="autoGenBar" style="margin:8px 16px 0;display:flex;align-items:center;justify-content:space-between;
-  gap:10px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card)">
-  <span style="font-size:13px;color:var(--txt)">⏱️ 매일 자동 생성</span>
-  <button class="btn sm" id="autoGenToggle" onclick="togglePause()">불러오는 중…</button>
 </div>
 
 <!-- 온보딩 위저드 (첫 실행) -->
@@ -265,7 +261,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v19 · 자동생성 토글 메인 노출</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v20 · 자동생성 동그라미 버튼</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1171,10 +1167,9 @@ function refreshPauseBtn(){
   const b=document.getElementById("pauseBtn");
   if(b){ b.textContent = on ? "🟢 자동 생성 켜짐 (누르면 멈춤)" : "⏸️ 자동 생성 멈춤 (누르면 켬)";
     b.style.background = on ? "" : "rgba(255,107,74,.15)"; b.style.color = on ? "" : "#ffb59e"; }
-  const t=document.getElementById("autoGenToggle");
-  if(t){ t.textContent = on ? "🟢 켜짐" : "⏸️ 멈춤";
-    t.style.background = on ? "rgba(51,194,127,.15)" : "rgba(255,107,74,.15)";
-    t.style.color = on ? "#7ee0b0" : "#ffb59e"; }
+  const d=document.getElementById("autoGenDot");
+  if(d){ d.style.background = on ? "#33c27f" : "#e5484d";
+    d.title = on ? "매일 자동 생성: 켜짐 (누르면 멈춤)" : "매일 자동 생성: 멈춤 (누르면 켬)"; }
 }
 async function setPausedVar(val){
   // 스케줄(매일 실행)까지 반영하려면 GitHub 저장소 변수(PAUSED)를 갱신
@@ -1189,8 +1184,9 @@ async function setPausedVar(val){
 }
 async function togglePause(){
   CFG.paused=!CFG.paused; saveCfg(); refreshPauseBtn();
-  const t=document.getElementById("autoGenToggle"); if(t) t.textContent="변경 중…";
+  const d=document.getElementById("autoGenDot"); if(d) d.style.opacity="0.5";
   const res=await setPausedVar(CFG.paused);
+  if(d) d.style.opacity="1";
   refreshPauseBtn();
   if(res.ok) toast(CFG.paused?"매일 자동 생성 멈춤 ✓ (스케줄까지 반영)":"매일 자동 생성 켜짐 ✓ (스케줄까지 반영)");
   else if(res.reason==="no-gh") toast((CFG.paused?"자동 생성 멈춤":"자동 생성 켜짐")+" — 이 기기에만 반영(스케줄 반영하려면 GitHub 정보 입력)",1);
