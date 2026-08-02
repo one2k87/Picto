@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-01",
+  "updated_at": "2026-08-02",
   "search_console": {
     "queries": [
       {
@@ -18,6 +18,11 @@
         "page": "https://wontheland.com/%EB%82%B4%EB%B6%80-%EC%B0%BD%EA%B3%A0-%EC%A4%91%EB%9F%89%EB%AC%BC-%EC%A0%81%EC%9E%AC%EC%9A%A9-%ED%8C%8C%EB%A0%88%ED%8A%B8-%EB%9E%99-%ED%8F%AC%EC%8A%A4%ED%8A%B8-%EA%B3%A0%EC%A0%95%EC%9A%A9-%EB%B0%94/",
         "clicks": 0,
         "impressions": 6
+      },
+      {
+        "page": "https://wontheland.com/%EB%8B%A4%EB%9D%BD%EB%B0%A9-%EC%B2%9C%EC%9E%A5-%EB%A7%A4%EC%9E%85%ED%98%95-%EC%9B%90%ED%98%95-%EC%A0%90%EA%B2%80%EA%B5%AC-%ED%83%80%EA%B3%B5-%EC%8B%9C-%EB%82%B4%EB%B6%80-%EA%B2%BD%EB%9F%89%EC%B2%A0/",
+        "clicks": 0,
+        "impressions": 1
       },
       {
         "page": "https://wontheland.com/%EB%93%9C%EB%A0%88%EC%8A%A4%EB%A3%B8-%EB%B6%99%EB%B0%95%EC%9D%B4%EC%9E%A5-%EB%8F%84%EC%96%B4-%EC%88%98%ED%8F%89-%EC%A1%B0%EC%A0%95%EC%9A%A9-%EC%88%A8%EC%9D%80-%EA%B2%BD%EC%B2%A9-%EC%A0%84%ED%9B%84/",
@@ -53,11 +58,6 @@
         "page": "https://wontheland.com/%EC%98%A5%EC%83%81-%EC%9A%B0%EC%88%98%EA%B4%80-%ED%99%88%ED%86%B5-%EB%8D%AE%EA%B0%9C-%EA%B5%90%EC%B2%B4-%EC%8B%9C-pvc-%EC%A0%91%EC%B0%A9%EC%A0%9C-%EB%8F%84%ED%8F%AC-%ED%9B%84-%EB%B0%80%EC%B0%A9/",
         "clicks": 0,
         "impressions": 1
-      },
-      {
-        "page": "https://wontheland.com/%EC%98%A5%EC%83%81-%ED%8C%8C%EB%9D%BC%ED%8E%AB-%EC%83%81%EB%B6%80-%EC%95%8C%EB%A3%A8%EB%AF%B8%EB%8A%84-%EB%91%90%EA%B2%81-%EC%8B%9C%EA%B3%B5-%EC%8B%9C-%EC%9D%B4%EC%9D%8C%EC%83%88-%EC%97%B4%ED%8C%BD/",
-        "clicks": 0,
-        "impressions": 6
       }
     ]
   },
@@ -84,7 +84,17 @@
         "users": 1
       },
       {
+        "title": "보일러실 온수 배관 가스켓 마모 시 링 플러그 스패너 조임 장력 조정 및 초기 누수 여부 스캐닝 규칙 - 원더랜드 블로그",
+        "views": 1,
+        "users": 1
+      },
+      {
         "title": "시니어 전문 자격증 실버 보드게임 지도사 노인 일자리 연계 현황 현실적으로 알아보기 - 원더랜드 블로그",
+        "views": 1,
+        "users": 1
+      },
+      {
+        "title": "옥상 방수 우레탄 중도 3mm 균일 두께 도포용 스크래퍼 가동 및 경화 전 표면 기포 제거 타임라인 공식 - 원더랜드 블로그",
         "views": 1,
         "users": 1
       },
