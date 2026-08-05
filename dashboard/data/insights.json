@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-04",
+  "updated_at": "2026-08-05",
   "search_console": {
     "queries": [
       {
@@ -37,7 +37,7 @@
       {
         "page": "https://wontheland.com/%EB%B3%B4%EC%9D%BC%EB%9F%AC%EC%8B%A4-%EB%82%9C%EB%B0%A9-%EB%B0%B0%EA%B4%80-%EB%88%84%EC%88%98-%EB%B6%80%EC%9C%84-%EC%BB%B7%ED%84%B0-%EC%A0%88%EB%8B%A8-%ED%9B%84-%EC%97%91%EC%85%80-xl-%EC%BB%A4/",
         "clicks": 0,
-        "impressions": 2
+        "impressions": 3
       },
       {
         "page": "https://wontheland.com/%EB%B3%B4%EC%9D%BC%EB%9F%AC%EC%8B%A4-%EC%98%A8%EC%88%98-%EB%B0%B0%EA%B4%80-%EA%B0%80%EC%8A%A4%EC%BC%93-%EB%A7%88%EB%AA%A8-%EC%8B%9C-%EB%A7%81-%ED%94%8C%EB%9F%AC%EA%B7%B8-%EC%8A%A4%ED%8C%A8%EB%84%88/",
@@ -65,18 +65,23 @@
     "top_pages": [
       {
         "title": "외부 테라스 데크 하부 아연각관 장선 용접 부위 부식 방지용 광명단 방청 스프레이 분사 및 건조 공식 제대로 해야 녹 발생을 막는다 - 원더랜드 블로그",
-        "views": 6,
+        "views": 7,
         "users": 2
       },
       {
         "title": "원더랜드 블로그 -",
         "views": 6,
-        "users": 5
+        "users": 6
       },
       {
         "title": "내부 창고 중량물 적재용 파레트 랙 포스트 고정용 바닥 앵커 볼트 타공 및 수평 조절 플레이트 매칭 기술 - 원더랜드 블로그",
         "views": 2,
         "users": 1
+      },
+      {
+        "title": "주택연금 신탁방식 도입 배우자 자동승계 및 등록면허세 절세 효과 핵심 정리 - 원더랜드 블로그",
+        "views": 2,
+        "users": 2
       },
       {
         "title": "[서울 성북구] 길음동 종암동 원룸촌 가구 대상 디지털 도어락 안심 이중 잠금장치 무상 보급 꼭 알아야 하는 이유 - 원더랜드 블로그",
@@ -105,11 +110,6 @@
       },
       {
         "title": "외부 테라스 조명용 실외 방우형 벽등 IP65 등급 접지선 배선 결선 및 단자함 실리콘 메우기 가이드라인 - 원더랜드 블로그",
-        "views": 1,
-        "users": 1
-      },
-      {
-        "title": "주택연금 신탁방식 도입 배우자 자동승계 및 등록면허세 절세 효과 핵심 정리 - 원더랜드 블로그",
         "views": 1,
         "users": 1
       }
