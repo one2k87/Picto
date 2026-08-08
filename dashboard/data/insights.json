@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-07",
+  "updated_at": "2026-08-08",
   "search_console": {
     "queries": [
       {
@@ -17,7 +17,7 @@
       {
         "page": "https://wontheland.com/%EB%82%B4%EB%B6%80-%EC%B0%BD%EA%B3%A0-%EC%A4%91%EB%9F%89%EB%AC%BC-%EC%A0%81%EC%9E%AC%EC%9A%A9-%ED%8C%8C%EB%A0%88%ED%8A%B8-%EB%9E%99-%ED%8F%AC%EC%8A%A4%ED%8A%B8-%EA%B3%A0%EC%A0%95%EC%9A%A9-%EB%B0%94/",
         "clicks": 0,
-        "impressions": 6
+        "impressions": 8
       },
       {
         "page": "https://wontheland.com/%EB%8B%A4%EB%9D%BD%EB%B0%A9-%EC%B2%9C%EC%9E%A5-%EB%A7%A4%EC%9E%85%ED%98%95-%EC%9B%90%ED%98%95-%EC%A0%90%EA%B2%80%EA%B5%AC-%ED%83%80%EA%B3%B5-%EC%8B%9C-%EB%82%B4%EB%B6%80-%EA%B2%BD%EB%9F%89%EC%B2%A0/",
@@ -27,7 +27,7 @@
       {
         "page": "https://wontheland.com/%EB%93%9C%EB%A0%88%EC%8A%A4%EB%A3%B8-%EB%B6%99%EB%B0%95%EC%9D%B4%EC%9E%A5-%EB%8F%84%EC%96%B4-%EC%88%98%ED%8F%89-%EC%A1%B0%EC%A0%95%EC%9A%A9-%EC%88%A8%EC%9D%80-%EA%B2%BD%EC%B2%A9-%EC%A0%84%ED%9B%84/",
         "clicks": 0,
-        "impressions": 3
+        "impressions": 4
       },
       {
         "page": "https://wontheland.com/%EB%AC%B8%EC%9D%98%ED%95%98%EA%B8%B0/",
@@ -37,7 +37,7 @@
       {
         "page": "https://wontheland.com/%EB%B3%B4%EC%9D%BC%EB%9F%AC%EC%8B%A4-%EB%82%9C%EB%B0%A9-%EB%B0%B0%EA%B4%80-%EB%88%84%EC%88%98-%EB%B6%80%EC%9C%84-%EC%BB%B7%ED%84%B0-%EC%A0%88%EB%8B%A8-%ED%9B%84-%EC%97%91%EC%85%80-xl-%EC%BB%A4/",
         "clicks": 0,
-        "impressions": 6
+        "impressions": 7
       },
       {
         "page": "https://wontheland.com/%EB%B3%B4%EC%9D%BC%EB%9F%AC%EC%8B%A4-%EC%98%A8%EC%88%98-%EB%B0%B0%EA%B4%80-%EA%B0%80%EC%8A%A4%EC%BC%93-%EB%A7%88%EB%AA%A8-%EC%8B%9C-%EB%A7%81-%ED%94%8C%EB%9F%AC%EA%B7%B8-%EC%8A%A4%ED%8C%A8%EB%84%88/",
@@ -52,7 +52,7 @@
       {
         "page": "https://wontheland.com/%EC%98%A5%EC%83%81-%EB%B0%A9%EC%88%98-%EC%9A%B0%EB%A0%88%ED%83%84-%EC%A4%91%EB%8F%84-3mm-%EA%B7%A0%EC%9D%BC-%EB%91%90%EA%BB%98-%EB%8F%84%ED%8F%AC%EC%9A%A9-%EC%8A%A4%ED%81%AC%EB%9E%98%ED%8D%BC/",
         "clicks": 0,
-        "impressions": 6
+        "impressions": 7
       },
       {
         "page": "https://wontheland.com/%EC%98%A5%EC%83%81-%EC%9A%B0%EC%88%98%EA%B4%80-%ED%99%88%ED%86%B5-%EB%8D%AE%EA%B0%9C-%EA%B5%90%EC%B2%B4-%EC%8B%9C-pvc-%EC%A0%91%EC%B0%A9%EC%A0%9C-%EB%8F%84%ED%8F%AC-%ED%9B%84-%EB%B0%80%EC%B0%A9/",
@@ -64,14 +64,14 @@
   "ga4": {
     "top_pages": [
       {
+        "title": "원더랜드 블로그 -",
+        "views": 10,
+        "users": 7
+      },
+      {
         "title": "외부 테라스 데크 하부 아연각관 장선 용접 부위 부식 방지용 광명단 방청 스프레이 분사 및 건조 공식 제대로 해야 녹 발생을 막는다 - 원더랜드 블로그",
         "views": 9,
         "users": 4
-      },
-      {
-        "title": "원더랜드 블로그 -",
-        "views": 9,
-        "users": 7
       },
       {
         "title": "내부 창고 중량물 적재용 파레트 랙 포스트 고정용 바닥 앵커 볼트 타공 및 수평 조절 플레이트 매칭 기술 - 원더랜드 블로그",
