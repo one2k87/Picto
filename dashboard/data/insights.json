@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-12",
+  "updated_at": "2026-08-13",
   "search_console": {
     "queries": [
       {
@@ -9,6 +9,11 @@
       }
     ],
     "pages": [
+      {
+        "page": "https://wontheland.com/%EC%98%A5%EC%83%81-%ED%8C%8C%EB%9D%BC%ED%8E%AB-%EC%83%81%EB%B6%80-%EC%95%8C%EB%A3%A8%EB%AF%B8%EB%8A%84-%EB%91%90%EA%B2%81-%EC%8B%9C%EA%B3%B5-%EC%8B%9C-%EC%9D%B4%EC%9D%8C%EC%83%88-%EC%97%B4%ED%8C%BD/",
+        "clicks": 1,
+        "impressions": 24
+      },
       {
         "page": "https://wontheland.com/",
         "clicks": 0,
@@ -35,6 +40,11 @@
         "impressions": 5
       },
       {
+        "page": "https://wontheland.com/%EB%93%9C%EB%A0%88%EC%8A%A4%EB%A3%B8-%EC%9D%98%EB%A5%98-%EC%88%98%EB%82%A9%EC%9A%A9-%EB%A9%94%EC%89%AC-%EC%85%94%EC%B8%A0%EB%A0%89-%EB%A0%88%EC%9D%BC-%ED%94%84%EB%A0%88%EC%9E%84-%EC%A2%8C%EC%9A%B0/",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
         "page": "https://wontheland.com/%EB%AC%B8%EC%9D%98%ED%95%98%EA%B8%B0/",
         "clicks": 0,
         "impressions": 3
@@ -48,16 +58,6 @@
         "page": "https://wontheland.com/%EB%B3%B4%EC%9D%BC%EB%9F%AC%EC%8B%A4-%EC%98%A8%EC%88%98-%EB%B0%B0%EA%B4%80-%EA%B0%80%EC%8A%A4%EC%BC%93-%EB%A7%88%EB%AA%A8-%EC%8B%9C-%EB%A7%81-%ED%94%8C%EB%9F%AC%EA%B7%B8-%EC%8A%A4%ED%8C%A8%EB%84%88/",
         "clicks": 0,
         "impressions": 1
-      },
-      {
-        "page": "https://wontheland.com/%EC%8B%9C%EB%8B%88%EC%96%B4-%EC%A0%84%EB%AC%B8-%EC%9E%90%EA%B2%A9%EC%A6%9D-%EC%8B%A4%EB%B2%84-%EB%B3%B4%EB%93%9C%EA%B2%8C%EC%9E%84-%EC%A7%80%EB%8F%84%EC%82%AC-%EB%85%B8%EC%9D%B8-%EC%9D%BC%EC%9E%90/",
-        "clicks": 0,
-        "impressions": 1
-      },
-      {
-        "page": "https://wontheland.com/%EC%98%A5%EC%83%81-%EB%B0%A9%EC%88%98-%EC%9A%B0%EB%A0%88%ED%83%84-%EC%A4%91%EB%8F%84-3mm-%EA%B7%A0%EC%9D%BC-%EB%91%90%EA%BB%98-%EB%8F%84%ED%8F%AC%EC%9A%A9-%EC%8A%A4%ED%81%AC%EB%9E%98%ED%8D%BC/",
-        "clicks": 0,
-        "impressions": 8
       }
     ]
   },
@@ -77,6 +77,11 @@
         "title": "내부 창고 중량물 적재용 파레트 랙 포스트 고정용 바닥 앵커 볼트 타공 및 수평 조절 플레이트 매칭 기술 - 원더랜드 블로그",
         "views": 2,
         "users": 1
+      },
+      {
+        "title": "외부 테라스 조명용 실외 방우형 벽등 IP65 등급 접지선 배선 결선 및 단자함 실리콘 메우기 가이드라인 - 원더랜드 블로그",
+        "views": 2,
+        "users": 2
       },
       {
         "title": "주택연금 신탁방식 도입 배우자 자동승계 및 등록면허세 절세 효과 핵심 정리 - 원더랜드 블로그",
@@ -105,11 +110,6 @@
       },
       {
         "title": "옥상 방수 우레탄 중도 3mm 균일 두께 도포용 스크래퍼 가동 및 경화 전 표면 기포 제거 타임라인 공식 - 원더랜드 블로그",
-        "views": 1,
-        "users": 1
-      },
-      {
-        "title": "옥상 파라펫 상부 알루미늄 두겁 시공 시 이음새 열팽창 유격 10mm 확보 및 고내후성 실리콘 실링 기술 - 원더랜드 블로그",
         "views": 1,
         "users": 1
       }
