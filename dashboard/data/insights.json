@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-14",
+  "updated_at": "2026-08-15",
   "search_console": {
     "queries": [
       {
@@ -52,7 +52,7 @@
       {
         "page": "https://wontheland.com/%EB%AC%B8%EC%9D%98%ED%95%98%EA%B8%B0/",
         "clicks": 0,
-        "impressions": 2
+        "impressions": 3
       },
       {
         "page": "https://wontheland.com/%EB%B3%B4%EC%9D%BC%EB%9F%AC%EC%8B%A4-%EB%82%9C%EB%B0%A9-%EB%B0%B0%EA%B4%80-%EB%88%84%EC%88%98-%EB%B6%80%EC%9C%84-%EC%BB%B7%ED%84%B0-%EC%A0%88%EB%8B%A8-%ED%9B%84-%EC%97%91%EC%85%80-xl-%EC%BB%A4/",
@@ -99,17 +99,17 @@
         "users": 1
       },
       {
+        "title": "보일러실 내 벽면 단열재 석고보드 2P 복합 시공 시 이음새 교차 배치 규칙 준수 및 크랙 차단 기술 조항 - 원더랜드 블로그",
+        "views": 1,
+        "users": 1
+      },
+      {
         "title": "보일러실 온수 배관 가스켓 마모 시 링 플러그 스패너 조임 장력 조정 및 초기 누수 여부 스캐닝 규칙 - 원더랜드 블로그",
         "views": 1,
         "users": 1
       },
       {
         "title": "시니어 전문 자격증 실버 보드게임 지도사 노인 일자리 연계 현황 현실적으로 알아보기 - 원더랜드 블로그",
-        "views": 1,
-        "users": 1
-      },
-      {
-        "title": "옥상 방수 우레탄 중도 3mm 균일 두께 도포용 스크래퍼 가동 및 경화 전 표면 기포 제거 타임라인 공식 - 원더랜드 블로그",
         "views": 1,
         "users": 1
       }
