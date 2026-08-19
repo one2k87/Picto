@@ -1,4 +1,11 @@
 {
+  "adsense_approved": false,
+  "_adsense_approved_설명": "애드센스 승인 여부. false=승인 전(심사 준비 중심), true=승인 후(광고 배치 강화 등 수익 최적화 활성). 앱 🛡️ 탭에서 체크",
+  "revenue": {
+    "ads_boost": true,
+    "related_cards": true
+  },
+  "_revenue_설명": "승인 후에만 적용되는 수익 최적화. ads_boost=광고 3개 배치, related_cards=관련 글 카드 강화",
   "paused": false,
   "_paused_설명": "true면 매일 자동 생성을 멈춤(초안이 안 쌓임). 애드센스 심사 중 등에 사용. 앱의 '매일 자동 생성' 스위치로 켜고 끔",
   "blog_url": "https://your-blog.com",
@@ -17,6 +24,21 @@
 
   "ads": { "insert_slots": true },
 
+  "coupang": {
+    "enabled": false,
+    "disclosure": true,
+    "widget_html": ""
+  },
+  "_coupang_설명": "쿠팡 파트너스(API 불필요). enabled=true면 본문 중간에 필수 고지문 + (선택)위젯 삽입. widget_html에 쿠팡 파트너스에서 발급한 배너/다이나믹 위젯 임베드 코드를 넣으면 관련 상품이 표시됨. 고지문은 법적 필수라 항상 권장",
+
+  "affiliate": {
+    "enabled": false,
+    "disclosure": true,
+    "box_title": "이 글에서 소개한 도구",
+    "links": []
+  },
+  "_affiliate_설명": "제휴 SaaS(쿠팡 외 일반 제휴). enabled=true면 본문 중간에 '추천 도구' 박스 + 고지문 삽입. links는 [{\"name\":\"GetResponse\",\"url\":\"내 제휴링크\",\"desc\":\"한 줄 설명\"}] 형태. 애드센스 슬롯과 겹치지 않게 자동 배치되어, 한 글에 애드센스+제휴가 함께 실림",
+
   "safety": {
     "strength": "표준",
     "force_draft": true,
@@ -32,7 +54,9 @@
     "refresh_max_per_run": 2,
     "_refresh_설명": "오래된 글 자동 최신화 주기(일). 0=끔, 7/14/30 등. 실행마다 refresh_max_per_run편씩 옛 정보를 현재 기준으로 다시 씀",
     "drip_hours": 0,
-    "_drip_설명": "드립(예약) 발행 간격(시간). 즉시발행(force_draft=false)일 때만 적용. 0=한번에, 2=2시간 간격으로 나눠 예약 발행(애드센스 안전)",
+    "drip_min_hours": 0,
+    "drip_max_hours": 0,
+    "_drip_설명": "드립(예약) 발행. 즉시발행(force_draft=false)일 때만 적용. drip_min_hours~drip_max_hours 사이 '랜덤 간격'으로 시간차 예약(예: 1.5~2.5). 0이면 한번에. drip_hours는 옛 고정간격(하위호환)",
     "blocklist_extra": []
   },
   "_safety_설명": "애드센스 안전장치. strength=강도 프리셋(느슨/표준/엄격). force_draft=자동발행 대신 초안 저장(검토 후 발행). 품질 미달(분량·소제목·키워드도배·중복)은 발행 보류. verify_accuracy=최신성검증(off/flag/strict). auto_revise=최신성 문제 발견 시 '글을 자동으로 다시 씀'(true). relink_old=새 글이 예전 글을 대체하면 예전 글에 최신글 링크 배너 자동 추가. blocklist_extra=추가 금지어",
@@ -48,7 +72,8 @@
     "unsplash_key": "",
     "_key_설명": "무료 스톡용 키(택1). pexels.com/api 또는 unsplash.com/developers 에서 무료 발급. 없으면 코드 썸네일로 자동 대체",
     "model": "imagen-4.0-fast-generate-001",
-    "size": "1024x1024",
+    "size": "1200x675",
+    "_size_설명": "구글 디스커버·SNS 규격(가로 1200px 이상, 16:9). 디스커버 노출·외부유입에 유리",
     "max_per_run": 20,
     "_max_per_run_설명": "실행 1회당 이미지 생성 최대 개수(비용 상한). 초과분은 자리표시로 대체",
     "_model_설명": "유료 provider일 때만 사용. Fast=저가(장당 약 $0.02)",

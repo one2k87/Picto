@@ -34,6 +34,30 @@ on:
         description: "일시정지: true면 생성 건너뜀 (앱 스위치에서 전달)"
         default: ""
         required: false
+      drip_min:
+        description: "드립 랜덤 최소 간격(시간) (앱 설정에서 전달)"
+        default: ""
+        required: false
+      drip_max:
+        description: "드립 랜덤 최대 간격(시간) (앱 설정에서 전달)"
+        default: ""
+        required: false
+      coupang:
+        description: "쿠팡 파트너스 삽입 (true/false)"
+        default: ""
+        required: false
+      coupang_widget:
+        description: "쿠팡 위젯 임베드 코드"
+        default: ""
+        required: false
+      adsense_approved:
+        description: "애드센스 승인됨 (true/false) — 승인 후 수익 최적화 활성"
+        default: ""
+        required: false
+      ads_boost:
+        description: "광고 배치 강화 (true/false) — 승인 후에만 적용"
+        default: ""
+        required: false
 
 permissions:
   contents: write   # 결과 latest.json 을 저장소에 커밋하기 위함
@@ -109,6 +133,12 @@ jobs:
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           REFRESH_DAYS: ${{ github.event.inputs.refresh_days != '' && github.event.inputs.refresh_days || secrets.REFRESH_DAYS }}
           REFRESH_MAX_PER_RUN: ${{ secrets.REFRESH_MAX_PER_RUN }}
+          DRIP_MIN_HOURS: ${{ github.event.inputs.drip_min != '' && github.event.inputs.drip_min || secrets.DRIP_MIN_HOURS }}
+          DRIP_MAX_HOURS: ${{ github.event.inputs.drip_max != '' && github.event.inputs.drip_max || secrets.DRIP_MAX_HOURS }}
+          ADSENSE_APPROVED: ${{ github.event.inputs.adsense_approved != '' && github.event.inputs.adsense_approved || vars.ADSENSE_APPROVED }}
+          ADS_BOOST: ${{ github.event.inputs.ads_boost != '' && github.event.inputs.ads_boost || secrets.ADS_BOOST }}
+          COUPANG_ENABLED: ${{ github.event.inputs.coupang != '' && github.event.inputs.coupang || secrets.COUPANG_ENABLED }}
+          COUPANG_WIDGET_HTML: ${{ github.event.inputs.coupang_widget != '' && github.event.inputs.coupang_widget || secrets.COUPANG_WIDGET_HTML }}
           PAUSED: ${{ github.event.inputs.paused != '' && github.event.inputs.paused || vars.PAUSED }}
           SAFETY_STRENGTH: ${{ github.event.inputs.strength != '' && github.event.inputs.strength || secrets.SAFETY_STRENGTH }}
           FORCE_DRAFT: ${{ secrets.FORCE_DRAFT }}

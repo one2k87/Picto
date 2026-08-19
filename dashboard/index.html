@@ -174,6 +174,8 @@
   <button id="autoGenDot" onclick="togglePause()" title="매일 자동 생성 (초록=켜짐 · 빨강=멈춤 · 누르면 전환)"
     style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.25);
     cursor:pointer;flex:0 0 auto;margin-right:6px;padding:0;background:#7a8291"></button>
+  <button class="icon-btn" id="keyBtn" title="AI 키 연결 마법사">🔑</button>
+  <button class="icon-btn" id="adsBtn" title="애드센스 승인 준비">🛡️</button>
   <button class="icon-btn" id="statsBtn" title="조회·수익">📊</button>
   <div class="run-wrap" id="runWrap" title="지금 생성 실행">
     <svg class="run-ring" viewBox="0 0 44 44" aria-hidden="true">
@@ -258,10 +260,106 @@
 <div id="grid" class="grid"></div>
 <div id="empty" class="empty" style="display:none"></div>
 
+<!-- AI 키 연결 마법사 -->
+<div class="sheet-bg" id="keyBg"></div>
+<div class="sheet" id="keySheet">
+  <h2>🔑 AI 키 연결 마법사</h2>
+  <div class="hint" style="margin-bottom:10px">글을 쓰려면 <b>구글 Gemini API 키</b>가 필요해요. 무료로 발급됩니다. 아래 순서대로 하면 끝나요.</div>
+
+  <div class="field">
+    <label>① 무료 키 발급 (처음 한 번)</label>
+    <a class="btn sm" href="https://aistudio.google.com/app/apikey" target="_blank" style="width:100%">구글 AI 스튜디오에서 키 만들기 열기</a>
+    <div class="hint">열린 화면에서 <b>"Create API key"</b>(API 키 만들기) → 나온 키(<code>AIza…</code>)를 복사하세요. 구글 로그인만 하면 됩니다.</div>
+  </div>
+
+  <div class="field">
+    <label>② 키 붙여넣기</label>
+    <input id="wizKey" placeholder="AIza... (복사한 키 붙여넣기)" autocapitalize="off" style="width:100%">
+    <button class="btn primary sm" id="wizTest" style="width:100%;margin-top:6px">키 확인(테스트)</button>
+    <div id="wizTestResult" style="margin-top:6px;font-size:13px"></div>
+  </div>
+
+  <div class="field" id="wizVolBox" style="display:none">
+    <label>③ 하루 몇 편 쓸까요?</label>
+    <select id="wizTier" style="width:100%">
+      <option value="free">무료 키 (여유롭게 하루 6편 추천)</option>
+      <option value="paid">유료 결제한 키 (하루 18편까지)</option>
+    </select>
+    <div class="hint" id="wizVolHint" style="margin-top:4px"></div>
+  </div>
+
+  <div class="field" id="wizSaveBox" style="display:none">
+    <label>④ 키 저장 (자동 실행에 반영)</label>
+    <button class="btn ok sm" id="wizRegister" style="width:100%">이 키로 자동 등록 (GitHub)</button>
+    <div id="wizRegResult" style="margin-top:6px;font-size:12px;color:var(--muted)"></div>
+    <div class="hint">GitHub 정보(설정 ▶)가 있어야 자동 등록됩니다. 안 되면 아래 '복사'로 GitHub Secret에 직접 넣으세요.</div>
+    <button class="btn sm" id="wizCopy" style="width:100%;margin-top:6px">키 복사 + 수동 등록 안내</button>
+  </div>
+
+  <div class="actions"><button class="btn sm" id="keyClose" style="width:100%">닫기</button></div>
+</div>
+
+<!-- 애드센스 승인 준비 시트 -->
+<div class="sheet-bg" id="adsBg"></div>
+<div class="sheet" id="adsSheet">
+  <h2>🛡️ 애드센스 승인 준비 <span style="font-size:11px;color:var(--muted);font-weight:400">사이트 자동 점검·조치</span></h2>
+  <div class="hint" style="margin-bottom:10px">
+    승인은 <b>구글이 콘텐츠 가치를 심사</b>합니다(자동 승인은 불가). 이 탭은 <b>사이트 쪽 준비를 자동으로</b> 처리해 승인 확률을 높여요.
+    워드프레스 정보(설정 📝)가 입력돼 있어야 동작합니다.
+  </div>
+
+  <div class="field">
+    <label>애드센스 승인 상태</label>
+    <button class="btn sm" id="adsApprovedBtn" style="width:100%">승인 전 (심사 준비 중)</button>
+    <div class="hint">승인되면 눌러서 '승인 완료'로 바꾸세요. 그래야 아래 <b>수익 최적화</b>가 열립니다. (승인 전엔 대량 발행보다 품질·필수페이지에 집중)</div>
+  </div>
+
+  <div class="field" id="adsRevenueBox" style="display:none">
+    <label>💰 승인 후 수익 최적화</label>
+    <label style="display:flex;gap:8px;align-items:center;cursor:pointer;margin-top:4px"><input type="checkbox" id="revAdsBoost" style="width:auto"> 광고 배치 강화 (3개: 상단·중반·결론 직전)</label>
+    <label style="display:flex;gap:8px;align-items:center;cursor:pointer;margin-top:6px"><input type="checkbox" id="revRelated" style="width:auto"> 관련 글 카드 (방문당 페이지수↑)</label>
+    <div class="hint">승인 후에만 적용됩니다. 광고 과밀은 정책 위반이라 3개까지만 권장.
+      <br>🔎 모바일 앵커·자동광고는 <b>AdSense 자동광고</b>(또는 Site Kit)에서 켜면 코드가 자동 삽입돼요.</div>
+  </div>
+
+  <div class="field">
+    <button class="btn primary sm" id="adsCheck" style="width:100%">① 사이트 점검하기</button>
+    <div id="adsReport" style="margin-top:10px;font-size:13px"></div>
+  </div>
+
+  <div class="field">
+    <button class="btn ok sm" id="adsMakePages" style="width:100%">② 필수 페이지 자동 생성 (소개·문의·개인정보·이용약관)</button>
+    <div class="hint">애드센스가 요구하는 4개 페이지를 규정에 맞게 만들어 발행합니다. 이미 있으면 건너뜁니다.</div>
+    <div id="adsPagesResult" style="margin-top:6px;font-size:12px;color:var(--muted)"></div>
+  </div>
+
+  <div class="field">
+    <button class="btn sm" id="adsReviewMode" style="width:100%">③ 심사 모드 켜기 (대량 생성 정지 + 엄격)</button>
+    <div class="hint">심사 중엔 대량 자동 생성을 멈추고(초안 안 쌓임) 품질을 엄격으로 둡니다. <b>승인 후</b> 자동 생성을 다시 켜세요.</div>
+  </div>
+
+  <div class="field">
+    <label>④ 반려 사유 분석 & 보완 <span id="adsAttemptN" style="font-size:11px;color:var(--muted)"></span></label>
+    <textarea id="adsReason" rows="3" placeholder="애드센스 반려 메일/화면의 사유를 그대로 붙여넣으세요 (예: 가치가 별로 없는 콘텐츠…)" style="width:100%;font-size:13px;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:8px"></textarea>
+    <button class="btn primary sm" id="adsAnalyze" style="width:100%;margin-top:6px">분석하고 보완 방법 보기</button>
+    <div id="adsFix" style="margin-top:8px;font-size:13px"></div>
+    <div class="hint">붙여넣으면 원인을 짚어 보완 방법과 자동 조치를 제안합니다. 고친 뒤 재신청 → 또 반려되면 그 사유를 다시 붙여넣어 반복하세요.</div>
+  </div>
+
+  <div class="field">
+    <label>⑤ ads.txt / 애드센스 인증코드</label>
+    <div class="hint">이 둘은 워드프레스 루트/헤더 수정이 필요해 자동화가 제한적입니다. <b>구글 Site Kit</b> 플러그인을 설치하면
+      인증코드·ads.txt가 자동 처리됩니다. (워드프레스 → 플러그인 → "Site Kit by Google")</div>
+    <a class="btn sm" href="https://wordpress.org/plugins/google-site-kit/" target="_blank" style="width:100%;margin-top:6px">Site Kit 설치 안내 열기</a>
+  </div>
+
+  <div class="actions"><button class="btn sm" id="adsClose" style="width:100%">닫기</button></div>
+</div>
+
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v20 · 자동생성 동그라미 버튼</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v26 · AI 키 연결 마법사</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -328,14 +426,16 @@
     <div class="hint">발행한 지 오래된 글을 자동으로 다시 점검해 최신 기준으로 고쳐 씁니다(실행마다 소수 편).</div>
   </div>
   <div class="field">
-    <label>드립(예약) 발행 간격</label>
+    <label>드립(예약) 발행 — 랜덤 간격</label>
     <select id="cfgDrip" style="width:100%">
-      <option value="0">한 번에 발행</option>
-      <option value="1">1시간 간격</option>
-      <option value="2">2시간 간격</option>
-      <option value="3">3시간 간격</option>
+      <option value="0-0">한 번에 발행</option>
+      <option value="1-2">랜덤 1~2시간 간격</option>
+      <option value="1.5-2.5">랜덤 1.5~2.5시간 간격</option>
+      <option value="2-3">랜덤 2~3시간 간격</option>
+      <option value="2-4">랜덤 2~4시간 간격</option>
     </select>
-    <div class="hint">즉시발행(초안강제 끔) 상태에서만 적용. 여러 글을 시간차로 나눠 예약 발행해 애드센스 안전성을 높입니다.</div>
+    <div class="hint">즉시발행(초안강제 끔) 상태에서만 적용. 여러 글을 <b>랜덤한 시간 간격</b>으로 나눠 예약 발행해,
+      한꺼번에 올리는 티를 없애고 애드센스 안전성을 높입니다.</div>
   </div>
   <div class="field">
     <label>최신성·정확성 검증</label>
@@ -417,6 +517,18 @@
     </select>
   </div>
   <div class="hint">입력값은 이 기기에만 저장됩니다(localStorage). 공용 기기에서는 사용에 주의하세요.</div>
+
+  <div class="divider"></div>
+  <h2 style="font-size:14px">🛒 쿠팡 파트너스 (제휴 수익)</h2>
+  <div class="field">
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+      <input type="checkbox" id="cfgCoupang" style="width:auto"> 글에 <b>쿠팡 파트너스</b> 넣기
+    </label>
+    <div class="hint">체크하면 글 하단에 필수 고지문(+위젯)이 들어갑니다. 체크 해제하면 지금처럼 쿠팡 없이 글만 작성돼요.</div>
+    <label style="margin-top:8px;display:block">쿠팡 위젯/배너 임베드 코드 (선택)</label>
+    <textarea id="cfgCoupangWidget" rows="3" placeholder="쿠팡 파트너스에서 발급한 다이나믹 배너/위젯 코드 붙여넣기" style="width:100%;font-size:13px;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:8px"></textarea>
+    <div class="hint">쿠팡 파트너스 → 배너/위젯 → 코드 생성 → 여기에 붙여넣기. 비우면 고지문만 들어갑니다.</div>
+  </div>
 
   <div class="divider"></div>
   <h2 style="font-size:14px">🔎 검색엔진 등록 (검색 노출)</h2>
@@ -1033,7 +1145,7 @@ function openSheet(){
   document.getElementById("cfgRelink").checked=!!sf.relink_old;
   document.getElementById("cfgVerify").value=sf.verify_accuracy||"flag";
   document.getElementById("cfgRefresh").value=String(sf.refresh_days!=null?sf.refresh_days:0);
-  document.getElementById("cfgDrip").value=String(sf.drip_hours!=null?sf.drip_hours:0);
+  document.getElementById("cfgDrip").value=((sf.drip_min_hours||0)+"-"+(sf.drip_max_hours||0));
   document.getElementById("cfgMinChars").value=sf.min_chars||"";
   document.getElementById("cfgMaxSim").value=(sf.max_similarity!=null?sf.max_similarity:"");
   document.getElementById("cfgData").value=CFG.dataUrl||"";
@@ -1046,6 +1158,8 @@ function openSheet(){
   document.getElementById("cfgUser").value=CFG.user||"";
   document.getElementById("cfgPass").value=CFG.pass||"";
   document.getElementById("cfgStatus").value=CFG.status||"draft";
+  document.getElementById("cfgCoupang").checked=!!(CFG.coupang&&CFG.coupang.enabled);
+  document.getElementById("cfgCoupangWidget").value=(CFG.coupang&&CFG.coupang.widget_html)||"";
   document.getElementById("cfgIndexnow").value=(CFG.safety&&CFG.safety.indexnow_key)||"";
   fillSitemap(CFG.site||"");
   document.getElementById("sheetBg").classList.add("open");
@@ -1116,7 +1230,8 @@ document.getElementById("cfgSave").onclick=()=>{
     relink_old:document.getElementById("cfgRelink").checked,
     verify_accuracy:document.getElementById("cfgVerify").value,
     refresh_days:parseInt(document.getElementById("cfgRefresh").value,10)||0,
-    drip_hours:parseInt(document.getElementById("cfgDrip").value,10)||0,
+    drip_min_hours:parseFloat((document.getElementById("cfgDrip").value.split("-")[0]))||0,
+    drip_max_hours:parseFloat((document.getElementById("cfgDrip").value.split("-")[1]))||0,
     min_chars:parseInt(document.getElementById("cfgMinChars").value,10)||undefined,
     max_similarity:parseFloat(document.getElementById("cfgMaxSim").value)||undefined
   });
@@ -1124,6 +1239,10 @@ document.getElementById("cfgSave").onclick=()=>{
   CFG.user=document.getElementById("cfgUser").value.trim();
   CFG.pass=document.getElementById("cfgPass").value.trim();
   CFG.status=document.getElementById("cfgStatus").value;
+  CFG.coupang=Object.assign({}, CFG.coupang, {
+    enabled:document.getElementById("cfgCoupang").checked,
+    widget_html:document.getElementById("cfgCoupangWidget").value
+  });
   CFG.safety=Object.assign({}, CFG.safety, {indexnow_key:document.getElementById("cfgIndexnow").value.trim()});
   saveCfg();closeSheet();toast("저장됨 ✓");loadData();};
 function fillSitemap(site){
@@ -1153,6 +1272,10 @@ function runInputs(withImg){
   if(CFG.trafficRatio!=null) inp.ratio=String(CFG.trafficRatio);   // 검색량 우선 비율
   if(CFG.safety&&CFG.safety.strength) inp.strength=CFG.safety.strength; // 안전/품질 강도
   if(CFG.safety&&CFG.safety.refresh_days!=null) inp.refresh_days=String(CFG.safety.refresh_days); // 리프레시 주기
+  if(CFG.safety&&CFG.safety.drip_max_hours){ inp.drip_min=String(CFG.safety.drip_min_hours||0); inp.drip_max=String(CFG.safety.drip_max_hours); } // 드립 랜덤 간격
+  if(CFG.coupang){ inp.coupang=CFG.coupang.enabled?"true":"false"; if(CFG.coupang.widget_html) inp.coupang_widget=CFG.coupang.widget_html; }
+  inp.adsense_approved = CFG.adsenseApproved ? "true" : "false";   // 승인 후 수익 최적화 게이트
+  if(CFG.revenue){ inp.ads_boost = CFG.revenue.ads_boost!==false ? "true":"false"; }
   inp.paused = CFG.paused ? "true" : "false";   // 일시정지 상태(수동 실행에도 반영)
   return inp;
 }
@@ -1193,6 +1316,255 @@ async function togglePause(){
   else toast("스케줄 반영 실패("+(res.status||res.reason)+") — 토큰에 'Variables 쓰기' 권한 필요",1);
 }
 document.getElementById("pauseBtn").onclick=togglePause;
+
+// ===== 🛡️ 애드센스 승인 준비 탭 =====
+function wpBase(){ return (CFG.site||"").replace(/\/+$/,""); }
+function wpAuth(){ return {Authorization:"Basic "+btoa((CFG.user||"")+":"+(CFG.pass||""))}; }
+function wpReady(){ return CFG.site&&CFG.user&&CFG.pass; }
+function refreshApprovedUI(){
+  const on=!!CFG.adsenseApproved;
+  const b=document.getElementById("adsApprovedBtn");
+  if(b){ b.textContent = on ? "✅ 승인 완료 (수익 최적화 켜짐)" : "승인 전 (심사 준비 중)";
+    b.style.background = on ? "rgba(51,194,127,.15)" : ""; b.style.color = on ? "#7ee0b0" : ""; }
+  const box=document.getElementById("adsRevenueBox"); if(box) box.style.display = on ? "block" : "none";
+  CFG.revenue=CFG.revenue||{ads_boost:true,related_cards:true};
+  const rb=document.getElementById("revAdsBoost"); if(rb) rb.checked=CFG.revenue.ads_boost!==false;
+  const rr=document.getElementById("revRelated"); if(rr) rr.checked=CFG.revenue.related_cards!==false;
+  const n=document.getElementById("adsAttemptN"); if(n) n.textContent=(CFG.adsAttempts&&CFG.adsAttempts.length)?("· 재신청 "+CFG.adsAttempts.length+"회차"):"";
+}
+function openAds(){ refreshApprovedUI(); document.getElementById("adsBg").classList.add("open"); document.getElementById("adsSheet").classList.add("open"); adsCheck(); }
+function closeAds(){ document.getElementById("adsBg").classList.remove("open"); document.getElementById("adsSheet").classList.remove("open"); }
+document.getElementById("adsBtn").onclick=openAds;
+document.getElementById("adsBg").onclick=closeAds;
+document.getElementById("adsClose").onclick=closeAds;
+
+// ===== 🔑 AI 키 연결 마법사 =====
+function openKeyWiz(){ document.getElementById("keyBg").classList.add("open"); document.getElementById("keySheet").classList.add("open");
+  document.getElementById("wizKey").value=CFG.llmKey||""; }
+function closeKeyWiz(){ document.getElementById("keyBg").classList.remove("open"); document.getElementById("keySheet").classList.remove("open"); }
+document.getElementById("keyBtn").onclick=openKeyWiz;
+document.getElementById("keyBg").onclick=closeKeyWiz;
+document.getElementById("keyClose").onclick=closeKeyWiz;
+
+async function testGeminiKey(key){
+  try{
+    const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key="+encodeURIComponent(key),
+      {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts:[{text:"say ok"}]}]})});
+    return {ok:r.ok, status:r.status};
+  }catch(e){ return {ok:false, status:"net"}; }
+}
+function wizVolHintText(){
+  const t=document.getElementById("wizTier").value;
+  document.getElementById("wizVolHint").textContent = t==="free"
+    ? "무료 키는 하루 한도가 있어요. 하루 6편 정도면 안전합니다(초반 추천)."
+    : "유료 결제한 키면 하루 18편 이상도 가능해요. 애드센스 정책상 품질·분산 발행은 유지하세요.";
+}
+document.getElementById("wizTier").onchange=wizVolHintText;
+document.getElementById("wizTest").onclick=async()=>{
+  const key=document.getElementById("wizKey").value.trim();
+  const res=document.getElementById("wizTestResult");
+  if(!key){ res.innerHTML='<span style="color:#ffb020">키를 붙여넣으세요.</span>'; return; }
+  res.textContent="확인 중…";
+  const r=await testGeminiKey(key);
+  if(r.ok){
+    CFG.llmKey=key; saveCfg();
+    res.innerHTML='<span style="color:#33c27f">✅ 정상 키예요! 아래로 이어가세요.</span>';
+    document.getElementById("wizVolBox").style.display="block";
+    document.getElementById("wizSaveBox").style.display="block";
+    wizVolHintText();
+  } else {
+    res.innerHTML='<span style="color:#ff6b4a">❌ 키가 올바르지 않거나 사용 설정이 안 됐어요('+r.status+'). 다시 복사해보세요.</span>';
+  }
+};
+async function ghSetSecret(name, value){
+  if(!CFG.ghOwner||!CFG.ghRepo||!CFG.ghToken) return {ok:false, reason:"no-gh"};
+  try{
+    if(!window.sodium){ await new Promise((ok,no)=>{const s=document.createElement("script");
+      s.src="https://cdnjs.cloudflare.com/ajax/libs/libsodium-wrappers/0.7.13/libsodium-wrappers.min.js"; s.onload=ok; s.onerror=no; document.head.appendChild(s);}); }
+    await window.sodium.ready; const sodium=window.sodium;
+    const base="https://api.github.com/repos/"+CFG.ghOwner+"/"+CFG.ghRepo+"/actions/secrets";
+    const pk=await fetch(base+"/public-key",{headers:ghHeaders()}); if(!pk.ok) return {ok:false, status:pk.status};
+    const j=await pk.json();
+    const enc=sodium.crypto_box_seal(sodium.from_string(value), sodium.from_base64(j.key, sodium.base64_variants.ORIGINAL));
+    const encB64=sodium.to_base64(enc, sodium.base64_variants.ORIGINAL);
+    const r=await fetch(base+"/"+name,{method:"PUT",headers:Object.assign({"Content-Type":"application/json"},ghHeaders()),
+      body:JSON.stringify({encrypted_value:encB64, key_id:j.key_id})});
+    return {ok:(r.status===201||r.status===204), status:r.status};
+  }catch(e){ return {ok:false, reason:"err"}; }
+}
+document.getElementById("wizRegister").onclick=async()=>{
+  const key=(document.getElementById("wizKey").value||"").trim(); if(!key){ toast("먼저 키 확인(테스트)",1); return; }
+  const box=document.getElementById("wizRegResult"); box.textContent="등록 중…";
+  const r=await ghSetSecret("LLM_API_KEY", key);
+  if(r.ok){ box.innerHTML='<span style="color:#33c27f">✅ GitHub에 자동 등록됨(LLM_API_KEY). 이제 자동 생성에 이 키가 쓰여요.</span>'; }
+  else if(r.reason==="no-gh"){ box.innerHTML='<span style="color:#ffb020">GitHub 정보가 없어요. 아래 복사 버튼으로 직접 등록하세요.</span>'; }
+  else { box.innerHTML='<span style="color:#ff6b4a">자동 등록 실패('+(r.status||r.reason)+'). 토큰에 <b>Secrets 쓰기</b> 권한 필요. 아래 복사로 직접 등록하세요.</span>'; }
+};
+document.getElementById("wizCopy").onclick=()=>{
+  const key=(document.getElementById("wizKey").value||"").trim(); if(!key){ toast("키를 붙여넣으세요",1); return; }
+  clip(key,"키 복사됨 ✓");
+  alert("GitHub 저장소 → Settings → Secrets and variables → Actions → New repository secret →\n이름: LLM_API_KEY\n값: (방금 복사한 키 붙여넣기) → Add secret");
+};
+document.getElementById("adsApprovedBtn").onclick=()=>{ CFG.adsenseApproved=!CFG.adsenseApproved; saveCfg(); refreshApprovedUI();
+  toast(CFG.adsenseApproved?"승인 완료 ✓ 수익 최적화가 켜졌어요":"승인 전으로 전환"); };
+document.getElementById("revAdsBoost").onchange=(e)=>{ CFG.revenue=Object.assign({},CFG.revenue,{ads_boost:e.target.checked}); saveCfg(); };
+document.getElementById("revRelated").onchange=(e)=>{ CFG.revenue=Object.assign({},CFG.revenue,{related_cards:e.target.checked}); saveCfg(); };
+
+const REQ_PAGES=[
+  {slug:"about", title:"소개", keys:["소개","about"]},
+  {slug:"contact", title:"문의", keys:["문의","contact"]},
+  {slug:"privacy-policy", title:"개인정보처리방침", keys:["개인정보","privacy"]},
+  {slug:"terms", title:"이용약관", keys:["이용약관","terms"]},
+];
+function pageHtml(slug){
+  const host=(CFG.site||"내 블로그").replace(/^https?:\/\//,"").replace(/\/+$/,"");
+  if(slug==="about") return `<p>안녕하세요. <strong>${host}</strong>는 금융·건강·생활·IT 등 일상에 도움이 되는 정보를 쉽게 정리해 전하는 블로그입니다.</p><p>운영자는 실제 경험과 공식 자료를 바탕으로, 독자가 바로 활용할 수 있는 실용적인 콘텐츠를 만들기 위해 노력합니다.</p><p><em>※ 운영자 소개·경력을 여기에 직접 추가하시면 신뢰도(E-E-A-T)에 더 좋습니다.</em></p>`;
+  if(slug==="contact") return `<p>문의 사항이 있으시면 아래 이메일로 연락 주세요.</p><p><strong>이메일:</strong> [여기에 연락 이메일을 입력하세요]</p><p>보내주신 문의는 확인 후 순차적으로 답변드립니다.</p>`;
+  if(slug==="privacy-policy") return `<p>본 사이트(${host})는 이용자의 개인정보를 소중히 다룹니다.</p>
+    <h2>수집하는 정보</h2><p>본 사이트는 회원가입을 요구하지 않으며, 방문 통계(쿠키)와 댓글 작성 시 입력 정보 외에 개인정보를 수집하지 않습니다.</p>
+    <h2>쿠키 및 제3자 광고</h2><p>본 사이트는 <strong>Google AdSense</strong> 등 제3자 광고를 게재할 수 있으며, 광고 제공업체는 쿠키를 사용해 이용자의 관심사에 맞는 광고를 제공합니다. 이용자는 <a href="https://policies.google.com/technologies/ads" target="_blank">Google 광고 설정</a>에서 맞춤 광고를 비활성화할 수 있습니다.</p>
+    <h2>분석 도구</h2><p>방문 분석을 위해 Google Analytics 등을 사용할 수 있으며, 이때 수집되는 정보는 익명 통계 목적에 한합니다.</p>
+    <h2>문의</h2><p>개인정보 관련 문의는 문의 페이지의 이메일로 연락 주세요.</p>`;
+  return `<p>본 약관은 ${host}(이하 "사이트") 이용에 관한 기본적인 사항을 규정합니다.</p>
+    <h2>콘텐츠</h2><p>사이트의 모든 콘텐츠는 정보 제공을 목적으로 하며, 정확성을 위해 노력하나 완전성을 보장하지 않습니다. 중요한 결정 전에는 공식 출처를 확인하시기 바랍니다.</p>
+    <h2>저작권</h2><p>사이트에 게시된 글·이미지의 무단 복제·배포를 금합니다.</p>
+    <h2>책임의 한계</h2><p>사이트 이용으로 발생한 손해에 대해 운영자는 법이 허용하는 범위에서 책임을 지지 않습니다.</p>`;
+}
+function stripLen(html){const d=document.createElement("div");d.innerHTML=html||"";return (d.textContent||"").replace(/\s+/g," ").trim().length;}
+async function createOnePage(slug){
+  const base=wpBase(); const p=REQ_PAGES.find(x=>x.slug===slug); if(!p) return;
+  try{
+    const r=await fetch(base+"/wp-json/wp/v2/pages",{method:"POST",
+      headers:Object.assign({"Content-Type":"application/json"},wpAuth()),
+      body:JSON.stringify({title:p.title,slug:p.slug,status:"publish",content:pageHtml(p.slug)})});
+    toast(r.ok?(p.title+" 생성됨 ✓"):(p.title+" 실패("+r.status+")"), r.ok?0:1);
+  }catch(e){ toast("생성 실패(네트워크/CORS)",1); }
+  adsCheck();
+}
+async function adsCheck(){
+  const box=document.getElementById("adsReport");
+  if(!wpReady()){ box.innerHTML='<span style="color:#ffb020">설정 📝에서 워드프레스 정보를 먼저 입력하세요.</span>'; return; }
+  box.textContent="점검 중…";
+  const base=wpBase();
+  let posts=0, cats=0, pages=[], sample=[], site={};
+  try{
+    const root=await fetch(base+"/wp-json"); if(root.ok) site=await root.json();
+    const rp=await fetch(base+"/wp-json/wp/v2/posts?per_page=20&status=publish&_embed=1",{headers:wpAuth()});
+    posts=parseInt(rp.headers.get("X-WP-Total")||"0",10); if(rp.ok) sample=await rp.json();
+    const rc=await fetch(base+"/wp-json/wp/v2/categories?per_page=1",{headers:wpAuth()}); cats=parseInt(rc.headers.get("X-WP-Total")||"0",10);
+    const rg=await fetch(base+"/wp-json/wp/v2/pages?per_page=100&status=publish",{headers:wpAuth()}); if(rg.ok) pages=await rg.json();
+  }catch(e){ box.innerHTML='<span style="color:#ff6b4a">조회 실패 — 사이트 주소/앱비밀번호/서버 CORS 확인.</span>'; return; }
+
+  const lens=sample.map(p=>stripLen(p.content&&p.content.rendered));
+  const avgLen=lens.length?Math.round(lens.reduce((a,b)=>a+b,0)/lens.length):0;
+  const withImg=sample.filter(p=>(p._embedded&&p._embedded["wp:featuredmedia"])||/<img/i.test((p.content&&p.content.rendered)||"")).length;
+  const imgRatio=sample.length?Math.round(withImg/sample.length*100):0;
+  const hasPage=(p)=>pages.some(x=>((x.slug||"").includes(p.slug))||p.keys.some(k=>((x.title&&x.title.rendered)||"").includes(k)));
+  const siteTitle=(site.name||"").trim(), siteDesc=(site.description||"").trim();
+
+  const groups=[
+    {h:"📄 필수 페이지 (자동 생성 가능)", items:REQ_PAGES.map(p=>({ok:hasPage(p), label:p.title+" 페이지",
+      reason:"애드센스는 소개·문의·개인정보처리방침·이용약관을 요구합니다. 없으면 반려됩니다.", fix:p.slug}))},
+    {h:"📝 콘텐츠", items:[
+      {ok:posts>=15, label:`발행 글 ${posts}개`, reason:"오리지널 글이 부족하면 '가치 없는 콘텐츠'로 반려됩니다. 15~30개 권장(직접 손질해 채우세요)."},
+      {ok:cats>=2, label:`카테고리 ${cats}개`, reason:"주제가 정리돼 있어야 합니다. 2개 이상 권장."},
+      {ok:avgLen>=800, label:`평균 글 길이 ${avgLen}자`, reason:"글이 짧으면 저품질로 판정됩니다. 800자 이상, 실경험·구체정보로 채우세요."},
+      {ok:imgRatio>=50, label:`대표 이미지 비율 ${imgRatio}%`, reason:"이미지 없는 글이 많으면 완성도가 낮아 보입니다."},
+    ]},
+    {h:"🏷️ 사이트 기본", items:[
+      {ok:!!siteTitle, label:`사이트 제목 ${siteTitle?"("+siteTitle+")":""}`, reason:"워드프레스 설정 → 일반 → 사이트 제목을 채우세요."},
+      {ok:!!siteDesc, label:"사이트 설명(태그라인)", reason:"워드프레스 설정 → 일반 → 태그라인을 채우세요."},
+    ]},
+    {h:"🔧 수동 확인 (안내)", items:[
+      {ok:null, label:"메뉴에 소개·문의·개인정보 연결", reason:"워드프레스 → 외모 → 메뉴에서 상단 메뉴에 추가."},
+      {ok:null, label:"사이트맵 Search Console 제출", reason:"설정 🔎 '검색엔진 등록'에서 사이트맵 주소 제출."},
+      {ok:null, label:"ads.txt / 애드센스 인증코드", reason:"Google Site Kit 플러그인으로 자동 처리."},
+      {ok:null, label:"검색엔진 색인 허용", reason:"워드프레스 설정 → 읽기 → '검색엔진 노출 방지' 체크 해제."},
+    ]},
+  ];
+  const scored=[].concat(...groups.map(g=>g.items)).filter(i=>i.ok!==null);
+  const passed=scored.filter(i=>i.ok).length;
+  let html=`<div style="margin-bottom:8px"><b>승인 준비 점수: ${passed}/${scored.length}</b></div>`;
+  for(const g of groups){
+    html+=`<div style="margin:10px 0 4px;color:var(--muted);font-weight:700">${g.h}</div>`;
+    for(const it of g.items){
+      const icon=it.ok===null?"🔹":(it.ok?"✅":"❌");
+      html+=`<div style="margin:3px 0">${icon} ${it.label}`;
+      if(it.ok===false && it.fix) html+=` <button class="btn sm" style="padding:1px 9px;font-size:11px" onclick="createOnePage('${it.fix}')">생성</button>`;
+      if(it.ok===false || it.ok===null) html+=`<div class="hint" style="margin:2px 0 5px 18px">↳ ${it.reason}</div>`;
+      html+=`</div>`;
+    }
+  }
+  const missPages=groups[0].items.filter(i=>!i.ok).length;
+  if(missPages) html+=`<div style="margin-top:8px"><button class="btn ok sm" style="width:100%" onclick="document.getElementById('adsMakePages').click()">부족한 필수 페이지 ${missPages}개 한번에 생성</button></div>`;
+  html+=`<div class="hint" style="margin-top:8px;color:#ffb59e">※ 가장 중요한 건 각 글의 '가치'(깊이·독창성)입니다. 점수가 만점이어도 얇은 AI 글이 많으면 반려될 수 있어요.</div>`;
+  box.innerHTML=html;
+}
+document.getElementById("adsCheck").onclick=adsCheck;
+document.getElementById("adsMakePages").onclick=async()=>{
+  if(!wpReady()){ toast("워드프레스 정보를 먼저 입력",1); return; }
+  const res=document.getElementById("adsPagesResult"); res.textContent="생성 중…";
+  const base=wpBase(); let made=0, skip=0, fail=0;
+  for(const p of REQ_PAGES){
+    try{
+      const q=await fetch(base+"/wp-json/wp/v2/pages?slug="+p.slug,{headers:wpAuth()});
+      const ex=q.ok?await q.json():[];
+      if(Array.isArray(ex)&&ex.length){ skip++; continue; }
+      const r=await fetch(base+"/wp-json/wp/v2/pages",{method:"POST",
+        headers:Object.assign({"Content-Type":"application/json"},wpAuth()),
+        body:JSON.stringify({title:p.title, slug:p.slug, status:"publish", content:pageHtml(p.slug)})});
+      if(r.ok) made++; else fail++;
+    }catch(e){ fail++; }
+  }
+  res.innerHTML=`생성 ${made} · 이미있음 ${skip} · 실패 ${fail}. `+(fail?"실패는 CORS/권한 확인.":"✅ 문의 페이지의 이메일은 직접 채워주세요.");
+  adsCheck();
+};
+// ④ 반려 사유 분석 → 원인·보완·자동조치
+function analyzeReason(text){
+  const t=(text||"").toLowerCase();
+  const rules=[
+    {k:["가치","value","thin","별로","insufficient","저품질","낮은 품질","최소한의","no content"],
+      cause:"콘텐츠가 얇거나 가치가 낮다고 판정됨 (가장 흔한 사유)",
+      fix:"글을 20~30개로 늘리고 각 글을 800자+ 실경험·구체정보로 손질하세요. 대량 AI 양산 느낌을 줄이는 게 핵심.", act:["review","pages"]},
+    {k:["복제","중복","copied","duplicate","scraped","표절","기존"],
+      cause:"복제/중복 콘텐츠 의심", fix:"AI 티·복붙 문장 제거, 글마다 독창적 관점·경험 추가.", act:["review"]},
+    {k:["탐색","navigation","메뉴","menu","구조를","use"],
+      cause:"사이트 탐색/메뉴 미흡", fix:"워드프레스 외모→메뉴에서 상단 메뉴에 소개·문의·개인정보를 연결하세요.", act:[]},
+    {k:["개인정보","privacy","필수","이용약관","terms","연락","contact","about","소개"],
+      cause:"필수 페이지 누락", fix:"소개·문의·개인정보처리방침·이용약관을 갖추세요.", act:["pages"]},
+    {k:["정책","policy","금지","prohibited","위반"],
+      cause:"정책 위반 소지 콘텐츠", fix:"성인/과장의료/저작권/도박 등 민감 글을 점검·삭제하세요.", act:[]},
+    {k:["트래픽","traffic","방문","visitors","활동"],
+      cause:"방문자/활동 부족 신호", fix:"사이트맵 제출 + 마케팅으로 초기 유입을 확보하세요.", act:[]},
+  ];
+  const found=rules.filter(r=>r.k.some(k=>t.includes(k.toLowerCase())));
+  if(!found.length) found.push({cause:"구체 사유 불명 — 대체로 '콘텐츠 가치' 문제",
+    fix:"글 품질·분량·독창성 강화 + 필수 페이지 + 심사 모드부터.", act:["review","pages"]});
+  return found;
+}
+document.getElementById("adsAnalyze").onclick=()=>{
+  const reason=document.getElementById("adsReason").value.trim();
+  if(!reason){ toast("반려 사유를 붙여넣으세요",1); return; }
+  CFG.adsAttempts=(CFG.adsAttempts||[]).concat([{date:new Date().toISOString().slice(0,10),reason}]).slice(-10);
+  saveCfg();
+  const found=analyzeReason(reason);
+  const btns={review:`<button class="btn sm" style="padding:1px 9px;font-size:11px" onclick="document.getElementById('adsReviewMode').click()">심사 모드 켜기</button>`,
+              pages:`<button class="btn sm" style="padding:1px 9px;font-size:11px" onclick="document.getElementById('adsMakePages').click()">필수 페이지 생성</button>`};
+  document.getElementById("adsFix").innerHTML=`<div style="margin-bottom:6px"><b>진단 결과 (${CFG.adsAttempts.length}회차)</b></div>`+
+    found.map(f=>`<div style="margin:6px 0;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:8px">
+      <div>🔴 <b>${f.cause}</b></div>
+      <div class="hint" style="margin:3px 0">↳ ${f.fix}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${(f.act||[]).map(a=>btns[a]||"").join("")}</div></div>`).join("")+
+    `<div class="hint" style="margin-top:4px">보완 후 애드센스에서 재신청 → 또 반려되면 그 사유를 다시 붙여넣어 반복하세요. 회차가 쌓여도 핵심은 '콘텐츠 가치'입니다.</div>`;
+  const n=document.getElementById("adsAttemptN"); if(n) n.textContent="· 재신청 "+CFG.adsAttempts.length+"회차";
+};
+document.getElementById("adsReviewMode").onclick=async()=>{
+  CFG.paused=true;
+  CFG.safety=Object.assign({}, CFG.safety, {strength:"엄격", force_draft:true, verify_accuracy:"strict"});
+  saveCfg(); refreshPauseBtn();
+  await setPausedVar(true);
+  toast("심사 모드 ✓ 대량 생성 정지 + 엄격. 승인 후 자동생성을 다시 켜세요.");
+};
 function setRing(pct){
   pct=Math.max(0,Math.min(100,pct));
   document.getElementById("ringFg").style.strokeDashoffset=(RING_LEN*(1-pct/100)).toFixed(1);

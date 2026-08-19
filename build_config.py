@@ -43,6 +43,17 @@ def b(name, default=False):
     return str(v).strip().lower() in ("1", "true", "yes", "on")
 
 
+def envj(name, default):
+    """환경변수 JSON: 없거나 파싱 실패면 default. (제휴 링크 목록 등)"""
+    v = os.getenv(name)
+    if v is None or str(v).strip() == "":
+        return default
+    try:
+        return json.loads(v)
+    except (ValueError, TypeError):
+        return default
+
+
 def _safety_block():
     """안전/품질 강도 프리셋 → 개별 env가 있으면 그 값으로 덮어씀."""
     presets = {
@@ -66,6 +77,8 @@ def _safety_block():
         "refresh_days": envi("REFRESH_DAYS", 0),
         "refresh_max_per_run": envi("REFRESH_MAX_PER_RUN", 2),
         "drip_hours": envf("DRIP_HOURS", 0),
+        "drip_min_hours": envf("DRIP_MIN_HOURS", 0),
+        "drip_max_hours": envf("DRIP_MAX_HOURS", 0),
         "blocklist_extra": [w.strip() for w in envs("BLOCKLIST_EXTRA", "").split(",") if w.strip()],
     }
 
@@ -82,6 +95,11 @@ except Exception:
 
 cfg = {
     "paused": b("PAUSED", False),          # 매일 자동 생성 일시정지
+    "adsense_approved": b("ADSENSE_APPROVED", False),   # 승인 후 수익 최적화 활성 여부
+    "revenue": {
+        "ads_boost": b("ADS_BOOST", True),
+        "related_cards": b("RELATED_CARDS", True),
+    },
     "blog_url": envs("BLOG_URL", envs("WP_SITE", "")),
     "categories": categories,
     "counts": {
@@ -93,6 +111,18 @@ cfg = {
         "series_max_parts": envi("SERIES_MAX", 3),
     },
     "ads": {"insert_slots": b("INSERT_ADS", True)},
+    "coupang": {                                    # 쿠팡 파트너스(API 불필요)
+        "enabled": b("COUPANG_ENABLED", False),
+        "disclosure": b("COUPANG_DISCLOSURE", True),
+        "widget_html": envs("COUPANG_WIDGET_HTML", ""),
+    },
+    "affiliate": {                                  # 제휴 SaaS(쿠팡 외 일반 제휴 링크)
+        "enabled": b("AFFILIATE_ENABLED", False),
+        "disclosure": b("AFFILIATE_DISCLOSURE", True),
+        "box_title": envs("AFFILIATE_BOX_TITLE", "이 글에서 소개한 도구"),
+        # [{"name":"GetResponse","url":"https://...ref=me","desc":"이메일 자동화"}]
+        "links": envj("AFFILIATE_LINKS", []),
+    },
     # 애드센스 안전장치(초안강제 + 품질게이트 + 금지주제 + 최신성검증). 강도 프리셋 후 개별 env로 덮어씀
     "safety": _safety_block(),
     # 검색량 우선 비율(0~100). 없으면 KEYWORD_STRATEGY로 환산(rankable=0/traffic=100/balanced=30)
@@ -106,7 +136,7 @@ cfg = {
         "pexels_key": envs("PEXELS_API_KEY", ""),         # 무료 스톡(택1)
         "unsplash_key": envs("UNSPLASH_ACCESS_KEY", ""),  # 무료 스톡(택1)
         "model": envs("IMAGE_MODEL", "imagen-4.0-fast-generate-001"),  # 유료 provider일 때만
-        "size": envs("IMAGE_SIZE", "1024x1024"),
+        "size": envs("IMAGE_SIZE", "1200x675"),                        # 디스커버/SNS 규격
         "max_per_run": envi("IMAGE_MAX_PER_RUN", 20),                   # 비용 상한(유료)
         "api_key": envs("IMAGE_API_KEY", ""),
     },

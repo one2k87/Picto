@@ -345,18 +345,31 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
         except Exception as e:
             print(f"  · 정확도 검증/재작성 건너뜀: {e}")
 
-    drip_hours = float(safety.get("drip_hours", 0) or 0)   # 드립 발행 간격(시간). 0=즉시
+    # 드립(분산) 발행: 한 번에 다 올리지 않고 '랜덤 간격'으로 시간차 예약
+    drip_min = float(safety.get("drip_min_hours", 0) or 0)
+    drip_max = float(safety.get("drip_max_hours", 0) or 0)
+    _legacy = float(safety.get("drip_hours", 0) or 0)   # 하위호환(고정 간격)
+    if drip_max <= 0 and _legacy > 0:
+        drip_min = drip_max = _legacy
+    if drip_min <= 0:
+        drip_min = drip_max
     drip_i = 0
+    drip_offset = 0.0        # 누적 시간(시간 단위)
+    for a in generated:      # 제휴 삽입(설정 시): 애드센스 슬롯과 겹치지 않게 각각 다른 위치에
+        _apply_coupang(a, cfg)      # 쿠팡: 2번째 소제목 앞
+        _apply_affiliate(a, cfg)    # 제휴 SaaS: 3번째 소제목 앞
     out = []
     for a in generated:
         if auto_publish and a["quality"] == "통과":
             # 초안 강제: 사람이 검토 후 발행(대량 자동 발행 방지)
             wp = dict(wp_cfg, status="draft") if force_draft else wp_cfg
             scheduled = False
-            if not force_draft and drip_hours > 0:
+            if not force_draft and drip_max > 0:
                 from datetime import datetime as _dt, timedelta as _td
-                a["_schedule_date"] = (_dt.now() + _td(hours=drip_hours * drip_i)).isoformat()
-                scheduled = drip_i > 0      # 첫 글은 즉시, 이후는 예약
+                if drip_i > 0:                      # 첫 글은 즉시, 이후는 랜덤 간격 누적
+                    drip_offset += random.uniform(drip_min, drip_max)
+                a["_schedule_date"] = (_dt.now() + _td(hours=drip_offset)).isoformat()
+                scheduled = drip_i > 0
                 drip_i += 1
             url = publish_to_wordpress(a, wp)
             if not url:
@@ -380,6 +393,75 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
     print(f"  → [{name}] 슬롯 {sum(slot_count.values())}건 · 글 {len(out)}편"
           f"(품질보류 {sum(1 for a in out if a.get('quality')=='보류')}편)")
     return out
+
+
+def _apply_coupang(a, cfg):
+    """쿠팡 파트너스(API 불필요): 위젯 + 필수 고지문을 삽입.
+    - 위젯은 '본문 중간'(2번째 소제목 뒤)에 넣어 전환율을 높인다(하단은 CTR 낮음).
+    - 고지문은 글 첫 부분 규정 준수를 위해 위젯 바로 앞에 함께 붙인다.
+    - 애드센스 슬롯([[AD]])과 위치가 겹치지 않게 독립적으로 배치된다.
+    """
+    c = cfg.get("coupang", {}) or {}
+    if not c.get("enabled"):
+        return
+    widget = ""
+    if c.get("widget_html"):
+        widget = f'<div class="coupang-widget" style="margin:22px 0;text-align:center">{c["widget_html"]}</div>'
+    notice = ""
+    if c.get("disclosure", True):
+        notice = ('<p class="coupang-notice" style="font-size:12px;color:#98a2b3;margin:10px 0 4px;'
+                  'padding:8px 12px;background:#fafbfc;border-left:3px solid #ff5a5f">'
+                  '이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>')
+    block = notice + widget
+    if not block:
+        return
+    html = a.get("html", "") or ""
+    # 본문 중간(2번째 <h2> 앞) 삽입 → 없으면 하단 append
+    a["html"] = _insert_mid_body(html, block, nth_h2=2)
+
+
+def _insert_mid_body(html, block, nth_h2=2):
+    """<h2> 기준으로 본문 중간에 block을 끼워 넣는다(실패 시 하단 append)."""
+    import re as _re
+    idxs = [m.start() for m in _re.finditer(r"<h2\b", html)]
+    if len(idxs) >= nth_h2:
+        pos = idxs[nth_h2 - 1]           # nth번째 h2 '앞'에 삽입
+        return html[:pos] + block + html[pos:]
+    return html + block
+
+
+def _apply_affiliate(a, cfg):
+    """제휴 SaaS(쿠팡 외 일반 제휴): '추천 도구' 박스 + 고지문을 본문 중간에 삽입.
+    - links: [{"name","url","desc"}] 목록을 카드형 박스로 렌더.
+    - 링크는 rel='sponsored nofollow'(검색엔진 정책 준수).
+    - 3번째 소제목 앞에 넣어 쿠팡(2번째)·애드센스 슬롯과 위치가 겹치지 않게 한다.
+    """
+    c = cfg.get("affiliate", {}) or {}
+    if not c.get("enabled"):
+        return
+    links = [l for l in (c.get("links") or []) if l.get("url") and l.get("name")]
+    if not links:
+        return
+    title = html_mod.escape(c.get("box_title") or "이 글에서 소개한 도구")
+    items = ""
+    for l in links:
+        name = html_mod.escape(str(l.get("name", "")))
+        url = html_mod.escape(str(l.get("url", "")), quote=True)
+        desc = html_mod.escape(str(l.get("desc", "")))
+        items += (
+            f'<li style="margin:8px 0"><a href="{url}" target="_blank" '
+            f'rel="sponsored nofollow noopener" style="font-weight:700;color:#2563eb;text-decoration:none">'
+            f'{name} →</a>{(" — " + desc) if desc else ""}</li>')
+    notice = ""
+    if c.get("disclosure", True):
+        notice = ('<p style="font-size:12px;color:#98a2b3;margin:0 0 6px">'
+                  '※ 이 글에는 제휴 링크가 포함되어 있으며, 링크를 통해 가입·구매 시 '
+                  '일정액의 수수료를 받을 수 있습니다(구매자 추가 부담 없음).</p>')
+    box = (f'<div class="affiliate-box" style="margin:22px 0;padding:16px 18px;'
+           f'border:1px solid #e5e7eb;border-radius:12px;background:#fafbfc">'
+           f'<div style="font-weight:800;margin-bottom:6px">{title}</div>'
+           f'{notice}<ul style="margin:6px 0 0;padding-left:18px">{items}</ul></div>')
+    a["html"] = _insert_mid_body(a.get("html", "") or "", box, nth_h2=3)
 
 
 def _kw_set(s):
@@ -536,6 +618,12 @@ def _refresh_old_posts(cfg, hist, wp_cfg):
 def run():
     start_t = time.time()
     cfg = load_config()
+
+    # 승인 후 수익 최적화(광고 3개 등)는 '애드센스 승인됨'일 때만 적용
+    _approved = bool(cfg.get("adsense_approved"))
+    _rev = cfg.get("revenue", {}) or {}
+    import generator as _gen
+    _gen.ADS_BOOST = _approved and bool(_rev.get("ads_boost", True))
 
     # 일시정지: 매일 자동 생성을 꺼둔 상태면 아무것도 하지 않고 종료(초안 안 쌓임, API 호출 0)
     if cfg.get("paused"):
