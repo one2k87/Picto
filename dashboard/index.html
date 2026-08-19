@@ -359,7 +359,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v26 · AI 키 연결 마법사</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v27 · 제휴 SaaS 추천 도구</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -528,6 +528,18 @@
     <label style="margin-top:8px;display:block">쿠팡 위젯/배너 임베드 코드 (선택)</label>
     <textarea id="cfgCoupangWidget" rows="3" placeholder="쿠팡 파트너스에서 발급한 다이나믹 배너/위젯 코드 붙여넣기" style="width:100%;font-size:13px;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:8px"></textarea>
     <div class="hint">쿠팡 파트너스 → 배너/위젯 → 코드 생성 → 여기에 붙여넣기. 비우면 고지문만 들어갑니다.</div>
+  </div>
+
+  <div class="divider"></div>
+  <h2 style="font-size:14px">💼 제휴 SaaS (개발자 툴 수익)</h2>
+  <div class="field">
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+      <input type="checkbox" id="cfgAffiliate" style="width:auto"> 글에 <b>제휴 SaaS 추천 도구</b> 박스 넣기
+    </label>
+    <div class="hint">체크하면 본문 중간에 "추천 도구" 박스(+필수 고지문)가 자동으로 들어갑니다. 쿠팡과 같은 글에 함께 넣을 수 있어요(서로 겹치지 않게 배치됨).</div>
+    <label style="margin-top:8px;display:block">소개할 제휴 링크 (한 줄에 하나씩)</label>
+    <textarea id="cfgAffiliateLinks" rows="4" placeholder="이름 | 제휴링크 | 한줄설명(선택)&#10;예) Cloudways | https://cloudways.com/?ref=내코드 | 빠른 워드프레스 호스팅&#10;예) GetResponse | https://getresponse.com/?ref=내코드 | 이메일 자동화" style="width:100%;font-size:13px;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:8px"></textarea>
+    <div class="hint"><b>이름 | 링크 | 설명</b> 형식으로 한 줄에 하나씩. 설명은 생략 가능(이름 | 링크만 써도 됨). 각 회사 사이트 하단 "Affiliates/Partners"에서 가입 후 받은 내 전용 링크를 넣으세요.</div>
   </div>
 
   <div class="divider"></div>
@@ -1160,6 +1172,8 @@ function openSheet(){
   document.getElementById("cfgStatus").value=CFG.status||"draft";
   document.getElementById("cfgCoupang").checked=!!(CFG.coupang&&CFG.coupang.enabled);
   document.getElementById("cfgCoupangWidget").value=(CFG.coupang&&CFG.coupang.widget_html)||"";
+  document.getElementById("cfgAffiliate").checked=!!(CFG.affiliate&&CFG.affiliate.enabled);
+  document.getElementById("cfgAffiliateLinks").value=linksToLines((CFG.affiliate&&CFG.affiliate.links)||[]);
   document.getElementById("cfgIndexnow").value=(CFG.safety&&CFG.safety.indexnow_key)||"";
   fillSitemap(CFG.site||"");
   document.getElementById("sheetBg").classList.add("open");
@@ -1243,8 +1257,22 @@ document.getElementById("cfgSave").onclick=()=>{
     enabled:document.getElementById("cfgCoupang").checked,
     widget_html:document.getElementById("cfgCoupangWidget").value
   });
+  CFG.affiliate=Object.assign({}, CFG.affiliate, {
+    enabled:document.getElementById("cfgAffiliate").checked,
+    links:linesToLinks(document.getElementById("cfgAffiliateLinks").value)
+  });
   CFG.safety=Object.assign({}, CFG.safety, {indexnow_key:document.getElementById("cfgIndexnow").value.trim()});
   saveCfg();closeSheet();toast("저장됨 ✓");loadData();};
+// 💼 제휴 SaaS 링크: "이름 | 링크 | 설명" 줄 ↔ {name,url,desc} 배열 변환
+function linesToLinks(text){
+  return String(text||"").split("\n").map(l=>l.trim()).filter(Boolean).map(l=>{
+    const p=l.split("|").map(s=>s.trim());
+    return {name:p[0]||"", url:p[1]||"", desc:p[2]||""};
+  }).filter(l=>l.name&&l.url);
+}
+function linksToLines(links){
+  return (links||[]).map(l=>[l.name,l.url,l.desc].filter((v,i)=>i<2||v).join(" | ")).join("\n");
+}
 function fillSitemap(site){
   const el=document.getElementById("cfgSitemap"); if(!el)return;
   el.value = site ? (site.replace(/\/+$/,"")+"/sitemap_index.xml") : "";
@@ -1274,6 +1302,7 @@ function runInputs(withImg){
   if(CFG.safety&&CFG.safety.refresh_days!=null) inp.refresh_days=String(CFG.safety.refresh_days); // 리프레시 주기
   if(CFG.safety&&CFG.safety.drip_max_hours){ inp.drip_min=String(CFG.safety.drip_min_hours||0); inp.drip_max=String(CFG.safety.drip_max_hours); } // 드립 랜덤 간격
   if(CFG.coupang){ inp.coupang=CFG.coupang.enabled?"true":"false"; if(CFG.coupang.widget_html) inp.coupang_widget=CFG.coupang.widget_html; }
+  if(CFG.affiliate){ inp.affiliate=CFG.affiliate.enabled?"true":"false"; if((CFG.affiliate.links||[]).length) inp.affiliate_links=JSON.stringify(CFG.affiliate.links); }
   inp.adsense_approved = CFG.adsenseApproved ? "true" : "false";   // 승인 후 수익 최적화 게이트
   if(CFG.revenue){ inp.ads_boost = CFG.revenue.ads_boost!==false ? "true":"false"; }
   inp.paused = CFG.paused ? "true" : "false";   // 일시정지 상태(수동 실행에도 반영)

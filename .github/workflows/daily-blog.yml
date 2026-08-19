@@ -50,6 +50,14 @@ on:
         description: "쿠팡 위젯 임베드 코드"
         default: ""
         required: false
+      affiliate:
+        description: "제휴 SaaS 추천 도구 박스 삽입 (true/false)"
+        default: ""
+        required: false
+      affiliate_links:
+        description: "제휴 링크 목록 (JSON 배열: name/url/desc)"
+        default: ""
+        required: false
       adsense_approved:
         description: "애드센스 승인됨 (true/false) — 승인 후 수익 최적화 활성"
         default: ""
@@ -139,6 +147,8 @@ jobs:
           ADS_BOOST: ${{ github.event.inputs.ads_boost != '' && github.event.inputs.ads_boost || secrets.ADS_BOOST }}
           COUPANG_ENABLED: ${{ github.event.inputs.coupang != '' && github.event.inputs.coupang || secrets.COUPANG_ENABLED }}
           COUPANG_WIDGET_HTML: ${{ github.event.inputs.coupang_widget != '' && github.event.inputs.coupang_widget || secrets.COUPANG_WIDGET_HTML }}
+          AFFILIATE_ENABLED: ${{ github.event.inputs.affiliate != '' && github.event.inputs.affiliate || secrets.AFFILIATE_ENABLED }}
+          AFFILIATE_LINKS: ${{ github.event.inputs.affiliate_links != '' && github.event.inputs.affiliate_links || secrets.AFFILIATE_LINKS }}
           PAUSED: ${{ github.event.inputs.paused != '' && github.event.inputs.paused || vars.PAUSED }}
           SAFETY_STRENGTH: ${{ github.event.inputs.strength != '' && github.event.inputs.strength || secrets.SAFETY_STRENGTH }}
           FORCE_DRAFT: ${{ secrets.FORCE_DRAFT }}
