@@ -359,7 +359,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v27 · 제휴 SaaS 추천 도구</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v28 · 작성자 정보 자동 등록</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -540,6 +540,27 @@
     <label style="margin-top:8px;display:block">소개할 제휴 링크 (한 줄에 하나씩)</label>
     <textarea id="cfgAffiliateLinks" rows="4" placeholder="이름 | 제휴링크 | 한줄설명(선택)&#10;예) Cloudways | https://cloudways.com/?ref=내코드 | 빠른 워드프레스 호스팅&#10;예) GetResponse | https://getresponse.com/?ref=내코드 | 이메일 자동화" style="width:100%;font-size:13px;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:8px"></textarea>
     <div class="hint"><b>이름 | 링크 | 설명</b> 형식으로 한 줄에 하나씩. 설명은 생략 가능(이름 | 링크만 써도 됨). 각 회사 사이트 하단 "Affiliates/Partners"에서 가입 후 받은 내 전용 링크를 넣으세요.</div>
+  </div>
+
+  <div class="divider"></div>
+  <h2 style="font-size:14px">✍️ 작성자 정보 (신뢰도 강화)</h2>
+  <div class="field">
+    <div class="hint" style="margin-bottom:8px">금융·건강 글은 "누가 썼는지"가 신뢰 신호(E-E-A-T)예요. 실명 노출 부담 없이 <b>필명</b>으로 설정하는 걸 추천드려요. 아래 값은 추천 기본값이며 자유롭게 바꿔도 됩니다.</div>
+    <label>작성자 이름(필명)</label>
+    <input id="cfgAuthorName" placeholder="예: 정다인 에디터">
+    <label style="margin-top:8px;display:block">한 줄 소개</label>
+    <input id="cfgAuthorBio" placeholder="예: 생활 속 금융·건강 정보를 조사하고 정리해 전달합니다.">
+    <div class="hint">과장된 자격("의사 15년 경력" 등)은 쓰지 마세요 — 실제와 다르면 오히려 정책 위반입니다. "정보를 조사·정리해 전달"처럼 사실 그대로가 안전해요.</div>
+    <label style="margin-top:8px;display:block">표시 유형</label>
+    <select id="cfgAuthorType">
+      <option value="Person">Person (실명/필명 저자 — 신뢰 신호 강함, 추천)</option>
+      <option value="Organization">Organization (편집팀 — 무난하지만 신호 약함)</option>
+    </select>
+    <div class="actions" style="margin-top:10px">
+      <button class="btn sm" id="authorRegister">GitHub에 자동 등록</button>
+    </div>
+    <div id="authorRegResult" class="hint" style="margin-top:6px"></div>
+    <div class="hint">등록하면 다음 글부터 이 이름·소개가 자동으로 들어갑니다. 위 "⚙️ GitHub 연동"에 저장소 정보가 있어야 자동 등록이 동작해요(🔑 키 마법사와 같은 방식).</div>
   </div>
 
   <div class="divider"></div>
@@ -1174,6 +1195,9 @@ function openSheet(){
   document.getElementById("cfgCoupangWidget").value=(CFG.coupang&&CFG.coupang.widget_html)||"";
   document.getElementById("cfgAffiliate").checked=!!(CFG.affiliate&&CFG.affiliate.enabled);
   document.getElementById("cfgAffiliateLinks").value=linksToLines((CFG.affiliate&&CFG.affiliate.links)||[]);
+  document.getElementById("cfgAuthorName").value=CFG.author||"정다인 에디터";
+  document.getElementById("cfgAuthorBio").value=CFG.authorBio||"생활 속 금융·건강 정보를 조사하고 정리해 전달합니다.";
+  document.getElementById("cfgAuthorType").value=CFG.authorType||"Person";
   document.getElementById("cfgIndexnow").value=(CFG.safety&&CFG.safety.indexnow_key)||"";
   fillSitemap(CFG.site||"");
   document.getElementById("sheetBg").classList.add("open");
@@ -1261,6 +1285,9 @@ document.getElementById("cfgSave").onclick=()=>{
     enabled:document.getElementById("cfgAffiliate").checked,
     links:linesToLinks(document.getElementById("cfgAffiliateLinks").value)
   });
+  CFG.author=document.getElementById("cfgAuthorName").value.trim();
+  CFG.authorBio=document.getElementById("cfgAuthorBio").value.trim();
+  CFG.authorType=document.getElementById("cfgAuthorType").value;
   CFG.safety=Object.assign({}, CFG.safety, {indexnow_key:document.getElementById("cfgIndexnow").value.trim()});
   saveCfg();closeSheet();toast("저장됨 ✓");loadData();};
 // 💼 제휴 SaaS 링크: "이름 | 링크 | 설명" 줄 ↔ {name,url,desc} 배열 변환
@@ -1433,6 +1460,25 @@ document.getElementById("wizCopy").onclick=()=>{
   const key=(document.getElementById("wizKey").value||"").trim(); if(!key){ toast("키를 붙여넣으세요",1); return; }
   clip(key,"키 복사됨 ✓");
   alert("GitHub 저장소 → Settings → Secrets and variables → Actions → New repository secret →\n이름: LLM_API_KEY\n값: (방금 복사한 키 붙여넣기) → Add secret");
+};
+document.getElementById("authorRegister").onclick=async()=>{
+  const name=(document.getElementById("cfgAuthorName").value||"").trim();
+  const bio=(document.getElementById("cfgAuthorBio").value||"").trim();
+  const type=document.getElementById("cfgAuthorType").value;
+  if(!name){ toast("작성자 이름을 입력하세요",1); return; }
+  const box=document.getElementById("authorRegResult"); box.textContent="등록 중… (3개 값)";
+  CFG.author=name; CFG.authorBio=bio; CFG.authorType=type; saveCfg();
+  const r1=await ghSetSecret("AUTHOR_NAME", name);
+  const r2=await ghSetSecret("AUTHOR_BIO", bio);
+  const r3=await ghSetSecret("AUTHOR_TYPE", type);
+  if(r1.ok&&r2.ok&&r3.ok){
+    box.innerHTML='<span style="color:#33c27f">✅ GitHub에 자동 등록됨(AUTHOR_NAME/BIO/TYPE). 다음 글부터 반영돼요.</span>';
+  } else if(r1.reason==="no-gh"){
+    box.innerHTML='<span style="color:#ffb020">GitHub 정보가 없어요. ⚙️ 위쪽 "GitHub 연동"에 저장소·토큰을 먼저 입력하세요.</span>';
+  } else {
+    box.innerHTML='<span style="color:#ff6b4a">일부 등록 실패. 토큰에 <b>Secrets 쓰기</b> 권한이 있는지 확인하세요('+
+      [r1,r2,r3].map(r=>r.status||r.reason).join(", ")+').</span>';
+  }
 };
 document.getElementById("adsApprovedBtn").onclick=()=>{ CFG.adsenseApproved=!CFG.adsenseApproved; saveCfg(); refreshApprovedUI();
   toast(CFG.adsenseApproved?"승인 완료 ✓ 수익 최적화가 켜졌어요":"승인 전으로 전환"); };
