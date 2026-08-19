@@ -207,9 +207,20 @@ def save_copy_html(article):
     return path
 
 
-def _plan_slots(cfg):
-    """각 갈래의 슬롯을 (series/single)로 계획. 시리즈=1슬롯(여러 편 생성)."""
-    c = cfg.get("counts", {})
+def _category_active_today(cat):
+    """카테고리별 '격일' 운영. active_days: all(기본)/odd(홀수날)/even(짝수날).
+    day-of-year 기준이라 요일과 무관하게 정확히 하루걸러 하루 실행된다."""
+    mode = str(cat.get("active_days") or "all").strip().lower()
+    if mode not in ("odd", "even"):
+        return True
+    doy_is_odd = (datetime.now().timetuple().tm_yday % 2 == 1)
+    return doy_is_odd if mode == "odd" else (not doy_is_odd)
+
+
+def _plan_slots(cfg, cat=None):
+    """각 갈래의 슬롯을 (series/single)로 계획. 시리즈=1슬롯(여러 편 생성).
+    카테고리 dict에 'counts'가 있으면 그 카테고리 전용 발행량으로 우선 사용(없으면 전역 기본값)."""
+    c = (cat or {}).get("counts") or cfg.get("counts", {})
     smin = c.get("series_min_parts", 2)
     smax = c.get("series_max_parts", 3)
 
@@ -234,6 +245,8 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
     blog_url = cfg.get("blog_url", "") or cfg.get("site", {}).get("blog_url", "")
     insert_ads = cfg.get("ads", {}).get("insert_slots", True)
     author = cfg.get("author") or "편집부"
+    author_bio = cfg.get("author_bio") or ""
+    author_type = cfg.get("author_type") or "Organization"
     wp_cfg = cfg.get("wordpress", {})
     resolver = make_image_resolver(cfg, auto_publish, name, img_budget)
 
@@ -243,7 +256,7 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
     related_pool = list(reversed(cat_hist))[:6]
 
     print(f"\n########## [{name}] ##########")
-    slots = _plan_slots(cfg)
+    slots = _plan_slots(cfg, cat)
     need = {"long": sum(1 for s in slots if s[0] == "long"),
             "season": sum(1 for s in slots if s[0] == "season")}
     topic_q = {}
@@ -281,12 +294,14 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
                 arts = generate_series(kw["keyword"], lane, n_parts, cfg["llm"],
                                        category=name, related=related, blog_url=blog_url,
                                        insert_ads=insert_ads, image_resolver=resolver, author=author,
+                                       author_bio=author_bio, author_type=author_type,
                                        competitive=comp)
             else:
                 print(f"-> [단일][{lane}]{'[상위노출강화]' if comp else ''} {kw['keyword']}")
                 arts = generate_article(kw["keyword"], lane, cfg["llm"],
                                         category=name, related=related, blog_url=blog_url,
                                         insert_ads=insert_ads, image_resolver=resolver, author=author,
+                                        author_bio=author_bio, author_type=author_type,
                                         competitive=comp)
         except Exception as e:
             print(f"[오류] '{kw['keyword']}' 글 생성 실패(건너뜀): {e}")
@@ -678,6 +693,9 @@ def run():
     all_articles = []
     for cat in cats:
         if not cat["name"]:
+            continue
+        if not _category_active_today(cat):
+            print(f"[건너뜀] '{cat['name']}' — 오늘은 격일 휴무일(active_days={cat.get('active_days')})")
             continue
         try:
             all_articles += _run_category(cfg, cat, hist, auto_publish, img_budget)

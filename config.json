@@ -9,17 +9,26 @@
   "paused": false,
   "_paused_설명": "true면 매일 자동 생성을 멈춤(초안이 안 쌓임). 애드센스 심사 중 등에 사용. 앱의 '매일 자동 생성' 스위치로 켜고 끔",
   "blog_url": "https://your-blog.com",
+  "author": "편집부",
+  "author_bio": "",
+  "author_type": "Organization",
+  "_author_설명": "작성자 표시(글 상단 ✍️ 줄 + 구조화데이터). author_type을 'Person'으로 바꾸고 실명+author_bio(한 줄 소개)를 넣으면 금융/건강 같은 YMYL 주제에서 신뢰 신호(E-E-A-T)가 강해짐. 예: author='김OO', author_bio='7년차 재무설계 실무 경험', author_type='Person'",
+
   "categories": [
-    { "name": "금융/재테크", "wp_category": "금융", "wp_slug": "finance", "desc": "신용카드, 대출, 정부지원금, 연금, 세금, 청약, 재테크, 주식/ETF 등 고단가 금융 주제" },
-    { "name": "건강/생활", "wp_category": "건강", "wp_slug": "health", "desc": "다이어트, 영양제, 탈모, 피부, 수면, 홈트, 건강검진 등 고단가 건강·생활 주제" },
-    { "name": "경제/IT", "wp_category": "경제IT", "wp_slug": "econ-it", "desc": "물가·금리·부동산 경제, AI 도구, 클라우드, 앱/프로그램 사용법 등 경제/IT 주제" }
+    { "name": "경제/IT", "wp_category": "경제IT", "wp_slug": "econ-it", "desc": "물가·금리·부동산 경제, AI 도구, 클라우드, 앱/프로그램 사용법 등 경제/IT 주제",
+      "counts": { "long_series": 0, "long_single": 4, "season_series": 0, "season_single": 0 }, "active_days": "all" },
+    { "name": "금융/재테크", "wp_category": "금융", "wp_slug": "finance", "desc": "신용카드, 대출, 정부지원금, 연금, 세금, 청약, 재테크, 주식/ETF 등 고단가 금융 주제",
+      "counts": { "long_series": 0, "long_single": 1, "season_series": 0, "season_single": 0 }, "active_days": "odd" },
+    { "name": "건강/생활", "wp_category": "건강", "wp_slug": "health", "desc": "다이어트, 영양제, 탈모, 피부, 수면, 홈트, 건강검진 등 고단가 건강·생활 주제",
+      "counts": { "long_series": 0, "long_single": 1, "season_series": 0, "season_single": 0 }, "active_days": "even" }
   ],
-  "_categories_설명": "wp_category=워드프레스 카테고리 이름, wp_slug=영문 주소(/category/finance/). 슬러그 비우면 이름으로 자동 생성",
+  "_categories_설명": "wp_category=워드프레스 카테고리 이름, wp_slug=영문 주소(/category/finance/). 카테고리 안 counts=이 카테고리 전용 발행량(전역 counts보다 우선). active_days: all=매일, odd=홀수날만, even=짝수날만(격일 운영). 지금 설정=경제/IT 매일 4편 + 금융·건강 격일로 1편씩 = 하루 총 5편",
 
   "counts": {
-    "long_series": 2, "long_single": 2,
-    "season_series": 1, "season_single": 1,
-    "series_min_parts": 2, "series_max_parts": 3
+    "long_series": 0, "long_single": 1,
+    "season_series": 0, "season_single": 0,
+    "series_min_parts": 2, "series_max_parts": 3,
+    "_설명": "카테고리에 counts가 없을 때만 쓰는 전역 기본값(소량 안전값)"
   },
 
   "ads": { "insert_slots": true },
@@ -40,29 +49,29 @@
   "_affiliate_설명": "제휴 SaaS(쿠팡 외 일반 제휴). enabled=true면 본문 중간에 '추천 도구' 박스 + 고지문 삽입. links는 [{\"name\":\"GetResponse\",\"url\":\"내 제휴링크\",\"desc\":\"한 줄 설명\"}] 형태. 애드센스 슬롯과 겹치지 않게 자동 배치되어, 한 글에 애드센스+제휴가 함께 실림",
 
   "safety": {
-    "strength": "표준",
+    "strength": "엄격",
     "force_draft": true,
-    "min_chars": 700,
+    "min_chars": 1000,
     "min_h2": 3,
     "stuffing_count": 8,
     "max_keyword_density": 0.03,
-    "max_similarity": 0.5,
-    "verify_accuracy": "flag",
+    "max_similarity": 0.4,
+    "verify_accuracy": "strict",
     "auto_revise": true,
-    "relink_old": false,
-    "refresh_days": 0,
+    "relink_old": true,
+    "refresh_days": 60,
     "refresh_max_per_run": 2,
-    "_refresh_설명": "오래된 글 자동 최신화 주기(일). 0=끔, 7/14/30 등. 실행마다 refresh_max_per_run편씩 옛 정보를 현재 기준으로 다시 씀",
+    "_refresh_설명": "오래된 글 자동 최신화 주기(일). 0=끔, 7/14/30/60 등. 실행마다 refresh_max_per_run편씩 옛 정보를 현재 기준으로 다시 씀",
     "drip_hours": 0,
-    "drip_min_hours": 0,
-    "drip_max_hours": 0,
-    "_drip_설명": "드립(예약) 발행. 즉시발행(force_draft=false)일 때만 적용. drip_min_hours~drip_max_hours 사이 '랜덤 간격'으로 시간차 예약(예: 1.5~2.5). 0이면 한번에. drip_hours는 옛 고정간격(하위호환)",
+    "drip_min_hours": 2,
+    "drip_max_hours": 5,
+    "_drip_설명": "드립(예약) 발행. 즉시발행(force_draft=false)일 때만 적용. drip_min_hours~drip_max_hours 사이 '랜덤 간격'으로 시간차 예약(예: 2~5시간). 하루 5편을 하루 종일 자연스럽게 나눠 발행. drip_hours는 옛 고정간격(하위호환)",
     "blocklist_extra": []
   },
   "_safety_설명": "애드센스 안전장치. strength=강도 프리셋(느슨/표준/엄격). force_draft=자동발행 대신 초안 저장(검토 후 발행). 품질 미달(분량·소제목·키워드도배·중복)은 발행 보류. verify_accuracy=최신성검증(off/flag/strict). auto_revise=최신성 문제 발견 시 '글을 자동으로 다시 씀'(true). relink_old=새 글이 예전 글을 대체하면 예전 글에 최신글 링크 배너 자동 추가. blocklist_extra=추가 금지어",
 
-  "traffic_ratio": 30,
-  "_traffic_ratio_설명": "검색량 우선 비율(0~100). 0=상위노출 잘되는 것만, 100=검색량 큰 것만, 30=상위노출 위주+검색량 약간. 나머지는 상위노출 몫",
+  "traffic_ratio": 15,
+  "_traffic_ratio_설명": "검색량 우선 비율(0~100). 0=상위노출 잘되는 것만, 100=검색량 큰 것만, 15=신규 도메인에 맞게 저경쟁(상위노출) 위주로 조정한 기본값. 나머지는 상위노출 몫",
 
 
   "images": {

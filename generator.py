@@ -418,12 +418,14 @@ def _invest_risk_html():
             '상담하시기 바랍니다.</p>')
 
 
-def _byline_html(author):
+def _byline_html(author, bio=""):
+    """작성자 표시줄. bio가 있으면 이름 옆에 짧은 소개를 덧붙여 E-E-A-T(경험·전문성) 신호를 강화."""
     from datetime import date
     d = date.today()
     a = html_mod.escape(author or "편집부")
+    bio_html = f' <span style="color:#b0b8c1">· {html_mod.escape(bio)}</span>' if bio else ""
     return (f'<p class="byline" style="font-size:12px;color:#98a2b3;margin:2px 0 12px">'
-            f'✍️ {a} · 최종 업데이트 {d.year}년 {d.month}월 {d.day}일</p>')
+            f'✍️ {a}{bio_html} · 최종 업데이트 {d.year}년 {d.month}월 {d.day}일</p>')
 
 
 def _freshness_html():
@@ -440,13 +442,18 @@ def _freshness_html():
             f'🗓️ <b>기준: {d.year}년 {d.month}월</b> · {tail}</p>')
 
 
-def _build_jsonld(title, meta, faqs, author="편집부", lang="ko"):
+def _build_jsonld(title, meta, faqs, author="편집부", lang="ko", author_type="Organization", author_bio=""):
+    """author_type='Person'이면 실명 저자로 인식되어 YMYL(금융/건강) E-E-A-T 신뢰 신호가 강해진다."""
     from datetime import date
     iso = date.today().isoformat()
+    a_type = "Person" if str(author_type or "").strip().lower() == "person" else "Organization"
+    author_obj = {"@type": a_type, "name": author or "편집부"}
+    if author_bio and a_type == "Person":
+        author_obj["description"] = author_bio
     blog = {"@context": "https://schema.org", "@type": "BlogPosting",
             "headline": title, "description": meta, "inLanguage": lang,
             "datePublished": iso, "dateModified": iso,
-            "author": {"@type": "Organization", "name": author or "편집부"},
+            "author": author_obj,
             "mainEntityOfPage": {"@type": "WebPage"}}
     scripts = [json.dumps(blog, ensure_ascii=False)]
     if faqs:
@@ -459,14 +466,14 @@ def _build_jsonld(title, meta, faqs, author="편집부", lang="ko"):
 
 
 def _assemble(data, related, blog_url, insert_ads, resolver=None, series_nav="",
-              category="", author="편집부"):
+              category="", author="편집부", author_bio="", author_type="Organization"):
     body = _convert_markers(data.get("html_body", ""), insert_ads, resolver)
     body, headings = _slugify_headings(body)
     toc = _build_toc(headings)
     summary = _summary_table_html(data.get("summary_table"))
     hook = data.get("hook", "")
     hook_html = f'<p class="hook" style="font-size:17px;font-weight:600">{html_mod.escape(hook)}</p>' if hook else ""
-    byline = _byline_html(author)                       # 작성자·최종수정일
+    byline = _byline_html(author, author_bio)            # 작성자·소개·최종수정일
     tldr = _tldr_html(data.get("tldr", []))             # 상단 핵심요약
     checklist = _checklist_html(data.get("checklist", []))  # 실행 체크리스트
     faq_html = _build_faq_html(data.get("faqs", []))
@@ -476,7 +483,8 @@ def _assemble(data, related, blog_url, insert_ads, resolver=None, series_nav="",
     risk_txt = f"{category} {data.get('title','')} {data.get('focus_keyword','')} {data.get('meta','')}"
     invest_risk = _invest_risk_html() if _needs_invest_risk(risk_txt) else ""
     internal = _build_internal_links(related, blog_url)
-    jsonld = _build_jsonld(data.get("title", ""), data.get("meta", ""), data.get("faqs", []), author)
+    jsonld = _build_jsonld(data.get("title", ""), data.get("meta", ""), data.get("faqs", []),
+                           author, author_type=author_type, author_bio=author_bio)
     # 순서: 후킹 → 작성정보 → 핵심요약 → (시리즈 내비) → 목차 → 요약표 → 본문 →
     #        실행 체크리스트 → FAQ → 정보기준일 → 투자위험 → 면책 → (시리즈 내비) → 내부링크 → 구조화데이터
     return (f"{hook_html}{byline}{tldr}{series_nav}{toc}{summary}{body}"
@@ -484,7 +492,8 @@ def _assemble(data, related, blog_url, insert_ads, resolver=None, series_nav="",
 
 
 def _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,
-             insert_ads, image_resolver, series_nav="", author="편집부", competitive=False):
+             insert_ads, image_resolver, series_nav="", author="편집부",
+             author_bio="", author_type="Organization", competitive=False):
     prompt = _article_prompt(keyword, kind, category, links, related, insert_ads, competitive)
     raw = chat(prompt, llm_cfg, system=SYSTEM, max_tokens=6000, temperature=0.7)
     data = _parse_output(raw)
@@ -507,7 +516,8 @@ def _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,
     data["title"] = title
     slug = slugify((data.get("slug") or "").strip() or slugify(title))
     full_html = _assemble(data, related, blog_url, insert_ads, image_resolver, series_nav,
-                          category=category, author=author)
+                          category=category, author=author, author_bio=author_bio,
+                          author_type=author_type)
     return {
         "keyword": keyword, "kind": kind, "lang": "ko", "category": category,
         "title": data.get("title") or keyword,
@@ -520,12 +530,13 @@ def _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,
 
 def generate_article(keyword, kind, llm_cfg, category="", related=None,
                      blog_url="", insert_ads=True, context_news=None, image_resolver=None,
-                     author="편집부", competitive=False):
+                     author="편집부", author_bio="", author_type="Organization", competitive=False):
     """키워드 1개 → 수익형 한국어 글 dict 반환(리스트로 감싸 반환)."""
     related = related or []
     links = find_reference_links(keyword, max_results=2)
     art = _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,
-                   insert_ads, image_resolver, author=author, competitive=competitive)
+                   insert_ads, image_resolver, author=author, author_bio=author_bio,
+                   author_type=author_type, competitive=competitive)
     return [art]
 
 
@@ -546,7 +557,7 @@ def _series_nav(parts_meta, cur_idx, blog_url):
 
 def generate_series(topic, kind, n_parts, llm_cfg, category="", related=None,
                     blog_url="", insert_ads=True, image_resolver=None, author="편집부",
-                    competitive=False):
+                    author_bio="", author_type="Organization", competitive=False):
     """
     하나의 주제를 2~3편 시리즈로 기획해 각 편을 완성 글로 생성.
     편 간 내부링크 + 마지막→처음 루프. 반환: 편 리스트(모두 같은 series_id).
@@ -577,6 +588,7 @@ def generate_series(topic, kind, n_parts, llm_cfg, category="", related=None,
         rel = related[:2]
         art = _gen_one(kw, kind, llm_cfg, category, links, rel, blog_url,
                        insert_ads, image_resolver, series_nav=nav, author=author,
+                       author_bio=author_bio, author_type=author_type,
                        competitive=competitive)
         art["slug"] = parts_meta[i]["slug"]     # 확정 슬러그 유지(링크 일치)
         art["series_id"] = series_id

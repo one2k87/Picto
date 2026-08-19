@@ -110,6 +110,9 @@ jobs:
           KEYWORD_STRATEGY: ${{ github.event.inputs.strategy != '' && github.event.inputs.strategy || secrets.KEYWORD_STRATEGY }}
           TRAFFIC_RATIO: ${{ github.event.inputs.ratio != '' && github.event.inputs.ratio || secrets.TRAFFIC_RATIO }}
           BLOG_URL: ${{ secrets.BLOG_URL }}
+          AUTHOR_NAME: ${{ secrets.AUTHOR_NAME }}
+          AUTHOR_BIO: ${{ secrets.AUTHOR_BIO }}
+          AUTHOR_TYPE: ${{ secrets.AUTHOR_TYPE }}
           LONG_SERIES: ${{ secrets.LONG_SERIES }}
           LONG_SINGLE: ${{ secrets.LONG_SINGLE }}
           SEASON_SERIES: ${{ secrets.SEASON_SERIES }}

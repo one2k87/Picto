@@ -61,7 +61,9 @@ def _safety_block():
         "표준":  {"force_draft": True,  "min_chars": 700,  "max_similarity": 0.50, "verify_accuracy": "flag"},
         "엄격":  {"force_draft": True,  "min_chars": 1000, "max_similarity": 0.40, "verify_accuracy": "strict"},
     }
-    strength = envs("SAFETY_STRENGTH", "표준")
+    # 발행량을 하루 5편으로 줄인 만큼(비용 여유 생김) 기본 강도를 '엄격'으로 상향.
+    # YMYL(금융/건강) 비중이 있는 만큼 품질 기준을 높게 잡는 게 정책 리스크 대비에 유리.
+    strength = envs("SAFETY_STRENGTH", "엄격")
     p = presets.get(strength, presets["표준"])
     return {
         "strength": strength,
@@ -73,20 +75,37 @@ def _safety_block():
         "max_similarity": envf("QUALITY_MAX_SIMILARITY", p["max_similarity"]),
         "verify_accuracy": envs("VERIFY_ACCURACY", p["verify_accuracy"]),
         "auto_revise": b("AUTO_REVISE", True),
-        "relink_old": b("RELINK_OLD", False),
-        "refresh_days": envi("REFRESH_DAYS", 0),
+        "relink_old": b("RELINK_OLD", True),           # 옛글↔새글 자동 내부링크(무비용, 신선도 신호)
+        "refresh_days": envi("REFRESH_DAYS", 60),       # 60일 지난 글을 주기적으로 최신화(사람 손 안 감)
         "refresh_max_per_run": envi("REFRESH_MAX_PER_RUN", 2),
         "drip_hours": envf("DRIP_HOURS", 0),
-        "drip_min_hours": envf("DRIP_MIN_HOURS", 0),
-        "drip_max_hours": envf("DRIP_MAX_HOURS", 0),
+        # 하루 5편을 하루 종일 자연스럽게 나눠 발행(한꺼번에 안 몰리게) — 2~5시간 랜덤 간격
+        "drip_min_hours": envf("DRIP_MIN_HOURS", 2),
+        "drip_max_hours": envf("DRIP_MAX_HOURS", 5),
         "blocklist_extra": [w.strip() for w in envs("BLOCKLIST_EXTRA", "").split(",") if w.strip()],
     }
 
 
+def _singles(n):
+    """단일글만 n편(시리즈 없음) — 발행량을 정확히 예측 가능하게(격일/소량 운영용)."""
+    return {"long_series": 0, "long_single": n, "season_series": 0, "season_single": 0}
+
+
+# 하루 총 5편 목표(직장인 저시간 운영):
+#   경제/IT(YMYL 아님, 리스크 낮음) → 매일 4편, 우선순위 카테고리
+#   금융/재테크 → 홀수날에만 1편
+#   건강/생활   → 짝수날에만 1편
+# → 홀수날: 경제/IT 4 + 금융 1 = 5편 / 짝수날: 경제/IT 4 + 건강 1 = 5편
 DEFAULT_CATS = [
-    {"name": "금융/재테크", "wp_category": "금융", "desc": "신용카드, 대출, 정부지원금, 연금, 세금, 청약, 재테크, 주식/ETF 등 고단가 금융 주제"},
-    {"name": "건강/생활", "wp_category": "건강", "desc": "다이어트, 영양제, 탈모, 피부, 수면, 홈트, 건강검진 등 고단가 건강·생활 주제"},
-    {"name": "경제/IT", "wp_category": "경제IT", "desc": "물가·금리·부동산 경제, AI 도구, 클라우드, 앱/프로그램 사용법 등 경제/IT 주제"},
+    {"name": "경제/IT", "wp_category": "경제IT",
+     "desc": "물가·금리·부동산 경제, AI 도구, 클라우드, 앱/프로그램 사용법 등 경제/IT 주제",
+     "counts": _singles(4), "active_days": "all"},
+    {"name": "금융/재테크", "wp_category": "금융",
+     "desc": "신용카드, 대출, 정부지원금, 연금, 세금, 청약, 재테크, 주식/ETF 등 고단가 금융 주제",
+     "counts": _singles(1), "active_days": "odd"},
+    {"name": "건강/생활", "wp_category": "건강",
+     "desc": "다이어트, 영양제, 탈모, 피부, 수면, 홈트, 건강검진 등 고단가 건강·생활 주제",
+     "counts": _singles(1), "active_days": "even"},
 ]
 try:
     categories = json.loads(envs("CATEGORIES_JSON", "")) or DEFAULT_CATS
@@ -102,11 +121,17 @@ cfg = {
     },
     "blog_url": envs("BLOG_URL", envs("WP_SITE", "")),
     "categories": categories,
+    # 작성자 정보(E-E-A-T 신뢰 신호). author_type=Person으로 하면 실명 저자로 구조화데이터에 표시됨.
+    "author": envs("AUTHOR_NAME", "편집부"),
+    "author_bio": envs("AUTHOR_BIO", ""),
+    "author_type": envs("AUTHOR_TYPE", "Organization"),
+    # 카테고리별 'counts'가 없을 때만 쓰는 전역 기본값(안전하게 소량). 카테고리별 실제 값은
+    # DEFAULT_CATS(또는 CATEGORIES_JSON)의 각 카테고리 안 "counts"/"active_days"가 우선한다.
     "counts": {
-        "long_series": envi("LONG_SERIES", 2),
-        "long_single": envi("LONG_SINGLE", 2),
-        "season_series": envi("SEASON_SERIES", 1),
-        "season_single": envi("SEASON_SINGLE", 1),
+        "long_series": envi("LONG_SERIES", 0),
+        "long_single": envi("LONG_SINGLE", 1),
+        "season_series": envi("SEASON_SERIES", 0),
+        "season_single": envi("SEASON_SINGLE", 0),
         "series_min_parts": envi("SERIES_MIN", 2),
         "series_max_parts": envi("SERIES_MAX", 3),
     },
@@ -125,10 +150,13 @@ cfg = {
     },
     # 애드센스 안전장치(초안강제 + 품질게이트 + 금지주제 + 최신성검증). 강도 프리셋 후 개별 env로 덮어씀
     "safety": _safety_block(),
-    # 검색량 우선 비율(0~100). 없으면 KEYWORD_STRATEGY로 환산(rankable=0/traffic=100/balanced=30)
+    # 검색량 우선 비율(0~100). 없으면 KEYWORD_STRATEGY로 환산
+    # (rankable=0 / rankable_lean=15 / balanced=30 / traffic=100)
+    # 기본을 rankable_lean으로: 신규 도메인은 대형 키워드 경쟁에서 못 이기므로
+    # '실제로 잡히는' 저경쟁 키워드 비중을 높여야 초반 트래픽이 실제로 붙는다.
     "traffic_ratio": (envi("TRAFFIC_RATIO", -1) if os.getenv("TRAFFIC_RATIO", "").strip()
-                      else {"rankable": 0, "traffic": 100, "balanced": 30}.get(
-                          envs("KEYWORD_STRATEGY", "balanced"), 30)),
+                      else {"rankable": 0, "rankable_lean": 15, "traffic": 100, "balanced": 30}.get(
+                          envs("KEYWORD_STRATEGY", "rankable_lean"), 15)),
     "images": {
         # 폰/수동 실행에서 images=false 를 넘기면 이미지 생성 끔. 기본은 무료(free)
         "provider": ("none" if str(os.getenv("IMAGE_ENABLED", "")).strip().lower() == "false"
