@@ -359,7 +359,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v30 · Supabase 원탭 설치 보조</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v31 · Supabase 스키마 자동 배포</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -581,6 +581,18 @@
       <button class="btn sm" id="supaRegister">3) GitHub에 자동 등록</button>
     </div>
     <div id="supaRegResult" class="hint" style="margin-top:6px"></div>
+
+    <div class="divider" style="margin:14px 0"></div>
+    <div class="hint" style="margin-bottom:8px"><b>완전 자동 배포(선택)</b> — 아래 2개까지 등록하면, 이후 스키마가 바뀔 때마다 사람이 SQL을 복사·붙여넣기 하지 않아도 GitHub Actions가 자동으로 반영합니다(<code>supabase/migrations/</code>에 push → 자동 배포). 지금 당장은 위 1~3단계만으로 충분하며, 이 부분은 선택 사항입니다.</div>
+    <label>4) Supabase 액세스 토큰 <span style="color:var(--muted);font-weight:400">(supabase.com/dashboard/account/tokens 발급)</span></label>
+    <input id="cfgSupaAccessToken" type="password" placeholder="sbp_..." autocapitalize="off">
+    <div class="hint">⚠️ 이 토큰은 <b>계정 전체</b>(모든 Supabase 프로젝트) 권한입니다. service_role 키보다 강력하니 더 조심해서 다루세요.</div>
+    <label style="margin-top:12px;display:block">5) DB 비밀번호 <span style="color:var(--muted);font-weight:400">(프로젝트 생성 시 설정, Project Settings → Database에서 재설정 가능)</span></label>
+    <input id="cfgSupaDbPassword" type="password" placeholder="DB 비밀번호" autocapitalize="off">
+    <div class="actions" style="margin-top:10px">
+      <button class="btn sm" id="supaAutoRegister">4-5) GitHub에 자동 등록</button>
+    </div>
+    <div id="supaAutoRegResult" class="hint" style="margin-top:6px"></div>
   </div>
 
   <div class="divider"></div>
@@ -1220,6 +1232,8 @@ function openSheet(){
   document.getElementById("cfgAuthorType").value=CFG.authorType||"Person";
   document.getElementById("cfgSupaUrl").value=CFG.supabaseUrl||"";
   document.getElementById("cfgSupaKey").value="";
+  document.getElementById("cfgSupaAccessToken").value="";
+  document.getElementById("cfgSupaDbPassword").value="";
   document.getElementById("cfgIndexnow").value=(CFG.safety&&CFG.safety.indexnow_key)||"";
   fillSitemap(CFG.site||"");
   document.getElementById("sheetBg").classList.add("open");
@@ -1532,6 +1546,24 @@ document.getElementById("supaRegister").onclick=async()=>{
   if(r1.ok&&r2.ok){
     box.innerHTML='<span style="color:#33c27f">✅ GitHub에 자동 등록됨(SUPABASE_URL/SERVICE_KEY). 다음 실행부터 백로그가 동기화돼요.</span>';
     document.getElementById("cfgSupaKey").value="";
+  } else if(r1.reason==="no-gh"){
+    box.innerHTML='<span style="color:#ffb020">GitHub 정보가 없어요. ⚙️ 위쪽 "GitHub 연동"에 저장소·토큰을 먼저 입력하세요.</span>';
+  } else {
+    box.innerHTML='<span style="color:#ff6b4a">일부 등록 실패. 토큰에 <b>Secrets 쓰기</b> 권한이 있는지 확인하세요('+
+      [r1,r2].map(r=>r.status||r.reason).join(", ")+').</span>';
+  }
+};
+document.getElementById("supaAutoRegister").onclick=async()=>{
+  const at=(document.getElementById("cfgSupaAccessToken").value||"").trim();
+  const pw=(document.getElementById("cfgSupaDbPassword").value||"").trim();
+  if(!at||!pw){ toast("액세스 토큰과 DB 비밀번호를 모두 입력하세요",1); return; }
+  const box=document.getElementById("supaAutoRegResult"); box.textContent="등록 중… (2개 값)";
+  const r1=await ghSetSecret("SUPABASE_ACCESS_TOKEN", at);
+  const r2=await ghSetSecret("SUPABASE_DB_PASSWORD", pw);
+  if(r1.ok&&r2.ok){
+    box.innerHTML='<span style="color:#33c27f">✅ 완전 자동 배포 활성화됨. 이제 supabase/migrations/에 push하면 스키마가 자동 반영돼요.</span>';
+    document.getElementById("cfgSupaAccessToken").value="";
+    document.getElementById("cfgSupaDbPassword").value="";
   } else if(r1.reason==="no-gh"){
     box.innerHTML='<span style="color:#ffb020">GitHub 정보가 없어요. ⚙️ 위쪽 "GitHub 연동"에 저장소·토큰을 먼저 입력하세요.</span>';
   } else {

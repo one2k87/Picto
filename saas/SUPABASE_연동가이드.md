@@ -21,6 +21,23 @@
 5. 이후 **매일 자동 실행**(`daily-blog.yml`)이 새로 생성되는 글도 자동으로 `content_queue`에 동기화합니다(`main.py` → `supabase_client.sync_backlog`).
 6. **다음 단계(아직 미구현)**: `content_queue`에서 `next_release_batch(n)` RPC로 하루 N편씩 뽑아 실제 발행(`force_draft` 해제)으로 전환하는 로직 — Task #49.
 
+### 0-A-1. (선택) 스키마도 완전 자동 배포하기 — 1단계 SQL 붙여넣기까지 없애기
+
+v31부터, GitHub Actions + Supabase CLI로 **스키마 변경도 git push 한 번으로 자동 반영**할 수 있습니다(다른 AI 세션 "Gia Ops"가 Tarae에 적용한 것과 같은 방식). 이걸 켜두면 위 1번의 "SQL 복사 → 편집기 열기 → 붙여넣기 → Run" 수동 단계가 **앞으로는** 필요 없어집니다(최초 설정 이후).
+
+**동작 방식**: `supabase/migrations/*.sql` 파일이 `main` 브랜치에 push되면 `.github/workflows/supabase-deploy.yml`이 실행되어, Supabase CLI(`supabase link` → `supabase db push`)로 실제 프로젝트에 스키마를 반영합니다. GitHub Actions 서버는 제한 없이 인터넷에 접속할 수 있어서(제가 작업하는 샌드박스와 달리) 이 방식이 가능합니다.
+
+**켜는 방법**: 앱 → ⚙️ 설정 → "🗄️ Supabase 연동" 하단 "완전 자동 배포(선택)" 섹션에 아래 2개를 입력하고 등록.
+
+| 값 | 발급 위치 | 민감도 |
+|---|---|---|
+| Supabase 액세스 토큰 | supabase.com/dashboard/account/tokens | ⚠️ **계정 전체**(모든 프로젝트) 권한 — service_role 키보다 강력하니 각별히 주의 |
+| DB 비밀번호 | 프로젝트 생성 시 설정(잊었으면 Project Settings → Database에서 재설정) | ⚠️ 해당 프로젝트 DB 전체 접근(RLS 우회) |
+
+등록하면 `SUPABASE_ACCESS_TOKEN`/`SUPABASE_DB_PASSWORD`가 GitHub Secret에 추가됩니다(project ref는 이미 등록된 `SUPABASE_URL`에서 워크플로가 자동으로 추출하므로 별도 입력 불필요).
+
+**앞으로 스키마를 바꿀 때**: `saas/supabase_schema.sql`(사람이 읽는 참고본)을 고치는 동시에, `supabase/migrations/`에 **새 타임스탬프 파일**을 추가해야 합니다(기존 마이그레이션 파일은 수정하지 않음 — CLI는 append-only 방식). 이 부분은 이후 스키마 변경 작업 때 함께 처리하면 됩니다.
+
 ---
 
 ## 0-B. (참고) 큰 그림 — SaaS로 팔 때

@@ -1,0 +1,55 @@
+name: Supabase 스키마 자동 배포
+
+# supabase/migrations/ 에 새 파일을 push하면 자동으로 Supabase 프로젝트에
+# 스키마가 반영됩니다. (Supabase CLI: supabase db push)
+#
+# 필요한 GitHub Secrets (Settings → Secrets and variables → Actions):
+#   - SUPABASE_ACCESS_TOKEN : supabase.com/dashboard/account/tokens 에서 발급
+#                             ⚠️ 계정 전체 권한(모든 프로젝트 관리 가능) — 절대 공개 금지
+#   - SUPABASE_DB_PASSWORD  : 프로젝트 생성 시 설정한 DB 비밀번호
+#                             (Project Settings → Database → Reset database password 로 재설정 가능)
+#   - SUPABASE_URL          : 이미 등록되어 있음(콘텐츠 큐 동기화용) — 여기서 project ref 추출에 재사용
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+      - "supabase/config.toml"
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v2
+        with:
+          version: latest
+
+      - name: 프로젝트 ref 추출 (SUPABASE_URL에서)
+        id: ref
+        run: |
+          URL="${{ secrets.SUPABASE_URL }}"
+          if [ -z "$URL" ]; then
+            echo "SUPABASE_URL 시크릿이 없습니다. 대시보드 앱에서 먼저 등록하세요." >&2
+            exit 1
+          fi
+          REF=$(echo "$URL" | sed -E 's#https?://([a-z0-9]+)\.supabase\.co.*#\1#')
+          if [ -z "$REF" ] || [ "$REF" = "$URL" ]; then
+            echo "SUPABASE_URL에서 project ref를 추출하지 못했습니다: $URL" >&2
+            exit 1
+          fi
+          echo "ref=$REF" >> "$GITHUB_OUTPUT"
+
+      - name: Supabase 프로젝트 연결
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase link --project-ref "${{ steps.ref.outputs.ref }}"
+
+      - name: 마이그레이션 배포 (db push)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase db push
