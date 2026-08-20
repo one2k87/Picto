@@ -428,6 +428,15 @@ def _byline_html(author, bio=""):
             f'✍️ {a}{bio_html} · 최종 업데이트 {d.year}년 {d.month}월 {d.day}일</p>')
 
 
+def _ai_notice_html():
+    """AI 기본법(2026-01-22 시행) 제31조 의무 표기 — 생성형 AI로 작성된 콘텐츠임을 항상 고지.
+    (Marry_Baby_Meal의 동일 취지 고지와 문구를 맞춤 — solvup_global_architecture.md 3번 참고)"""
+    return ('<p class="ai-notice" style="margin:2px 0 12px;padding:8px 12px;border-left:3px solid #98a2b3;'
+            'background:#f6f7f9;color:#667085;font-size:12px;line-height:1.6">'
+            '⚠️ 본 콘텐츠(텍스트·이미지)는 생성형 AI를 통해 작성되었습니다. 정확성을 위해 검증 과정을 거치지만, '
+            '실제 적용 전 공식 출처로 최종 확인하시길 권합니다.</p>')
+
+
 def _freshness_html():
     """정보 기준일 안내(최신성 신뢰 신호). 본문 하단에 배치. 문구는 무작위로 조금씩 달리한다."""
     from datetime import date
@@ -474,6 +483,7 @@ def _assemble(data, related, blog_url, insert_ads, resolver=None, series_nav="",
     hook = data.get("hook", "")
     hook_html = f'<p class="hook" style="font-size:17px;font-weight:600">{html_mod.escape(hook)}</p>' if hook else ""
     byline = _byline_html(author, author_bio)            # 작성자·소개·최종수정일
+    ai_notice = _ai_notice_html()                        # AI 기본법 제31조 의무 표기(항상 포함)
     tldr = _tldr_html(data.get("tldr", []))             # 상단 핵심요약
     checklist = _checklist_html(data.get("checklist", []))  # 실행 체크리스트
     faq_html = _build_faq_html(data.get("faqs", []))
@@ -485,9 +495,9 @@ def _assemble(data, related, blog_url, insert_ads, resolver=None, series_nav="",
     internal = _build_internal_links(related, blog_url)
     jsonld = _build_jsonld(data.get("title", ""), data.get("meta", ""), data.get("faqs", []),
                            author, author_type=author_type, author_bio=author_bio)
-    # 순서: 후킹 → 작성정보 → 핵심요약 → (시리즈 내비) → 목차 → 요약표 → 본문 →
+    # 순서: 후킹 → 작성정보 → AI생성 고지 → 핵심요약 → (시리즈 내비) → 목차 → 요약표 → 본문 →
     #        실행 체크리스트 → FAQ → 정보기준일 → 투자위험 → 면책 → (시리즈 내비) → 내부링크 → 구조화데이터
-    return (f"{hook_html}{byline}{tldr}{series_nav}{toc}{summary}{body}"
+    return (f"{hook_html}{byline}{ai_notice}{tldr}{series_nav}{toc}{summary}{body}"
             f"{checklist}{faq_html}{freshness}{invest_risk}{disclaimer}{series_nav}{internal}{jsonld}")
 
 
