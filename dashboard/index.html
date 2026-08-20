@@ -359,7 +359,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v29 · Supabase 연동</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v30 · Supabase 원탭 설치 보조</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -566,14 +566,19 @@
   <div class="divider"></div>
   <h2 style="font-size:14px">🗄️ Supabase 연동 (초안 백로그 큐)</h2>
   <div class="field">
-    <div class="hint" style="margin-bottom:8px">쌓인 초안을 하루 몇 편씩 순서대로 발행 전환하기 위한 저장소예요. Supabase 프로젝트의 <b>Project Settings → API</b>에서 URL과 <b>service_role</b> 키를 확인해 아래에 입력하세요. 먼저 <span class="mono">saas/supabase_schema.sql</span>을 Supabase SQL Editor에서 1회 실행해야 합니다.</div>
-    <label>Supabase URL</label>
+    <div class="hint" style="margin-bottom:8px">쌓인 초안을 하루 몇 편씩 순서대로 발행 전환하기 위한 저장소예요. <b>딱 한 번만</b> 아래 1→2→3 순서로 하면 끝입니다(Supabase는 보안상 테이블 생성을 외부 앱에서 자동 실행하지 못하게 막아둬서, 이 SQL 실행 한 단계만 직접 눌러야 해요).</div>
+    <label>1) Supabase URL <span style="color:var(--muted);font-weight:400">(Project Settings → API에서 확인)</span></label>
     <input id="cfgSupaUrl" placeholder="https://xxxx.supabase.co" autocapitalize="off">
-    <label style="margin-top:8px;display:block">service_role 키</label>
+    <div class="actions" style="margin-top:8px;flex-wrap:wrap;gap:6px">
+      <button class="btn sm" id="supaCopySql">스키마 SQL 복사</button>
+      <button class="btn sm" id="supaOpenEditor">Supabase SQL 편집기 열기</button>
+    </div>
+    <div class="hint">복사 → 편집기 열기 → 붙여넣기(⌘V) → Run. 이미 실행했다면 다시 안 해도 됩니다(재실행해도 안전).</div>
+    <label style="margin-top:12px;display:block">2) service_role 키 <span style="color:var(--muted);font-weight:400">(같은 화면, API 항목)</span></label>
     <input id="cfgSupaKey" type="password" placeholder="eyJ..." autocapitalize="off">
     <div class="hint">⚠️ service_role 키는 전체 데이터에 접근 가능한 민감 정보입니다. GitHub Secret로만 저장되며(암호화), 이 앱 화면에는 다시 표시되지 않습니다.</div>
     <div class="actions" style="margin-top:10px">
-      <button class="btn sm" id="supaRegister">GitHub에 자동 등록</button>
+      <button class="btn sm" id="supaRegister">3) GitHub에 자동 등록</button>
     </div>
     <div id="supaRegResult" class="hint" style="margin-top:6px"></div>
   </div>
@@ -1497,6 +1502,24 @@ document.getElementById("authorRegister").onclick=async()=>{
     box.innerHTML='<span style="color:#ff6b4a">일부 등록 실패. 토큰에 <b>Secrets 쓰기</b> 권한이 있는지 확인하세요('+
       [r1,r2,r3].map(r=>r.status||r.reason).join(", ")+').</span>';
   }
+};
+function supaProjectRef(){
+  const m=(document.getElementById("cfgSupaUrl").value||"").trim().match(/https?:\/\/([a-z0-9-]+)\.supabase\.co/i);
+  return m?m[1]:"";
+}
+document.getElementById("supaCopySql").onclick=async()=>{
+  try{
+    const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+    const r=await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/saas/supabase_schema.sql`,{cache:"no-store"});
+    if(!r.ok) throw new Error(r.status);
+    const sql=await r.text();
+    clip(sql,"스키마 SQL 복사됨 ✓ 편집기에 붙여넣고 Run 하세요");
+  }catch(e){ toast("SQL을 못 불러왔어요 — saas/supabase_schema.sql을 GitHub에서 직접 열어 복사하세요",1); }
+};
+document.getElementById("supaOpenEditor").onclick=()=>{
+  const ref=supaProjectRef();
+  if(!ref){ toast("먼저 위 Supabase URL을 입력하세요",1); return; }
+  window.open(`https://supabase.com/dashboard/project/${ref}/sql/new`,"_blank","noopener");
 };
 document.getElementById("supaRegister").onclick=async()=>{
   const url=(document.getElementById("cfgSupaUrl").value||"").trim();

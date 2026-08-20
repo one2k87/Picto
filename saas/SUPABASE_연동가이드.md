@@ -7,11 +7,11 @@
 
 ## 0-A. 지금 당장 하는 것 — 초안 백로그 큐 연동
 
-1. **스키마 실행**: Supabase 대시보드 → SQL Editor → New query → `saas/supabase_schema.sql` **전체**(1~8번 섹션 다 포함, 8번이 `content_queue`) 붙여넣기 → Run.
-2. **키 확인**: Project Settings → API에서 **Project URL**과 **service_role key**(⚠️비밀) 복사.
-3. **등록(둘 중 하나)**:
-   - 앱(v29 이상) → ⚙️ 설정 → "🗄️ Supabase 연동"에 URL+service_role 키 입력 → "GitHub에 자동 등록" 버튼(🔑 키 마법사와 같은 방식으로 `SUPABASE_URL`/`SUPABASE_SERVICE_KEY` GitHub Secret에 암호화 등록).
-   - 또는 GitHub 저장소 → Settings → Secrets and variables → Actions에 직접 `SUPABASE_URL`/`SUPABASE_SERVICE_KEY` 등록.
+> **왜 완전 자동이 아닌가**: GitHub는 브라우저에서 토큰으로 API를 직접 호출할 수 있어 앱이 시크릿을 자동 등록하지만, Supabase는 보안 설계상 "테이블 생성(SQL 실행)"을 외부 앱이 대신 못 하게 막아둡니다(관리 API가 브라우저에서 직접 호출되도록 열려있지 않음). 그래서 **SQL 실행 1단계만 사람이 직접** 하고, 나머지(키 등록·이후 매일 자동 동기화)는 전부 자동입니다.
+
+1. **스키마 실행(1회, 앱이 복사+편집기 열기까지 도와줌)**: 앱(v30 이상) → ⚙️ 설정 → "🗄️ Supabase 연동"에 URL 입력 → **"스키마 SQL 복사"** 클릭(GitHub에서 최신 `saas/supabase_schema.sql`을 자동으로 가져와 복사) → **"Supabase SQL 편집기 열기"** 클릭(URL에서 프로젝트를 자동 인식해 해당 프로젝트의 SQL Editor를 새 탭으로 엶) → 편집기에 붙여넣기(⌘V) → **Run**.
+2. **키 확인**: Project Settings → API에서 **service_role key**(⚠️비밀) 복사해 같은 화면에 입력.
+3. **등록**: "GitHub에 자동 등록" 버튼 → `SUPABASE_URL`/`SUPABASE_SERVICE_KEY`가 GitHub Secret에 암호화 등록됨(🔑 키 마법사와 같은 방식).
 4. **기존 백로그 1회 가져오기** (터미널, 저장소 루트에서):
    ```
    SUPABASE_URL="https://xxxx.supabase.co" SUPABASE_SERVICE_KEY="eyJ..." \
