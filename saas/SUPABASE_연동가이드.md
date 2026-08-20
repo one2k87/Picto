@@ -1,9 +1,29 @@
-# Supabase 연동 가이드 (Scripto SaaS)
+# Supabase 연동 가이드 (Scripto)
 
-> 목표: 로그인·구독/15일체험·다중 사용자·관리자 대시보드를 위한 백엔드 연결.
-> 아키텍처: **컨트롤 플레인(웹앱=로그인·결제·설정) + 생성 워커(내 Gemini 키로 글 생성·발행)**.
+> 이 문서는 두 가지 용도를 다룹니다.
+> **A) 지금 당장** — 초안 백로그(1,053편) 방출 큐(`content_queue` 테이블). 혼자 쓰는 운영 도구, 로그인·결제 불필요.
+> **B) 나중에** — Scripto를 SaaS로 팔 때의 로그인·구독/15일체험·다중 사용자·관리자 대시보드(아래 1~7번, 기존 설계).
+> 둘 다 같은 Supabase 프로젝트를 쓰고, 스키마도 같은 파일(`saas/supabase_schema.sql`) 안에 함께 있습니다.
 
-## 0. 큰 그림
+## 0-A. 지금 당장 하는 것 — 초안 백로그 큐 연동
+
+1. **스키마 실행**: Supabase 대시보드 → SQL Editor → New query → `saas/supabase_schema.sql` **전체**(1~8번 섹션 다 포함, 8번이 `content_queue`) 붙여넣기 → Run.
+2. **키 확인**: Project Settings → API에서 **Project URL**과 **service_role key**(⚠️비밀) 복사.
+3. **등록(둘 중 하나)**:
+   - 앱(v29 이상) → ⚙️ 설정 → "🗄️ Supabase 연동"에 URL+service_role 키 입력 → "GitHub에 자동 등록" 버튼(🔑 키 마법사와 같은 방식으로 `SUPABASE_URL`/`SUPABASE_SERVICE_KEY` GitHub Secret에 암호화 등록).
+   - 또는 GitHub 저장소 → Settings → Secrets and variables → Actions에 직접 `SUPABASE_URL`/`SUPABASE_SERVICE_KEY` 등록.
+4. **기존 백로그 1회 가져오기** (터미널, 저장소 루트에서):
+   ```
+   SUPABASE_URL="https://xxxx.supabase.co" SUPABASE_SERVICE_KEY="eyJ..." \
+   python3 saas/import_backlog_to_supabase.py
+   ```
+   실제 워드프레스 초안(`post_id` 있는 것)만 가져오며, 여러 번 실행해도 중복 안 쌓입니다(upsert).
+5. 이후 **매일 자동 실행**(`daily-blog.yml`)이 새로 생성되는 글도 자동으로 `content_queue`에 동기화합니다(`main.py` → `supabase_client.sync_backlog`).
+6. **다음 단계(아직 미구현)**: `content_queue`에서 `next_release_batch(n)` RPC로 하루 N편씩 뽑아 실제 발행(`force_draft` 해제)으로 전환하는 로직 — Task #49.
+
+---
+
+## 0-B. (참고) 큰 그림 — SaaS로 팔 때
 ```
 [사용자] → 웹앱 로그인(Supabase Auth: 구글)
         → 초기 세팅비 결제 → start_trial() → 15일 체험 시작

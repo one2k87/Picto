@@ -48,6 +48,12 @@
   },
   "_affiliate_설명": "제휴 SaaS(쿠팡 외 일반 제휴). enabled=true면 본문 중간에 '추천 도구' 박스 + 고지문 삽입. links는 [{\"name\":\"GetResponse\",\"url\":\"내 제휴링크\",\"desc\":\"한 줄 설명\"}] 형태. 애드센스 슬롯과 겹치지 않게 자동 배치되어, 한 글에 애드센스+제휴가 함께 실림",
 
+  "supabase": {
+    "url": "",
+    "service_key": ""
+  },
+  "_supabase_설명": "초안 백로그 큐(content_queue 테이블) 동기화용(선택). 비워두면 조용히 건너뜀. url/service_key를 채우면 매 실행마다 새로 생성된 초안을 Supabase에 동기화하고, saas/import_backlog_to_supabase.py로 기존 백로그도 1회 가져올 수 있음. service_key는 절대 공개 저장소에 커밋하지 말 것(GitHub Secret로만 관리)",
+
   "safety": {
     "strength": "엄격",
     "force_draft": true,

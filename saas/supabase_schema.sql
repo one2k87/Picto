@@ -116,3 +116,50 @@ from public.profiles p left join public.subscriptions s on s.user_id = p.id;
 -- ── 7. 관리자 지정 (본인 계정) ───────────────────────────────
 -- 아래는 one2k87@gmail.com 로 최초 로그인한 뒤 1회 실행하세요:
 -- update public.profiles set role = 'admin' where email = 'one2k87@gmail.com';
+
+-- ══════════════════════════════════════════════════════════════
+-- ── 8. 콘텐츠 발행 큐 (운영자 단독 사용 — 초안 백로그 방출용) ──
+-- 위 1~7번(profiles/subscriptions/sites/usage)은 '여러 사용자에게 파는' SaaS용이고,
+-- 이 8번은 지금 강경원님 혼자 운영하는 스크립토의 '초안 1,053편을 하루 N편씩
+-- 순서대로 실제 발행 전환'하기 위한 큐입니다. 로그인·RLS 정책 없이 서버(워커)의
+-- service_role 키로만 접근합니다(service_role은 RLS를 우회하므로 정책 불필요,
+-- 대신 RLS를 켜둬서 anon/authenticated 키로는 절대 조회 불가하게 막아둡니다).
+create table if not exists public.content_queue (
+  id bigserial primary key,
+  wp_post_id bigint,                 -- 워드프레스 글 ID(초안 상태로 이미 존재)
+  title text,
+  slug text,
+  category text,
+  keyword text,
+  kind text,                          -- long | season
+  status text not null default 'draft',   -- draft(대기) | queued(방출예정) | published(발행완료) | skipped(제외)
+  priority int not null default 0,        -- 높을수록 먼저 방출(품질/신선도 점수 등)
+  generated_at timestamptz,
+  queued_at timestamptz,
+  published_at timestamptz,
+  source text default 'backlog_import',   -- backlog_import | daily_run
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (wp_post_id)
+);
+alter table public.content_queue enable row level security;
+-- 의도적으로 select/insert/update 정책을 추가하지 않음 → service_role만 접근 가능.
+
+-- 다음 방출 대상 N개를 우선순위·오래된 순으로 반환(워커에서 호출)
+create or replace function public.next_release_batch(n int default 5)
+returns setof public.content_queue
+language sql stable as $$
+  select * from public.content_queue
+  where status = 'draft'
+  order by priority desc, generated_at asc nulls last, id asc
+  limit n;
+$$;
+
+-- 방출 처리 완료 표시(워커에서 발행 성공 후 호출)
+create or replace function public.mark_published(ids bigint[])
+returns void language plpgsql as $$
+begin
+  update public.content_queue
+     set status = 'published', published_at = now(), updated_at = now()
+   where id = any(ids);
+end; $$;

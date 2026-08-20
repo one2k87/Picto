@@ -29,6 +29,7 @@ import accuracy
 import monitor
 import notify
 import insights
+import supabase_client
 from llm import chat
 from generator import generate_article, generate_series
 from publisher import (publish_to_wordpress, upload_media, add_update_banner,
@@ -725,6 +726,10 @@ def run():
         })
     save_history(hist)
     log_rows(all_articles, cfg.get("sheets"))
+    try:
+        supabase_client.sync_backlog(cfg, all_articles, source="daily_run")
+    except Exception as e:
+        print(f"[supabase] 동기화 건너뜀: {e}")
 
     # 네이버·빙에 새 글 즉시 등록(IndexNow). 실제 '게시됨'(공개) 글만, 키가 있을 때만.
     inkey = wp_cfg.get("indexnow_key")

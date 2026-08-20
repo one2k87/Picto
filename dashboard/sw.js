@@ -1,7 +1,7 @@
 // 서비스워커 - 아이폰 홈화면 설치(PWA)
 // v3: 앱 화면(HTML/JS)과 데이터(JSON)는 '항상 최신 우선'으로 받아,
 //     업데이트가 즉시 반영되도록 함(예전엔 캐시가 옛 화면을 붙잡던 문제 수정).
-const CACHE = "scripto-v28";
+const CACHE = "scripto-v29";
 
 // 앱에서 '즉시 업데이트' 요청 시 대기 없이 새 버전으로 전환
 self.addEventListener("message", (e) => {

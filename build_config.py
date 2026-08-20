@@ -148,6 +148,10 @@ cfg = {
         # [{"name":"GetResponse","url":"https://...ref=me","desc":"이메일 자동화"}]
         "links": envj("AFFILIATE_LINKS", []),
     },
+    "supabase": {                                    # 초안 백로그 큐 동기화(선택). 없으면 조용히 건너뜀
+        "url": envs("SUPABASE_URL", ""),
+        "service_key": envs("SUPABASE_SERVICE_KEY", ""),
+    },
     # 애드센스 안전장치(초안강제 + 품질게이트 + 금지주제 + 최신성검증). 강도 프리셋 후 개별 env로 덮어씀
     "safety": _safety_block(),
     # 검색량 우선 비율(0~100). 없으면 KEYWORD_STRATEGY로 환산

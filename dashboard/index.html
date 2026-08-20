@@ -359,7 +359,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v28 · 작성자 정보 자동 등록</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v29 · Supabase 연동</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -561,6 +561,21 @@
     </div>
     <div id="authorRegResult" class="hint" style="margin-top:6px"></div>
     <div class="hint">등록하면 다음 글부터 이 이름·소개가 자동으로 들어갑니다. 위 "⚙️ GitHub 연동"에 저장소 정보가 있어야 자동 등록이 동작해요(🔑 키 마법사와 같은 방식).</div>
+  </div>
+
+  <div class="divider"></div>
+  <h2 style="font-size:14px">🗄️ Supabase 연동 (초안 백로그 큐)</h2>
+  <div class="field">
+    <div class="hint" style="margin-bottom:8px">쌓인 초안을 하루 몇 편씩 순서대로 발행 전환하기 위한 저장소예요. Supabase 프로젝트의 <b>Project Settings → API</b>에서 URL과 <b>service_role</b> 키를 확인해 아래에 입력하세요. 먼저 <span class="mono">saas/supabase_schema.sql</span>을 Supabase SQL Editor에서 1회 실행해야 합니다.</div>
+    <label>Supabase URL</label>
+    <input id="cfgSupaUrl" placeholder="https://xxxx.supabase.co" autocapitalize="off">
+    <label style="margin-top:8px;display:block">service_role 키</label>
+    <input id="cfgSupaKey" type="password" placeholder="eyJ..." autocapitalize="off">
+    <div class="hint">⚠️ service_role 키는 전체 데이터에 접근 가능한 민감 정보입니다. GitHub Secret로만 저장되며(암호화), 이 앱 화면에는 다시 표시되지 않습니다.</div>
+    <div class="actions" style="margin-top:10px">
+      <button class="btn sm" id="supaRegister">GitHub에 자동 등록</button>
+    </div>
+    <div id="supaRegResult" class="hint" style="margin-top:6px"></div>
   </div>
 
   <div class="divider"></div>
@@ -1198,6 +1213,8 @@ function openSheet(){
   document.getElementById("cfgAuthorName").value=CFG.author||"정다인 에디터";
   document.getElementById("cfgAuthorBio").value=CFG.authorBio||"생활 속 금융·건강 정보를 조사하고 정리해 전달합니다.";
   document.getElementById("cfgAuthorType").value=CFG.authorType||"Person";
+  document.getElementById("cfgSupaUrl").value=CFG.supabaseUrl||"";
+  document.getElementById("cfgSupaKey").value="";
   document.getElementById("cfgIndexnow").value=(CFG.safety&&CFG.safety.indexnow_key)||"";
   fillSitemap(CFG.site||"");
   document.getElementById("sheetBg").classList.add("open");
@@ -1288,6 +1305,7 @@ document.getElementById("cfgSave").onclick=()=>{
   CFG.author=document.getElementById("cfgAuthorName").value.trim();
   CFG.authorBio=document.getElementById("cfgAuthorBio").value.trim();
   CFG.authorType=document.getElementById("cfgAuthorType").value;
+  CFG.supabaseUrl=document.getElementById("cfgSupaUrl").value.trim();
   CFG.safety=Object.assign({}, CFG.safety, {indexnow_key:document.getElementById("cfgIndexnow").value.trim()});
   saveCfg();closeSheet();toast("저장됨 ✓");loadData();};
 // 💼 제휴 SaaS 링크: "이름 | 링크 | 설명" 줄 ↔ {name,url,desc} 배열 변환
@@ -1478,6 +1496,24 @@ document.getElementById("authorRegister").onclick=async()=>{
   } else {
     box.innerHTML='<span style="color:#ff6b4a">일부 등록 실패. 토큰에 <b>Secrets 쓰기</b> 권한이 있는지 확인하세요('+
       [r1,r2,r3].map(r=>r.status||r.reason).join(", ")+').</span>';
+  }
+};
+document.getElementById("supaRegister").onclick=async()=>{
+  const url=(document.getElementById("cfgSupaUrl").value||"").trim();
+  const key=(document.getElementById("cfgSupaKey").value||"").trim();
+  if(!url||!key){ toast("URL과 service_role 키를 모두 입력하세요",1); return; }
+  const box=document.getElementById("supaRegResult"); box.textContent="등록 중… (2개 값)";
+  CFG.supabaseUrl=url; saveCfg();
+  const r1=await ghSetSecret("SUPABASE_URL", url);
+  const r2=await ghSetSecret("SUPABASE_SERVICE_KEY", key);
+  if(r1.ok&&r2.ok){
+    box.innerHTML='<span style="color:#33c27f">✅ GitHub에 자동 등록됨(SUPABASE_URL/SERVICE_KEY). 다음 실행부터 백로그가 동기화돼요.</span>';
+    document.getElementById("cfgSupaKey").value="";
+  } else if(r1.reason==="no-gh"){
+    box.innerHTML='<span style="color:#ffb020">GitHub 정보가 없어요. ⚙️ 위쪽 "GitHub 연동"에 저장소·토큰을 먼저 입력하세요.</span>';
+  } else {
+    box.innerHTML='<span style="color:#ff6b4a">일부 등록 실패. 토큰에 <b>Secrets 쓰기</b> 권한이 있는지 확인하세요('+
+      [r1,r2].map(r=>r.status||r.reason).join(", ")+').</span>';
   }
 };
 document.getElementById("adsApprovedBtn").onclick=()=>{ CFG.adsenseApproved=!CFG.adsenseApproved; saveCfg(); refreshApprovedUI();

@@ -152,6 +152,8 @@ jobs:
           COUPANG_WIDGET_HTML: ${{ github.event.inputs.coupang_widget != '' && github.event.inputs.coupang_widget || secrets.COUPANG_WIDGET_HTML }}
           AFFILIATE_ENABLED: ${{ github.event.inputs.affiliate != '' && github.event.inputs.affiliate || secrets.AFFILIATE_ENABLED }}
           AFFILIATE_LINKS: ${{ github.event.inputs.affiliate_links != '' && github.event.inputs.affiliate_links || secrets.AFFILIATE_LINKS }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           PAUSED: ${{ github.event.inputs.paused != '' && github.event.inputs.paused || vars.PAUSED }}
           SAFETY_STRENGTH: ${{ github.event.inputs.strength != '' && github.event.inputs.strength || secrets.SAFETY_STRENGTH }}
           FORCE_DRAFT: ${{ secrets.FORCE_DRAFT }}
