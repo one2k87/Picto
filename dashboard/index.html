@@ -347,10 +347,30 @@
   </div>
 
   <div class="field">
-    <label>⑤ ads.txt / 애드센스 인증코드</label>
-    <div class="hint">이 둘은 워드프레스 루트/헤더 수정이 필요해 자동화가 제한적입니다. <b>구글 Site Kit</b> 플러그인을 설치하면
-      인증코드·ads.txt가 자동 처리됩니다. (워드프레스 → 플러그인 → "Site Kit by Google")</div>
-    <a class="btn sm" href="https://wordpress.org/plugins/google-site-kit/" target="_blank" style="width:100%;margin-top:6px">Site Kit 설치 안내 열기</a>
+    <label>⑤ 필수 플러그인 <span id="adsPlugVer" style="font-size:11px;color:var(--muted)"></span></label>
+    <div class="hint">각 플러그인이 <b>왜</b> 애드센스 승인에 필요한지와 설치 후 설정법까지 함께 안내합니다.</div>
+    <div class="actions" style="margin-top:8px;flex-wrap:wrap;gap:6px">
+      <button class="btn sm" id="adsPlugScan">설치 상태 확인</button>
+      <button class="btn ok sm" id="adsPlugInstall">필수 플러그인 자동 설치</button>
+    </div>
+    <div id="adsPlugList" style="margin-top:8px;font-size:13px"></div>
+  </div>
+
+  <div class="field">
+    <label>⑥ 신청 이력 <span style="font-size:11px;color:var(--muted);font-weight:400">몇 번째에 승인됐는지 기록</span></label>
+    <div class="hint">신청할 때마다 기록해두면, 무엇을 고쳤을 때 결과가 달라졌는지가 남습니다. 다음 사이트(쿠팡 서브도메인)를 만들 때 이 기록이 그대로 자산이 됩니다.</div>
+    <div class="actions" style="margin-top:8px;flex-wrap:wrap;gap:6px">
+      <button class="btn sm" id="adsLogApply">신청함 기록</button>
+      <button class="btn sm" id="adsLogReject">반려됨 기록</button>
+      <button class="btn ok sm" id="adsLogApprove">승인됨 기록</button>
+    </div>
+    <div id="adsHistory" style="margin-top:8px;font-size:12px"></div>
+  </div>
+
+  <div class="field">
+    <label>⑦ 신청 절차 안내</label>
+    <button class="btn sm" id="adsGuide" style="width:100%">단계별 신청 방법 보기</button>
+    <div id="adsGuideBox" style="margin-top:8px;font-size:13px"></div>
   </div>
 
   <div class="actions"><button class="btn sm" id="adsClose" style="width:100%">닫기</button></div>
@@ -359,7 +379,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v32 · 애드센스 템플릿성 진단</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v33 · 애드센스 세팅 자동화</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1410,6 +1430,149 @@ async function togglePause(){
 }
 document.getElementById("pauseBtn").onclick=togglePause;
 
+// ===== 애드센스 규칙 파일(정책 변화 대응) =====
+// 심사 기준은 수시로 바뀌므로 코드에 박지 않고 별도 JSON에서 읽는다.
+// 원격(GitHub)에서 최신본을 먼저 시도하고, 실패하면 로컬 사본을 쓴다.
+let ADS_RULES=null;
+async function loadAdsRules(force){
+  if(ADS_RULES && !force) return ADS_RULES;
+  const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+  const urls=[
+    `https://raw.githubusercontent.com/${owner}/${repo}/main/dashboard/data/adsense_rules.json`,
+    "./data/adsense_rules.json"
+  ];
+  for(const u of urls){
+    try{ const r=await fetch(u,{cache:"no-store"}); if(r.ok){ ADS_RULES=await r.json(); ADS_RULES._src=u; return ADS_RULES; } }catch(e){}
+  }
+  return null;
+}
+function rulesAgeNote(R){
+  if(!R||!R.updated) return "";
+  const days=Math.floor((Date.now()-new Date(R.updated).getTime())/86400000);
+  const limit=R.recheck_after_days||90;
+  return days>limit
+    ? `<span style="color:#ffb020">기준 ${R.version} · ${days}일 전 갱신 — 정책이 바뀌었을 수 있으니 공식 문서를 확인하세요</span>`
+    : `<span style="color:var(--muted)">기준 ${R.version} · ${days}일 전 갱신</span>`;
+}
+
+// ===== 플러그인: 설치 상태 확인 / 자동 설치 =====
+async function adsPluginScan(){
+  const box=document.getElementById("adsPlugList");
+  if(!wpReady()){ box.innerHTML='<span style="color:#ffb020">설정 📝에서 워드프레스 정보를 먼저 입력하세요.</span>'; return; }
+  const R=await loadAdsRules(); if(!R){ box.innerHTML='<span style="color:#ff6b4a">규칙 파일을 불러오지 못했습니다.</span>'; return; }
+  document.getElementById("adsPlugVer").innerHTML=rulesAgeNote(R);
+  box.textContent="확인 중…";
+  let installed=[], canRead=true;
+  try{
+    const r=await fetch(wpBase()+"/wp-json/wp/v2/plugins",{headers:wpAuth()});
+    if(r.ok) installed=await r.json(); else canRead=false;
+  }catch(e){ canRead=false; }
+  const findP=(slug)=>installed.find(p=>((p.plugin||"").split("/")[0]===slug)||(p.textdomain===slug));
+  let html="";
+  if(!canRead) html+=`<div class="hint" style="color:#ffb020;margin-bottom:8px">플러그인 목록을 읽을 권한이 없어 설치 여부는 확인 못 했습니다. 아래 설명을 보고 수동 설치하세요.</div>`;
+  for(const p of R.plugins.slice().sort((a,b)=>a.priority-b.priority)){
+    const f=canRead?findP(p.slug):null;
+    const st=!canRead?"❔":(!f?"❌":(f.status==="active"?"✅":"⚠️"));
+    const stTxt=!canRead?"확인 불가":(!f?"미설치":(f.status==="active"?"활성":"설치됨(비활성)"));
+    html+=`<div style="margin:8px 0;padding:8px 10px;border:1px solid var(--line);border-radius:9px">
+      <div><b>${st} ${escAttr(p.name)}</b> <span style="font-size:11px;color:var(--muted)">${p.required?"필수":"권장"} · ${stTxt}</span></div>
+      <div class="hint" style="margin-top:4px"><b>왜 필요한가</b> — ${p.why}</div>
+      <div class="hint" style="margin-top:4px"><b>설정 방법</b> — ${p.how}</div>
+      <a class="btn sm" style="margin-top:6px;padding:1px 9px;font-size:11px" target="_blank" rel="noopener"
+         href="https://wordpress.org/plugins/${p.slug}/">플러그인 페이지</a>
+    </div>`;
+  }
+  html+=`<div class="hint" style="margin-top:8px">📌 <b>수동으로 꼭 해야 하는 것</b></div>`;
+  for(const m of R.manual_steps){
+    html+=`<div style="margin:6px 0 0 4px"><b>· ${escAttr(m.label)}</b><div class="hint" style="margin-left:10px">이유: ${m.why}<br>방법: ${m.how}</div></div>`;
+  }
+  box.innerHTML=html;
+}
+async function adsPluginInstall(){
+  const box=document.getElementById("adsPlugList");
+  if(!wpReady()){ toast("워드프레스 정보를 먼저 입력",1); return; }
+  const R=await loadAdsRules(); if(!R) return;
+  const targets=R.plugins.filter(p=>p.required);
+  box.innerHTML="설치 중… (호스팅이 파일 수정을 막아두면 실패할 수 있습니다)";
+  let ok=0, already=0, fail=[];
+  for(const p of targets){
+    try{
+      const r=await fetch(wpBase()+"/wp-json/wp/v2/plugins",{method:"POST",
+        headers:Object.assign({"Content-Type":"application/json"},wpAuth()),
+        body:JSON.stringify({slug:p.slug,status:"active"})});
+      if(r.ok){ ok++; }
+      else{
+        const e=await r.json().catch(()=>({}));
+        if((e.code||"")==="rest_plugin_already_installed"){ already++; }
+        else fail.push({name:p.name,slug:p.slug,code:e.code||r.status,msg:e.message||""});
+      }
+    }catch(e){ fail.push({name:p.name,slug:p.slug,code:"network",msg:String(e)}); }
+  }
+  let html=`<div><b>설치 완료 ${ok}건 · 이미 설치됨 ${already}건 · 실패 ${fail.length}건</b></div>`;
+  if(fail.length){
+    html+=`<div class="hint" style="margin-top:6px;color:#ffb020">아래는 자동 설치가 막혔습니다. 워드프레스 관리자 → 플러그인 → 새로 추가에서 이름으로 검색해 설치하세요.</div>`;
+    for(const f of fail) html+=`<div style="margin:4px 0 0 6px">· <b>${escAttr(f.name)}</b> <span class="hint">(${escAttr(String(f.code))})</span></div>`;
+    html+=`<div class="hint" style="margin-top:6px">대부분 호스팅의 <code>DISALLOW_FILE_MODS</code> 설정이나 권한 때문입니다. 수동 설치해도 효과는 동일합니다.</div>`;
+  }
+  box.innerHTML=html;
+  setTimeout(adsPluginScan,1200);
+}
+
+// ===== 신청 이력(몇 번째에 승인됐는지 + 그 사이 무엇을 바꿨는지) =====
+function adsLog(){ try{ return JSON.parse(localStorage.getItem("adsense_attempts")||"[]"); }catch(e){ return []; } }
+function adsLogSave(v){ localStorage.setItem("adsense_attempts",JSON.stringify(v)); renderAdsHistory(); }
+function adsAddEntry(kind){
+  const log=adsLog();
+  const note=prompt(kind==="apply"
+    ? "이번 신청 전에 무엇을 고쳤나요? (예: 태그 noindex, 도입부 20편 재작성)"
+    : kind==="reject" ? "반려 사유를 짧게 적어주세요 (예: 가치 없는 콘텐츠)"
+    : "승인 축하합니다! 마지막에 결정적이었다고 생각하는 조치는?");
+  if(note===null) return;
+  log.push({kind, note:note.trim(), at:new Date().toISOString().slice(0,10)});
+  adsLogSave(log);
+  if(kind==="approve"){ CFG.adsenseApproved=true; saveCfg(); refreshApprovedUI(); toast("승인 기록됨 🎉"); }
+}
+function renderAdsHistory(){
+  const box=document.getElementById("adsHistory"); if(!box) return;
+  const log=adsLog();
+  const applies=log.filter(x=>x.kind==="apply").length;
+  const approved=log.some(x=>x.kind==="approve");
+  const n=document.getElementById("adsAttemptN");
+  if(n) n.textContent=applies?`(현재 ${applies}회 신청)`:"";
+  if(!log.length){ box.innerHTML='<span class="hint">아직 기록이 없습니다. 신청할 때마다 눌러 남겨두세요.</span>'; return; }
+  let html=`<div><b>총 ${applies}회 신청</b>${approved?` · <span style="color:#33c27f">${applies}회 만에 승인 ✅</span>`:" · 진행 중"}</div>`;
+  log.slice().reverse().forEach(e=>{
+    const ic=e.kind==="apply"?"📨":e.kind==="reject"?"❌":"✅";
+    const lb=e.kind==="apply"?"신청":e.kind==="reject"?"반려":"승인";
+    html+=`<div style="margin:4px 0">${ic} <b>${lb}</b> <span class="hint">${e.at}</span><div class="hint" style="margin-left:16px">${escAttr(e.note||"-")}</div></div>`;
+  });
+  html+=`<button class="btn sm" style="margin-top:6px;padding:1px 9px;font-size:11px" onclick="if(confirm('이력을 모두 지울까요?')){localStorage.removeItem('adsense_attempts');renderAdsHistory();}">이력 초기화</button>`;
+  box.innerHTML=html;
+}
+
+// ===== 신청 절차 안내 =====
+async function adsShowGuide(){
+  const box=document.getElementById("adsGuideBox");
+  const R=await loadAdsRules();
+  const site=(CFG.site||"내 사이트 주소").replace(/^https?:\/\//,"").replace(/\/+$/,"");
+  const steps=[
+    ["신청 전 최종 확인","위 ① 점검에서 <b>템플릿성 진단 4개 항목이 모두 ✅</b>인지, 공개 글이 20편 이상인지 확인하세요. 하나라도 ❌면 신청하지 말고 먼저 고치는 게 낫습니다 — 반려가 쌓이면 재심사 간격이 길어집니다."],
+    ["Site Kit으로 사이트 연결","워드프레스 → Site Kit → 애드센스 모듈 연결. 소유권 확인과 인증 코드 삽입이 자동으로 끝납니다."],
+    ["애드센스에서 사이트 추가",`<a href="https://adsense.google.com/adsense/signup" target="_blank" rel="noopener">애드센스 가입/사이트 추가</a>에서 <b>${escAttr(site)}</b>를 입력하고 안내대로 진행하세요.`],
+    ["심사 대기","보통 며칠~2주. <b>이 기간에 대량 발행을 하지 마세요.</b> 위 ③ 심사 모드를 켜두면 자동 생성이 멈춥니다."],
+    ["결과 기록","승인이든 반려든 위 ⑥에 기록하세요. 반려면 사유를 ④에 붙여넣어 보완 방법을 받으세요."]
+  ];
+  let html="";
+  steps.forEach((s,i)=>{ html+=`<div style="margin:6px 0"><b>${i+1}. ${s[0]}</b><div class="hint" style="margin-left:12px">${s[1]}</div></div>`; });
+  if(R&&R.official_docs){
+    html+=`<div class="hint" style="margin-top:8px"><b>공식 문서</b><br>`;
+    html+=R.official_docs.map(d=>`<a href="${d.url}" target="_blank" rel="noopener">${escAttr(d.label)}</a>`).join(" · ");
+    html+=`</div>`;
+  }
+  html+=`<div class="hint" style="margin-top:8px">${rulesAgeNote(R)}</div>`;
+  box.innerHTML=html;
+}
+
 // ===== 🛡️ 애드센스 승인 준비 탭 =====
 function wpBase(){ return (CFG.site||"").replace(/\/+$/,""); }
 function wpAuth(){ return {Authorization:"Basic "+btoa((CFG.user||"")+":"+(CFG.pass||""))}; }
@@ -1425,7 +1588,8 @@ function refreshApprovedUI(){
   const rr=document.getElementById("revRelated"); if(rr) rr.checked=CFG.revenue.related_cards!==false;
   const n=document.getElementById("adsAttemptN"); if(n) n.textContent=(CFG.adsAttempts&&CFG.adsAttempts.length)?("· 재신청 "+CFG.adsAttempts.length+"회차"):"";
 }
-function openAds(){ refreshApprovedUI(); document.getElementById("adsBg").classList.add("open"); document.getElementById("adsSheet").classList.add("open"); adsCheck(); }
+function openAds(){ refreshApprovedUI(); document.getElementById("adsBg").classList.add("open"); document.getElementById("adsSheet").classList.add("open");
+  renderAdsHistory(); loadAdsRules(true).then(R=>{ const v=document.getElementById("adsPlugVer"); if(v) v.innerHTML=rulesAgeNote(R); }); adsCheck(); }
 function closeAds(){ document.getElementById("adsBg").classList.remove("open"); document.getElementById("adsSheet").classList.remove("open"); }
 document.getElementById("adsBtn").onclick=openAds;
 document.getElementById("adsBg").onclick=closeAds;
@@ -1692,27 +1856,33 @@ async function adsCheck(){
   const lonelyTags=tags.filter(t=>(t.count||0)<=1).length;   // 글 1개짜리 태그 = 얇은 중복 페이지
   const tagRatio=posts?Math.round(tagTotal/posts*100):0;      // 태그수/글수 (100% 근처면 글마다 전용 태그)
 
+  // 임계값은 규칙 파일에서 읽어온다(정책이 바뀌면 JSON만 갱신하면 됨)
+  const R=await loadAdsRules();
+  const TH=Object.assign({min_posts:20,min_categories:2,min_avg_length:800,min_image_ratio:50,
+    max_title_ending_dup:30,max_title_cliche:40,max_opening_cliche:30,max_opening_tail_sim:15,
+    max_lonely_tags:3}, (R&&R.thresholds)||{});
+
   const groups=[
     {h:"📄 필수 페이지 (자동 생성 가능)", items:REQ_PAGES.map(p=>({ok:hasPage(p), label:p.title+" 페이지",
       reason:"애드센스는 소개·문의·개인정보처리방침·이용약관을 요구합니다. 없으면 반려됩니다.", fix:p.slug}))},
     {h:"📝 콘텐츠", items:[
-      {ok:posts>=15, label:`발행 글 ${posts}개`, reason:"오리지널 글이 부족하면 '가치 없는 콘텐츠'로 반려됩니다. 15~30개 권장(직접 손질해 채우세요)."},
-      {ok:cats>=2, label:`카테고리 ${cats}개`, reason:"주제가 정리돼 있어야 합니다. 2개 이상 권장."},
-      {ok:avgLen>=800, label:`평균 글 길이 ${avgLen}자`, reason:"글이 짧으면 저품질로 판정됩니다. 800자 이상, 실경험·구체정보로 채우세요."},
-      {ok:imgRatio>=50, label:`대표 이미지 비율 ${imgRatio}%`, reason:"이미지 없는 글이 많으면 완성도가 낮아 보입니다."},
+      {ok:posts>=TH.min_posts, label:`발행 글 ${posts}개`, reason:`오리지널 글이 부족하면 '가치 없는 콘텐츠'로 반려됩니다. ${TH.min_posts}~${TH.recommended_posts||30}개 권장. <b>초안은 심사에 잡히지 않습니다</b> — 실제 공개된 글 수 기준입니다.`},
+      {ok:cats>=TH.min_categories, label:`카테고리 ${cats}개`, reason:"주제가 정리돼 있어야 합니다. 다만 메뉴에 있는데 글이 없는 빈 카테고리는 오히려 감점이니 함께 정리하세요."},
+      {ok:avgLen>=TH.min_avg_length, label:`평균 글 길이 ${avgLen}자`, reason:`글이 짧으면 저품질로 판정됩니다. ${TH.min_avg_length}자 이상, 실경험·구체정보로 채우세요.`},
+      {ok:imgRatio>=TH.min_image_ratio, label:`대표 이미지 비율 ${imgRatio}%`, reason:"이미지 없는 글이 많으면 완성도가 낮아 보입니다."},
     ]},
     {h:"🚨 템플릿성 진단 (반려 1순위 원인)", items:[
-      {ok:T.ratio<30, label:`제목 어미 중복 ${T.ratio}%`+(T.top.length?` — 최다: "${escAttr(T.top[0][0])}" ${T.top[0][1]}건`:""),
-       reason:"여러 글의 제목이 같은 말로 끝나면 '기계로 찍어낸 사이트'로 보입니다. 30% 미만으로 낮추세요."},
-      {ok:T.clicheRatio<40, label:`상투적 제목 표현 ${T.clicheRatio}%`,
-       reason:"'꼭 알아야 할 / 총정리 / 제대로 알아보기' 같은 표현이 반복되면 템플릿 신호입니다. 제목을 글마다 다르게 지으세요."},
-      {ok:O.clicheRatio<30, label:`상투적 도입부 ${O.clicheRatio}% (${O.n}편 검사)`,
-       reason:"'처음 알아봤을 때 저는 ~인 줄 알았습니다 → 하지만 실제로 확인해보니…' 같은 경험담 흉내 틀이 반복되면, 심사관이 세 편만 읽어도 대량생산으로 판단합니다. 도입부는 글마다 완전히 다른 방식으로 시작하세요."},
-      {ok:O.ratio<15, label:`도입부 서술부 유사쌍 ${O.ratio}% (최대 ${O.max}%)`,
-       reason:"첫 문장이 같은 어미로 끝나는 글이 많습니다."+
-              (O.worst?`<br><span style="opacity:.75">예: “…${escAttr(O.worst[0])}” / “…${escAttr(O.worst[1])}”</span>`:"")},
-      {ok:lonelyTags<=3, label:`글 1개짜리 태그 ${lonelyTags}개 (태그/글 비율 ${tagRatio}%)`,
-       reason:"글마다 전용 태그가 생기면 내용이 하나뿐인 얇은 태그 페이지가 색인됩니다. Rank Math → 일반 설정 → 태그 아카이브를 <b>noindex</b>로 바꾸세요."},
+      {ok:T.ratio<TH.max_title_ending_dup, label:`제목 어미 중복 ${T.ratio}%`+(T.top.length?` — 최다: "${escAttr(T.top[0][0])}" ${T.top[0][1]}건`:""),
+       reason:`<b>왜 문제인가</b> — 심사관은 글을 하나씩 읽는 게 아니라 <u>목록을 훑습니다</u>. 제목이 같은 말로 끝나면 그 순간 '자동 생성 사이트'로 분류됩니다.<br><b>어떻게 고치나</b> — 반복되는 어미를 쓴 글의 제목을 바꾸세요. 기준 ${TH.max_title_ending_dup}% 미만.`},
+      {ok:T.clicheRatio<TH.max_title_cliche, label:`상투적 제목 표현 ${T.clicheRatio}%`,
+       reason:`<b>왜 문제인가</b> — '꼭 알아야 할 / 총정리 / 제대로 알아보기'는 양산형 블로그의 표지입니다. 구글이 이 패턴을 대량 학습해둔 상태입니다.<br><b>어떻게 고치나</b> — 제목에 <u>그 글에만 해당하는 구체 정보</u>(숫자·조건·대상)를 넣으세요. "청년 월세 지원 총정리" → "월세 지원, 소득 바뀌면 재조사 대상이 됩니다".`},
+      {ok:O.clicheRatio<TH.max_opening_cliche, label:`상투적 도입부 ${O.clicheRatio}% (${O.n}편 검사)`,
+       reason:`<b>왜 문제인가</b> — "처음 알아봤을 때 저는 ~인 줄 알았습니다 → 하지만 실제로 확인해보니…"는 경험담을 흉내 낸 틀입니다. 실제 경험이 아니라 형식만 빌린 것이라 <u>세 편만 연달아 읽으면 바로 드러납니다</u>.<br><b>어떻게 고치나</b> — 도입 방식을 글마다 바꾸세요. 질문형 / 장면·사례형 / 숫자·데이터형 / 오해정정형 / 시기형 중에서 돌려가며 쓰면 됩니다.`},
+      {ok:O.ratio<TH.max_opening_tail_sim, label:`도입부 서술부 유사쌍 ${O.ratio}% (최대 ${O.max}%)`,
+       reason:`<b>왜 문제인가</b> — 한국어는 문장 끝에서 문체가 드러납니다. 첫 문장이 같은 어미로 끝나면 다른 주제라도 같은 사람이 같은 틀로 찍어낸 티가 납니다.`+
+              (O.worst?`<br><span style="opacity:.75">실제 예: “…${escAttr(O.worst[0])}” / “…${escAttr(O.worst[1])}”</span>`:"")},
+      {ok:lonelyTags<=TH.max_lonely_tags, label:`글 1개짜리 태그 ${lonelyTags}개 (태그/글 비율 ${tagRatio}%)`,
+       reason:`<b>왜 문제인가</b> — 글마다 전용 태그가 생기면 <u>내용이 하나뿐인 태그 페이지</u>가 글 수만큼 색인됩니다. 실질 글이 30개여도 구글은 알맹이 없는 페이지 30개를 함께 봅니다. 이게 '가치 없는 콘텐츠' 판정의 흔한 숨은 원인입니다.<br><b>어떻게 고치나</b> — Rank Math → 일반 설정 → 태그 아카이브를 <b>noindex</b>로. 앞으로는 태그를 10~15개 사전에서만 골라 쓰세요.`},
     ]},
     {h:"🏷️ 사이트 기본", items:[
       {ok:!!siteTitle, label:`사이트 제목 ${siteTitle?"("+siteTitle+")":""}`, reason:"워드프레스 설정 → 일반 → 사이트 제목을 채우세요."},
@@ -1785,11 +1955,33 @@ function analyzeReason(text){
     fix:"글 품질·분량·독창성 강화 + 필수 페이지 + 심사 모드부터.", act:["review","pages"]});
   return found;
 }
-document.getElementById("adsAnalyze").onclick=()=>{
+document.getElementById("adsAnalyze").onclick=async()=>{
   const reason=document.getElementById("adsReason").value.trim();
   if(!reason){ toast("반려 사유를 붙여넣으세요",1); return; }
   CFG.adsAttempts=(CFG.adsAttempts||[]).concat([{date:new Date().toISOString().slice(0,10),reason}]).slice(-10);
   saveCfg();
+  // 반려 기록을 신청 이력에도 자동 반영(몇 회차에 무엇 때문에 막혔는지 추적)
+  const lg=adsLog(); lg.push({kind:"reject",note:reason.slice(0,120),at:new Date().toISOString().slice(0,10)}); adsLogSave(lg);
+  // 규칙 파일의 반려 대응 플레이북을 우선 사용(정책 변화 시 JSON만 갱신)
+  const R=await loadAdsRules();
+  if(R&&R.rejection_playbook){
+    const low=reason.toLowerCase();
+    const hits=R.rejection_playbook.filter(p=>p.match.some(m=>low.includes(String(m).toLowerCase())));
+    if(hits.length){
+      document.getElementById("adsFix").innerHTML=
+        `<div style="margin-bottom:6px"><b>진단 결과 (${CFG.adsAttempts.length}회차)</b> ${rulesAgeNote(R)}</div>`+
+        hits.map(h=>`<div style="margin:6px 0;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:8px">
+          <div class="hint">${h.diagnosis}</div>
+          <ul style="margin:6px 0 0 16px;padding:0">${h.actions.map(a=>`<li style="margin:3px 0">${a}</li>`).join("")}</ul>
+          </div>`).join("")+
+        `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+           <button class="btn sm" style="padding:1px 9px;font-size:11px" onclick="document.getElementById('adsCheck').click()">다시 점검하기</button>
+           <button class="btn sm" style="padding:1px 9px;font-size:11px" onclick="document.getElementById('adsReviewMode').click()">심사 모드 켜기</button>
+         </div>`;
+      const n2=document.getElementById("adsAttemptN"); if(n2) n2.textContent="· 재신청 "+CFG.adsAttempts.length+"회차";
+      return;
+    }
+  }
   const found=analyzeReason(reason);
   const btns={review:`<button class="btn sm" style="padding:1px 9px;font-size:11px" onclick="document.getElementById('adsReviewMode').click()">심사 모드 켜기</button>`,
               pages:`<button class="btn sm" style="padding:1px 9px;font-size:11px" onclick="document.getElementById('adsMakePages').click()">필수 페이지 생성</button>`};
@@ -1808,6 +2000,12 @@ document.getElementById("adsReviewMode").onclick=async()=>{
   await setPausedVar(true);
   toast("심사 모드 ✓ 대량 생성 정지 + 엄격. 승인 후 자동생성을 다시 켜세요.");
 };
+document.getElementById("adsPlugScan").onclick=adsPluginScan;
+document.getElementById("adsPlugInstall").onclick=adsPluginInstall;
+document.getElementById("adsGuide").onclick=adsShowGuide;
+document.getElementById("adsLogApply").onclick=()=>adsAddEntry("apply");
+document.getElementById("adsLogReject").onclick=()=>adsAddEntry("reject");
+document.getElementById("adsLogApprove").onclick=()=>adsAddEntry("approve");
 function setRing(pct){
   pct=Math.max(0,Math.min(100,pct));
   document.getElementById("ringFg").style.strokeDashoffset=(RING_LEN*(1-pct/100)).toFixed(1);
