@@ -359,7 +359,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v31 · Supabase 스키마 자동 배포</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v32 · 애드센스 템플릿성 진단</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1597,6 +1597,62 @@ function pageHtml(slug){
     <h2>책임의 한계</h2><p>사이트 이용으로 발생한 손해에 대해 운영자는 법이 허용하는 범위에서 책임을 지지 않습니다.</p>`;
 }
 function stripLen(html){const d=document.createElement("div");d.innerHTML=html||"";return (d.textContent||"").replace(/\s+/g," ").trim().length;}
+
+// ===== 콘텐츠 '템플릿성' 진단 =====
+// 애드센스 반려 사유 1위인 '가치 없는 콘텐츠'는 대부분 글이 나빠서가 아니라
+// 여러 글이 같은 틀로 찍혀 나와서 걸립니다. 제목 꼬리말과 도입부 첫 문장이
+// 반복되는지를 수치로 잡아냅니다.
+function stripText(html){const d=document.createElement("div");d.innerHTML=html||"";return (d.textContent||"").replace(/\s+/g," ").trim();}
+function firstSentence(html){
+  const t=stripText(html);
+  const m=t.match(/^[\s\S]{10,200}?[.!?。]/);
+  return (m?m[0]:t.slice(0,120)).trim();
+}
+function bigrams(s){
+  const t=(s||"").replace(/[^가-힣a-zA-Z0-9]/g,"");
+  const out=new Set(); for(let i=0;i<t.length-1;i++) out.add(t.slice(i,i+2));
+  return out;
+}
+function jaccard(a,b){
+  if(!a.size||!b.size) return 0;
+  let inter=0; a.forEach(x=>{ if(b.has(x)) inter++; });
+  return inter/(a.size+b.size-inter);
+}
+function words(s){return stripText(s).replace(/[^가-힣a-zA-Z0-9 ]/g," ").trim().split(/\s+/).filter(Boolean);}
+// 제목이 같은 어미로 끝나는 정도(=템플릿 제목 비율).
+// 한국어는 마지막 '한 어절'(방법/총정리/알아보기…)에서 반복이 드러난다.
+function titleTemplateStats(titles){
+  const ratioOf=(fn)=>{
+    const c={}; titles.forEach(t=>{const k=fn(t); if(k) c[k]=(c[k]||0)+1;});
+    const dup=Object.entries(c).filter(([,n])=>n>=2).sort((a,b)=>b[1]-a[1]);
+    return {r: titles.length?Math.round(dup.reduce((s,[,n])=>s+n,0)/titles.length*100):0, top:dup.slice(0,3)};
+  };
+  const a=ratioOf(t=>{const w=words(t); return w.length?w[w.length-1]:"";});
+  const b=ratioOf(t=>words(t).slice(-2).join(" "));
+  const best=a.r>=b.r?a:b;
+  const CLICHE=["알아야 할","알아보기","총정리","완벽 정리","완벽 분석","하는 방법","핵심 정보","핵심 사항",
+                "한 번에","제대로","꼭 알아야","반드시","활용법","가이드"];
+  const cliche=titles.filter(t=>CLICHE.some(c=>stripText(t).includes(c))).length;
+  return {ratio:best.r, top:best.top,
+          clicheRatio: titles.length?Math.round(cliche/titles.length*100):0};
+}
+// 도입부 상투 구문(경험담 흉내 템플릿). 2개 이상 동시에 걸리면 템플릿으로 본다.
+const OPEN_CLICHE=[/처음\s*(접했|알아봤|이용했|들었|봤|겪었)/,/줄\s*알았/,/생각했(습니다|던|어요)/,
+  /실제로\s*(확인|진행|해보|알아)/,/가장\s*(중요|먼저)/,/느끼게\s*되었/,/알게\s*되었/,/헷갈리는/,/궁금해하는/];
+// 한국어 템플릿은 문장 '서술부'에서 반복되므로 첫 문장 끝 15자를 비교한다.
+function openingStats(sample){
+  const opens=sample.map(p=>firstSentence(p.content&&p.content.rendered)).filter(s=>s.length>15);
+  const tails=opens.map(s=>s.replace(/[.!?。]\s*$/,"").slice(-15));
+  const grams=tails.map(bigrams);
+  let pairs=0, hits=0, max=0, worst=null;
+  for(let i=0;i<grams.length;i++) for(let j=i+1;j<grams.length;j++){
+    const s=jaccard(grams[i],grams[j]); pairs++;
+    if(s>=0.40){ hits++; if(s>max){max=s; worst=[tails[i],tails[j]];} }
+  }
+  const cl=opens.filter(o=>OPEN_CLICHE.filter(r=>r.test(o)).length>=2).length;
+  return {ratio: pairs?Math.round(hits/pairs*100):0, max:Math.round(max*100), worst, n:opens.length,
+          clicheRatio: opens.length?Math.round(cl/opens.length*100):0};
+}
 async function createOnePage(slug){
   const base=wpBase(); const p=REQ_PAGES.find(x=>x.slug===slug); if(!p) return;
   try{
@@ -1612,13 +1668,15 @@ async function adsCheck(){
   if(!wpReady()){ box.innerHTML='<span style="color:#ffb020">설정 📝에서 워드프레스 정보를 먼저 입력하세요.</span>'; return; }
   box.textContent="점검 중…";
   const base=wpBase();
-  let posts=0, cats=0, pages=[], sample=[], site={};
+  let posts=0, cats=0, pages=[], sample=[], site={}, tags=[], tagTotal=0;
   try{
     const root=await fetch(base+"/wp-json"); if(root.ok) site=await root.json();
     const rp=await fetch(base+"/wp-json/wp/v2/posts?per_page=20&status=publish&_embed=1",{headers:wpAuth()});
     posts=parseInt(rp.headers.get("X-WP-Total")||"0",10); if(rp.ok) sample=await rp.json();
     const rc=await fetch(base+"/wp-json/wp/v2/categories?per_page=1",{headers:wpAuth()}); cats=parseInt(rc.headers.get("X-WP-Total")||"0",10);
     const rg=await fetch(base+"/wp-json/wp/v2/pages?per_page=100&status=publish",{headers:wpAuth()}); if(rg.ok) pages=await rg.json();
+    const rt=await fetch(base+"/wp-json/wp/v2/tags?per_page=100&orderby=count&order=asc",{headers:wpAuth()});
+    tagTotal=parseInt(rt.headers.get("X-WP-Total")||"0",10); if(rt.ok) tags=await rt.json();
   }catch(e){ box.innerHTML='<span style="color:#ff6b4a">조회 실패 — 사이트 주소/앱비밀번호/서버 CORS 확인.</span>'; return; }
 
   const lens=sample.map(p=>stripLen(p.content&&p.content.rendered));
@@ -1627,6 +1685,12 @@ async function adsCheck(){
   const imgRatio=sample.length?Math.round(withImg/sample.length*100):0;
   const hasPage=(p)=>pages.some(x=>((x.slug||"").includes(p.slug))||p.keys.some(k=>((x.title&&x.title.rendered)||"").includes(k)));
   const siteTitle=(site.name||"").trim(), siteDesc=(site.description||"").trim();
+
+  // 템플릿성 진단(반려 사유 1위 '가치 없는 콘텐츠'의 실제 원인을 잡는 부분)
+  const T=titleTemplateStats(sample.map(p=>(p.title&&p.title.rendered)||""));
+  const O=openingStats(sample);
+  const lonelyTags=tags.filter(t=>(t.count||0)<=1).length;   // 글 1개짜리 태그 = 얇은 중복 페이지
+  const tagRatio=posts?Math.round(tagTotal/posts*100):0;      // 태그수/글수 (100% 근처면 글마다 전용 태그)
 
   const groups=[
     {h:"📄 필수 페이지 (자동 생성 가능)", items:REQ_PAGES.map(p=>({ok:hasPage(p), label:p.title+" 페이지",
@@ -1637,9 +1701,22 @@ async function adsCheck(){
       {ok:avgLen>=800, label:`평균 글 길이 ${avgLen}자`, reason:"글이 짧으면 저품질로 판정됩니다. 800자 이상, 실경험·구체정보로 채우세요."},
       {ok:imgRatio>=50, label:`대표 이미지 비율 ${imgRatio}%`, reason:"이미지 없는 글이 많으면 완성도가 낮아 보입니다."},
     ]},
+    {h:"🚨 템플릿성 진단 (반려 1순위 원인)", items:[
+      {ok:T.ratio<30, label:`제목 어미 중복 ${T.ratio}%`+(T.top.length?` — 최다: "${escAttr(T.top[0][0])}" ${T.top[0][1]}건`:""),
+       reason:"여러 글의 제목이 같은 말로 끝나면 '기계로 찍어낸 사이트'로 보입니다. 30% 미만으로 낮추세요."},
+      {ok:T.clicheRatio<40, label:`상투적 제목 표현 ${T.clicheRatio}%`,
+       reason:"'꼭 알아야 할 / 총정리 / 제대로 알아보기' 같은 표현이 반복되면 템플릿 신호입니다. 제목을 글마다 다르게 지으세요."},
+      {ok:O.clicheRatio<30, label:`상투적 도입부 ${O.clicheRatio}% (${O.n}편 검사)`,
+       reason:"'처음 알아봤을 때 저는 ~인 줄 알았습니다 → 하지만 실제로 확인해보니…' 같은 경험담 흉내 틀이 반복되면, 심사관이 세 편만 읽어도 대량생산으로 판단합니다. 도입부는 글마다 완전히 다른 방식으로 시작하세요."},
+      {ok:O.ratio<15, label:`도입부 서술부 유사쌍 ${O.ratio}% (최대 ${O.max}%)`,
+       reason:"첫 문장이 같은 어미로 끝나는 글이 많습니다."+
+              (O.worst?`<br><span style="opacity:.75">예: “…${escAttr(O.worst[0])}” / “…${escAttr(O.worst[1])}”</span>`:"")},
+      {ok:lonelyTags<=3, label:`글 1개짜리 태그 ${lonelyTags}개 (태그/글 비율 ${tagRatio}%)`,
+       reason:"글마다 전용 태그가 생기면 내용이 하나뿐인 얇은 태그 페이지가 색인됩니다. Rank Math → 일반 설정 → 태그 아카이브를 <b>noindex</b>로 바꾸세요."},
+    ]},
     {h:"🏷️ 사이트 기본", items:[
       {ok:!!siteTitle, label:`사이트 제목 ${siteTitle?"("+siteTitle+")":""}`, reason:"워드프레스 설정 → 일반 → 사이트 제목을 채우세요."},
-      {ok:!!siteDesc, label:"사이트 설명(태그라인)", reason:"워드프레스 설정 → 일반 → 태그라인을 채우세요."},
+      {ok:!!siteDesc, label:"사이트 설명(태그라인)", reason:"워드프레스 설정 → 일반 → 태그라인을 채우세요. 비어 있으면 제목이 '블로그 -'처럼 끊겨 미완성으로 보입니다."},
     ]},
     {h:"🔧 수동 확인 (안내)", items:[
       {ok:null, label:"메뉴에 소개·문의·개인정보 연결", reason:"워드프레스 → 외모 → 메뉴에서 상단 메뉴에 추가."},
