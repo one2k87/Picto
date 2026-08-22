@@ -161,6 +161,8 @@
   .toast.show{opacity:1}
   .toast.err{background:var(--danger);color:#fff}
 </style>
+<!-- 구글 로그인(애드센스 상태 조회 전용, 읽기 권한만). 없어도 나머지 기능은 정상 동작 -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <header>
@@ -368,9 +370,19 @@
   </div>
 
   <div class="field">
-    <label>⑦ 신청 절차 안내</label>
+    <label>⑦ 신청 절차 안내 <span style="font-size:11px;color:var(--muted);font-weight:400">Site Kit 기준</span></label>
     <button class="btn sm" id="adsGuide" style="width:100%">단계별 신청 방법 보기</button>
     <div id="adsGuideBox" style="margin-top:8px;font-size:13px"></div>
+  </div>
+
+  <div class="field">
+    <label>⑧ 승인 상태 자동 추적 <span style="font-size:11px;color:var(--muted);font-weight:400">애드센스 API 조회</span></label>
+    <div class="hint">신청 후 <b>지금 어느 단계인지</b>를 구글에서 직접 읽어옵니다(읽기 전용). 애드센스에 매번 들어가 확인할 필요가 없어집니다.</div>
+    <div class="actions" style="margin-top:8px;flex-wrap:wrap;gap:6px">
+      <button class="btn primary sm" id="adsTrackBtn">구글 연결하고 상태 조회</button>
+      <button class="btn sm" id="adsTrackSetup">설정 방법</button>
+    </div>
+    <div id="adsTrackBox" style="margin-top:8px;font-size:13px"></div>
   </div>
 
   <div class="actions"><button class="btn sm" id="adsClose" style="width:100%">닫기</button></div>
@@ -379,7 +391,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v34 · 초안 정리 + 세팅 자동화</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v35 · 승인 상태 자동 추적</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1563,15 +1575,21 @@ async function adsShowGuide(){
   const box=document.getElementById("adsGuideBox");
   const R=await loadAdsRules();
   const site=(CFG.site||"내 사이트 주소").replace(/^https?:\/\//,"").replace(/\/+$/,"");
-  const steps=[
-    ["신청 전 최종 확인","위 ① 점검에서 <b>템플릿성 진단 4개 항목이 모두 ✅</b>인지, 공개 글이 20편 이상인지 확인하세요. 하나라도 ❌면 신청하지 말고 먼저 고치는 게 낫습니다 — 반려가 쌓이면 재심사 간격이 길어집니다."],
-    ["Site Kit으로 사이트 연결","워드프레스 → Site Kit → 애드센스 모듈 연결. 소유권 확인과 인증 코드 삽입이 자동으로 끝납니다."],
-    ["애드센스에서 사이트 추가",`<a href="https://adsense.google.com/adsense/signup" target="_blank" rel="noopener">애드센스 가입/사이트 추가</a>에서 <b>${escAttr(site)}</b>를 입력하고 안내대로 진행하세요.`],
-    ["심사 대기","보통 며칠~2주. <b>이 기간에 대량 발행을 하지 마세요.</b> 위 ③ 심사 모드를 켜두면 자동 생성이 멈춥니다."],
-    ["결과 기록","승인이든 반려든 위 ⑥에 기록하세요. 반려면 사유를 ④에 붙여넣어 보완 방법을 받으세요."]
-  ];
+  const flow=(R&&R.application_flow)||null;
   let html="";
-  steps.forEach((s,i)=>{ html+=`<div style="margin:6px 0"><b>${i+1}. ${s[0]}</b><div class="hint" style="margin-left:12px">${s[1]}</div></div>`; });
+  if(flow){
+    html+=`<div class="hint" style="padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:9px;margin-bottom:8px">${flow.principle}</div>`;
+    (flow.steps||[]).forEach((s,i)=>{
+      const own=String(s.who||"").includes("직접");
+      html+=`<div style="margin:8px 0;padding:8px 10px;border-left:3px solid ${own?"#f0b429":"var(--line)"};background:var(--card)">
+        <div><b>${i+1}. ${escAttr(s.title)}</b> <span style="font-size:11px;color:${own?"#f0b429":"var(--muted)"}">${escAttr(s.who||"")}</span></div>
+        <div class="hint" style="margin-top:3px">${s.detail}</div></div>`;
+    });
+    html+=`<div class="hint" style="margin-top:6px">🔗 내 사이트: <b>${escAttr(site)}</b> ·
+      <a href="https://adsense.google.com/adsense/sites" target="_blank" rel="noopener">애드센스 사이트 목록 열기</a></div>`;
+  } else {
+    html+=`<div class="hint">규칙 파일을 불러오지 못했습니다.</div>`;
+  }
   if(R&&R.official_docs){
     html+=`<div class="hint" style="margin-top:8px"><b>공식 문서</b><br>`;
     html+=R.official_docs.map(d=>`<a href="${d.url}" target="_blank" rel="noopener">${escAttr(d.label)}</a>`).join(" · ");
@@ -1579,6 +1597,132 @@ async function adsShowGuide(){
   }
   html+=`<div class="hint" style="margin-top:8px">${rulesAgeNote(R)}</div>`;
   box.innerHTML=html;
+}
+
+// ===== ⑧ 애드센스 승인 상태 자동 추적 =====
+// AdSense Management API v2는 '읽기 전용'입니다. 사이트 추가·신청은 API로 불가능하고
+// (accounts.sites에 create가 없음), 조회만 됩니다. 그래서 신청은 사람이 Site Kit으로 하고
+// 이후 상태만 여기서 자동으로 읽어옵니다. 권한도 adsense.readonly 하나만 요청합니다.
+const ADS_SCOPE="https://www.googleapis.com/auth/adsense.readonly";
+let ADS_TOKEN=null;
+
+function adsTrackSetupHtml(){
+  const origin=location.origin;
+  return `<div style="padding:8px 10px;border:1px solid var(--line);border-radius:9px">
+    <div><b>최초 1회 설정</b> (구글 클라우드에서 조회용 열쇠를 만드는 과정입니다)</div>
+    <ol style="margin:6px 0 0 16px;padding:0;line-height:1.8">
+      <li><a href="https://console.cloud.google.com/projectcreate" target="_blank" rel="noopener">구글 클라우드 콘솔</a>에서 프로젝트를 하나 만듭니다(이름 아무거나).</li>
+      <li><a href="https://console.cloud.google.com/apis/library/adsense.googleapis.com" target="_blank" rel="noopener">AdSense Management API</a>로 가서 <b>사용(Enable)</b>을 누릅니다.</li>
+      <li>API 및 서비스 → OAuth 동의 화면 → <b>외부(External)</b> 선택 → 앱 이름·이메일만 채우고 저장.
+          테스트 사용자에 <b>본인 구글 계정</b>을 추가하세요.</li>
+      <li>사용자 인증 정보 → 사용자 인증 정보 만들기 → <b>OAuth 클라이언트 ID</b> → 유형 <b>웹 애플리케이션</b>.</li>
+      <li><b>승인된 자바스크립트 원본</b>에 아래 주소를 그대로 추가합니다.
+          <div style="margin:4px 0"><code style="user-select:all">${escAttr(origin)}</code>
+          <button class="btn sm" style="padding:0 7px;font-size:11px" onclick="clip('${escAttr(origin)}','주소 복사됨')">복사</button></div></li>
+      <li>만들어진 <b>클라이언트 ID</b>를 아래에 붙여넣고 저장하세요.</li>
+    </ol>
+    <div style="margin-top:8px">
+      <input id="adsClientId" placeholder="000000-xxxxx.apps.googleusercontent.com" autocapitalize="off"
+             style="width:100%;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:8px;font-size:13px">
+      <button class="btn ok sm" style="width:100%;margin-top:6px" onclick="adsSaveClientId()">클라이언트 ID 저장</button>
+    </div>
+    <div class="hint" style="margin-top:6px">이 ID는 비밀이 아니며(브라우저에 노출되는 값), 요청하는 권한은 <b>애드센스 읽기 전용</b> 하나뿐입니다.
+      광고 설정을 바꾸거나 결제 정보를 보는 권한은 요청하지 않습니다.</div>
+  </div>`;
+}
+function adsSaveClientId(){
+  const v=(document.getElementById("adsClientId").value||"").trim();
+  if(!v){ toast("클라이언트 ID를 입력하세요",1); return; }
+  CFG.adsClientId=v; saveCfg(); toast("저장됨 ✓ 이제 '구글 연결하고 상태 조회'를 누르세요");
+}
+function adsGetToken(){
+  return new Promise((resolve,reject)=>{
+    if(!CFG.adsClientId) return reject(new Error("no-client-id"));
+    if(!(window.google&&google.accounts&&google.accounts.oauth2)) return reject(new Error("gis-not-loaded"));
+    try{
+      const tc=google.accounts.oauth2.initTokenClient({
+        client_id:CFG.adsClientId, scope:ADS_SCOPE,
+        callback:(r)=>{ if(r&&r.access_token){ ADS_TOKEN=r.access_token; resolve(r.access_token); }
+                        else reject(new Error(r&&r.error||"no-token")); },
+        error_callback:(e)=>reject(new Error((e&&e.type)||"oauth-error")),
+      });
+      tc.requestAccessToken({prompt: ADS_TOKEN?"":"consent"});
+    }catch(e){ reject(e); }
+  });
+}
+async function adsApi(path, token){
+  const r=await fetch("https://adsense.googleapis.com/v2/"+path,{headers:{Authorization:"Bearer "+token}});
+  if(!r.ok){ const t=await r.text().catch(()=>""); throw new Error(`${r.status} ${t.slice(0,180)}`); }
+  return r.json();
+}
+async function adsTrack(){
+  const box=document.getElementById("adsTrackBox");
+  if(!CFG.adsClientId){ box.innerHTML=adsTrackSetupHtml(); return; }
+  box.textContent="구글 연결 중…";
+  let token;
+  try{ token=await adsGetToken(); }
+  catch(e){
+    const m=String(e.message||e);
+    box.innerHTML=`<span style="color:#ff6b4a">연결 실패 (${escAttr(m)})</span>`+
+      (m.includes("gis")?'<div class="hint">구글 로그인 스크립트가 아직 로드되지 않았습니다. 앱을 새로고침한 뒤 다시 시도하세요.</div>':
+       '<div class="hint">클라이언트 ID가 맞는지, 승인된 자바스크립트 원본에 이 앱 주소가 등록됐는지 확인하세요.</div>');
+    return;
+  }
+  box.textContent="애드센스 조회 중…";
+  const R=await loadAdsRules();
+  const ST=(R&&R.site_states)||{};
+  try{
+    const accs=await adsApi("accounts",token);
+    const list=accs.accounts||[];
+    if(!list.length){
+      box.innerHTML='<span style="color:#ffb020">애드센스 계정이 아직 없습니다.</span>'+
+        '<div class="hint">⑦ 신청 절차 안내를 따라 Site Kit으로 계정을 먼저 연결하세요.</div>';
+      return;
+    }
+    let html="";
+    for(const a of list){
+      html+=`<div style="margin:8px 0 4px"><b>계정</b> ${escAttr(a.displayName||a.name)}
+             <span class="hint">(${escAttr((a.name||"").replace("accounts/",""))})</span></div>`;
+      let sites=[];
+      try{ const s=await adsApi(`${a.name}/sites`,token); sites=s.sites||[]; }catch(e){ html+=`<div class="hint">사이트 조회 실패: ${escAttr(String(e.message).slice(0,80))}</div>`; }
+      if(!sites.length) html+=`<div class="hint">등록된 사이트가 없습니다. Site Kit으로 사이트를 연결하세요.</div>`;
+      const mySite=(CFG.site||"").replace(/^https?:\/\//,"").replace(/^www\./,"").replace(/\/+$/,"");
+      for(const st of sites){
+        const meta=ST[st.state]||ST.STATE_UNSPECIFIED||{label:st.state,color:"#98a2b3",meaning:"",action:""};
+        const mine=(st.domain||"").replace(/^www\./,"")===mySite;
+        html+=`<div style="margin:6px 0;padding:8px 10px;border:1px solid var(--line);border-radius:9px${mine?";border-color:"+meta.color:""}">
+          <div><b>${escAttr(st.domain||"")}</b> ${mine?'<span class="hint">· 내 블로그</span>':""}
+            <span style="float:right;color:${meta.color};font-weight:700">${escAttr(meta.label)}</span></div>
+          <div class="hint" style="margin-top:4px">${meta.meaning}</div>
+          ${meta.action?`<div class="hint" style="margin-top:2px">👉 ${meta.action}</div>`:""}
+          ${st.autoAdsEnabled?'<div class="hint">자동 광고 켜짐</div>':""}
+        </div>`;
+        // 승인 감지 시 앱 상태를 자동으로 맞춰준다
+        if(mine&&st.state==="READY"&&!CFG.adsenseApproved){
+          CFG.adsenseApproved=true; saveCfg(); refreshApprovedUI();
+          const lg=adsLog();
+          if(!lg.some(x=>x.kind==="approve")){ lg.push({kind:"approve",note:"API에서 READY 상태 확인",at:new Date().toISOString().slice(0,10)}); adsLogSave(lg); }
+          html+=`<div style="color:#33c27f;margin:4px 0">🎉 승인이 확인되어 앱을 '승인 완료'로 전환했습니다.</div>`;
+        }
+      }
+      try{
+        const pi=await adsApi(`${a.name}/policyIssues`,token);
+        const issues=pi.policyIssues||[];
+        if(issues.length){
+          html+=`<div style="margin:8px 0 4px;color:#ff6b4a"><b>정책 문제 ${issues.length}건</b></div>`;
+          for(const it of issues.slice(0,5)){
+            html+=`<div class="hint" style="margin-left:8px">· ${escAttr(it.entityType||"")} ${escAttr((it.policyTopics||[]).map(t=>t.topic).join(", ")||it.action||"")}</div>`;
+          }
+        }
+      }catch(e){ /* policyIssues는 권한/상태에 따라 없을 수 있음 — 조용히 넘어감 */ }
+    }
+    html+=`<div class="hint" style="margin-top:8px">조회 시각 ${new Date().toLocaleString("ko-KR")} · 읽기 전용 권한으로 조회했습니다.</div>`;
+    box.innerHTML=html;
+  }catch(e){
+    const m=String(e.message||e);
+    box.innerHTML=`<span style="color:#ff6b4a">조회 실패</span><div class="hint">${escAttr(m)}</div>`+
+      (m.startsWith("403")?'<div class="hint">AdSense Management API가 사용 설정됐는지, OAuth 동의 화면 테스트 사용자에 본인 계정이 있는지 확인하세요.</div>':"");
+  }
 }
 
 // ===== 🛡️ 애드센스 승인 준비 탭 =====
@@ -2052,6 +2196,12 @@ document.getElementById("wpTrashDrafts").onclick=async()=>{
 document.getElementById("adsPlugScan").onclick=adsPluginScan;
 document.getElementById("adsPlugInstall").onclick=adsPluginInstall;
 document.getElementById("adsGuide").onclick=adsShowGuide;
+document.getElementById("adsTrackBtn").onclick=adsTrack;
+document.getElementById("adsTrackSetup").onclick=()=>{
+  const box=document.getElementById("adsTrackBox");
+  box.innerHTML=adsTrackSetupHtml();
+  const i=document.getElementById("adsClientId"); if(i) i.value=CFG.adsClientId||"";
+};
 document.getElementById("adsLogApply").onclick=()=>adsAddEntry("apply");
 document.getElementById("adsLogReject").onclick=()=>adsAddEntry("reject");
 document.getElementById("adsLogApprove").onclick=()=>adsAddEntry("approve");
