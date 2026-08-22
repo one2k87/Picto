@@ -240,6 +240,49 @@ def _plan_slots(cfg, cat=None):
     return slots
 
 
+def _recent_for_template(hist, limit=30):
+    """템플릿성 비교용 최근 글 목록. history.json에는 본문이 없으므로 제목만 사용한다
+    (제목 어미 중복은 제목만으로 판정 가능. 도입부 비교는 같은 실행 내 글끼리 이뤄진다)."""
+    arts = (hist or {}).get("articles", []) or []
+    return [{"title": a.get("title", ""), "html": "", "opening": ""} for a in arts[-limit:]]
+
+
+def _log_hold(cfg, article, reason):
+    """보류 사유를 누적 기록한다(dashboard/data/quality_log.json).
+
+    나중에 이 로그를 통째로 AI에게 넘기면, 어떤 사유가 반복되는지 보고
+    생성 로직(프롬프트·임계값)을 한 번에 고칠 수 있다.
+    """
+    path = os.path.join("dashboard", "data", "quality_log.json")
+    try:
+        log = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {"entries": [], "counts": {}}
+    except Exception:
+        log = {"entries": [], "counts": {}}
+    items = quality.classify(reason)
+    entry = {
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "title": article.get("title", ""),
+        "keyword": article.get("keyword", ""),
+        "category": article.get("category", ""),
+        "reason": reason,
+        "codes": [c["code"] for c in items],
+        "kind": "discard" if quality.is_discard(reason) else "retry",
+    }
+    log.setdefault("entries", []).append(entry)
+    log["entries"] = log["entries"][-1000:]          # 너무 커지지 않게 최근 1000건만
+    counts = log.setdefault("counts", {})
+    for c in items:
+        counts[c["code"]] = counts.get(c["code"], 0) + 1
+    log["updated"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+    # 가장 많이 걸리는 사유 = 로직을 고쳐야 할 지점
+    log["top"] = sorted(counts.items(), key=lambda kv: -kv[1])[:5]
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        json.dump(log, open(path, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"[품질로그] 기록 실패: {e}")
+
+
 def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
     """한 카테고리에 대해 슬롯 계획대로 글을 생성해 리스트로 반환."""
     name = cat["name"]
@@ -333,9 +376,13 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
     # 품질 게이트: 분량·구조·키워드 스터핑·중복 검사 (같은 실행 글끼리 유사도 비교)
     safety = cfg.get("safety", {}) or {}
     force_draft = safety.get("force_draft", True)
+    # 템플릿성 비교용: 최근 생성/발행 글(제목·도입부)
+    recent_ref = _recent_for_template(hist, limit=int(safety.get("template_window", 30)))
     for i, a in enumerate(generated):
         others = [b["html"] for j, b in enumerate(generated) if j != i]
-        ok, reason = quality.check(a, others, safety)
+        peers = recent_ref + [{"title": b.get("title", ""), "html": b.get("html", "")}
+                              for j, b in enumerate(generated) if j < i]
+        ok, reason = quality.check(a, others, safety, recent=peers)
         a["quality"] = "통과" if ok else "보류"
         a["quality_reason"] = reason
         # 최신성·정확성 검증(연도/진행상태/불확실 주장) → 문제 있으면 '글을 다시 씀'
@@ -398,16 +445,33 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
                 a["status"] = "게시됨"
             a["post_url"] = url or ""
         elif auto_publish and a["quality"] == "보류":
-            a["status"] = "품질보류"      # 발행 안 함(검토 필요)
-            a["post_url"] = ""
-            print(f"  · 품질보류(발행 제외): {a['keyword']} — {a['quality_reason']}")
+            # 보류 사유를 두 갈래로 나눈다.
+            #   discard(주제 중복) = 고쳐도 또 겹침 → 즉시 폐기, 다시 쓰지 않음
+            #   retry(분량·구조·템플릿) = 고쳐서 다시 쓸 수 있음 → 재생성 대기
+            reason = a.get("quality_reason", "")
+            _log_hold(cfg, a, reason)
+            items = quality.classify(reason)
+            a["hold_detail"] = items          # 앱이 '왜 보류됐는지'를 그대로 보여줄 수 있게
+            if quality.is_discard(reason):
+                a["status"] = "폐기"
+                a["discarded"] = True
+                a["post_url"] = ""
+                print(f"  · 폐기(주제 중복, 재작성 안 함): {a['keyword']} — {reason}")
+            else:
+                a["status"] = "재생성대기"
+                a["retry_queued"] = True
+                a["post_url"] = ""
+                fixes = " / ".join(c["fix"] for c in items) or "원인 확인 후 재생성"
+                print(f"  · 재생성대기: {a['keyword']} — {reason}")
+                print(f"      ↳ 조치: {fixes}")
         else:
             a["status"] = "복붙대기"
             a["post_url"] = ""
         a["copy_file"] = save_copy_html(a)
         out.append(a)
     print(f"  → [{name}] 슬롯 {sum(slot_count.values())}건 · 글 {len(out)}편"
-          f"(품질보류 {sum(1 for a in out if a.get('quality')=='보류')}편)")
+          f"(재생성대기 {sum(1 for a in out if a.get('status')=='재생성대기')}편 · "
+          f"폐기 {sum(1 for a in out if a.get('status')=='폐기')}편)")
     return out
 
 
