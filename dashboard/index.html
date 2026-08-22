@@ -391,7 +391,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v35 · 승인 상태 자동 추적</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v36 · 애드센스 상태 추적 준비완료</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1604,6 +1604,10 @@ async function adsShowGuide(){
 // (accounts.sites에 create가 없음), 조회만 됩니다. 그래서 신청은 사람이 Site Kit으로 하고
 // 이후 상태만 여기서 자동으로 읽어옵니다. 권한도 adsense.readonly 하나만 요청합니다.
 const ADS_SCOPE="https://www.googleapis.com/auth/adsense.readonly";
+// OAuth 클라이언트 ID는 비밀값이 아니다(브라우저에 노출되는 것이 정상 설계).
+// 실제 보호는 구글 콘솔의 '승인된 JavaScript 원본'이 담당한다 → 등록된 주소에서만 동작.
+const ADS_CLIENT_ID_DEFAULT="502118836474-3aopk0i2v60cfa24grc97a68silq3pmh.apps.googleusercontent.com";
+function adsClientId(){ return (CFG.adsClientId||"").trim() || ADS_CLIENT_ID_DEFAULT; }
 let ADS_TOKEN=null;
 
 function adsTrackSetupHtml(){
@@ -1637,11 +1641,11 @@ function adsSaveClientId(){
 }
 function adsGetToken(){
   return new Promise((resolve,reject)=>{
-    if(!CFG.adsClientId) return reject(new Error("no-client-id"));
+    if(!adsClientId()) return reject(new Error("no-client-id"));
     if(!(window.google&&google.accounts&&google.accounts.oauth2)) return reject(new Error("gis-not-loaded"));
     try{
       const tc=google.accounts.oauth2.initTokenClient({
-        client_id:CFG.adsClientId, scope:ADS_SCOPE,
+        client_id:adsClientId(), scope:ADS_SCOPE,
         callback:(r)=>{ if(r&&r.access_token){ ADS_TOKEN=r.access_token; resolve(r.access_token); }
                         else reject(new Error(r&&r.error||"no-token")); },
         error_callback:(e)=>reject(new Error((e&&e.type)||"oauth-error")),
@@ -1657,7 +1661,7 @@ async function adsApi(path, token){
 }
 async function adsTrack(){
   const box=document.getElementById("adsTrackBox");
-  if(!CFG.adsClientId){ box.innerHTML=adsTrackSetupHtml(); return; }
+  if(!adsClientId()){ box.innerHTML=adsTrackSetupHtml(); return; }
   box.textContent="구글 연결 중…";
   let token;
   try{ token=await adsGetToken(); }
@@ -2200,7 +2204,7 @@ document.getElementById("adsTrackBtn").onclick=adsTrack;
 document.getElementById("adsTrackSetup").onclick=()=>{
   const box=document.getElementById("adsTrackBox");
   box.innerHTML=adsTrackSetupHtml();
-  const i=document.getElementById("adsClientId"); if(i) i.value=CFG.adsClientId||"";
+  const i=document.getElementById("adsClientId"); if(i) i.value=CFG.adsClientId||ADS_CLIENT_ID_DEFAULT;
 };
 document.getElementById("adsLogApply").onclick=()=>adsAddEntry("apply");
 document.getElementById("adsLogReject").onclick=()=>adsAddEntry("reject");
