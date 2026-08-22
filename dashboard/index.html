@@ -57,18 +57,30 @@
 
   /* iOS: 입력창 탭 시 자동 확대 방지(글꼴 16px 이상이면 확대 안 함) */
   input,textarea,select{font-size:16px !important}
-  .filters{display:flex;gap:5px;padding:5px 12px 3px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* 가로 스크롤 대신 줄바꿈 — 모바일에서 칩이 화면 밖으로 밀리지 않게 */
+  .filters{display:flex;gap:5px;padding:5px 12px 3px;flex-wrap:wrap}
   .filters::-webkit-scrollbar{display:none}
   .chip{padding:3px 9px;border-radius:14px;border:1px solid var(--line);white-space:nowrap;
-    background:var(--card);cursor:pointer;font-size:11px;color:var(--muted);flex:0 0 auto}
+    background:var(--card);cursor:pointer;font-size:11px;color:var(--muted);flex:0 1 auto;
+    max-width:100%;overflow:hidden;text-overflow:ellipsis}
   .chip b{font-weight:700}
   .chip.active{color:#fff;border-color:var(--accent);background:#241f3d}
   /* 섹션 구분선 */
   .sec-div{height:1px;background:var(--line);margin:8px 16px;opacity:.7}
   /* 패널 탭 */
-  .ptab{flex:1;padding:7px 6px;font-size:12px;border:1px solid var(--line);background:var(--card);
-    color:var(--muted);border-radius:9px;cursor:pointer;white-space:nowrap}
+  .ptab{flex:1 1 0;min-width:0;padding:7px 4px;font-size:12px;border:1px solid var(--line);background:var(--card);
+    color:var(--muted);border-radius:9px;cursor:pointer;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis}
   .ptab.active{color:#fff;border-color:var(--accent);background:#241f3d}
+
+  /* 좁은 화면(아이폰 등): 한 화면에 들어오도록 여백·글자 축소 */
+  @media (max-width:430px){
+    .filters{padding:5px 10px 3px;gap:4px}
+    .chip{font-size:10.5px;padding:3px 7px}
+    .ptab{font-size:11px;padding:7px 2px}
+    .sec-div,.bulkbar{margin-left:10px;margin-right:10px}
+    #panelTabs{margin-left:10px !important;margin-right:10px !important}
+  }
 
   .bulkbar{display:flex;gap:8px;padding:6px 16px 2px;flex-wrap:wrap;align-items:center}
   .cardchk{width:22px;height:22px;flex:0 0 auto;accent-color:var(--accent);margin:0}
@@ -207,6 +219,7 @@
   <span class="chip active" data-f="all">전체 <b id="c-all">0</b></span>
   <span class="chip" data-f="long">🎯 저경쟁 롱테일 <b id="c-long">0</b></span>
   <span class="chip" data-f="season">🗓️ 시즌 선점 <b id="c-season">0</b></span>
+  <span class="chip" data-f="archive" id="chipArchive" style="display:none">🗃️ 보관함 <b id="c-archive">0</b></span>
 </div>
 
 <div class="sec-div"></div>
@@ -391,7 +404,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v36 · 애드센스 상태 추적 준비완료</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v37 · 모바일 레이아웃 + 보관함</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -689,6 +702,17 @@
     <div class="hint">발행 이력(누적 글)·사용량/비용·유입 기록을 <b>0에서 다시</b> 시작합니다.
       애드센스 승인 후 새로 시작할 때 사용하세요. <b>글 자체는 워드프레스에 그대로</b> 남습니다(앱 기록만 초기화).
       GitHub 정보가 있으면 클라우드 기록(history/status)도 함께 비웁니다.</div>
+  </div>
+
+  <div class="field">
+    <label>🗃️ 목록 보관함 <span id="archStateLbl" style="font-size:11px;color:var(--muted);font-weight:400"></span></label>
+    <div class="actions" style="flex-wrap:wrap;gap:6px">
+      <button class="btn sm" id="archNow">지금까지 글 목록에서 숨기기</button>
+      <button class="btn sm" id="archUndo">보관 해제</button>
+    </div>
+    <div class="hint">워드프레스에서 초안을 휴지통으로 보낸 뒤, <b>앱 목록만 깔끔하게 비우는</b> 기능입니다.
+      기록은 지워지지 않고 🗃️ 보관함 칩으로 다시 볼 수 있으며,
+      <b>발행을 다시 시작하면 새 글은 자동으로 목록에 나타납니다</b>(보관 기준일 이후 글만 표시).</div>
   </div>
 
   <div class="field">
@@ -990,10 +1014,20 @@ async function clip(t,msg){try{await navigator.clipboard.writeText(t);toast(msg)
   catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);
     ta.select();document.execCommand("copy");ta.remove();toast(msg);}}
 
+// 보관함: CFG.archiveBefore 날짜 이전(포함)의 글은 목록에서 숨긴다.
+// 워드프레스에서 초안을 휴지통으로 보낸 뒤 앱 목록만 비우는 용도.
+// 이후 새로 생성되는 글은 날짜가 더 뒤라 자동으로 다시 보인다.
+function isArchived(a){
+  const cut=CFG.archiveBefore; if(!cut) return false;
+  return String(a.date||"") <= String(cut);
+}
+function archivedCount(){ return (DATA?.articles||[]).filter(isArchived).length; }
+
 function visible(){
   const q=(fSearch||"").trim().toLowerCase();
   let list=(DATA?.articles||[]).filter(a=>
-    (fKind==="all"||a.kind===fKind)&&(fCat==="all"||a.category===fCat)&&
+    (fKind==="archive" ? isArchived(a) : !isArchived(a))&&
+    (fKind==="all"||fKind==="archive"||a.kind===fKind)&&(fCat==="all"||a.category===fCat)&&
     (fStatus==="all"||a.status===fStatus)&&
     (!q || ((a.title||"")+" "+(a.keyword||"")+" "+(a.focus_keyword||"")+" "+(a.tags||[]).join(" ")).toLowerCase().includes(q)));
   if(sortMode==="volume") list=[...list].sort((x,y)=>(y.volume||0)-(x.volume||0));
@@ -1006,8 +1040,9 @@ function renderCatFilters(){
   const cats=[...new Set((DATA?.articles||[]).map(a=>a.category).filter(Boolean))];
   const box=document.getElementById("catFilters");
   if(!cats.length){box.innerHTML="";return;}
-  box.innerHTML=`<span class="chip cat ${fCat==="all"?"active":""}" data-c="all">📂 전체 카테고리</span>`+
-    cats.map(c=>`<span class="chip cat ${fCat===c?"active":""}" data-c="${c}">${c} <b>${(DATA.articles||[]).filter(a=>a.category===c).length}</b></span>`).join("");
+  const live=(DATA.articles||[]).filter(a=>!isArchived(a));
+  box.innerHTML=`<span class="chip cat ${fCat==="all"?"active":""}" data-c="all">📂 전체</span>`+
+    cats.map(c=>`<span class="chip cat ${fCat===c?"active":""}" data-c="${c}">${c} <b>${live.filter(a=>a.category===c).length}</b></span>`).join("");
   box.querySelectorAll(".chip[data-c]").forEach(ch=>ch.onclick=()=>{fCat=ch.dataset.c;render();});
 }
 
@@ -1128,10 +1163,12 @@ function publishSelected(){ bulkPublish([...SEL],"선택한 글"); }
 function publishAll(){ bulkPublish(visible(),"현재 목록의 글"); }
 
 function render(){
-  const arts=DATA?.articles||[];
+  const arts=(DATA?.articles||[]).filter(a=>!isArchived(a));   // 보관된 글은 카운트에서 제외
   renderCatFilters();
   c("c-all",arts.length);c("c-long",arts.filter(a=>a.kind==="long").length);
   c("c-season",arts.filter(a=>a.kind==="season").length);
+  const nArc=archivedCount(), chArc=document.getElementById("chipArchive");
+  if(chArc){ chArc.style.display=nArc?"":"none"; c("c-archive",nArc); }
   const cats=(DATA&&DATA.categories)?DATA.categories.length:[...new Set(arts.map(a=>a.category))].length;
   document.getElementById("genat").textContent=DATA?
     ("📂 카테고리 "+cats+"개 · 생성 "+new Date(DATA.generated_at).toLocaleString("ko-KR")
@@ -1270,6 +1307,7 @@ function openSheet(){
   document.getElementById("cfgAuthorName").value=CFG.author||"정다인 에디터";
   document.getElementById("cfgAuthorBio").value=CFG.authorBio||"생활 속 금융·건강 정보를 조사하고 정리해 전달합니다.";
   document.getElementById("cfgAuthorType").value=CFG.authorType||"Person";
+  refreshArchLbl();
   document.getElementById("cfgSupaUrl").value=CFG.supabaseUrl||"";
   document.getElementById("cfgSupaKey").value="";
   document.getElementById("cfgSupaAccessToken").value="";
@@ -2156,6 +2194,25 @@ document.getElementById("adsReviewMode").onclick=async()=>{
   await setPausedVar(true);
   toast("심사 모드 ✓ 대량 생성 정지 + 엄격. 승인 후 자동생성을 다시 켜세요.");
 };
+// 보관함 조작: 기준일만 저장하면 되므로 데이터는 손상되지 않는다.
+function refreshArchLbl(){
+  const el=document.getElementById("archStateLbl"); if(!el) return;
+  el.textContent=CFG.archiveBefore?`(${CFG.archiveBefore} 이전 ${archivedCount()}편 숨김)`:"(보관 안 함)";
+}
+document.getElementById("archNow").onclick=()=>{
+  const n=(DATA?.articles||[]).length;
+  if(!n){ toast("표시할 글이 없습니다",1); return; }
+  const today=new Date().toISOString().slice(0,10);
+  if(!confirm(`지금까지의 글 ${n}편을 목록에서 숨깁니다.\n\n· 기록은 삭제되지 않습니다(🗃️ 보관함에서 확인 가능)\n· 앞으로 새로 생성되는 글은 자동으로 다시 표시됩니다\n\n진행할까요?`)) return;
+  CFG.archiveBefore=today; saveCfg(); fKind="all";
+  document.querySelectorAll('.chip[data-f]').forEach(c=>c.classList.toggle("active",c.dataset.f==="all"));
+  render(); refreshArchLbl(); toast("목록을 비웠습니다 ✓ 새 글은 자동으로 표시됩니다");
+};
+document.getElementById("archUndo").onclick=()=>{
+  if(!CFG.archiveBefore){ toast("보관된 글이 없습니다",1); return; }
+  CFG.archiveBefore=""; saveCfg(); render(); refreshArchLbl(); toast("보관 해제됨 — 전체 글이 다시 표시됩니다");
+};
+
 // 초안만 골라 휴지통으로. 발행글은 어떤 경우에도 건드리지 않는다.
 document.getElementById("wpTrashDrafts").onclick=async()=>{
   const box=document.getElementById("wpTrashResult");
