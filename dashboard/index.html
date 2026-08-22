@@ -379,7 +379,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v33 · 애드센스 세팅 자동화</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v34 · 초안 정리 + 세팅 자동화</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -677,6 +677,14 @@
     <div class="hint">발행 이력(누적 글)·사용량/비용·유입 기록을 <b>0에서 다시</b> 시작합니다.
       애드센스 승인 후 새로 시작할 때 사용하세요. <b>글 자체는 워드프레스에 그대로</b> 남습니다(앱 기록만 초기화).
       GitHub 정보가 있으면 클라우드 기록(history/status)도 함께 비웁니다.</div>
+  </div>
+
+  <div class="field">
+    <label>🗑️ 워드프레스 초안 전량 휴지통으로</label>
+    <button class="btn sm" id="wpTrashDrafts" style="width:100%;border-color:#e5484d;color:#ff9a9a">초안 전부 휴지통으로 보내기</button>
+    <div class="hint"><b>초안(draft) 상태의 글만</b> 휴지통으로 옮깁니다. 발행된 글·예약글·페이지는 절대 건드리지 않습니다.
+      휴지통이라 워드프레스에서 <b>복구 가능</b>하며, 30일 후 자동 삭제됩니다(워드프레스 기본값).</div>
+    <div id="wpTrashResult" style="margin-top:6px;font-size:12px"></div>
   </div>
 
   <div class="divider"></div>
@@ -1999,6 +2007,47 @@ document.getElementById("adsReviewMode").onclick=async()=>{
   saveCfg(); refreshPauseBtn();
   await setPausedVar(true);
   toast("심사 모드 ✓ 대량 생성 정지 + 엄격. 승인 후 자동생성을 다시 켜세요.");
+};
+// 초안만 골라 휴지통으로. 발행글은 어떤 경우에도 건드리지 않는다.
+document.getElementById("wpTrashDrafts").onclick=async()=>{
+  const box=document.getElementById("wpTrashResult");
+  if(!wpReady()){ toast("워드프레스 정보를 먼저 입력",1); return; }
+  const base=wpBase();
+  box.textContent="초안 개수 확인 중…";
+  let total=0;
+  try{
+    const r=await fetch(base+"/wp-json/wp/v2/posts?status=draft&per_page=1",{headers:wpAuth()});
+    if(!r.ok) throw new Error(r.status);
+    total=parseInt(r.headers.get("X-WP-Total")||"0",10);
+  }catch(e){ box.innerHTML='<span style="color:#ff6b4a">초안 조회 실패 — 사이트 주소/앱비밀번호를 확인하세요.</span>'; return; }
+  if(!total){ box.innerHTML='<span class="hint">휴지통으로 보낼 초안이 없습니다.</span>'; return; }
+  if(!confirm(`초안 ${total}편을 휴지통으로 보냅니다.\n\n· 발행된 글과 페이지는 건드리지 않습니다\n· 워드프레스 휴지통에서 복구할 수 있습니다\n\n진행할까요?`)) return;
+  if(!confirm(`한 번 더 확인합니다.\n초안 ${total}편 → 휴지통. 계속할까요?`)) return;
+
+  let done=0, fail=0;
+  const t0=Date.now();
+  while(true){
+    let batch=[];
+    try{
+      // 항상 첫 페이지만 다시 읽는다(휴지통으로 빠지면 목록에서 사라지므로)
+      const r=await fetch(base+"/wp-json/wp/v2/posts?status=draft&per_page=50&_fields=id",{headers:wpAuth()});
+      if(!r.ok) break;
+      batch=await r.json();
+    }catch(e){ break; }
+    if(!Array.isArray(batch)||!batch.length) break;
+    for(const p of batch){
+      try{
+        // force 미지정 = 휴지통으로 이동(완전 삭제 아님)
+        const d=await fetch(`${base}/wp-json/wp/v2/posts/${p.id}`,{method:"DELETE",headers:wpAuth()});
+        if(d.ok) done++; else fail++;
+      }catch(e){ fail++; }
+    }
+    box.innerHTML=`휴지통으로 이동 중… <b>${done}</b>/${total}${fail?` (실패 ${fail})`:""}`;
+    if(Date.now()-t0>1000*60*10){ box.innerHTML+=" <span style='color:#ffb020'>· 시간이 오래 걸려 중단했습니다. 다시 눌러 이어서 진행하세요.</span>"; return; }
+  }
+  box.innerHTML=`<span style="color:#33c27f">✅ 초안 ${done}편을 휴지통으로 옮겼습니다.</span>`+
+    (fail?` <span style="color:#ff6b4a">실패 ${fail}편</span>`:"")+
+    `<div class="hint">워드프레스 → 글 → 휴지통에서 복구할 수 있습니다. 완전히 비우려면 워드프레스에서 '휴지통 비우기'를 누르세요.</div>`;
 };
 document.getElementById("adsPlugScan").onclick=adsPluginScan;
 document.getElementById("adsPlugInstall").onclick=adsPluginInstall;
