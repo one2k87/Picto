@@ -772,7 +772,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v82 · 승인 탭 타임라인</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v83 · 승인 탭 타임라인</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2770,6 +2770,9 @@ async function prepState(){
   const s={niche:!!CFG.niche, author:!!(CFG.author&&CFG.authorBio),
            posts:0, offNiche:0, onNiche:0, cliche:0, wp:wpReady(), check:CFG.lastCheck||null};
   if(!s.wp) return s;
+  // NICHES는 비동기 로드다. 기다리지 않으면 detect 키워드가 비어
+  // 모든 글이 '주제 밖'이 되거나 분류 자체가 안 된다(detectNiche와 같은 함정).
+  if(!NICHES) await loadNiches();
   try{
     const base=wpBase(), H=wpAuth();
     const r=await fetch(base+"/wp-json/wp/v2/posts?per_page=100&status=publish&_fields=id,title,categories",{headers:H});
