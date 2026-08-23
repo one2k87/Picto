@@ -685,7 +685,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v56 · 워드프레스 연결 진단</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v57 · 아이디 입력 경고</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -853,6 +853,9 @@
   <div class="field">
     <label>아이디</label>
     <input id="cfgUser" placeholder="wp_id" autocapitalize="off">
+    <div class="hint">⚠️ <b>이메일이 아니라 로그인 아이디</b>입니다. 워드프레스 → 사용자 → 프로필의 '사용자 이름'을 그대로 넣으세요.
+      이메일을 넣으면 401 오류가 납니다(가장 흔한 실수).</div>
+    <div id="cfgUserWarn" class="hint" style="display:none;color:var(--danger)"></div>
   </div>
   <div class="field">
     <label>응용 프로그램 비밀번호</label>
@@ -2879,6 +2882,18 @@ async function renderGuide(){
       <div class="hint">${escAttr(f.a)}</div></div>`).join("")}
     <div class="hint" style="margin-top:8px">기준 ${escAttr(g.updated||"")} · 가격은 변동될 수 있으니 결제 화면에서 다시 확인하세요.</div>`;
 }
+(function userFieldGuard(){
+  const el=document.getElementById("cfgUser"), w=document.getElementById("cfgUserWarn");
+  if(!el||!w) return;
+  const check=()=>{
+    const v=(el.value||"").trim();
+    const bad=v.includes("@");
+    w.style.display=bad?"block":"none";
+    w.innerHTML=bad?"❌ 이메일 주소가 입력됐습니다. <b>로그인 아이디</b>로 바꾸세요 — 이대로 저장하면 인증이 실패합니다.":"";
+    el.style.borderColor=bad?"var(--danger)":"";
+  };
+  el.addEventListener("input",check); check();
+})();
 (function wpDiagBtn(){
   const b=document.getElementById("wpDiagBtn");
   if(b) b.onclick=()=>wpDiagnose();
