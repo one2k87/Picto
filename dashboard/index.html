@@ -734,7 +734,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v73 · 재점검 버튼·점수 비교</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v74 · 승인 프로그램</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2548,8 +2548,16 @@ function moveApprovalControls(){
   ["cfgSite","cfgUser","cfgPass","wpDiagBtn"].forEach(id=>{ const f=fieldOf(id); if(f) c.push(f); });
   c.reverse().forEach(el=>check.prepend(el));
 
-  // ② 준비 = 주제 → 글쓴이 → 연락처 → 한 번에 정리
-  const pr=[head("② 승인 준비","주제를 좁히고, 글쓴이를 정하고, 블로그를 정돈하는 순서입니다.")];
+  // ② 준비 = 승인 프로그램(무엇을 할 차례인지 계산) + 개별 도구
+  const plan=document.createElement("div");
+  plan.className="field"; plan.style.cssText="border:1px solid var(--accent);border-radius:12px;padding:12px";
+  plan.innerHTML=`<label>🧭 승인 프로그램 <span style="font-size:11px;color:var(--muted);font-weight:400">지금 할 차례만 펼칩니다</span></label>
+    <div id="prepPlan"><div class="hint">상태를 읽는 중…</div></div>
+    <button class="btn sm" style="width:100%;margin-top:8px" onclick="renderPrepPlan()">🔄 상태 다시 읽기</button>`;
+  prep.prepend(plan);
+  setTimeout(()=>{ try{ renderPrepPlan(); }catch(e){ console.warn(e); } }, 300);
+
+  const pr=[head("② 개별 도구","위 프로그램이 안내하는 대로만 하셔도 됩니다. 아래는 직접 쓸 때의 도구입니다.")];
   ["nicheDetectBtn","cfgAuthorName","cfgContactEmail","runnerBtn","setupGuideBtn"]
     .forEach(id=>{ const f=fieldOf(id); if(f) pr.push(f); });
   pr.reverse().forEach(el=>prep.prepend(el));
@@ -2600,6 +2608,356 @@ function moveApprovalControls(){
     title.after(d);
   }
   return true;
+}
+
+/* ===== 공통 진행 로그 =====
+   작업 로그가 줄마다 쌓이면 화면이 수백 줄로 늘어나 스크롤이 끝없이 길어진다.
+   높이를 고정하고 그 안에서만 스크롤하게 하며, 같은 key의 줄은 덮어쓴다. */
+function makeLog(box, barBox){
+  const lines=[];
+  let fill=null;
+  if(barBox){
+    barBox.innerHTML=`<div style="height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden">
+      <div style="height:100%;width:0%;border-radius:99px;background:var(--accent);transition:width .25s"></div></div>`;
+    barBox.style.display="none"; fill=barBox.firstElementChild.firstElementChild;
+  }
+  box.style.cssText="margin-top:8px;font-size:12.5px;max-height:220px;overflow-y:auto;"+
+    "-webkit-overflow-scrolling:touch;overscroll-behavior:contain";
+  const render=()=>{
+    box.innerHTML=lines.map(l=>`<div style="margin:3px 0">${
+      l.ok===true?"✅":l.ok===false?"❌":"⏳"} ${l.t}</div>`).join("");
+    box.scrollTop=box.scrollHeight;
+  };
+  return {
+    say(t, ok, key){
+      const last=lines[lines.length-1];
+      if(key && last && last.key===key){ last.t=t; last.ok=ok; }
+      else lines.push({t,ok,key});
+      render();
+    },
+    prog(cur,total){
+      if(!fill) return;
+      if(!total){ barBox.style.display="none"; return; }
+      barBox.style.display="block";
+      fill.style.width=Math.min(100,Math.round(cur/total*100))+"%";
+    },
+    html(h){ box.insertAdjacentHTML("beforeend", h); box.scrollTop=box.scrollHeight; },
+    clear(){ lines.length=0; render(); }
+  };
+}
+
+/* ===== 승인 프로그램 =====
+   "무엇을 눌러야 하나"를 사람이 기억하지 않아도 되도록, 상태를 읽어
+   지금 해야 할 단계 하나만 펼쳐 보여준다. 앞 단계가 끝나야 다음이 열린다. */
+async function prepState(){
+  const s={niche:!!CFG.niche, author:!!(CFG.author&&CFG.authorBio),
+           posts:0, offNiche:0, onNiche:0, cliche:0, wp:wpReady(), check:CFG.lastCheck||null};
+  if(!s.wp) return s;
+  try{
+    const base=wpBase(), H=wpAuth();
+    const r=await fetch(base+"/wp-json/wp/v2/posts?per_page=100&status=publish&_fields=id,title,categories",{headers:H});
+    const list=r.ok?await r.json():[];
+    s.posts=list.length;
+    const want=(CFG.niche&&CFG.niche.wpCatId)||null;
+    // 니치 카테고리 이름으로 매칭(아이디가 없을 때)
+    const cr=await fetch(base+"/wp-json/wp/v2/categories?per_page=100&hide_empty=false",{headers:H});
+    const cats=cr.ok?await cr.json():[];
+    const key=(CFG.niche&&CFG.niche.key)||"";
+    const det=((NICHES&&NICHES.catalog)||[]).find(x=>x.key===key);
+    const kws=(det&&det.detect)||[];
+    const mine=new Set(cats.filter(c=>kws.some(k=>((c.name||"")+(c.description||"")).includes(k))).map(c=>c.id));
+    if(want) mine.add(want);
+    s.mineCatIds=[...mine];
+    s.mineCatNames=cats.filter(c=>mine.has(c.id)).map(c=>c.name);
+    s.offList=list.filter(p=>!(p.categories||[]).some(c=>mine.has(c)));
+    s.onList =list.filter(p=> (p.categories||[]).some(c=>mine.has(c)));
+    s.offNiche=s.offList.length; s.onNiche=s.onList.length;
+    s.cliche=s.onList.filter(p=>isClicheTitle(stripText(p.title.rendered))).length;
+  }catch(e){}
+  return s;
+}
+
+const TITLE_CLICHE=["총정리","완벽정리","알아보기","한눈에","꼭 알아야","반드시 알아야","제대로",
+  "핵심 정리","완벽 가이드","모든 것","A to Z","싹 정리","한방에","확실하게","제대로 알아"];
+function isClicheTitle(t){
+  if(TITLE_CLICHE.some(c=>t.includes(c))) return true;
+  return /(방법|정리|이유|팁|가이드|비교|안내|규칙|조항|매뉴얼|공식|프로토콜|체크리스트)$/.test(t.trim());
+}
+
+function renderPrepPlan(){
+  const host=document.getElementById("prepPlan"); if(!host) return;
+  host.innerHTML=`<div class="hint">상태를 읽는 중…</div>`;
+  prepState().then(s=>{
+    const step=(n,title,done,desc,btn)=>`
+      <div class="field" style="border-left:3px solid ${done?"var(--ok)":"var(--accent)"};padding-left:10px">
+        <label>${done?"✅":"▶"} ${n}. ${title}</label>
+        <div class="hint">${desc}</div>
+        ${btn||""}</div>`;
+    const B=(id,t,cls)=>`<button class="btn ${cls||"sm"}" style="width:100%;margin-top:6px" onclick="${id}">${t}</button>`;
+    let h="";
+    h+=step(1,"주제 정하기", s.niche,
+      s.niche?`<b>${escAttr(CFG.niche.label)}</b>로 정해져 있습니다.`
+             :"승인은 한 분야만 깊게 다룰 때 잘 납니다. 블로그를 읽어 자동으로 골라드립니다.",
+      s.niche?"":B("document.getElementById('nicheDetectBtn').click()","🔍 내 블로그 보고 자동 추천","primary sm"));
+    h+=step(2,"글쓴이 정하기", s.author,
+      s.author?`<b>${escAttr(CFG.author)}</b> · ${escAttr((CFG.authorBio||"").slice(0,40))}…`
+              :"누가 썼는지가 강한 신뢰 신호입니다. 비워두면 주제에 맞춰 자동으로 채웁니다.",
+      s.author?"":B("ensurePersona(true);renderPrepPlan()","🎲 자동으로 정하기","primary sm"));
+    if(!s.wp){
+      h+=step(3,"블로그 연결", false,"‘점검’ 탭에서 주소·아이디·앱 비밀번호를 먼저 넣어주세요.","");
+      host.innerHTML=h; return;
+    }
+    const has=s.posts>0;
+    h+=step(3, has?"기존 글 정리":"첫 글 만들기", has?(s.offNiche===0&&s.cliche===0):false,
+      has
+        ? (s.offNiche||s.cliche
+           ? `공개 글 ${s.posts}편 중 <b>주제 밖 ${s.offNiche}편</b>은 비공개로 돌리고,
+              <b>상투적 제목 ${s.cliche}편</b>은 다시 씁니다. 이 둘이 반려 1순위 원인입니다.`
+           : "주제도 정리됐고 상투적 제목도 없습니다.")
+        : `아직 글이 없습니다. 승인용 글 ${(CFG.approvalPlan&&CFG.approvalPlan.posts)||20}편을 예약해 하루 ${(CFG.approvalPlan&&CFG.approvalPlan.perDay)||1}편씩 발행합니다.`,
+      has ? (s.offNiche||s.cliche ? B("openContentFix()","🧭 기존 글 정리 시작","primary sm"):"")
+          : B("startApprovalPosts()","✍️ 승인용 글 생성 시작","primary sm"));
+    h+=step(4,"사이트 기본 갖추기", false,
+      "필수 페이지·플러그인·디자인을 정돈합니다. 디자인은 사이트마다 다르게 제안합니다.",
+      B("document.getElementById('runnerBtn').click()","🧹 한 번에 정리","sm")+
+      B("openDesignPlan()","🎨 디자인 제안 받기","sm"));
+    const sc=s.check?`${s.check.score}/${s.check.total}`:"미실행";
+    h+=step(5,"점검 통과", s.check&&s.check.score===s.check.total,
+      `현재 점수 <b>${sc}</b>. 만점이 되면 신청 단계로 넘어갑니다.`,
+      B("gotoSub('adsSheet','check');setTimeout(()=>document.getElementById('adsCheck').click(),300)","🔄 점검 실행","sm"));
+    h+=step(6,"애드센스 신청", false,
+      "신청 방법과 이력 관리는 ‘신청’ 탭에 있습니다.",
+      B("gotoSub('adsSheet','apply')","📮 신청 탭으로","sm"));
+    host.innerHTML=h;
+  }).catch(e=>{ host.innerHTML=`<div class="hint" style="color:var(--danger)">상태를 읽지 못했습니다: ${escAttr(String(e))}</div>`; });
+}
+function gotoSub(pid,k){ try{ showSub(pid,k); window.scrollTo({top:0,behavior:"smooth"}); }catch(e){} }
+
+/* ===== 기존 글 정리 (B안) =====
+   ① 승인 주제 밖의 글은 지우지 않고 '비공개'로 돌린다 — 승인 후 되돌릴 수 있게.
+   ② 주제 안의 글 중 상투적 제목만 다시 쓴다. AI가 뽑고 사람이 체크해서 적용한다.
+   제목만 고쳐도 '어미 중복'과 '상투 표현' 두 항목이 함께 잡힌다. */
+let _fixCache=null;
+
+async function openContentFix(){
+  const host=document.getElementById("prepPlan");
+  host.innerHTML=`<div class="field"><label>🧭 기존 글 정리</label>
+    <div id="fixBar"></div><div id="fixLog"></div>
+    <div id="fixBody" style="margin-top:8px"></div>
+    <button class="btn sm" style="width:100%;margin-top:8px" onclick="renderPrepPlan()">← 프로그램으로 돌아가기</button></div>`;
+  const log=makeLog(document.getElementById("fixLog"), document.getElementById("fixBar"));
+  log.say("블로그를 읽는 중…");
+  const s=await prepState();
+  _fixCache=s;
+  log.clear();
+  log.say(`공개 글 ${s.posts}편 · 주제 안 ${s.onNiche}편 · 주제 밖 ${s.offNiche}편 · 상투 제목 ${s.cliche}편`, true);
+
+  document.getElementById("fixBody").innerHTML=`
+    <div class="wiz-note"><b>① 주제 밖 글 ${s.offNiche}편</b><br>
+      승인 심사에서 주제가 흩어지면 그 자체가 감점입니다. 삭제가 아니라 <b>비공개</b>로 돌립니다.
+      승인 후 램프 단계에서 되살릴 수 있습니다.
+      ${s.offNiche?`<button class="btn sm" style="width:100%;margin-top:8px" onclick="hideOffNiche()">주제 밖 ${s.offNiche}편 비공개로</button>`:"<br>정리할 글이 없습니다."}</div>
+    <div class="wiz-note"><b>② 상투적 제목 ${s.cliche}편</b><br>
+      '총정리·알아보기·제대로' 같은 표현과 반복되는 어미를 걷어내고, 그 글에만 해당하는
+      구체적인 제목으로 바꿉니다. <b>적용 전에 목록으로 보여드립니다.</b>
+      ${s.cliche?`<button class="btn sm" style="width:100%;margin-top:8px" onclick="rewriteTitles()">제목 ${s.cliche}편 다시 쓰기</button>`:"<br>고칠 제목이 없습니다."}</div>`;
+}
+
+async function hideOffNiche(){
+  const s=_fixCache; if(!s||!s.offList) return;
+  if(!confirm(`주제 밖 글 ${s.offNiche}편을 비공개로 돌립니다.\n\n· 삭제가 아닙니다(비공개 = private)\n· 언제든 다시 공개할 수 있습니다\n\n진행할까요?`)) return;
+  const log=makeLog(document.getElementById("fixLog"), document.getElementById("fixBar"));
+  const base=wpBase(), HJ=Object.assign({"Content-Type":"application/json"},wpAuth());
+  let done=0, fail=0;
+  for(const p of s.offList){
+    try{
+      const r=await fetch(`${base}/wp-json/wp/v2/posts/${p.id}`,{method:"POST",headers:HJ,
+        body:JSON.stringify({status:"private"})});
+      r.ok?done++:fail++;
+    }catch(e){ fail++; }
+    log.prog(done+fail, s.offList.length);
+    log.say(`비공개 전환 중… ${done}/${s.offList.length}${fail?` · 실패 ${fail}`:""}`, undefined, "hide");
+  }
+  log.prog(0,0);
+  log.say(`${done}편 비공개 완료${fail?` · 실패 ${fail}`:""}`, fail===0, "hide");
+  try{ await adsCheck(); }catch(e){}
+  setTimeout(openContentFix, 900);
+}
+
+// AI로 제목 다시 쓰기 — 뽑기만 하고, 적용은 사람이 확인한 뒤에
+async function rewriteTitles(){
+  const s=_fixCache; if(!s) return;
+  const key=(CFG.llmKey||"").trim();
+  const log=makeLog(document.getElementById("fixLog"), document.getElementById("fixBar"));
+  if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return; }
+  const targets=s.onList.filter(p=>isClicheTitle(stripText(p.title.rendered)));
+  log.say(`제목 ${targets.length}편을 다시 쓰는 중…`);
+
+  const olds=targets.map((p,i)=>`${i+1}. ${stripText(p.title.rendered)}`).join("\n");
+  const prompt=`아래는 한국어 블로그의 기존 글 제목 목록입니다. 각 제목을 새로 써 주세요.
+
+[반드시 지킬 것]
+- 금지 표현: 총정리, 완벽정리, 알아보기, 한눈에, 꼭 알아야, 반드시 알아야, 제대로, 모든 것, A to Z, 한방에
+- 금지 어미(제목의 마지막 단어): 방법, 정리, 이유, 팁, 가이드, 비교, 안내, 규칙, 조항, 매뉴얼, 공식, 프로토콜, 체크리스트
+- ${targets.length}개 제목의 마지막 단어가 서로 겹치지 않게 하세요. 어미를 최대한 다양하게.
+- 그 글에만 해당하는 구체 정보(숫자·조건·대상·시점)를 제목에 넣으세요.
+- 원래 주제와 검색 키워드는 유지하세요. 25~45자.
+- 과장·낚시 금지. 사실만.
+
+[출력 형식]
+번호. 새 제목
+(설명 없이 목록만)
+
+[기존 제목]
+${olds}`;
+
+  let out="";
+  try{
+    const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key),
+      {method:"POST",headers:{"Content-Type":"application/json"},
+       body:JSON.stringify({contents:[{parts:[{text:prompt}]}],
+         generationConfig:{temperature:0.9,maxOutputTokens:4096}})});
+    const j=await r.json();
+    out=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"";
+    if(!out) throw new Error(j.error?.message||"빈 응답");
+  }catch(e){ log.say("AI 호출 실패: "+escAttr(String(e).slice(0,120)), false); return; }
+
+  const news=out.split("\n").map(l=>l.replace(/^\s*\d+[.)]\s*/,"").trim()).filter(Boolean);
+  const pairs=targets.map((p,i)=>({id:p.id, old:stripText(p.title.rendered), neo:news[i]||""}))
+                     .filter(x=>x.neo && x.neo!==x.old);
+  if(!pairs.length){ log.say("쓸 만한 결과가 없습니다. 다시 시도해 주세요.", false); return; }
+
+  // 새 제목이 다시 규칙을 어기지 않는지 검사(AI가 지시를 어길 때가 있다)
+  const bad=pairs.filter(x=>isClicheTitle(x.neo));
+  const ends={}; pairs.forEach(x=>{const w=x.neo.split(/\s+/).pop(); ends[w]=(ends[w]||0)+1;});
+  const dup=Object.entries(ends).filter(([,n])=>n>=2);
+  log.say(`제안 ${pairs.length}편 생성${bad.length?` · 규칙 위반 ${bad.length}편 제외`:""}${dup.length?` · 어미 중복 ${dup.length}종`:""}`, bad.length===0);
+
+  const good=pairs.filter(x=>!isClicheTitle(x.neo));
+  window._titlePairs=good;
+  document.getElementById("fixBody").innerHTML=`
+    <div class="wiz-note">적용할 제목만 체크하세요. <b>${good.length}편</b> 제안됐습니다.</div>
+    <div style="max-height:300px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+                border:1px solid var(--line);border-radius:10px;padding:8px">
+      ${good.map((x,i)=>`<label style="display:block;margin:8px 0;font-size:12.5px;line-height:1.5">
+        <input type="checkbox" class="tfix" data-i="${i}" checked style="width:auto;margin-right:6px">
+        <span style="color:var(--muted);text-decoration:line-through">${escAttr(x.old)}</span><br>
+        <span style="margin-left:20px">→ <b>${escAttr(x.neo)}</b></span></label>`).join("")}
+    </div>
+    <button class="btn primary sm" style="width:100%;margin-top:8px" onclick="applyTitles()">체크한 제목 적용</button>
+    <button class="btn sm" style="width:100%;margin-top:6px" onclick="rewriteTitles()">🎲 다시 뽑기</button>`;
+}
+
+async function applyTitles(){
+  const pairs=window._titlePairs||[];
+  const picked=[...document.querySelectorAll(".tfix:checked")].map(c=>pairs[+c.dataset.i]).filter(Boolean);
+  if(!picked.length){ toast("적용할 제목을 하나 이상 선택하세요"); return; }
+  if(!confirm(`${picked.length}편의 제목을 바꿉니다.\n\n· 본문과 주소(slug)는 그대로입니다\n· 되돌리려면 워드프레스 리비전에서 복구할 수 있습니다\n\n진행할까요?`)) return;
+  const log=makeLog(document.getElementById("fixLog"), document.getElementById("fixBar"));
+  const base=wpBase(), HJ=Object.assign({"Content-Type":"application/json"},wpAuth());
+  let done=0, fail=0;
+  for(const x of picked){
+    try{
+      const r=await fetch(`${base}/wp-json/wp/v2/posts/${x.id}`,{method:"POST",headers:HJ,
+        body:JSON.stringify({title:x.neo})});
+      r.ok?done++:fail++;
+    }catch(e){ fail++; }
+    log.prog(done+fail, picked.length);
+    log.say(`제목 적용 중… ${done}/${picked.length}${fail?` · 실패 ${fail}`:""}`, undefined, "apply");
+  }
+  log.prog(0,0);
+  log.say(`제목 ${done}편 변경${fail?` · 실패 ${fail}`:""}`, fail===0, "apply");
+  try{ await adsCheck(); }catch(e){}
+  setTimeout(openContentFix, 900);
+}
+
+/* ===== 사이트 기본 디자인 제안 =====
+   승인 대행을 여러 사이트에 돌리면 결과물이 전부 똑같이 생기게 된다.
+   같은 손이 만든 티가 나면 그 자체로 위험 신호다. 그래서 사이트 주소를
+   씨앗으로 삼아 매번 다른 조합을 뽑는다(같은 사이트는 항상 같은 결과). */
+const DESIGN={
+  palette:[
+    {n:"차분한 남색", main:"#2C3E63", accent:"#E4B363", bg:"#FBFAF7", text:"#23262E"},
+    {n:"따뜻한 흙색", main:"#6B4F3A", accent:"#7A9E7E", bg:"#FDFBF6", text:"#2B2622"},
+    {n:"깊은 청록",   main:"#1F5C56", accent:"#E8845C", bg:"#F8FBFA", text:"#1E2B29"},
+    {n:"모던 그레이", main:"#37393B", accent:"#4C8BF5", bg:"#FFFFFF", text:"#26282A"},
+    {n:"부드러운 자주", main:"#5B3A5C", accent:"#D9A441", bg:"#FCFAFC", text:"#2A222B"},
+    {n:"숲색",       main:"#2F5233", accent:"#C9762F", bg:"#FAFCF8", text:"#212A22"}
+  ],
+  font:[
+    {n:"Pretendard + 본고딕", body:"Pretendard", head:"Noto Sans KR", note:"가장 무난하고 읽기 쉽습니다"},
+    {n:"본명조 제목",         body:"Pretendard", head:"Noto Serif KR", note:"제목에 무게가 생겨 정보성 글과 잘 맞습니다"},
+    {n:"에스코어드림",        body:"S-Core Dream", head:"S-Core Dream", note:"조금 부드러운 인상"},
+    {n:"나눔 조합",           body:"Nanum Gothic", head:"Nanum Myeongjo", note:"오래된 조합이라 익숙합니다"}
+  ],
+  home:[
+    {n:"최신 글 목록형", d:"홈에 최신 글을 세로로 나열. 가장 단순하고 심사에서 안전합니다."},
+    {n:"카드 그리드 2열", d:"대표 이미지를 살린 2열 카드. 이미지가 100% 있을 때 효과적입니다."},
+    {n:"고정 소개 + 목록", d:"홈 상단에 사이트 소개 3~4줄, 아래에 최신 글. 신뢰 신호가 강해집니다."},
+    {n:"카테고리 분할형", d:"카테고리별로 최신 3편씩 묶어 보여줍니다. 글이 30편 넘을 때 좋습니다."}
+  ],
+  header:[
+    {n:"좌측 로고 + 우측 메뉴", d:"가장 흔하지만 안정적"},
+    {n:"가운데 정렬 로고", d:"메뉴는 그 아래 한 줄. 개인 블로그 느낌"},
+    {n:"좁은 상단바 + 큰 제목", d:"글 읽기에 집중되는 구조"}
+  ],
+  side:[
+    {n:"사이드바 없음(1단)", d:"모바일 비중이 높으면 이쪽이 낫습니다"},
+    {n:"우측 사이드바", d:"카테고리·최신글 위젯. 체류시간에 도움"},
+  ]
+};
+function _pick(arr,seed,salt){ return arr[_pseudo(seed,salt)%arr.length]; }
+
+function openDesignPlan(){
+  const host=document.getElementById("prepPlan");
+  const seed=(CFG.site||"scripto")+"|"+((CFG.niche&&CFG.niche.key)||"");
+  const p=_pick(DESIGN.palette,seed,"pal"), f=_pick(DESIGN.font,seed,"font");
+  const hm=_pick(DESIGN.home,seed,"home"), hd=_pick(DESIGN.header,seed,"head"), sd=_pick(DESIGN.side,seed,"side");
+  const sw=(c)=>`<span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:${c};
+    border:1px solid rgba(0,0,0,.15);vertical-align:-2px;margin-right:4px"></span>`;
+  host.innerHTML=`<div class="field"><label>🎨 이 사이트의 디자인 제안</label>
+    <div class="hint">사이트 주소를 씨앗으로 뽑았습니다. <b>같은 사람이 만든 티가 나지 않도록</b> 사이트마다 다른 조합이 나옵니다.
+      마음에 안 들면 아래에서 다시 뽑으세요.</div>
+
+    <div class="wiz-note"><b>색</b> — ${escAttr(p.n)}<br>
+      ${sw(p.main)}주 색 <code>${p.main}</code> · ${sw(p.accent)}강조 <code>${p.accent}</code><br>
+      ${sw(p.bg)}배경 <code>${p.bg}</code> · ${sw(p.text)}본문 <code>${p.text}</code><br>
+      <span class="hint">GeneratePress → 사용자 정의하기 → 색상에 그대로 넣으세요.
+      본문은 순수 검정(#000)보다 살짝 옅은 색이 눈이 편합니다.</span></div>
+
+    <div class="wiz-note"><b>글꼴</b> — ${escAttr(f.n)}<br>
+      제목 <code>${escAttr(f.head)}</code> · 본문 <code>${escAttr(f.body)}</code><br>
+      <span class="hint">${escAttr(f.note)} · 본문 17px, 줄간격 1.8, 문단 간격 1.2em을 권합니다.
+      모바일에서 16px 아래로 내려가면 읽기 어렵습니다.</span></div>
+
+    <div class="wiz-note"><b>홈 구성</b> — ${escAttr(hm.n)}<br><span class="hint">${escAttr(hm.d)}</span></div>
+    <div class="wiz-note"><b>머리말</b> — ${escAttr(hd.n)}<br><span class="hint">${escAttr(hd.d)}</span></div>
+    <div class="wiz-note"><b>사이드바</b> — ${escAttr(sd.n)}<br><span class="hint">${escAttr(sd.d)}</span></div>
+
+    <div class="wiz-note">⚠️ <b>승인 전에는 하지 마세요</b><br>
+      · 팝업·플로팅 배너 — 페이지 경험 위반으로 직결됩니다<br>
+      · 자동 재생 슬라이드 — 속도 점수를 깎습니다<br>
+      · 광고 자리 미리 비워두기 — 승인 전 빈 광고 영역은 감점입니다</div>
+
+    <button class="btn sm" style="width:100%;margin-top:8px" onclick="reDesign()">🎲 다른 조합 보기</button>
+    <button class="btn sm" style="width:100%;margin-top:6px" onclick="renderPrepPlan()">← 프로그램으로 돌아가기</button></div>`;
+}
+let _designNudge=0;
+function reDesign(){ _designNudge++; const o=CFG.site; CFG.site=(o||"")+"#"+_designNudge; openDesignPlan(); CFG.site=o; }
+
+/* 글이 아직 없는 블로그: 승인용 초반 글을 예약한다 */
+function startApprovalPosts(){
+  const plan=CFG.approvalPlan||{posts:20,perDay:1};
+  const host=document.getElementById("prepPlan");
+  const n=(CFG.niche&&CFG.niche.label)||"(주제 미정)";
+  host.innerHTML=`<div class="field"><label>✍️ 승인용 글 만들기</label>
+    <div class="wiz-note"><b>${escAttr(n)}</b> 주제로 <b>${plan.posts}편</b>을 만들고
+      하루 <b>${plan.perDay||1}편</b>씩 발행합니다. 한꺼번에 쏟아내면 그 자체가 자동 생성 신호가 됩니다.</div>
+    <div class="wiz-note">글 생성은 <b>▶ 실행</b> 버튼(화면 오른쪽 아래)이 담당합니다.
+      지금 설정된 주제·글쓴이·품질 기준이 그대로 적용됩니다.<br>
+      <span class="hint">매일 자동으로 돌리려면 설정 → 연결 → '매일 자동 생성'을 켜세요.</span></div>
+    <button class="btn primary sm" style="width:100%" onclick="document.getElementById('runWrap').click()">▶ 지금 한 편 생성해 보기</button>
+    <button class="btn sm" style="width:100%;margin-top:6px" onclick="renderPrepPlan()">← 프로그램으로 돌아가기</button></div>`;
 }
 
 function pageHtml(slug){
