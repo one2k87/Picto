@@ -25,6 +25,7 @@ import topics
 import metrics
 import images
 import quality
+import strategy
 import accuracy
 import monitor
 import notify
@@ -87,7 +88,8 @@ def collect_lane(cfg, cat, lane, n_slots, exclude):
     pool = max(3, n_slots + 2)
 
     raw = chat(topics.build_topic_prompt(cat["name"], cat["desc"], lane, pool, exclude=exclude,
-                                         winners=cfg.get("_insight_hints")),
+                                         winners=cfg.get("_insight_hints"),
+                                         intent=cfg.get("_today_intent")),
                cfg["llm"], max_tokens=900, temperature=0.9)
     cand = topics.parse_topics(raw, pool)
     # 금지·위험 주제 필터(성인/도박/과장의료/저작권/전쟁 등 자동 제외)
@@ -755,6 +757,17 @@ def run():
     # 이미지 비용 상한: 실행 1회당 최대 개수(카테고리 합산)
     img_budget = {"used": 0, "max": int(cfg.get("images", {}).get("max_per_run", 10 ** 9))}
 
+    # 오늘의 의도 배분(strategy.json 기반). 수익형/누적형을 요일별로 다르게 쓴다.
+    _plan = strategy.load_plan()
+    _todo = strategy.today_intents(_plan)
+    _order = (["revenue"] * _todo.get("revenue", 0)) + (["evergreen"] * _todo.get("evergreen", 0))
+    random.shuffle(_order)                      # 같은 의도가 몰려 보이지 않게 섞는다
+    cfg["_intent_queue"] = _order
+    print(f"[전략] 오늘 계획 — 수익형 {_todo.get('revenue',0)}편 · 누적형 {_todo.get('evergreen',0)}편"
+          f" (기준 {_plan.get('data_status')})")
+    if _plan.get("winners"):
+        cfg["_insight_hints"] = _plan["winners"]
+
     all_articles = []
     for cat in cats:
         if not cat["name"]:
@@ -762,6 +775,9 @@ def run():
         if not _category_active_today(cat):
             print(f"[건너뜀] '{cat['name']}' — 오늘은 격일 휴무일(active_days={cat.get('active_days')})")
             continue
+        q = cfg.get("_intent_queue") or []
+        cfg["_today_intent"] = q.pop(0) if q else "evergreen"
+        print(f"  · 의도: {'수익형' if cfg['_today_intent']=='revenue' else '누적형'}")
         try:
             all_articles += _run_category(cfg, cat, hist, auto_publish, img_budget)
         except Exception as e:
@@ -786,6 +802,7 @@ def run():
             "title": a["title"], "slug": a.get("slug", ""), "url": a.get("post_url", ""),
             "post_id": a.get("post_id"), "status": a.get("status", ""),
             "kind": a["kind"], "keyword": a["keyword"], "category": a.get("category", ""),
+            "intent": a.get("intent") or strategy.classify_intent(f"{a.get('title','')} {a.get('keyword','')}"),
             "date": today, "series_id": a.get("series_id", ""),
         })
     save_history(hist)

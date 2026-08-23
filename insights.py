@@ -173,3 +173,21 @@ def winner_topics(insights, limit=8):
     """유입 상위 검색어 → 주제 선정 피드백용 문자열 목록."""
     qs = (insights.get("search_console", {}) or {}).get("queries", [])
     return [q["query"] for q in qs[:limit] if q.get("query")]
+
+
+if __name__ == "__main__":
+    # 단독 실행(주간 전략 워크플로용): config.json을 읽어 성과를 모으고 insights.json에 저장
+    import os as _os
+    _cfg_path = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "config.json")
+    try:
+        with open(_cfg_path, encoding="utf-8") as _f:
+            _cfg = json.load(_f)
+    except Exception as _e:
+        print(f"[insights] config.json을 읽지 못했습니다: {_e}")
+        raise SystemExit(0)
+    _out = collect(_cfg)
+    _dir = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "dashboard", "data")
+    _os.makedirs(_dir, exist_ok=True)
+    with open(_os.path.join(_dir, "insights.json"), "w", encoding="utf-8") as _f:
+        json.dump(_out, _f, ensure_ascii=False, indent=2)
+    print(f"[insights] 저장 완료 · 키: {list(_out.keys()) or '(수집된 데이터 없음)'}")

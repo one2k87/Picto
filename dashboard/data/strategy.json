@@ -1,0 +1,56 @@
+{
+  "updated": "2026-08-23 15:20",
+  "next_review": "2026-08-30",
+  "data_status": "no_data",
+  "verdict": "아직 성과 데이터가 없어 기본 계획으로 운영합니다. 발행·색인이 쌓이면 자동으로 실측 기반으로 바뀝니다.",
+  "matched_posts": 0,
+  "intent_ratio": {
+    "revenue": 0.6,
+    "evergreen": 0.4
+  },
+  "category_weights": {},
+  "weekday_plan": {
+    "0": {
+      "label": "월",
+      "revenue": 4,
+      "evergreen": 1
+    },
+    "1": {
+      "label": "화",
+      "revenue": 2,
+      "evergreen": 3
+    },
+    "2": {
+      "label": "수",
+      "revenue": 3,
+      "evergreen": 2
+    },
+    "3": {
+      "label": "목",
+      "revenue": 2,
+      "evergreen": 3
+    },
+    "4": {
+      "label": "금",
+      "revenue": 4,
+      "evergreen": 1
+    },
+    "5": {
+      "label": "토",
+      "revenue": 1,
+      "evergreen": 1
+    },
+    "6": {
+      "label": "일",
+      "revenue": 1,
+      "evergreen": 1
+    }
+  },
+  "winners": [],
+  "weak_queries": [],
+  "buckets": [],
+  "actions": [
+    "애드센스 승인 후 발행을 시작하면 다음 주부터 실측 학습이 시작됩니다."
+  ],
+  "note": "글별 수익은 애드센스 API로 조회할 수 없어 '클릭 × 의도별 RPM 배수'로 추정한 값입니다."
+}

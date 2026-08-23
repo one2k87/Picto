@@ -37,10 +37,31 @@ def season_focus(today=None):
     return nxt, _SEASON_HINT.get(nxt, "")
 
 
-def build_topic_prompt(category, category_desc, kind, count, exclude=None, today=None, winners=None):
+# 의도별 주제 지침 — strategy.py가 정한 그날의 비율에 따라 주입된다
+INTENT_GUIDE = {
+    "revenue": """
+[이번 주제의 의도 = 수익형(결정 직전 검색)]
+- 광고 단가가 높은 '돈이 오가기 직전' 검색만 잡는다.
+- 반드시 다음 중 하나를 포함: 비용·가격·얼마·금리·한도·수수료·비교·추천·후기·순위·환급·혜택.
+- 예) "OO 수수료 얼마", "OO vs OO 뭐가 싼가", "OO 한도 조건", "OO 실제 후기".
+- 단순 정보 나열이 아니라 '선택을 도와주는' 각도로 잡는다.
+""",
+    "evergreen": """
+[이번 주제의 의도 = 누적형(계속 찾는 검색)]
+- 시즌을 타지 않고 1년 내내 일정하게 찾는 '방법·절차'형만 잡는다.
+- 반드시 다음 중 하나를 포함: 방법·절차·신청·발급·조건·기준·확인·차이·준비물·서류.
+- 예) "OO 발급 절차", "OO와 OO 차이", "OO 신청 준비물".
+- 한 번 상위노출되면 오래가는 주제를 우선한다(뉴스성·일회성 금지).
+""",
+}
+
+
+def build_topic_prompt(category, category_desc, kind, count, exclude=None, today=None,
+                       winners=None, intent=None):
     exclude = exclude or []
     ex_text = "\n".join(f"- {t}" for t in exclude[:60]) or "(없음)"
     winners = winners or []
+    intent_text = INTENT_GUIDE.get(intent or "", "")
     win_text = ""
     if winners:
         win_text = ("\n[성과 피드백 — 최근 실제 유입이 많았던 검색어]\n"
@@ -95,7 +116,7 @@ def build_topic_prompt(category, category_desc, kind, count, exclude=None, today
   (나쁜 예: 너무 좁아 아무도 안 찾는 "○○동 △△은행 무직자 소액대출 후기" 류)
 """
 
-    return common + win_text + extra + f"""
+    return common + intent_text + win_text + extra + f"""
 출력은 줄바꿈으로 구분된 한국어 주제 문장 정확히 {count}개만. 번호/설명/따옴표 없이.
 각 주제는 그대로 블로그 제목 키워드로 쓸 수 있게 구체적으로."""
 

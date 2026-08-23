@@ -685,7 +685,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v50 · 카드 스와이프·검색·토스트</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v51 · 수익 전략 엔진</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1039,6 +1039,16 @@
     <a class="btn sm" href="https://ai.dev/rate-limit" target="_blank" rel="noopener">구글 실제 사용량 보기</a>
     <div class="hint">무료 flash-lite ≈ 하루 1,000회 · 매일 태평양시 자정(한국 약 오후 4~5시) 리셋.
       아래는 이번 실행 기준 추정치입니다(정확치는 위 버튼).</div>
+  </div>
+
+  <div class="field">
+    <label>🎯 수익 전략 <span style="font-size:11px;color:var(--muted);font-weight:400">주 1회 자동 분석</span></label>
+    <div class="hint">지금 쓰는 글이 실제로 상위노출·수익으로 이어지는지 판정하고, 다음 주 요일별 계획을 다시 세웁니다.</div>
+    <div class="actions" style="margin-top:8px;flex-wrap:wrap;gap:6px">
+      <button class="btn sm" id="stratReload">새로고침</button>
+      <button class="btn primary sm" id="stratRun">지금 분석 실행</button>
+    </div>
+    <div id="stratBox" style="margin-top:10px;font-size:13px"></div>
   </div>
 
   <h2 style="font-size:14px">가정값 입력</h2>
@@ -2562,6 +2572,23 @@ document.getElementById("wpTrashDrafts").onclick=async()=>{
     (fail?` <span style="color:#ff6b4a">실패 ${fail}편</span>`:"")+
     `<div class="hint">워드프레스 → 글 → 휴지통에서 복구할 수 있습니다. 완전히 비우려면 워드프레스에서 '휴지통 비우기'를 누르세요.</div>`;
 };
+(function stratBtns(){
+  const rl=document.getElementById("stratReload");
+  if(rl) rl.onclick=()=>{ renderStrategy(true); toast("전략 다시 불러옴","info"); };
+  const run=document.getElementById("stratRun");
+  if(run) run.onclick=async()=>{
+    if(!CFG.ghOwner||!CFG.ghRepo||!CFG.ghToken){ toast("설정 > 연결에 GitHub 정보를 먼저 입력하세요",1); return; }
+    run.disabled=true; run.textContent="실행 중…";
+    try{
+      const r=await fetch(`https://api.github.com/repos/${CFG.ghOwner}/${CFG.ghRepo}/actions/workflows/weekly-strategy.yml/dispatches`,
+        {method:"POST",headers:{Authorization:"Bearer "+CFG.ghToken,Accept:"application/vnd.github+json"},
+         body:JSON.stringify({ref:"main"})});
+      if(r.status===204){ toast("분석을 시작했습니다. 1~2분 뒤 새로고침하세요","info"); }
+      else{ const t=await r.text(); toast("실행 실패 ("+r.status+")",1); console.warn(t); }
+    }catch(e){ toast("실행 실패 — 네트워크 확인",1); }
+    run.disabled=false; run.textContent="지금 분석 실행";
+  };
+})();
 document.getElementById("adsPlugScan").onclick=adsPluginScan;
 document.getElementById("adsPlugInstall").onclick=adsPluginInstall;
 document.getElementById("adsGuide").onclick=adsShowGuide;
@@ -3108,6 +3135,7 @@ const SUBTABS={
   statsSheet:{
     tabs:[
       {k:"now",  label:"현황"},
+      {k:"strat",label:"전략", ids:["stratBox"]},
       {k:"guess",label:"가정값", ids:["stViews","stRpm"]},
       {k:"real", label:"실측",   ids:["stRealViews","stRealRev","stWpCount"]},
     ],
@@ -3204,6 +3232,7 @@ function showSub(pageId,k){
   page.querySelectorAll(".subtabs .st").forEach(b=>b.classList.toggle("active",b.dataset.k===k));
   page.querySelectorAll(".sub-sec").forEach(d=>d.classList.toggle("on",d.dataset.k===k));
   if(k===cfg.home&&cfg.render){ try{ cfg.render(); }catch(e){ console.warn(e); } }
+  if(pageId==="statsSheet"&&k==="strat"){ try{ renderStrategy(); }catch(e){ console.warn(e); } }
   window.scrollTo({top:0,behavior:"instant"});
 }
 function moveSub(pageId,dir){
@@ -3341,6 +3370,61 @@ function animateBars(root){
   (root||document).querySelectorAll(".bfill[data-w]").forEach(b=>{
     requestAnimationFrame(()=>{ b.style.width=b.dataset.w+"%"; });
   });
+}
+
+// ===== 수익 전략 (strategy.json) =====
+let STRAT=null;
+async function loadStrategy(force){
+  if(STRAT&&!force) return STRAT;
+  const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+  for(const u of [`https://raw.githubusercontent.com/${owner}/${repo}/main/dashboard/data/strategy.json`,
+                  "./data/strategy.json"]){
+    try{ const r=await fetch(u,{cache:"no-store"}); if(r.ok){ STRAT=await r.json(); return STRAT; } }catch(e){}
+  }
+  return null;
+}
+function strategyHtml(s){
+  if(!s) return `<div class="hint">전략 데이터가 아직 없습니다. 아래 '지금 분석'을 눌러 생성하세요.</div>`;
+  const st=s.data_status;
+  const col=st==="ok"?"var(--ok)":st==="partial"?"var(--warn)":"var(--muted)";
+  const lbl=st==="ok"?"실측 학습 중":st==="partial"?"데이터 부족":"학습 전";
+  const ir=s.intent_ratio||{};
+  const rev=Math.round((ir.revenue||0)*100);
+  const wd=s.weekday_plan||{};
+  const order=["0","1","2","3","4","5","6"];
+  return `
+    <div class="dash">
+      <div class="dcard"><div class="dl">학습 상태</div><div class="dv" style="color:${col};font-size:15px">${lbl}</div></div>
+      <div class="dcard"><div class="dl">실적 붙은 글</div><div class="dv">${s.matched_posts||0}편</div></div>
+    </div>
+    <div class="bars" style="margin-top:10px">
+      <div class="bar"><span class="bl">수익형</span><span class="btrack"><span class="bfill" data-w="${rev}"></span></span><span class="bn">${rev}%</span></div>
+      <div class="bar"><span class="bl">누적형</span><span class="btrack"><span class="bfill" data-w="${100-rev}"></span></span><span class="bn">${100-rev}%</span></div>
+    </div>
+    <div class="hint" style="margin-top:8px">${escAttr(s.verdict||"")}</div>
+    <div class="dl" style="font-size:11px;color:var(--muted);margin-top:12px">이번 주 요일별 계획</div>
+    <div class="bars">${order.filter(d=>wd[d]).map(d=>{
+      const v=wd[d], t=(v.revenue||0)+(v.evergreen||0);
+      return `<div class="bar"><span class="bl">${v.label}</span>
+        <span class="btrack" style="display:flex;gap:2px;background:transparent">
+          <span style="flex:${v.revenue||0};background:var(--accent);border-radius:5px;min-width:${v.revenue?4:0}px"></span>
+          <span style="flex:${v.evergreen||0};background:var(--card2);border-radius:5px;min-width:${v.evergreen?4:0}px"></span>
+        </span><span class="bn">${t}편</span></div>`;}).join("")}</div>
+    <div class="hint">보라 = 수익형 · 회색 = 누적형</div>
+    ${(s.winners||[]).length?`<div class="dl" style="font-size:11px;color:var(--muted);margin-top:12px">잘 되는 검색어</div>
+      <div class="hint">${s.winners.slice(0,6).map(w=>escAttr(w)).join(" · ")}</div>`:""}
+    ${(s.weak_queries||[]).length?`<div class="dl" style="font-size:11px;color:#f0a0ad;margin-top:10px">노출은 되는데 클릭 0 (제목 재작성 대상)</div>
+      <div class="hint">${s.weak_queries.slice(0,6).map(w=>escAttr(w)).join(" · ")}</div>`:""}
+    ${(s.actions||[]).length?`<div class="dnext" style="margin-top:12px"><div class="dl">권고</div>
+      <div class="dv" style="font-size:12.5px;line-height:1.6">${s.actions.map(a=>escAttr(a)).join("<br>")}</div></div>`:""}
+    <div class="hint" style="margin-top:8px">갱신 ${escAttr(s.updated||"-")} · 다음 분석 ${escAttr(s.next_review||"-")}<br>${escAttr(s.note||"")}</div>`;
+}
+async function renderStrategy(force){
+  const box=document.getElementById("stratBox"); if(!box) return;
+  box.innerHTML=`<div class="skel" style="height:60px"></div>`;
+  const s=await loadStrategy(force);
+  box.innerHTML=strategyHtml(s);
+  animateBars(box);
 }
 
 // ===== 현황 대시보드 =====
@@ -3548,10 +3632,8 @@ function moveKeyWiz(){
 (function cardSwipe(){
   const grid=document.getElementById("grid"); if(!grid) return;
   const TH=78; let card=null,x0=0,y0=0,dx=0,locked=null;
-  const label=(c,d)=>{
-    const pub=c.classList.contains("s-pub");
-    return d>0?(pub?"열기":"게시하기"):(c.classList.contains("sel")?"선택 해제":"선택");
-  };
+  // 게시는 되돌릴 수 없어 스와이프에서 제외한다(오른쪽=열기, 왼쪽=선택만).
+  const label=(c,d)=>d>0?"열기":(c.classList.contains("sel")?"선택 해제":"선택");
   grid.addEventListener("touchstart",e=>{
     if(e.touches.length!==1){card=null;return;}
     const c=e.target.closest(".card"); if(!c||e.target.closest("a,button,input")){card=null;return;}
@@ -3581,13 +3663,8 @@ function moveKeyWiz(){
     const idx=[...grid.children].indexOf(c);
     const a=visible()[idx]; if(!a) return;
     if(d>0){
-      if(c.classList.contains("s-pub")){
-        if(a.post_url){ window.open(a.post_url,"_blank","noopener"); toast("글을 열었습니다","info"); }
-        else toast("주소가 없습니다",1);
-      }else{
-        c.classList.add("fire");
-        try{ bulkPublish([a],"이 글"); }catch(e){ toast("게시 실패",1); }
-      }
+      if(a.post_url){ window.open(a.post_url,"_blank","noopener"); toast("글을 열었습니다","info"); }
+      else toast("아직 발행되지 않은 글입니다","warn");
     }else{
       if(SEL.has(a)) SEL.delete(a); else SEL.add(a);
       c.classList.toggle("sel",SEL.has(a));
