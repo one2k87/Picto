@@ -734,7 +734,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v70 · 승인 탭 통합</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v71 · 승인 탭 통합</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -4442,7 +4442,11 @@ function gotoTab(k){
   // 보조탭은 페이지를 처음 열 때 만들고, 이후엔 항상 '현황'부터 보여준다
   if(k==="ads"||k==="stats"){
     const pid=k==="ads"?"adsSheet":"statsSheet";
-    setTimeout(()=>{ buildSubtabs(pid); showSub(pid,SUBTABS[pid].home); },60);
+    setTimeout(()=>{ buildSubtabs(pid);
+      // 승인 탭의 보조탭은 여기서 처음 만들어진다. 설정에서 옮겨올 블록은
+      // 그 뒤에 붙여야 하므로, 타이머로 기다리지 말고 이 시점에 실행한다.
+      if(pid==="adsSheet"){ try{ moveApprovalControls(); }catch(e){ console.warn("승인 탭 통합:",e); } }
+      showSub(pid,SUBTABS[pid].home); },60);
   }
   syncViews(); syncTabbar();
   window.scrollTo({top:0,behavior:"instant"});   // 탭 바꾸면 항상 맨 위부터
@@ -5222,13 +5226,8 @@ function wizBind(){
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",wizBind);
 else wizBind();
 
-// 승인 탭 통합 — 승인 탭의 서브탭이 만들어진 뒤라야 옮길 수 있다
-(function mergeApproval(){
-  let tries=0;
-  const go=()=>{ try{ if(moveApprovalControls()) return; }catch(e){ console.warn("승인 탭 통합 실패:",e); return; }
-    if(++tries<25) setTimeout(go,200); };
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",go); else go();
-})();
+// 승인 탭 통합은 gotoTab("ads")에서 보조탭을 만든 직후에 실행한다.
+// (여기서 타이머로 기다리면 사용자가 탭을 열기 전에 재시도가 끝나버린다)
 
 
 applyPlanUI();
