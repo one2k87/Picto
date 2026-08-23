@@ -734,7 +734,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v64 · 작성자 자동 추천</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v65 · 작성자 자동 추천</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2398,14 +2398,24 @@ const PERSONA_BIO = {
               "공식 자료를 근거로 정리하고, 확실하지 않은 부분은 단정하지 않습니다. 잘못된 내용은 제보를 받아 바로잡습니다."]
 };
 
-function _pseudo(seed){ let h=0; for(const c of String(seed||Math.random())) h=(h*31+c.charCodeAt(0))>>>0; return h; }
+// 씨앗이 한 글자만 달라도 결과가 완전히 흩어지도록 섞는다.
+// (단순 h*31 해시는 하위 비트만 바뀌어 h>>4, h>>8이 같은 값에 고정된다)
+function _pseudo(seed, salt){
+  let h=2166136261>>>0;
+  const str=String(seed)+"|"+(salt||"");
+  for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619)>>>0; }
+  h^=h>>>15; h=Math.imul(h,2246822507)>>>0;
+  h^=h>>>13; h=Math.imul(h,3266489909)>>>0;
+  return (h^(h>>>16))>>>0;
+}
 function suggestPersona(seed){
   const key=(CFG.niche&&CFG.niche.key)||"";
   const bios=PERSONA_BIO[key]||PERSONA_BIO._default;
-  const h=_pseudo(seed!=null?seed:Date.now()+Math.random());
+  const sd=(seed!=null?seed:String(Date.now())+Math.random());
   return {
-    name: PERSONA_SUR[h%PERSONA_SUR.length] + PERSONA_GIVEN[(h>>4)%PERSONA_GIVEN.length],
-    bio:  bios[(h>>8)%bios.length]
+    name: PERSONA_SUR[_pseudo(sd,"sur")%PERSONA_SUR.length]
+        + PERSONA_GIVEN[_pseudo(sd,"given")%PERSONA_GIVEN.length],
+    bio:  bios[_pseudo(sd,"bio")%bios.length]
   };
 }
 // 비어 있으면 채우고, 자동으로 채운 값이면 니치가 바뀔 때 소개도 따라 바꾼다.
