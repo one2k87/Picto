@@ -616,7 +616,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v46 · 파스텔 라벤더</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v47 · 설정·목록 서브탭</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1387,6 +1387,7 @@ function render(){
   c("c-season",arts.filter(a=>a.kind==="season").length);
   const nArc=archivedCount(), chArc=document.getElementById("chipArchive");
   if(chArc){ chArc.style.display=nArc?"":"none"; c("c-archive",nArc); }
+  if(window.refreshKindTabs) try{ window.refreshKindTabs(); }catch(e){}
   const cats=(DATA&&DATA.categories)?DATA.categories.length:[...new Set(arts.map(a=>a.category))].length;
   document.getElementById("genat").textContent=DATA?
     ("📂 카테고리 "+cats+"개 · 생성 "+new Date(DATA.generated_at).toLocaleString("ko-KR")
@@ -3057,6 +3058,38 @@ function buildSubtabs(pageId){
   page.dataset.subtabbed="1"; page.dataset.sub=cfg.home;
   showSub(pageId,cfg.home);
 }
+// 설정: 아코디언 그룹(1단계) → 상단 서브탭(3-3)
+// 그룹 헤더를 없애고 본문만 남겨 탭으로 오가게 한다.
+function settingsToSubtabs(){
+  const page=document.getElementById("sheet");
+  if(!page||page.dataset.subtabbed) return;
+  const grps=[...page.querySelectorAll(".grp")];
+  if(!grps.length) return;
+  const title=page.querySelector("h2");
+  const bar=document.createElement("div"); bar.className="subtabs";
+  const hint=document.createElement("div");
+  hint.className="swipehint"; hint.textContent="← 좌우로 밀어 탭 이동 →";
+  const secs=[];
+  grps.forEach((g,i)=>{
+    const name=g.querySelector(".gt")?.textContent||("그룹"+i);
+    const body=g.querySelector(".grp-b");
+    const d=document.createElement("div");
+    d.className="sub-sec"; d.dataset.k="g"+i;
+    while(body&&body.firstChild) d.appendChild(body.firstChild);
+    secs.push({k:"g"+i,label:name,el:d});
+    g.remove();
+  });
+  bar.innerHTML=secs.map(s=>`<button class="st" type="button" data-k="${s.k}">${escAttr(s.label)}</button>`).join("");
+  if(title&&title.nextSibling) page.insertBefore(bar,title.nextSibling); else page.prepend(bar);
+  bar.after(hint);
+  // 저장/닫기 버튼 줄은 항상 아래에 남기고, 그 앞에 섹션을 넣는다
+  const tail=page.querySelector(".actions");
+  secs.forEach(s=>{ if(tail) page.insertBefore(s.el,tail); else page.appendChild(s.el); });
+  SUBTABS.sheet={tabs:secs.map(s=>({k:s.k,label:s.label})),home:"g0"};
+  bar.querySelectorAll(".st").forEach(b=>b.onclick=()=>showSub("sheet",b.dataset.k));
+  page.dataset.subtabbed="1";
+  showSub("sheet","g0");
+}
 function showSub(pageId,k){
   const page=document.getElementById(pageId), cfg=SUBTABS[pageId]; if(!page||!cfg) return;
   page.dataset.sub=k;
@@ -3071,6 +3104,40 @@ function moveSub(pageId,dir){
   const n=i+dir;
   if(n<0||n>=ks.length) return false;
   showSub(pageId,ks[n]); return true;
+}
+
+// 글 목록: 종류 필터 칩 → 상단 고정 탭(3-3)
+function kindTabList(){
+  const out=["all","long","season"];
+  if(archivedCount()) out.push("archive");
+  return out;
+}
+function moveKindTab(dir){
+  const ks=kindTabList(), i=ks.indexOf(fKind), n=i+dir;
+  if(n<0||n>=ks.length) return;
+  setKindTab(ks[n]);
+}
+function setKindTab(k){
+  fKind=k;
+  document.querySelectorAll("#kindTabs .st").forEach(b=>b.classList.toggle("active",b.dataset.f===k));
+  render(); window.scrollTo({top:0,behavior:"instant"});
+}
+function buildKindTabs(){
+  const old=document.querySelector('.filters .chip[data-f]');
+  if(!old) return;
+  const row=old.closest(".filters"); if(!row||row.id==="kindTabs") return;
+  row.id="kindTabs"; row.className="subtabs";
+  const L={all:"전체",long:"저경쟁",season:"시즌",archive:"보관함"};
+  const build=()=>{
+    const ks=kindTabList();
+    row.innerHTML=ks.map(k=>{
+      const n=k==="archive"?archivedCount()
+        :(DATA?.articles||[]).filter(a=>!isArchived(a)&&(k==="all"||a.kind===k)).length;
+      return `<button class="st ${fKind===k?"active":""}" type="button" data-f="${k}">${L[k]}<span style="opacity:.65"> ${n}</span></button>`;
+    }).join("");
+    row.querySelectorAll(".st").forEach(b=>b.onclick=()=>setKindTab(b.dataset.f));
+  };
+  window.refreshKindTabs=build; build();
 }
 
 // ===== 시각화 유틸 =====
@@ -3270,11 +3337,12 @@ function gotoTab(k){
     if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.6) return;
     // 하단 탭은 항상 화면에 있으니 클릭으로 쓰고, 스와이프는 상단 보조탭 전용.
     const cur=currentTab();
-    const pageId=cur==="ads"?"adsSheet":cur==="stats"?"statsSheet":null;
-    if(!pageId) return;                                  // 메인·설정에서는 스와이프 없음
-    const page=document.getElementById(pageId);
-    const cfg=SUBTABS[pageId];
     const dir=dx<0?1:-1;
+    if(cur==="list"){ moveKindTab(dir); return; }        // 메인은 글 종류 탭을 넘긴다
+    const pageId=cur==="ads"?"adsSheet":cur==="stats"?"statsSheet":cur==="set"?"sheet":null;
+    if(!pageId) return;
+    const page=document.getElementById(pageId), cfg=SUBTABS[pageId];
+    if(!cfg) return;
     if(moveSub(pageId,dir)) return;
     // 첫 보조탭에서 더 오른쪽으로 밀면 메인으로 빠져나온다
     if(dir===-1&&page.dataset.sub===cfg.home) gotoTab("list");
@@ -3430,7 +3498,8 @@ function foldHints(root){
     h.parentNode.insertBefore(b,h);
   });
 }
-try{ organizeSettings(); moveKeyWiz(); foldHints(document.getElementById("sheet")); }
+try{ organizeSettings(); moveKeyWiz(); foldHints(document.getElementById("sheet"));
+     settingsToSubtabs(); buildKindTabs(); }
 catch(e){ console.warn("설정 정리 건너뜀:",e); }
 
 applyPlanUI();
