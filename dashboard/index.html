@@ -734,7 +734,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v68 · 니치 자동 판별</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v69 · 니치 자동 판별</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2470,29 +2470,40 @@ async function detectNiche(){
     const evidence=Math.round(share*40) + Math.min(15, hitTitle);
     return {...n, _posts:posts, _cats:hitCat, _titles:hitTitle,
             _evidence:evidence, _total:n.approval_score + evidence};
-  }).filter(r=>r._evidence>0).sort((a,b)=>b._total-a._total);
-
-  return {total, cats:cats.filter(c=>c.count>0).map(c=>({n:c.name,c:c.count})), rows};
+  });
+  // 제목에 단어 하나 스친 것까지 후보로 올리면 글 0편짜리가 목록을 채운다.
+  // 실제로 글이 있는 니치를 먼저 보여주고, 없으면 단서가 뚜렷한 것만 채운다.
+  const owned = rows.filter(r=>r._posts>0).sort((a,b)=>b._total-a._total);
+  const guess = rows.filter(r=>r._posts===0 && r._titles>=3).sort((a,b)=>b._total-a._total);
+  return {total, cats:cats.filter(c=>c.count>0).map(c=>({n:c.name,c:c.count})),
+          rows: owned.concat(guess).slice(0,4), owned:owned.length};
 }
 
 // 판별 결과를 사람이 읽을 수 있는 카드로
 function nicheDetectHtml(res){
   if(res.error) return `<div class="wiz-res no on">${escAttr(res.error)}</div>`;
-  if(!res.rows.length) return `<div class="wiz-res no on">글에서 주제를 알아보지 못했습니다. 아래에서 직접 골라주세요.</div>`;
+  if(!res.rows.length) return `<div class="wiz-res no on">글에서 주제를 알아보지 못했습니다. 아래 '질문으로 정하기'를 눌러주세요.</div>`;
   const top=res.rows[0];
-  const warn=top.approval_score<60;
+  const low=res.rows.filter(r=>r._posts>0 && r.approval_score<60);
   return `
-  <div class="wiz-res ${warn?"wait":"ok"} on">
-    공개 글 ${res.total}편을 읽었습니다. 가장 잘 맞는 분야는 <b>${escAttr(top.label)}</b>입니다
-    (관련 글 ${top._posts}편 · 승인 점수 ${top.approval_score}).
+  <div class="wiz-res ok on">
+    공개 글 <b>${res.total}편</b>을 읽었습니다. <b>${escAttr(top.label)}</b>을(를) 추천합니다 —
+    이미 ${top._posts}편이 있고 승인 점수도 ${top.approval_score}점으로 높습니다.
   </div>
-  ${res.rows.slice(0,3).map((r,i)=>`
-    <button class="wiz-opt${i===0?" sel":""}" data-k="${escAttr(r.key)}">
-      <span class="oi">${i===0?"⭐":"·"}</span>
-      <span><span class="ot">${escAttr(r.label)} <span style="font-weight:400;color:var(--muted)">승인 ${r.approval_score}점</span></span>
-      <span class="od">${r._posts?`이미 ${r._posts}편`:"글 없음"}${r._cats.length?` · ${escAttr(r._cats.join(", "))}`:""}
-      ${r.approval_score<60?` · <span style="color:var(--danger)">저품질 AI 블로그가 몰린 분야라 심사에 불리합니다</span>`:""}</span></span>
-    </button>`).join("")}`;
+  ${res.rows.map((r,i)=>{
+    const risky=r.approval_score<60;
+    return `<button class="wiz-opt${i===0?" sel":""}" data-k="${escAttr(r.key)}">
+      <span class="oi">${i===0?"⭐":(risky?"⚠️":"·")}</span>
+      <span><span class="ot">${escAttr(r.label)}
+        <span style="font-weight:400;color:${risky?"var(--danger)":"var(--muted)"}">승인 ${r.approval_score}점</span></span>
+      <span class="od">${r._posts?`이 블로그에 ${r._posts}편`:`글 없음 · 제목 단서 ${r._titles}건`}${
+        r._cats.length?` · ${escAttr(r._cats.join(", "))}`:""}</span></span>
+    </button>`;}).join("")}
+  ${low.length?`<div class="wiz-note">⚠️ <b>${escAttr(low.map(x=>x.label).join(", "))}</b>는 글이 있어도 권하지 않습니다.
+    저품질 AI 블로그가 가장 많이 몰린 분야라, 같은 품질이어도 심사에서 불리합니다.
+    승인 뒤에 이 주제로 넓히는 편이 안전합니다.</div>`:""}
+  <div class="wiz-note">고른 분야 <b>하나로만</b> 승인을 받고, 통과한 뒤에 램프 엔진이 3주에 걸쳐 넓힙니다.
+    나머지 글을 지울 필요는 없습니다.</div>`;
 }
 
 function pageHtml(slug){
