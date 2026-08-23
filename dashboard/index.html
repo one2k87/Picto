@@ -81,6 +81,25 @@
     overflow:hidden;text-overflow:ellipsis}
   .ptab.active{color:#fff;border-color:var(--accent);background:#241f3d}
 
+  /* ── 설정 정리(1단계): 설명 접기 + 목적별 그룹 ── */
+  .hint.fold{display:none}
+  .hint.fold.open{display:block}
+  .hintbtn{display:inline-flex;align-items:center;gap:3px;margin-top:4px;padding:1px 8px;
+    font-size:11px;color:var(--muted);background:transparent;border:1px solid var(--line);
+    border-radius:999px;cursor:pointer;line-height:1.7}
+  .hintbtn:active{border-color:var(--accent);color:var(--txt)}
+  .grp{border:1px solid var(--line);border-radius:12px;margin:8px 0;background:var(--card);overflow:hidden}
+  .grp-h{display:flex;align-items:center;gap:8px;padding:12px 14px;cursor:pointer;user-select:none}
+  .grp-h .gt{font-size:14px;font-weight:700;color:var(--txt)}
+  .grp-h .gd{font-size:11px;color:var(--muted);flex:1;min-width:0;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .grp-h .gc{font-size:13px;color:var(--muted);transition:transform .18s}
+  .grp.open .grp-h .gc{transform:rotate(90deg)}
+  .grp-b{display:none;padding:0 14px 12px}
+  .grp.open .grp-b{display:block}
+  .grp-b>h2{margin:14px 0 6px !important;font-size:13px !important;color:var(--muted) !important}
+  .grp-b>.divider{display:none}
+
   /* 가로 스크롤 원천 차단 — 어떤 요소도 화면 밖으로 못 나가게 */
   html,body{max-width:100%;overflow-x:hidden}
   img,svg,video,table{max-width:100%}
@@ -429,7 +448,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v38 · 모바일 UI 정리</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v39 · 설정 그룹화 + 설명 접기</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -696,6 +715,7 @@
   </div>
 
   <div class="divider"></div>
+  <h2 style="font-size:14px">🔧 앱 · 데이터</h2>
   <div class="field">
     <label>🔓 자동 로그인</label>
     <button class="btn sm" id="autoLoginBtn" style="width:100%">자동 로그인 켜기</button>
@@ -2768,6 +2788,70 @@ document.getElementById("usePwBtn").onclick=()=>{
 };
 gate();
 if(needLock()) faceUnlock();   // 잠금 상태면 진입하자마자 Face ID 시도
+
+// ===== 설정 화면 정리 (UI 1단계) =====
+// 기존 HTML을 다시 쓰지 않고, 로드 후 DOM을 목적별 그룹으로 재배치한다.
+// (요소를 옮기는 것이라 위에서 붙인 이벤트 핸들러는 그대로 유지된다)
+const SETTING_GROUPS=[
+  {key:"connect", t:"연결",   d:"블로그·실행 환경",        open:true,  match:["워드프레스","생성 실행"]},
+  {key:"content", t:"콘텐츠", d:"카테고리·품질·작성자",     open:false, match:["__TOP__","품질·안전","작성자 정보"]},
+  {key:"money",   t:"수익",   d:"쿠팡·제휴",               open:false, match:["쿠팡","제휴 SaaS"]},
+  {key:"expose",  t:"노출",   d:"검색엔진 등록",            open:false, match:["검색엔진"]},
+  {key:"adv",     t:"고급",   d:"Supabase·백업·데이터",     open:false, match:["Supabase","앱 · 데이터"]},
+];
+function organizeSettings(){
+  const sheet=document.getElementById("sheet");
+  if(!sheet||sheet.dataset.organized) return;
+  const kids=[...sheet.children];
+  const isHdr=el=>el.tagName==="H2"&&/font-size:\s*14px/.test(el.getAttribute("style")||"");
+  // 구간 나누기: 첫 h2(제목)는 남기고, 그 뒤를 h2 기준으로 자른다
+  const secs=[]; let cur={name:"__TOP__",nodes:[]}; let started=false;
+  for(const el of kids){
+    if(el.tagName==="H2"&&!isHdr(el)){ continue; }            // 최상단 '⚙️ 설정' 제목 유지
+    if(el.classList&&el.classList.contains("actions")&&el.querySelector("#cfgSave")) break; // 저장 버튼 이후는 유지
+    if(isHdr(el)){ if(started||cur.nodes.length) secs.push(cur);
+      cur={name:(el.textContent||"").trim(),nodes:[el]}; started=true; }
+    else cur.nodes.push(el);
+  }
+  if(cur.nodes.length) secs.push(cur);
+  if(!secs.length) return;
+
+  const anchor=kids.find(el=>el.tagName==="H2"&&!isHdr(el));  // 제목 뒤에 그룹을 넣는다
+  const used=new Set();
+  const frag=document.createDocumentFragment();
+  for(const g of SETTING_GROUPS){
+    const mine=secs.filter(s=>!used.has(s)&&g.match.some(m=>s.name.includes(m)));
+    if(!mine.length) continue;
+    mine.forEach(s=>used.add(s));
+    const box=document.createElement("div");
+    box.className="grp"+(g.open?" open":"");
+    box.innerHTML=`<div class="grp-h"><span class="gt">${g.t}</span><span class="gd">${g.d}</span><span class="gc">▶</span></div><div class="grp-b"></div>`;
+    const body=box.querySelector(".grp-b");
+    mine.forEach(s=>s.nodes.forEach(n=>body.appendChild(n)));
+    box.querySelector(".grp-h").onclick=()=>box.classList.toggle("open");
+    frag.appendChild(box);
+  }
+  // 어느 그룹에도 안 들어간 구간은 '고급' 뒤에 그대로 둔다(누락 방지)
+  secs.filter(s=>!used.has(s)).forEach(s=>s.nodes.forEach(n=>frag.appendChild(n)));
+  if(anchor&&anchor.nextSibling) sheet.insertBefore(frag,anchor.nextSibling);
+  else sheet.appendChild(frag);
+  sheet.dataset.organized="1";
+}
+// 긴 설명문은 기본으로 접고, 필요할 때만 펼친다(정보는 지우지 않는다)
+function foldHints(root){
+  (root||document).querySelectorAll(".hint").forEach(h=>{
+    if(h.dataset.folded) return;
+    const len=(h.textContent||"").trim().length;
+    if(len<=45) return;                       // 짧은 안내는 그대로 노출
+    h.dataset.folded="1"; h.classList.add("fold");
+    const b=document.createElement("button");
+    b.type="button"; b.className="hintbtn"; b.textContent="ⓘ 설명";
+    b.onclick=()=>{ const on=h.classList.toggle("open"); b.textContent=on?"× 접기":"ⓘ 설명"; };
+    h.parentNode.insertBefore(b,h);
+  });
+}
+try{ organizeSettings(); foldHints(document.getElementById("sheet")); }
+catch(e){ console.warn("설정 정리 건너뜀:",e); }
 
 applyPlanUI();
 refreshPauseBtn();               // 메인 상단 '매일 자동 생성' 토글 상태 표시
