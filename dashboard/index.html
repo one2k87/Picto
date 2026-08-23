@@ -502,6 +502,13 @@
 .wizcta .ct{font-weight:800;font-size:15.5px}
 .wizcta .cd{font-size:12.5px;opacity:.9;margin-top:2px}
 .wizcta .cg{margin-left:auto;font-size:20px;opacity:.85}
+
+/* 초기화 오류 배너 — 조용히 죽는 것을 막는다 */
+#errBar{position:fixed;left:0;right:0;bottom:0;z-index:99999;display:none;
+  background:#5b1f2a;color:#ffd9df;font-size:12px;line-height:1.5;padding:10px 14px;
+  padding-bottom:calc(10px + env(safe-area-inset-bottom));border-top:1px solid #a3435a}
+#errBar b{color:#fff}
+#errBar .x{float:right;cursor:pointer;opacity:.7;padding:0 4px}
 </style>
 <!-- 구글 로그인(애드센스 상태 조회 전용, 읽기 권한만). 없어도 나머지 기능은 정상 동작 -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -734,7 +741,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v78 · 첫 동기화는 합치기</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v79 · 설정탭 먹통 수정</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1247,10 +1254,20 @@ let DATA=null, fKind="all", fLang="all", fCat="all", fSearch="", fStatus="all", 
 let CFG=loadCfg();
 
 function loadCfg(){try{return JSON.parse(localStorage.getItem(LS))||{}}catch(e){return {}}}
+// 동기화가 값을 적용하는 중인지 표시하는 플래그.
+// ⚠️ 반드시 saveCfg보다 위에서 var로 선언할 것.
+//    아래쪽에 let으로 두면 saveCfg가 먼저 불릴 때 TDZ에 걸려
+//    typeof조차 ReferenceError를 던지고, 그 뒤 초기화가 통째로 멈춘다.
+//    (실제로 폰에서 설정 탭이 아무 반응 없던 원인)
+var _syncApplying=false;
+
 function saveCfg(){
-  // 어느 기기가 더 최신인지 판단하는 기준. 받아서 적용하는 중에는 갱신하지 않는다.
-  if(typeof _syncApplying!=="undefined" && !_syncApplying) CFG.cfgTouchedAt=new Date().toISOString();
-  localStorage.setItem(LS,JSON.stringify(CFG));
+  try{
+    // 어느 기기가 더 최신인지 판단하는 기준. 받아서 적용하는 중에는 갱신하지 않는다.
+    if(!_syncApplying) CFG.cfgTouchedAt=new Date().toISOString();
+  }catch(e){}
+  try{ localStorage.setItem(LS,JSON.stringify(CFG)); }
+  catch(e){ console.warn("설정 저장 실패:",e); }
   // 설정이 바뀔 때마다 서버에도 올린다(연속 입력은 한 번으로 묶임)
   try{ if(typeof syncAuto==="function") syncAuto(); }catch(e){}
 }
@@ -3097,8 +3114,7 @@ async function _rpc(fn, args){
   return txt?JSON.parse(txt):null;
 }
 
-// 받은 값을 적용하는 동안에는 자동 올리기를 멈춘다(무한 왕복 방지)
-let _syncApplying=false;
+// (_syncApplying은 saveCfg 위에서 var로 선언되어 있다 — TDZ 방지)
 
 async function syncPush(silent){
   if(!syncReady()){ if(!silent) toast("암호 문구를 먼저 정해주세요",1); return false; }
@@ -5946,5 +5962,19 @@ setTimeout(maybeOnboard, 800);   // 첫 실행이면 온보딩 위저드
     <button class="btn primary" id="wizNext" type="button">다음</button>
   </div>
 </div>
+<div id="errBar"><span class="x" onclick="this.parentNode.style.display='none'">✕</span>
+  <b>화면 오류</b> <span id="errMsg"></span></div>
+<script>
+// 스크립트가 도중에 죽으면 화면은 멀쩡해 보이는데 버튼만 안 먹는다.
+// 그런 상태를 사용자가 알아챌 수 있도록 표면에 띄운다.
+(function(){
+  const show=(m)=>{ try{
+    const b=document.getElementById("errBar"), t=document.getElementById("errMsg");
+    if(!b||!t) return; t.textContent=String(m).slice(0,220); b.style.display="block";
+  }catch(e){} };
+  window.addEventListener("error",e=>show((e.message||"오류")+" @"+((e.filename||"").split("/").pop())+":"+e.lineno));
+  window.addEventListener("unhandledrejection",e=>show("처리되지 않은 오류: "+(e.reason&&e.reason.message||e.reason)));
+})();
+</script>
 </body>
 </html>
