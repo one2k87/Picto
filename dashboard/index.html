@@ -734,7 +734,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v71 · 승인 탭 통합</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v72 · 설정값 상호 반영</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2515,6 +2515,24 @@ function nicheDetectHtml(res){
    입력이 멈추면 자동으로 저장한다. */
 function fieldOf(id){ const e=document.getElementById(id); return e?e.closest(".field"):null; }
 
+// 승인 탭에서 다루는 입력칸 ↔ CFG 키 대응(한 곳에서만 관리한다)
+const APPROVAL_FIELDS=[["cfgSite","site"],["cfgUser","user"],["cfgPass","pass"],
+  ["cfgContactEmail","contactEmail"],["cfgAuthorName","author"],["cfgAuthorBio","authorBio"]];
+
+// CFG → 화면. 설정 탭을 한 번도 열지 않아도 승인 탭에 값이 보이게 한다.
+function fillApprovalFields(){
+  ensurePersona(false);
+  APPROVAL_FIELDS.forEach(([id,key])=>{
+    const e=document.getElementById(id); if(!e) return;
+    const v=CFG[key]||"";
+    if(v && e.value!==v) e.value=v;       // 사용자가 입력 중인 값을 덮지 않도록 다를 때만
+  });
+  const box=document.getElementById("nicheNow");
+  if(box){ const n=CFG.niche;
+    box.innerHTML=n?`현재: <b>${escAttr(n.label)}</b> · 소주제 ${(n.subniches||[]).length}개${n.region?" · "+escAttr(n.region):""}`
+                   :"아직 정하지 않았습니다."; }
+}
+
 function moveApprovalControls(){
   const ads=document.getElementById("adsSheet"); if(!ads) return false;
   const check=ads.querySelector('.sub-sec[data-k="check"]');
@@ -2537,27 +2555,39 @@ function moveApprovalControls(){
   pr.reverse().forEach(el=>prep.prepend(el));
 
   // ③ 승인 탭에서 고친 값은 자동 저장
-  const AUTO=["cfgSite","cfgUser","cfgPass","cfgContactEmail","cfgAuthorName","cfgAuthorBio"];
+  // ⚠️ 여기서 한 번 사고가 났다. 입력칸을 CFG로 채우기 전에 자동 저장이 돌면
+  //    빈 화면의 값이 그대로 CFG를 덮어써서 저장해둔 접속 정보가 사라진다.
+  //    그래서 ①먼저 채우고 ②사용자가 실제로 건드린 칸만 ③빈 값으로는 덮어쓰지 않는다.
   const badge=document.createElement("div");
   badge.className="hint"; badge.style.cssText="text-align:right;opacity:0;transition:opacity .3s";
   badge.textContent="설정에 저장됨 ✓";
   check.prepend(badge);
+
+  const touched=new Set();
   let t=null;
   const flush=()=>{
+    if(!touched.size) return;                       // 손댄 적 없으면 아무것도 쓰지 않는다
     const g=id=>{const e=document.getElementById(id); return e?e.value.trim():"";};
-    CFG.site=g("cfgSite"); CFG.user=g("cfgUser"); CFG.pass=g("cfgPass");
-    CFG.contactEmail=g("cfgContactEmail");
-    const an=g("cfgAuthorName"), ab=g("cfgAuthorBio");
-    if((an&&an!==CFG.author)||(ab&&ab!==CFG.authorBio)) CFG.authorAuto=false;
-    CFG.author=an; CFG.authorBio=ab;
+    const put=(id,key)=>{
+      if(!touched.has(id)) return;
+      const v=g(id);
+      if(!v && CFG[key]) return;                    // 빈 값으로 기존 값을 지우지 않는다
+      CFG[key]=v;
+    };
+    if(touched.has("cfgAuthorName")||touched.has("cfgAuthorBio")) CFG.authorAuto=false;
+    put("cfgSite","site"); put("cfgUser","user"); put("cfgPass","pass");
+    put("cfgContactEmail","contactEmail");
+    put("cfgAuthorName","author"); put("cfgAuthorBio","authorBio");
     saveCfg();
     badge.style.opacity="1"; setTimeout(()=>badge.style.opacity="0",1400);
   };
-  AUTO.forEach(id=>{ const e=document.getElementById(id); if(!e) return;
-    e.addEventListener("input",()=>{ clearTimeout(t); t=setTimeout(flush,700); });
-    e.addEventListener("change",flush);
+  APPROVAL_FIELDS.forEach(([id])=>{ const e=document.getElementById(id); if(!e) return;
+    const mark=()=>touched.add(id);
+    e.addEventListener("input",()=>{ mark(); clearTimeout(t); t=setTimeout(flush,700); });
+    e.addEventListener("change",()=>{ mark(); flush(); });
   });
 
+  fillApprovalFields();          // 저장돼 있던 값을 화면에 올린다(설정을 안 열었어도)
   ads.dataset.merged="1";
   // 설정 탭에는 어디로 갔는지 표시를 남긴다
   const sheet=document.getElementById("sheet");
@@ -4445,7 +4475,8 @@ function gotoTab(k){
     setTimeout(()=>{ buildSubtabs(pid);
       // 승인 탭의 보조탭은 여기서 처음 만들어진다. 설정에서 옮겨올 블록은
       // 그 뒤에 붙여야 하므로, 타이머로 기다리지 말고 이 시점에 실행한다.
-      if(pid==="adsSheet"){ try{ moveApprovalControls(); }catch(e){ console.warn("승인 탭 통합:",e); } }
+      if(pid==="adsSheet"){ try{ moveApprovalControls(); fillApprovalFields(); }
+        catch(e){ console.warn("승인 탭 통합:",e); } }
       showSub(pid,SUBTABS[pid].home); },60);
   }
   syncViews(); syncTabbar();
