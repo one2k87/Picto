@@ -734,7 +734,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v60 · 설정 마법사</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v61 · 설정 마법사</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -4772,9 +4772,12 @@ function closeWizard(){
   document.body.style.overflow="";
 }
 
-/* ── 버튼 연결 ─────────────────────────────────────────── */
-(function wizBind(){
-  const w=document.getElementById("wiz"); if(!w) return;
+/* ── 버튼 연결 ───────────────────────────────────────────
+   마법사의 HTML은 이 스크립트보다 뒤(body 끝)에 있으므로,
+   문서가 다 만들어진 뒤에 붙여야 한다. */
+function wizBind(){
+  const w=document.getElementById("wiz");
+  if(!w){ console.warn("마법사 DOM을 찾지 못했습니다"); return; }
   document.getElementById("wizX").onclick=()=>{
     if(WIZ.i>0 && !confirm("마법사를 닫을까요?\n\n지금까지 넣은 값은 저장되어 있습니다.")) return;
     closeWizard();
@@ -4800,7 +4803,9 @@ function closeWizard(){
     cta.onclick=startWizard;
     title.after(cta);
   }
-})();
+}
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",wizBind);
+else wizBind();
 
 
 applyPlanUI();
