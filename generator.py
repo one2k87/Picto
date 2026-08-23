@@ -82,11 +82,12 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
     # 글마다 '구성 스타일'을 무작위로 골라 획일적인 AI 양산 티를 없앤다.
     _style = random.choice([
         "문제 해결형: 독자의 고민→원인→해결 순서로 풀되, 실제 상황 예시로 시작한다.",
-        "경험/후기형: '직접 해보니' 시점으로 과정과 느낀 점, 주의할 점을 이야기하듯 쓴다.",
+        "자료검증형: 공식 자료에서 확인한 사실을 근거로, 헷갈리는 지점을 짚어준다.",
         "비교/선택형: 몇 가지 선택지를 표와 함께 장단점으로 비교하고 상황별 추천을 준다.",
         "단계별 가이드형: 실제로 따라 할 수 있는 순서(1→2→3)로, 각 단계에 팁을 곁들인다.",
         "자주 묻는 질문형: 사람들이 실제로 궁금해하는 질문을 앞세워 하나씩 답해준다.",
     ])
+    _open_mode = OPENING_MODES[_variant(keyword, len(OPENING_MODES))]
     if not insert_ads:
         ad_rule = "5. 이미지는 '딱 1개'만 [[IMG:이미지설명]]로 본문 상단부에 넣으세요(광고 마커는 넣지 말 것)."
     elif ADS_BOOST:   # 승인 후 수익 최적화: 광고 3개(첫 소제목·중반·결론 직전)
@@ -105,7 +106,8 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
 - 핵심 키워드+연관어(LSI)를 제목·첫문단·여러 H2 소제목·마지막 문단에 자연스럽게 반복(억지 반복 금지).
 - 비교표·체크리스트·구체 수치·실제 예시를 넣어 경쟁 글보다 정보량이 많게(독보적 완성도).
 - FAQ를 4~5개로 늘려 '사람들이 또 묻는 질문(PAA)'까지 커버.
-- 제목은 검색어를 정확히 포함하면서 '총정리/완벽정리/2026년' 등으로 신뢰+클릭을 동시에.
+- 제목은 검색어를 정확히 포함하되, '총정리·완벽정리·알아보기·핵심정보' 같은 상투어는 절대 쓰지 말 것.
+  대신 그 글에만 있는 구체 정보(금액·조건·기간·대상)를 제목에 넣어 차별화한다.
 """
         if competitive else "")
 
@@ -162,7 +164,7 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
 [작성 규칙 — 자료 전략 그대로]
 1. 제목(title): 반드시 35~60자의 '클릭을 부르는 완성된 문장형 제목'. 한 단어/키워드만 쓰지 말 것.
    핵심 키워드를 앞쪽에 넣고, 숫자·연도·혜택·궁금증을 더한다.
-   (나쁜 예: "무직자 대출"  → 좋은 예: "무직자도 되는 소액 비상금 대출 조건 총정리 (2026 한도·금리)")
+   (나쁜 예: "무직자 대출 총정리"  → 좋은 예: "무직자 비상금 대출, 한도는 300만 원까지입니다")
    (나쁜 예: "다이어트"    → 좋은 예: "직장인 다이어트 식단, 이 3가지만 지켜도 살 빠집니다")
 2. hook(첫 문장): 3초 안에 이탈을 막는 질문형 또는 공감형 한 문장. (예: "대출 이자 부담, 조금이라도 줄일 방법 없을까요?")
 3. 첫 문단에서 검색 의도에 바로 답하고 핵심 키워드를 1회 자연스럽게 포함.
@@ -179,8 +181,13 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
 - 이 글만의 '고유한 각도'를 하나 정해 일관되게 밀고 간다(특정 대상·상황·비교 관점 등).
 - 구체적인 숫자·조건·예시를 반드시 포함한다(한도·금리·기간·자격요건·실제 상황 예시 등). 두루뭉술한 일반론 금지.
 - 다음 같은 '속 빈 상투어'는 쓰지 말 것: "일반적으로", "중요합니다", "잘 알려져 있듯이", "다양한 방법이 있습니다", "결론적으로 매우 중요".
-- 다른 글을 복제한 듯한 문장·구성을 피하고, 실제 경험담·현실적 팁을 회화체로 녹인다.
+- 다른 글을 복제한 듯한 문장·구성을 피한다. 겪지 않은 경험을 지어내지 말고,
+  '자료를 확인한 결과' 관점에서 실무적으로 주의할 지점을 짚는다.
 - 사실은 단정하지 말고 "공식 기준 확인 필요"처럼 검증 여지를 남긴다(정확성·신뢰성 E-E-A-T).
+
+{HUMAN_STYLE}
+[이번 글의 도입 방식] {_open_mode}
+  (이 방식으로만 시작한다. 다른 글과 같은 틀로 시작하면 안 된다.)
 
 [이번 글 구성 스타일] {_style}
   (매번 같은 뼈대를 반복하지 말고, 위 스타일에 맞춰 흐름과 소제목을 자연스럽게 바꾼다.)
@@ -428,6 +435,72 @@ def _byline_html(author, bio=""):
             f'✍️ {a}{bio_html} · 최종 업데이트 {d.year}년 {d.month}월 {d.day}일</p>')
 
 
+# ── 사람이 검수한 글처럼 만드는 층 ────────────────────────────────
+# 원칙: '안 한 경험을 지어내지 않는다'.
+#   구글이 문제 삼는 건 AI 사용 자체가 아니라 "검수 없는 대량 발행"이다.
+#   그래서 ①구조·리듬을 글마다 다르게 하고 ②실제 확인한 출처·날짜를 남기고
+#   ③운영자가 한 줄이라도 직접 채우는 '검수 슬롯'을 만든다.
+#   반대로 겪지도 않은 일을 1인칭으로 지어내는 건 정책 위험이자 우리 탐지기에
+#   그대로 걸리는 짓이라 프롬프트에서 명시적으로 금지한다.
+HUMAN_STYLE = """
+[사람이 쓰고 검수한 글처럼 — 반드시 지킬 것]
+1) 문장 리듬을 흔들어라. 짧은 문장(5~10자)과 긴 문장(60자 이상)을 섞는다.
+   모든 문장이 비슷한 길이면 기계가 쓴 티가 난다.
+2) 문단 길이도 들쭉날쭉하게. 한 줄짜리 문단을 최소 두 번 넣는다.
+3) 구체적으로 써라. "저렴합니다"(X) → "3만 2천 원이었습니다"(O).
+   금액·기간·서류명·기관명·조건 숫자를 반드시 넣는다. 모르면 그 항목을 아예 빼라.
+4) 괄호로 곁가지를 달아라. (저는 이 부분에서 한 번 헤맸습니다) 같은 실무 코멘트.
+5) 확정하지 못하는 건 솔직히 적어라. "지자체마다 다르니 확인이 필요합니다".
+   모든 문장이 단정적이면 오히려 신뢰가 떨어진다.
+6) ❌ 절대 금지 — 겪지 않은 경험을 지어내지 마라.
+   "제가 직접 신청해보니", "처음 알아봤을 때 저는 ~인 줄 알았습니다" 같은
+   가짜 경험담은 쓰지 않는다. 대신 '자료를 확인한 결과' 관점으로 쓴다.
+7) ❌ 상투적 도입 금지 — "~을 알아보다 보면", "가장 중요한 것은", "총정리"로 시작하지 마라.
+8) 근거가 되는 공식 출처(기관명 + 페이지명)를 본문에 최소 1회 언급하라.
+"""
+
+# 도입부 방식 — slug로 고정 선택해 글마다 다른 방식이 나오게 한다
+OPENING_MODES = [
+    "질문형: 독자가 실제로 검색창에 칠 법한 질문 한 줄로 시작한다.",
+    "장면형: 그 상황이 벌어지는 구체적 순간을 한 문장으로 묘사하며 시작한다.",
+    "숫자형: 핵심 수치 하나를 앞세워 시작한다(예: '한도는 3천만 원입니다').",
+    "오해정정형: 흔히 잘못 아는 사실을 먼저 바로잡으며 시작한다.",
+    "시기형: 지금 이 시점에 왜 중요한지(마감·변경일)로 시작한다.",
+    "비교형: 헷갈리는 두 가지의 차이를 한 문장으로 못 박으며 시작한다.",
+]
+
+
+def _variant(seed_text, n):
+    """slug 등을 시드로 0~n-1 값을 고정 반환(같은 글은 항상 같은 구조)."""
+    h = 0
+    for ch in str(seed_text or ""):
+        h = (h * 31 + ord(ch)) & 0xFFFFFFFF
+    return h % max(1, n)
+
+
+def _review_slot_html(note=""):
+    """운영자가 직접 한 줄 채우는 '검수 슬롯'.
+    여기에 실제 경험·확인 내용을 넣으면 그게 진짜 사람 검수 기록이 된다."""
+    if note:
+        return ('<div class="review-note" style="margin:16px 0;padding:11px 13px;border-left:3px solid #b9a3f0;'
+                'background:#f7f5fd;color:#3a3357;font-size:13.5px;line-height:1.65">'
+                f'✍️ <b>운영자 확인</b> — {html_mod.escape(note)}</div>')
+    return ""
+
+
+def _verified_html(sources=None):
+    """확인 흔적: 무엇을 언제 확인했는지 남긴다(검수 절차의 증거)."""
+    from datetime import date
+    d = date.today()
+    src = ""
+    if sources:
+        items = " · ".join(html_mod.escape(s) for s in sources[:3])
+        src = f"<br>확인한 자료: {items}"
+    return ('<p class="verified" style="margin-top:14px;padding:9px 12px;border-left:3px solid #cfc6e8;'
+            'background:#faf9fe;color:#6b6386;font-size:12px;line-height:1.6">'
+            f'🔎 {d.year}년 {d.month}월 {d.day}일 기준으로 내용을 확인했습니다.{src}</p>')
+
+
 def _ai_notice_html():
     """AI 기본법(2026-01-22 시행) 제31조 의무 표기 — 생성형 AI로 작성된 콘텐츠임을 항상 고지.
     (Marry_Baby_Meal의 동일 취지 고지와 문구를 맞춤 — solvup_global_architecture.md 3번 참고)"""
@@ -495,10 +568,27 @@ def _assemble(data, related, blog_url, insert_ads, resolver=None, series_nav="",
     internal = _build_internal_links(related, blog_url)
     jsonld = _build_jsonld(data.get("title", ""), data.get("meta", ""), data.get("faqs", []),
                            author, author_type=author_type, author_bio=author_bio)
-    # 순서: 후킹 → 작성정보 → AI생성 고지 → 핵심요약 → (시리즈 내비) → 목차 → 요약표 → 본문 →
-    #        실행 체크리스트 → FAQ → 정보기준일 → 투자위험 → 면책 → (시리즈 내비) → 내부링크 → 구조화데이터
-    return (f"{hook_html}{byline}{ai_notice}{tldr}{series_nav}{toc}{summary}{body}"
-            f"{checklist}{faq_html}{freshness}{invest_risk}{disclaimer}{series_nav}{internal}{jsonld}")
+    # ── 구조 변주 ──
+    # 모든 글이 같은 골격이면 그 자체가 대량생산 신호다. slug를 시드로
+    # 선택 블록(요약표·체크리스트·목차)을 글마다 다르게 넣고 순서도 흔든다.
+    seed = data.get("slug") or data.get("title") or ""
+    v = _variant(seed, 6)
+    if v in (1, 4):
+        summary = ""                      # 요약표 빼는 글
+    if v in (2, 5):
+        checklist = ""                    # 체크리스트 빼는 글
+    if v == 3:
+        toc = ""                          # 목차 빼는 글(짧은 글처럼)
+    review = _review_slot_html(data.get("review_note", ""))
+    verified = _verified_html(data.get("sources"))
+
+    head = f"{hook_html}{byline}{ai_notice}{review}"
+    if v % 2 == 0:                        # 요약을 목차 앞/뒤로 번갈아
+        mid = f"{tldr}{series_nav}{toc}{summary}"
+    else:
+        mid = f"{series_nav}{toc}{tldr}{summary}"
+    tail = f"{checklist}{faq_html}{verified}{freshness}{invest_risk}{disclaimer}{series_nav}{internal}{jsonld}"
+    return head + mid + body + tail
 
 
 def _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,
@@ -522,7 +612,8 @@ def _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,
         or re.search(r"(?<![0-9])월\s*(출시|시행|시작|오픈|공개)", title)  # 숫자 없이 'X월 ...'
     )
     if _bad:
-        title = f"{keyword} 총정리 — 조건·방법·신청까지 한눈에"
+        # 폴백 제목도 상투어를 쓰지 않는다(품질 게이트가 잡는 표현이므로)
+        title = f"{keyword}, 신청 전에 확인해야 할 조건"
     data["title"] = title
     slug = slugify((data.get("slug") or "").strip() or slugify(title))
     full_html = _assemble(data, related, blog_url, insert_ads, image_resolver, series_nav,
