@@ -685,7 +685,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v53 · 초보자 개설 안내</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v54 · 블로그 정리 러너</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -700,6 +700,12 @@
       결제 후 받은 키를 넣고 '키 확인'을 누르세요.</div>
   </div>
 
+  <div class="field">
+    <label>🧹 블로그 정리 러너 <span style="font-size:11px;color:var(--danger);font-weight:400">되돌릴 수 없음</span></label>
+    <button class="btn sm" id="runnerBtn" style="width:100%;border-color:#e5484d;color:#ff9a9a">승인용으로 한 번에 정리</button>
+    <div class="hint">태그 전량 삭제 · 빈 카테고리 삭제 · 태그라인 설정 · 색인 허용 · 필수 페이지 생성을 순서대로 실행합니다. <b>글은 삭제되지 않습니다.</b></div>
+    <div id="runnerBox" style="margin-top:8px;font-size:12.5px"></div>
+  </div>
   <div class="field">
     <label>🌱 처음 시작하시나요?</label>
     <button class="btn sm" id="setupGuideBtn" style="width:100%">블로그 개설부터 안내받기</button>
@@ -2611,6 +2617,102 @@ document.getElementById("wpTrashDrafts").onclick=async()=>{
                    :"아직 정하지 않았습니다.";
   }
 })();
+// ===== 블로그 정리 러너 =====
+// 승인 준비를 위해 워드프레스를 한 번에 정돈한다. 각 단계는 실패해도 다음으로 넘어가고,
+// 무엇이 됐고 무엇이 안 됐는지 리포트로 남긴다.
+async function wpRunner(){
+  const box=document.getElementById("runnerBox");
+  if(!wpReady()){ box.innerHTML='<span style="color:#ff6b4a">설정 › 연결에서 워드프레스 정보를 먼저 입력하세요.</span>'; return; }
+  const base=wpBase(), H=wpAuth(), HJ=Object.assign({"Content-Type":"application/json"},H);
+  const log=[]; const say=(t,ok)=>{log.push({t,ok}); box.innerHTML=log.map(l=>
+    `<div style="margin:3px 0">${l.ok===true?"✅":l.ok===false?"❌":"⏳"} ${escAttr(l.t)}</div>`).join("");};
+
+  const before={};
+  try{
+    const r=await fetch(base+"/wp-json/wp/v2/tags?per_page=1",{headers:H});
+    before.tags=parseInt(r.headers.get("X-WP-Total")||"0",10);
+    const p=await fetch(base+"/wp-json/wp/v2/posts?per_page=1&status=publish",{headers:H});
+    before.posts=parseInt(p.headers.get("X-WP-Total")||"0",10);
+  }catch(e){}
+  say(`시작 — 공개 글 ${before.posts||0}편 · 태그 ${before.tags||0}개`,true);
+
+  // 1) 태그 전량 삭제
+  if(!confirm(`태그 ${before.tags||0}개를 모두 삭제합니다.\n\n· 글은 삭제되지 않습니다(태그 연결만 끊김)\n· 복구되지 않습니다\n\n진행할까요?`)){
+    say("사용자가 취소했습니다",false); return; }
+  say("태그 삭제 중…");
+  let del=0, fail=0, guard=0;
+  while(guard++<80){
+    let list=[];
+    try{
+      const r=await fetch(base+"/wp-json/wp/v2/tags?per_page=100&_fields=id",{headers:H});
+      if(!r.ok) break; list=await r.json();
+    }catch(e){ break; }
+    if(!Array.isArray(list)||!list.length) break;
+    for(const t of list){
+      try{ // 태그는 force=true여야 삭제됨(휴지통 개념 없음). 글에는 영향 없음.
+        const d=await fetch(`${base}/wp-json/wp/v2/tags/${t.id}?force=true`,{method:"DELETE",headers:H});
+        d.ok?del++:fail++;
+      }catch(e){ fail++; }
+    }
+    say(`태그 삭제 중… ${del}개 완료${fail?` (실패 ${fail})`:""}`);
+  }
+  say(`태그 ${del}개 삭제 완료${fail?` · 실패 ${fail}`:""}`, fail===0);
+
+  // 2) 빈 카테고리 삭제
+  say("빈 카테고리 정리 중…");
+  let catDel=0;
+  try{
+    const cats=await (await fetch(base+"/wp-json/wp/v2/categories?per_page=100",{headers:H})).json();
+    for(const c of cats){
+      if((c.count||0)===0 && c.slug!=="uncategorized"){
+        const d=await fetch(`${base}/wp-json/wp/v2/categories/${c.id}?force=true`,{method:"DELETE",headers:H});
+        if(d.ok) catDel++;
+      }
+    }
+  }catch(e){}
+  say(`빈 카테고리 ${catDel}개 삭제`,true);
+
+  // 3) 사이트 기본값(태그라인·색인 허용)
+  say("사이트 기본 설정 중…");
+  const niche=CFG.niche;
+  const desc=niche?`${niche.label} 정보를 직접 확인해 정리합니다`:"실제로 확인한 정보만 정리합니다";
+  let setOk=false;
+  try{
+    const r=await fetch(base+"/wp-json/wp/v2/settings",{method:"POST",headers:HJ,
+      body:JSON.stringify({description:desc, blog_public:true})});
+    setOk=r.ok;
+  }catch(e){}
+  say(setOk?`태그라인 설정 · 검색엔진 노출 허용`:"사이트 설정 변경 실패(권한 확인 필요)",setOk);
+
+  // 4) 필수 페이지
+  say("필수 페이지 확인 중…");
+  let made=0;
+  for(const p of REQ_PAGES){
+    try{
+      const q=await fetch(base+"/wp-json/wp/v2/pages?slug="+p.slug,{headers:H});
+      const ex=q.ok?await q.json():[];
+      if(Array.isArray(ex)&&ex.length) continue;
+      const r=await fetch(base+"/wp-json/wp/v2/pages",{method:"POST",headers:HJ,
+        body:JSON.stringify({title:p.title,slug:p.slug,status:"publish",content:pageHtml(p.slug)})});
+      if(r.ok) made++;
+    }catch(e){}
+  }
+  say(`필수 페이지 ${made}개 생성 (이미 있으면 건너뜀)`,true);
+
+  // 5) 결과
+  let after={};
+  try{
+    const r=await fetch(base+"/wp-json/wp/v2/tags?per_page=1",{headers:H});
+    after.tags=parseInt(r.headers.get("X-WP-Total")||"0",10);
+  }catch(e){}
+  say(`완료 — 태그 ${before.tags||0} → ${after.tags||0}개`,true);
+  box.innerHTML+=`<div class="dnext" style="margin-top:10px"><div class="dl">다음 할 일</div>
+    <div class="dv" style="font-size:12.5px;line-height:1.6">
+    ① Rank Math → 일반 설정 → 태그·작성자·날짜 아카이브를 noindex로 (플러그인 설정이라 자동 불가)<br>
+    ② 🛡️ 승인 탭에서 다시 점검해 템플릿성 4개 항목 확인</div></div>`;
+  toast("블로그 정리 완료","info");
+}
+
 // ===== 초보자 개설 안내 =====
 let GUIDE=null;
 async function loadGuide(){
@@ -2660,6 +2762,10 @@ async function renderGuide(){
       <div class="hint">${escAttr(f.a)}</div></div>`).join("")}
     <div class="hint" style="margin-top:8px">기준 ${escAttr(g.updated||"")} · 가격은 변동될 수 있으니 결제 화면에서 다시 확인하세요.</div>`;
 }
+(function runnerBtn(){
+  const b=document.getElementById("runnerBtn");
+  if(b) b.onclick=()=>wpRunner();
+})();
 (function guideBtn(){
   const b=document.getElementById("setupGuideBtn");
   if(b) b.onclick=()=>renderGuide();
