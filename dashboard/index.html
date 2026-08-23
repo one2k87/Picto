@@ -734,7 +734,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v76 · 기기 간 동기화</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v77 · 자동 동기화</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -988,24 +988,28 @@
   <div class="divider"></div>
   <h2 style="font-size:14px">🔄 기기 간 설정 동기화</h2>
   <div class="field">
-    <div class="hint" style="margin-bottom:8px">폰에 넣은 값이 PC에 없어 매번 다시 입력하던 문제를 없앱니다.
-      <b>설정은 이 기기에서 암호화한 뒤에 올라가며, 서버는 내용을 읽지 못합니다.</b>
-      공개(publishable) 키만 쓰므로 키가 노출돼도 남이 내 설정을 찾거나 풀 수 없습니다.</div>
-    <label>Supabase 주소</label>
-    <input id="cfgSyncUrl" placeholder="https://xxxx.supabase.co" autocapitalize="off">
-    <label style="margin-top:8px;display:block">공개 키 (publishable / anon)</label>
-    <input id="cfgSyncKey" placeholder="sb_publishable_... 또는 eyJ..." autocapitalize="off">
-    <div class="hint">⚠️ <b>service_role(secret) 키는 넣지 마세요.</b> 이 앱은 공개 주소에 있어서
-      그 키를 넣으면 DB 전체가 남에게 열립니다. 공개 키로도 동기화는 문제없이 됩니다.</div>
-    <label style="margin-top:8px;display:block">암호 문구</label>
+    <div class="hint" style="margin-bottom:8px">폰과 PC가 같은 설정을 쓰도록 자동으로 맞춥니다.
+      <b>암호 문구 하나만 정하면 끝</b>이고, 이후엔 버튼을 누를 일이 없습니다 —
+      값이 바뀌면 알아서 올라가고, 앱을 열거나 다른 화면에서 돌아오면 알아서 받아옵니다.</div>
+    <label>암호 문구</label>
     <input id="cfgSyncPass" type="password" placeholder="기억할 수 있는 문장" autocapitalize="off">
-    <div class="hint">이 문구로 설정을 잠그고 풉니다. <b>모든 기기에서 똑같이</b> 넣어야 합니다.
-      서버에 저장되지 않으니 잊으면 복구할 수 없습니다 — 길고 기억하기 쉬운 문장을 쓰세요.</div>
-    <div class="actions" style="margin-top:8px;gap:6px">
-      <button class="btn sm" id="syncPushBtn" style="flex:1">⬆️ 지금 올리기</button>
-      <button class="btn sm" id="syncPullBtn" style="flex:1">⬇️ 지금 받기</button>
-    </div>
+    <div class="hint">이 문구로 설정을 잠그고 풉니다. <b>모든 기기에서 똑같이</b> 넣으세요.
+      서버에 저장되지 않아 잊으면 복구할 수 없습니다.
+      설정 내용은 이 기기에서 암호화된 뒤 올라가므로 서버는 내용을 읽지 못합니다.</div>
     <div id="syncBox" style="margin-top:8px"></div>
+    <details style="margin-top:8px">
+      <summary class="hint" style="cursor:pointer">수동 조작 · 직접 지정 (평소엔 볼 일 없음)</summary>
+      <div class="actions" style="margin-top:8px;gap:6px">
+        <button class="btn sm" id="syncPushBtn" style="flex:1">⬆️ 지금 올리기</button>
+        <button class="btn sm" id="syncPullBtn" style="flex:1">⬇️ 서버 것으로 덮기</button>
+      </div>
+      <label style="margin-top:8px;display:block">Supabase 주소 (비우면 기본값)</label>
+      <input id="cfgSyncUrl" placeholder="기본 저장소 사용 중" autocapitalize="off">
+      <label style="margin-top:8px;display:block">공개 키 (비우면 기본값)</label>
+      <input id="cfgSyncKey" placeholder="기본 저장소 사용 중" autocapitalize="off">
+      <div class="hint">자기 Supabase 프로젝트를 쓰고 싶을 때만 채우세요.
+        ⚠️ service_role(secret) 키는 절대 넣지 마세요 — 공개 앱이라 DB 전체가 열립니다.</div>
+    </details>
   </div>
 
   <h2 style="font-size:14px">🗄️ Supabase 연동 (초안 백로그 큐)</h2>
@@ -1243,6 +1247,8 @@ let CFG=loadCfg();
 
 function loadCfg(){try{return JSON.parse(localStorage.getItem(LS))||{}}catch(e){return {}}}
 function saveCfg(){
+  // 어느 기기가 더 최신인지 판단하는 기준. 받아서 적용하는 중에는 갱신하지 않는다.
+  if(typeof _syncApplying!=="undefined" && !_syncApplying) CFG.cfgTouchedAt=new Date().toISOString();
   localStorage.setItem(LS,JSON.stringify(CFG));
   // 설정이 바뀔 때마다 서버에도 올린다(연속 입력은 한 번으로 묶임)
   try{ if(typeof syncAuto==="function") syncAuto(); }catch(e){}
@@ -3024,7 +3030,20 @@ function startApprovalPosts(){
       그래서 서버에는 **암호문만** 올린다. 열쇠(암호 문구)는 기기에만 두고
       DB에는 저장하지 않으므로, Supabase 키가 새어도 내용은 읽히지 않는다.
    동기화 대상에서 제외: 암호 문구 자체, 마지막 동기화 시각(순환 방지). */
-const SYNC_SKIP=["syncPass","syncAt","lastCheck"];
+// 동기화에서 제외할 항목. syncPass는 절대 서버로 보내지 않는다(그게 열쇠다).
+// cfgTouchedAt은 어느 쪽이 최신인지 판단하는 데만 쓰므로 payload에 넣지 않는다.
+const SYNC_SKIP=["syncPass","syncAt","lastCheck","cfgTouchedAt"];
+
+// 접속 정보는 앱에 내장한다. publishable 키는 공개용으로 설계된 값이라
+// 노출돼도 문제가 없고, 어차피 표에는 직접 접근할 수 없다(RLS + RPC만 허용).
+// 사용자가 입력할 것은 암호 문구 하나뿐이다.
+const SYNC_DEFAULTS={
+  url:"https://nsojjjwbaddasdnknekc.supabase.co",
+  key:"sb_publishable_fIxl_Y3EX74XYamuBhPFlw_i8zGAHl3"
+};
+function syncUrl(){ return (CFG.supabaseUrl||SYNC_DEFAULTS.url).replace(/\/+$/,""); }
+function syncKey(){ return CFG.syncKey||SYNC_DEFAULTS.key; }
+
 const APP_VER=(()=>{const h=document.querySelector("#sheet h2 span");
   const m=(h&&h.textContent||"").match(/v\d+/); return m?m[0]:"v?";})();
 
@@ -3032,10 +3051,9 @@ async function _sha256hex(t){
   const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));
   return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
 }
-// slot은 암호 문구의 해시다. 공개 키를 가진 제3자가 남의 설정을 찾아낼 수 없다.
 async function _slot(){ return _sha256hex("scripto|slot|"+(CFG.syncPass||"")); }
 
-async function _syncKey(pass, slot){
+async function _syncKeyMat(pass, slot){
   const enc=new TextEncoder();
   const base=await crypto.subtle.importKey("raw",enc.encode(pass),"PBKDF2",false,["deriveKey"]);
   return crypto.subtle.deriveKey(
@@ -3046,7 +3064,7 @@ const _b64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
 const _unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 
 async function syncEncrypt(obj, pass, slot){
-  const key=await _syncKey(pass,slot);
+  const key=await _syncKeyMat(pass,slot);
   const iv=crypto.getRandomValues(new Uint8Array(12));
   const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,
     new TextEncoder().encode(JSON.stringify(obj)));
@@ -3055,88 +3073,120 @@ async function syncEncrypt(obj, pass, slot){
 async function syncDecrypt(str, pass, slot){
   const [ivB,ctB]=String(str).split(".");
   if(!ivB||!ctB) throw new Error("형식 오류");
-  const key=await _syncKey(pass,slot);
+  const key=await _syncKeyMat(pass,slot);
   const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:_unb64(ivB)},key,_unb64(ctB));
   return JSON.parse(new TextDecoder().decode(pt));
 }
 
-function syncReady(){ return !!(CFG.supabaseUrl && CFG.syncKey && CFG.syncPass); }
+// 암호 문구만 있으면 켜진다
+function syncReady(){ return !!(CFG.syncPass && syncUrl() && syncKey()); }
 function _deviceName(){
   const ua=navigator.userAgent;
   if(/iPhone/.test(ua)) return "iPhone"; if(/iPad/.test(ua)) return "iPad";
   if(/Android/.test(ua)) return "Android"; if(/Mac/.test(ua)) return "Mac";
   if(/Win/.test(ua)) return "Windows"; return "기타";
 }
-// 공개(publishable) 키로 RPC만 호출한다. 표에는 직접 접근하지 않는다.
 async function _rpc(fn, args){
-  const r=await fetch(`${CFG.supabaseUrl.replace(/\/+$/,"")}/rest/v1/rpc/${fn}`,{
-    method:"POST",
-    headers:{"apikey":CFG.syncKey,"Authorization":"Bearer "+CFG.syncKey,"Content-Type":"application/json"},
+  const k=syncKey();
+  const r=await fetch(`${syncUrl()}/rest/v1/rpc/${fn}`,{
+    method:"POST", headers:{apikey:k,Authorization:"Bearer "+k,"Content-Type":"application/json"},
     body:JSON.stringify(args)});
   const txt=await r.text();
   if(!r.ok) throw new Error(`${r.status} ${txt.slice(0,140)}`);
   return txt?JSON.parse(txt):null;
 }
 
+// 받은 값을 적용하는 동안에는 자동 올리기를 멈춘다(무한 왕복 방지)
+let _syncApplying=false;
+
 async function syncPush(silent){
-  if(!syncReady()){ if(!silent) toast("주소·공개 키·암호 문구를 먼저 넣어주세요",1); return false; }
+  if(!syncReady()){ if(!silent) toast("암호 문구를 먼저 정해주세요",1); return false; }
   try{
     const slot=await _slot();
     const body={};
     for(const k of Object.keys(CFG)) if(!SYNC_SKIP.includes(k)) body[k]=CFG[k];
     const payload=await syncEncrypt(body, CFG.syncPass, slot);
     const ts=await _rpc("settings_put",{p_slot:slot,p_payload:payload,p_device:_deviceName(),p_version:APP_VER});
-    CFG.syncAt=ts||new Date().toISOString(); saveCfg();
+    CFG.syncAt=ts||new Date().toISOString();
+    _syncApplying=true; saveCfg(); _syncApplying=false;
     if(!silent) toast("설정을 올렸습니다 ✓");
     renderSyncBox(); return true;
   }catch(e){ if(!silent) toast("올리기 실패: "+String(e.message||e).slice(0,90),1); return false; }
 }
 
-async function syncPull(silent){
-  if(!syncReady()){ if(!silent) toast("주소·공개 키·암호 문구를 먼저 넣어주세요",1); return false; }
+// force=false면 '서버가 더 최신일 때만' 덮어쓴다. 자동 동기화는 항상 이 모드.
+async function syncPull(silent, force){
+  if(!syncReady()){ if(!silent) toast("암호 문구를 먼저 정해주세요",1); return false; }
   try{
     const slot=await _slot();
     const rows=await _rpc("settings_get",{p_slot:slot});
-    if(!rows||!rows.length){ if(!silent) toast("서버에 저장된 설정이 없습니다 — 먼저 올려주세요",1); return false; }
+    if(!rows||!rows.length){
+      if(!silent) toast("서버에 저장된 설정이 없습니다",1);
+      if(silent) syncPush(true);                 // 이 기기가 첫 기기면 바로 올려둔다
+      return false;
+    }
     const row=rows[0];
+    const remoteAt=new Date(row.updated_at).getTime();
+    const localAt=CFG.cfgTouchedAt?new Date(CFG.cfgTouchedAt).getTime():0;
+    const knownAt=CFG.syncAt?new Date(CFG.syncAt).getTime():0;
+    if(!force){
+      if(remoteAt<=knownAt) return false;        // 이미 아는 버전 — 할 일 없음
+      if(localAt>remoteAt){                      // 이 기기가 더 최신 → 올린다
+        return syncPush(true);
+      }
+    }
     let obj;
     try{ obj=await syncDecrypt(row.payload, CFG.syncPass, slot); }
     catch(e){ if(!silent) toast("암호 문구가 다릅니다",1); return false; }
     const keep={syncPass:CFG.syncPass, syncKey:CFG.syncKey, supabaseUrl:CFG.supabaseUrl};
     for(const k of Object.keys(obj)) if(!SYNC_SKIP.includes(k)) CFG[k]=obj[k];
     Object.assign(CFG, keep);
-    CFG.syncAt=row.updated_at; saveCfg();
-    if(!silent) toast(`${row.device||"다른 기기"}의 설정을 받았습니다 ✓`);
+    CFG.syncAt=row.updated_at; CFG.cfgTouchedAt=row.updated_at;
+    _syncApplying=true; saveCfg(); _syncApplying=false;
     try{ openSheet(); }catch(e){}
     try{ fillApprovalFields(); }catch(e){}
-    renderSyncBox(); return true;
+    renderSyncBox();
+    if(!silent) toast(`${row.device||"다른 기기"}의 설정을 받았습니다 ✓`);
+    else toast(`${row.device||"다른 기기"}에서 바뀐 설정을 반영했습니다`);
+    return true;
   }catch(e){ if(!silent) toast("받기 실패: "+String(e.message||e).slice(0,90),1); return false; }
 }
 
-// 저장할 때마다 자동으로 올린다(연속 입력은 한 번으로 묶는다)
+// 설정이 바뀌면 자동으로 올린다(연속 입력은 한 번으로 묶음)
 let _syncTimer=null;
 function syncAuto(){
-  if(!syncReady() || CFG.syncAutoOff) return;
+  if(_syncApplying || !syncReady() || CFG.syncAutoOff) return;
   clearTimeout(_syncTimer);
-  _syncTimer=setTimeout(()=>syncPush(true), 2500);
+  _syncTimer=setTimeout(()=>syncPush(true), 2000);
 }
+
+// 자동 받기 — 앱을 켤 때, 다른 탭·앱에서 돌아올 때, 그리고 60초마다.
+// 버튼을 누를 일이 없도록 하는 것이 목적이다.
+(function syncLoop(){
+  const tick=()=>{ if(syncReady() && !CFG.syncAutoOff && navigator.onLine) syncPull(true,false); };
+  const start=()=>{
+    tick();
+    setInterval(()=>{ if(document.visibilityState==="visible") tick(); }, 60000);
+    document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") tick(); });
+    window.addEventListener("online", tick);
+  };
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",()=>setTimeout(start,1200));
+  else setTimeout(start,1200);
+})();
 
 async function renderSyncBox(){
   const box=document.getElementById("syncBox"); if(!box) return;
-  if(!CFG.supabaseUrl||!CFG.syncKey){
-    box.innerHTML=`<div class="hint">주소와 공개 키를 넣어주세요.</div>`; return; }
   if(!CFG.syncPass){
-    box.innerHTML=`<div class="hint">암호 문구를 정하면 켜집니다. <b>모든 기기에서 같은 문구</b>를 쓰세요.</div>`; return; }
+    box.innerHTML=`<div class="hint">암호 문구를 넣으면 자동 동기화가 켜집니다.</div>`; return; }
+  const f=t=>new Date(t).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
   try{
     const rows=await _rpc("settings_get",{p_slot:await _slot()});
-    const f=t=>new Date(t).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
-    box.innerHTML=`<div class="hint">${
-      rows&&rows.length ? `서버: <b>${escAttr(rows[0].device||"?")}</b>에서 ${f(rows[0].updated_at)} 저장 (${escAttr(rows[0].app_version||"-")})`
-                        : "서버에 아직 저장된 설정이 없습니다."}<br>
-      이 기기: ${escAttr(_deviceName())}${CFG.syncAt?` · 마지막 동기화 ${f(CFG.syncAt)}`:""}</div>`;
+    box.innerHTML=`<div class="hint" style="color:var(--ok)">✅ 자동 동기화 켜짐 · 이 기기: ${escAttr(_deviceName())}<br>
+      ${rows&&rows.length
+        ? `서버에 <b>${escAttr(rows[0].device||"?")}</b>가 ${f(rows[0].updated_at)}에 저장한 설정이 있습니다.`
+        : "아직 올라간 설정이 없습니다. 설정을 하나라도 바꾸면 자동으로 올라갑니다."}</div>`;
   }catch(e){
-    box.innerHTML=`<div class="hint" style="color:var(--danger)">서버 조회 실패 — ${escAttr(String(e.message||e).slice(0,110))}<br>
-      스키마가 아직 배포되지 않았을 수 있습니다(GitHub Actions 확인).</div>`;
+    box.innerHTML=`<div class="hint" style="color:var(--danger)">서버 연결 실패 — ${escAttr(String(e.message||e).slice(0,100))}</div>`;
   }
 }
 
@@ -3930,9 +3980,14 @@ async function renderGuide(){
 (function syncBtns(){
   const p=document.getElementById("syncPushBtn"), q=document.getElementById("syncPullBtn");
   if(p) p.onclick=()=>syncPush(false);
-  if(q) q.onclick=()=>{ if(confirm("서버의 설정으로 이 기기를 덮어씁니다.\n\n이 기기에서만 바꾼 값이 있으면 사라집니다.\n계속할까요?")) syncPull(false); };
-  // 앱을 켤 때 서버 설정을 자동으로 받아온다(설정이 갖춰져 있을 때만)
-  setTimeout(()=>{ if(syncReady()) syncPull(true); }, 1200);
+  if(q) q.onclick=()=>{ if(confirm("서버의 설정으로 이 기기를 덮어씁니다.\n\n이 기기에서만 바꾼 값이 있으면 사라집니다.\n계속할까요?")) syncPull(false,true); };
+  // 암호 문구를 넣는 순간 바로 켜지도록
+  const pw=document.getElementById("cfgSyncPass");
+  if(pw) pw.addEventListener("change",()=>{
+    CFG.syncPass=pw.value.trim(); saveCfg();
+    if(syncReady()) syncPull(true,false).then(ok=>{ if(!ok) syncPush(true); });
+    renderSyncBox();
+  });
 })();
 (function nicheDetectBtnInit(){
   const b=document.getElementById("nicheDetectBtn"); if(!b) return;
