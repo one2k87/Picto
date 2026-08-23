@@ -5,10 +5,14 @@ name: Supabase 스키마 자동 배포
 #
 # 필요한 GitHub Secrets (Settings → Secrets and variables → Actions):
 #   - SUPABASE_ACCESS_TOKEN : supabase.com/dashboard/account/tokens 에서 발급
-#                             ⚠️ 계정 전체 권한(모든 프로젝트 관리 가능) — 절대 공개 금지
+#                             ⚠️ 계정 전체 권한 — 절대 공개 금지
 #   - SUPABASE_DB_PASSWORD  : 프로젝트 생성 시 설정한 DB 비밀번호
-#                             (Project Settings → Database → Reset database password 로 재설정 가능)
-#   - SUPABASE_URL          : 이미 등록되어 있음(콘텐츠 큐 동기화용) — 여기서 project ref 추출에 재사용
+#                             (Project Settings → Database → Reset database password)
+#
+# project ref는 비밀이 아닙니다(브라우저에서 쓰는 공개 URL의 일부).
+# 그래서 시크릿이 아니라 supabase/config.toml 의 project_id 에서 읽습니다.
+# 예전 버전은 SUPABASE_URL 시크릿에 의존해, 그 시크릿이 없으면
+# 첫 단계에서 바로 실패했습니다(실제로 두 번 실패).
 
 on:
   push:
@@ -16,6 +20,7 @@ on:
     paths:
       - "supabase/migrations/**"
       - "supabase/config.toml"
+      - ".github/workflows/supabase-deploy.yml"
   workflow_dispatch: {}
 
 jobs:
@@ -28,28 +33,53 @@ jobs:
         with:
           version: latest
 
-      - name: 프로젝트 ref 추출 (SUPABASE_URL에서)
-        id: ref
+      - name: 필요한 시크릿 확인
+        env:
+          TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          DBPW: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
-          URL="${{ secrets.SUPABASE_URL }}"
-          if [ -z "$URL" ]; then
-            echo "SUPABASE_URL 시크릿이 없습니다. 대시보드 앱에서 먼저 등록하세요." >&2
+          MISSING=""
+          [ -z "$TOKEN" ] && MISSING="$MISSING SUPABASE_ACCESS_TOKEN"
+          [ -z "$DBPW" ]  && MISSING="$MISSING SUPABASE_DB_PASSWORD"
+          if [ -n "$MISSING" ]; then
+            echo "::error::GitHub Secrets가 없습니다:$MISSING"
+            echo "등록 위치: 저장소 → Settings → Secrets and variables → Actions → New repository secret"
+            echo "또는 Scripto 앱 → 설정 → 고급 → Supabase 연동 → '4-5) GitHub에 자동 등록'"
             exit 1
           fi
-          REF=$(echo "$URL" | sed -E 's#https?://([a-z0-9]+)\.supabase\.co.*#\1#')
-          if [ -z "$REF" ] || [ "$REF" = "$URL" ]; then
-            echo "SUPABASE_URL에서 project ref를 추출하지 못했습니다: $URL" >&2
+          echo "시크릿 확인 완료"
+
+      - name: 프로젝트 ref 확인 (config.toml)
+        id: ref
+        run: |
+          REF=$(grep -E '^\s*project_id\s*=' supabase/config.toml | head -1 | sed -E 's/.*=\s*"([^"]+)".*/\1/')
+          # config.toml에 없으면 예전 방식(SUPABASE_URL 시크릿)으로 한 번 더 시도
+          if [ -z "$REF" ] || [ "$REF" = "scripto" ]; then
+            URL="${{ secrets.SUPABASE_URL }}"
+            REF=$(echo "$URL" | sed -E 's#https?://([a-z0-9]+)\.supabase\.co.*#\1#')
+          fi
+          if [ -z "$REF" ] || ! echo "$REF" | grep -qE '^[a-z0-9]{20}$'; then
+            echo "::error::project ref를 찾지 못했습니다. supabase/config.toml의 project_id를 확인하세요. (읽은 값: '$REF')"
             exit 1
           fi
           echo "ref=$REF" >> "$GITHUB_OUTPUT"
+          echo "project ref: $REF"
 
       - name: Supabase 프로젝트 연결
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: supabase link --project-ref "${{ steps.ref.outputs.ref }}"
 
       - name: 마이그레이션 배포 (db push)
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: supabase db push
+        run: supabase db push --include-all
+
+      - name: 반영된 마이그레이션 목록
+        if: always()
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase migration list || true

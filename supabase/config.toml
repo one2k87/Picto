@@ -7,7 +7,7 @@
 # (로컬에서 `supabase start`로 전체 스택을 띄우고 싶다면 `supabase init`으로
 # 새 config.toml을 받아 참고하세요.)
 
-project_id = "scripto"
+project_id = "nsojjjwbaddasdnknekc"
 
 [db]
 major_version = 17
