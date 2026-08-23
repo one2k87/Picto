@@ -473,7 +473,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v42 · 페이지 전환 + 스와이프</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v43 · 페이지 전환 + 스와이프</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2856,7 +2856,9 @@ function gotoTab(k){
   let x0=0,y0=0,t0=0,tracking=false;
   const START=el=>{
     // 가로 스크롤 영역이나 입력 중일 땐 스와이프를 잡지 않는다
-    return !el.closest("input,textarea,select,.filters");
+    // (target이 document/텍스트노드일 수도 있으므로 방어적으로 처리)
+    if(!el||typeof el.closest!=="function") return true;
+    return !el.closest("input,textarea,select,.filters,.grp-h");
   };
   document.addEventListener("touchstart",e=>{
     if(e.touches.length!==1||!START(e.target)) { tracking=false; return; }
