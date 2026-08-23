@@ -14,12 +14,30 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
 <style>
+  /* 파스텔 라벤더 · 다크(기본) — 보라를 기조로 표면까지 은은하게 물들인 톤 */
   :root{
-    --bg:#0f1115; --card:#181b22; --card2:#1f232c; --line:#2a2f3a;
-    --txt:#e7e9ee; --muted:#9aa3b2; --hot:#ff6b4a; --niche:#4aa3ff;
-    --ok:#33c27f; --warn:#f0b429; --accent:#7c5cff; --danger:#ff5a6e;
+    --bg:#141020; --card:#1d1830; --card2:#26203c; --line:#332b4d;
+    --txt:#efeaf9; --muted:#a79dc4; --hot:#f2a08c; --niche:#9fc4f0;
+    --ok:#9fd8b4; --warn:#f5cf94; --accent:#b9a3f0; --accent-2:#8f74e0;
+    --danger:#f0a0ad; --glow:rgba(185,163,240,.30);
     --safe-t:env(safe-area-inset-top); --safe-b:env(safe-area-inset-bottom);
   }
+  /* 파스텔 라벤더 · 라이트 */
+  html[data-theme="light"]{
+    --bg:#f8f5fd; --card:#ffffff; --card2:#f2ecfb; --line:#e4daf6;
+    --txt:#2d2542; --muted:#7a6f96; --hot:#e08571; --niche:#6d9fd8;
+    --ok:#5cae7d; --warn:#d69b3f; --accent:#8b6ee0; --accent-2:#a98ef0;
+    --danger:#d97186; --glow:rgba(139,110,224,.22);
+  }
+  html[data-theme="light"] header{background:rgba(248,245,253,.9) !important}
+  html[data-theme="light"] .tabbar{background:rgba(255,255,255,.94)}
+  html[data-theme="light"] .tb.active{color:var(--accent-2)}
+  html[data-theme="light"] .ptab.active,html[data-theme="light"] .chip.active,
+  html[data-theme="light"] .st.active,html[data-theme="light"] .dnext{
+    background:#efe7fd;color:var(--accent-2)}
+  html[data-theme="light"] .install-bar{background:#efe7fd}
+  html[data-theme="light"] .install-bar b{color:var(--accent-2)}
+  html[data-theme="light"] .skel{background:linear-gradient(90deg,#f2ecfb 25%,#e8dff8 50%,#f2ecfb 75%)}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{margin:0;background:var(--bg);color:var(--txt);
     font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",sans-serif;
@@ -187,6 +205,62 @@
     transition:stroke-dashoffset .7s cubic-bezier(.4,0,.2,1)}
   .ring .rtxt{font-size:12px;color:var(--muted);line-height:1.5;min-width:0}
   .ring .rtxt b{display:block;font-size:15px;color:var(--txt)}
+
+  /* ── 세련도 보정: 부드러운 그림자·눌림·전환 ── */
+  .card{transition:transform .16s cubic-bezier(.34,1.4,.64,1),border-color .16s,box-shadow .16s}
+  .card:active{transform:scale(.988)}
+  .btn{transition:transform .14s cubic-bezier(.34,1.4,.64,1),background .16s,border-color .16s}
+  .btn:active{transform:scale(.96)}
+  .grp{transition:border-color .18s}
+  .grp.open{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+  .st,.chip,.ptab{transition:background .16s,color .16s,border-color .16s,transform .12s}
+  .st:active,.chip:active,.ptab:active{transform:scale(.96)}
+  .tb .i{transition:transform .2s cubic-bezier(.34,1.5,.6,1)}
+  .tb.active .i{transform:translateY(-2px) scale(1.08)}
+  .dcard{transition:border-color .16s}
+  .dcard:active{border-color:var(--accent)}
+
+  /* ── 글 카드 상태 색띠: 목록에서 상태를 색으로 먼저 읽는다 ── */
+  .card{position:relative;padding-left:16px}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+    background:var(--line);border-radius:16px 0 0 16px}
+  .card.s-pub::before{background:var(--ok)}
+  .card.s-draft::before{background:var(--accent)}
+  .card.s-hold::before{background:var(--warn)}
+  .card.s-fail::before{background:var(--danger)}
+
+  /* ── 스파크라인 ── */
+  .spark{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+  .spark .sh{display:flex;align-items:baseline;gap:8px;font-size:11px;color:var(--muted);margin-bottom:6px}
+  .spark .sh b{font-size:15px;color:var(--txt)}
+  .spark svg{width:100%;height:46px;display:block;overflow:visible}
+  .spark .sline{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray:1000;stroke-dashoffset:1000;animation:draw 1.1s ease-out forwards}
+  .spark .sarea{fill:var(--glow);opacity:0;animation:fadeIn .8s .3s ease-out forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes fadeIn{to{opacity:1}}
+
+  /* ── 진행 스텝 인디케이터 ── */
+  .steps{display:flex;align-items:center;gap:0;margin:12px 0 6px}
+  .stp{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;min-width:0}
+  .stp::before{content:"";position:absolute;top:9px;left:-50%;width:100%;height:2px;background:var(--line)}
+  .stp:first-child::before{display:none}
+  .stp.done::before,.stp.cur::before{background:var(--accent)}
+  .stp .sd{width:19px;height:19px;border-radius:50%;background:var(--card2);
+    border:2px solid var(--line);z-index:1;display:grid;place-items:center;
+    font-size:10px;color:var(--muted);transition:.25s}
+  .stp.done .sd{background:var(--accent);border-color:var(--accent);color:#1a1430}
+  .stp.cur .sd{border-color:var(--accent);color:var(--accent);
+    box-shadow:0 0 0 4px var(--glow);animation:pulseDot 1.9s ease-in-out infinite}
+  .stp .sl{font-size:10px;color:var(--muted);white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .stp.cur .sl{color:var(--accent);font-weight:700}
+
+  /* ── 빈 화면 ── */
+  .emptyart{text-align:center;padding:28px 18px}
+  .emptyart svg{width:96px;height:96px;opacity:.9;margin-bottom:10px}
+  .emptyart .et{font-size:15px;font-weight:700;margin-bottom:4px}
+  .emptyart .es{font-size:12.5px;color:var(--muted);line-height:1.6}
 
   /* ── 미니 막대 차트 ── */
   .bars{display:flex;flex-direction:column;gap:6px;margin:8px 0}
@@ -542,7 +616,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v45 · 아이콘·시각화</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v46 · 파스텔 라벤더</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -810,6 +884,11 @@
 
   <div class="divider"></div>
   <h2 style="font-size:14px">🔧 앱 · 데이터</h2>
+  <div class="field">
+    <label>🎨 화면 테마</label>
+    <button class="btn sm" id="themeBtn" style="width:100%">라벤더 다크</button>
+    <div class="hint">파스텔 라벤더 톤. 눌러서 다크 ↔ 라이트를 전환합니다.</div>
+  </div>
   <div class="field">
     <label>🔓 자동 로그인</label>
     <button class="btn sm" id="autoLoginBtn" style="width:100%">자동 로그인 켜기</button>
@@ -1314,14 +1393,17 @@ function render(){
      +(DATA.total_all?" · 누적 "+DATA.total_all+"편":"")):"";
   const list=visible(),grid=document.getElementById("grid"),empty=document.getElementById("empty");
   if(!list.length){grid.innerHTML="";empty.style.display="block";
-    empty.innerHTML=arts.length?"이 필터에 해당하는 글이 없습니다.":
-      "표시할 글이 없습니다.<br><br>① 설정 ⚙️ 의 <b>데이터 주소</b>가 <code>.../data/latest.json</code> 로 정확한지,<br>② 방금 실행이 <b>글 0편</b>으로 끝나지 않았는지 확인하세요.<br><br>GitHub → Actions → 최근 실행 → <b>블로그 생성 실행</b> 로그에<br>‘글 0편’ 또는 ‘[오류] … 실패’ 가 있으면 <b>LLM 키/모델</b> 문제입니다.";return;}
+    empty.innerHTML=arts.length?emptyArt("filter"):(CFG.archiveBefore?emptyArt("archived"):
+      emptyArt("none"));return;}
   empty.style.display="none";
   grid.innerHTML=list.map((a,i)=>{
     const pub=a.status==="게시됨";
     const sCls=pub?"b-ok":(a.status==="게시실패"?"b-err":"b-wait");
     const links=(a.links||[]).map(l=>`<a href="${l.url}" target="_blank" rel="noopener">🔗 ${l.title||l.url}</a>`).join("");
-    return `<div class="card${SEL.has(a)?" sel":""}">
+    // 왼쪽 색띠로 상태를 먼저 읽히게 한다(게시=초록 / 초안=보라 / 보류=노랑 / 실패=빨강)
+    const stripe=pub?"s-pub":a.status==="게시실패"?"s-fail"
+      :(a.quality==="보류"||a.status==="품질보류"||a.status==="재생성대기")?"s-hold":"s-draft";
+    return `<div class="card ${stripe}${SEL.has(a)?" sel":""}">
       <div class="row">
         ${pub?"":`<input type="checkbox" class="cardchk" ${SEL.has(a)?"checked":""} onclick="toggleSel(${i})">`}
         ${a.category?`<span class="badge b-cat">📂 ${a.category}</span>`:""}
@@ -2880,6 +2962,22 @@ document.getElementById("usePwBtn").onclick=()=>{
   document.getElementById("faceUnlockBtn").style.display="none";
   document.getElementById("usePwBtn").style.display="none";
 };
+// ===== 테마 (파스텔 라벤더 다크/라이트) =====
+function applyTheme(){
+  const light=CFG.theme==="light";
+  document.documentElement.setAttribute("data-theme",light?"light":"dark");
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute("content",light?"#f8f5fd":"#141020");
+  const b=document.getElementById("themeBtn");
+  if(b) b.textContent=light?"라벤더 라이트":"라벤더 다크";
+}
+(function themeInit(){
+  applyTheme();
+  const b=document.getElementById("themeBtn");
+  if(b) b.onclick=()=>{ CFG.theme=(CFG.theme==="light")?"dark":"light"; saveCfg(); applyTheme();
+    toast(CFG.theme==="light"?"라이트 테마 ✓":"다크 테마 ✓"); };
+})();
+
 // ===== 페이지 전환 (UI 3-1) =====
 // 설정·승인·수익 시트를 '아래에서 올라오는 팝업'이 아니라 전체 화면 페이지로 바꾼다.
 // .sheet → .page 로 클래스만 교체하고, 기존 open/close 함수(=.open 토글)는 그대로 쓴다.
@@ -3004,6 +3102,58 @@ function animateRings(root){
     requestAnimationFrame(()=>{ c.style.strokeDashoffset=c.dataset.off; });
   });
 }
+// 빈 화면: 긴 안내문 대신 그림 + 한 줄 + 행동 하나
+function emptyArt(kind){
+  const art=`<svg viewBox="0 0 120 120" fill="none" aria-hidden="true">
+    <rect x="26" y="18" width="60" height="78" rx="9" stroke="var(--line)" stroke-width="3"/>
+    <path d="M38 40h36M38 55h30M38 70h22" stroke="var(--accent)" stroke-width="3.4" stroke-linecap="round" opacity=".55"/>
+    <circle cx="86" cy="84" r="19" fill="var(--card2)" stroke="var(--accent)" stroke-width="3"/>
+    <path d="M86 76v16M78 84h16" stroke="var(--accent)" stroke-width="3.4" stroke-linecap="round"/></svg>`;
+  const M={
+    filter:{t:"이 조건에 맞는 글이 없어요",
+      s:"위 필터를 <b>전체</b>로 바꾸면 다시 보입니다.",
+      b:`<button class="btn sm" style="margin-top:12px" onclick="fKind='all';document.querySelectorAll('.chip[data-f]').forEach(c=>c.classList.toggle('active',c.dataset.f==='all'));render();">전체 보기</button>`},
+    archived:{t:"목록을 비워둔 상태예요",
+      s:`${CFG.archiveBefore} 이전 글은 보관함에 있습니다.<br>발행을 다시 시작하면 새 글이 여기 나타납니다.`,
+      b:`<button class="btn sm" style="margin-top:12px" onclick="fKind='archive';document.querySelectorAll('.chip[data-f]').forEach(c=>c.classList.toggle('active',c.dataset.f==='archive'));render();">보관함 열기</button>`},
+    none:{t:"아직 만들어진 글이 없어요",
+      s:"설정에서 블로그와 AI 키를 연결한 뒤<br>상단 실행 버튼을 눌러보세요.",
+      b:`<button class="btn primary sm" style="margin-top:12px" onclick="gotoTab('set')">설정 열기</button>`},
+  };
+  const m=M[kind]||M.none;
+  return `<div class="emptyart">${art}<div class="et">${m.t}</div><div class="es">${m.s}</div>${m.b||""}</div>`;
+}
+// 일별 생성량 스파크라인 — 꾸준히 돌고 있는지 한눈에
+function sparkHtml(days){
+  const vals=days.map(d=>d[1]); if(!vals.length) return "";
+  const W=280,H=42,max=Math.max(1,...vals),n=vals.length;
+  const px=i=>n<2?0:i*(W/(n-1));
+  const py=v=>H-(v/max)*(H-4)-2;
+  const pts=vals.map((v,i)=>`${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(" ");
+  const area=`0,${H} ${pts} ${W},${H}`;
+  const total=vals.reduce((a,b)=>a+b,0);
+  const avg=Math.round(total/n*10)/10;
+  return `<div class="spark">
+    <div class="sh"><b>${total}편</b> 최근 ${n}일 · 하루 평균 ${avg}편</div>
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+      <polygon class="sarea" points="${area}"/>
+      <polyline class="sline" points="${pts}"/>
+    </svg></div>`;
+}
+function dailyCounts(arts,n){
+  const m={}; (arts||[]).forEach(a=>{const d=(a.date||"").slice(0,10); if(d) m[d]=(m[d]||0)+1;});
+  const keys=Object.keys(m).sort().slice(-(n||14));
+  return keys.map(k=>[k,m[k]]);
+}
+// 승인 진행 스텝
+function stepsHtml(cur){
+  const S=[["점검","check"],["준비","prep"],["신청","apply"],["심사중","review"],["승인","done"]];
+  const i=S.findIndex(s=>s[1]===cur);
+  return `<div class="steps">`+S.map((s,n)=>{
+    const cls=n<i?"done":n===i?"cur":"";
+    return `<div class="stp ${cls}"><div class="sd">${n<i?"✓":n+1}</div><div class="sl">${s[0]}</div></div>`;
+  }).join("")+`</div>`;
+}
 // 카테고리 분포 막대
 function barsHtml(pairs){
   const max=Math.max(1,...pairs.map(p=>p[1]));
@@ -3035,7 +3185,9 @@ function renderAdsDash(){
   const col=approved?"#33c27f":pct>=70?"#f0b429":"#ff6b4a";
   const desc=approved?"광고 게재 가능 상태입니다"
     :(m?`점검 ${m[1]}/${m[2]} 항목 통과`:"아직 점검을 실행하지 않았습니다");
+  const stage=approved?"done":(applies?"review":(m?(pct>=70?"apply":"prep"):"check"));
   box.innerHTML=
+    stepsHtml(stage)+
     ringHtml(pct,col,approved?"승인 완료":`준비도 ${pct}%`,desc)+
     `<div class="dash">
       <div class="dcard"><div class="dl">승인 상태</div>
@@ -3072,6 +3224,7 @@ function renderMoneyDash(){
       <div class="dcard"><div class="dl">글당 월 조회</div><div class="dv">${views||"-"}</div></div>
       <div class="dcard"><div class="dl">RPM</div><div class="dv">${rpm?won(rpm):"-"}</div></div>
     </div>
+    ${sparkHtml(dailyCounts(arts,14))}
     ${pairs.length?`<div class="dl" style="font-size:11px;color:var(--muted);margin-top:12px">카테고리 분포 (전체 ${arts.length}편)</div>`+barsHtml(pairs):""}
     ${pub===0?`<div class="dnext"><div class="dl">아직 공개된 글이 없습니다</div>
       <div class="dv">승인 후 발행을 시작하면 실제 수치가 쌓입니다</div></div>`:""}`;
