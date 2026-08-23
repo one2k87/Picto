@@ -685,7 +685,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v54 · 블로그 정리 러너</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v55 · 러너 오류 진단</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2639,24 +2639,62 @@ async function wpRunner(){
   // 1) 태그 전량 삭제
   if(!confirm(`태그 ${before.tags||0}개를 모두 삭제합니다.\n\n· 글은 삭제되지 않습니다(태그 연결만 끊김)\n· 복구되지 않습니다\n\n진행할까요?`)){
     say("사용자가 취소했습니다",false); return; }
-  say("태그 삭제 중…");
-  let del=0, fail=0, guard=0;
-  while(guard++<80){
+
+  // ── 먼저 딱 1개만 지워보고 실패하면 '왜'를 그대로 보여준다 ──
+  // 추측으로 재시도하면 원인을 영영 못 찾는다.
+  say("삭제 권한 확인 중… (1개 시험 삭제)");
+  let probe=null;
+  try{
+    const one=await (await fetch(base+"/wp-json/wp/v2/tags?per_page=1&_fields=id",{headers:H})).json();
+    if(Array.isArray(one)&&one.length){
+      const d=await fetch(`${base}/wp-json/wp/v2/tags/${one[0].id}?force=true`,{method:"DELETE",headers:H});
+      probe={status:d.status, ok:d.ok};
+      if(!d.ok){ probe.body=(await d.text()).slice(0,200); }
+    }
+  }catch(e){ probe={status:"network", body:String(e).slice(0,200)}; }
+
+  if(probe && !probe.ok){
+    const s=probe.status;
+    const hint =
+      s===401 ? "응용 프로그램 비밀번호가 틀렸거나 만료됐습니다. 워드프레스 → 사용자 → 프로필에서 새로 발급해 설정에 다시 넣으세요."
+      : s===403 ? "이 계정에 태그를 삭제할 권한(manage_categories)이 없습니다. 관리자 계정으로 발급한 응용 프로그램 비밀번호인지 확인하세요."
+      : s==="network" ? "브라우저가 워드프레스에 연결하지 못했습니다(CORS 또는 보안 플러그인 차단). 아래 '대안'을 보세요."
+      : `서버가 ${s}를 반환했습니다.`;
+    say(`시험 삭제 실패 (${s}) — ${hint}`,false);
+    box.innerHTML+=`<div class="dnext" style="margin-top:10px"><div class="dl">서버 응답 원문</div>
+      <div class="hint" style="word-break:break-all">${escAttr(probe.body||"(없음)")}</div></div>
+      <div class="dnext" style="margin-top:8px"><div class="dl">대안 — 워드프레스에서 직접 지우기</div>
+      <div class="dv" style="font-size:12.5px;line-height:1.7">
+      1. 워드프레스 관리자 → <b>글 → 태그</b><br>
+      2. 화면 오른쪽 위 <b>화면 옵션</b> → 페이지당 항목 수를 <b>999</b>로<br>
+      3. 제목 왼쪽 <b>체크박스 전체 선택</b> → 일괄 작업 <b>삭제</b> → 적용<br>
+      4. 2~3번을 태그가 0이 될 때까지 반복 (1,976개면 두세 번)</div></div>`;
+    return;
+  }
+  let del=probe&&probe.ok?1:0, fail=0, guard=0;
+
+  // 순차 삭제는 2,000개에 10분 넘게 걸리고, 그 사이 모바일 브라우저가
+  // 백그라운드 탭을 잠재우면 중간에 멈춘다. 5개씩 병렬로 보내 시간을 줄인다.
+  say(`태그 삭제 중… (총 ${before.tags||0}개, 몇 분 걸립니다)`);
+  while(guard++<120){
     let list=[];
     try{
       const r=await fetch(base+"/wp-json/wp/v2/tags?per_page=100&_fields=id",{headers:H});
-      if(!r.ok) break; list=await r.json();
-    }catch(e){ break; }
+      if(!r.ok){ say(`목록 조회 실패 (${r.status})`,false); break; }
+      list=await r.json();
+    }catch(e){ say("목록 조회 중 연결 끊김 — 다시 눌러 이어서 진행하세요",false); break; }
     if(!Array.isArray(list)||!list.length) break;
-    for(const t of list){
-      try{ // 태그는 force=true여야 삭제됨(휴지통 개념 없음). 글에는 영향 없음.
-        const d=await fetch(`${base}/wp-json/wp/v2/tags/${t.id}?force=true`,{method:"DELETE",headers:H});
-        d.ok?del++:fail++;
-      }catch(e){ fail++; }
+    for(let i=0;i<list.length;i+=5){
+      const chunk=list.slice(i,i+5);
+      const res=await Promise.all(chunk.map(t=>
+        fetch(`${base}/wp-json/wp/v2/tags/${t.id}?force=true`,{method:"DELETE",headers:H})
+          .then(d=>d.ok).catch(()=>false)));
+      res.forEach(ok=>ok?del++:fail++);
+      say(`태그 삭제 중… ${del} / ${before.tags||0}${fail?` (실패 ${fail})`:""}`);
     }
-    say(`태그 삭제 중… ${del}개 완료${fail?` (실패 ${fail})`:""}`);
+    if(fail>50){ say(`실패가 ${fail}건이라 중단합니다. 위 '대안'으로 진행하세요`,false); break; }
   }
-  say(`태그 ${del}개 삭제 완료${fail?` · 실패 ${fail}`:""}`, fail===0);
+  say(`태그 ${del}개 삭제${fail?` · 실패 ${fail}`:" 완료"}`, fail===0);
 
   // 2) 빈 카테고리 삭제
   say("빈 카테고리 정리 중…");
