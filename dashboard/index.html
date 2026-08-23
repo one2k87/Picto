@@ -741,7 +741,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v79 · 설정탭 먹통 수정</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v80 · 설정 항목 소실 수정</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1740,49 +1740,53 @@ document.getElementById("licVerify").onclick=async()=>{
   }else{ toast(res.msg||"확인 실패",1); }
 };
 
+// 요소가 없어도 나머지 초기화가 계속되도록 하는 안전한 대입
+function _sv(id,v){ const e=document.getElementById(id); if(e) e.value=v; return !!e; }
+function _sc(id,v){ const e=document.getElementById(id); if(e) e.checked=!!v; return !!e; }
+
 function openSheet(){
-  document.getElementById("cfgLicense").value=CFG.license||"";
+  _sv("cfgLicense",CFG.license||"");
   const rr=(CFG.trafficRatio!=null?CFG.trafficRatio:30);
-  document.getElementById("cfgRatio").value=rr; ratioLabel(rr);
+  _sv("cfgRatio",rr); ratioLabel(rr);
   applyPlanUI(); renderCatEditor(); refreshFaceBtn();
   const sf=CFG.safety||{};
-  document.getElementById("cfgStrength").value=sf.strength||"표준";
-  document.getElementById("cfgForceDraft").checked=(sf.force_draft!==false);
-  document.getElementById("cfgRelink").checked=!!sf.relink_old;
-  document.getElementById("cfgVerify").value=sf.verify_accuracy||"flag";
-  document.getElementById("cfgRefresh").value=String(sf.refresh_days!=null?sf.refresh_days:0);
-  document.getElementById("cfgDrip").value=((sf.drip_min_hours||0)+"-"+(sf.drip_max_hours||0));
-  document.getElementById("cfgMinChars").value=sf.min_chars||"";
-  document.getElementById("cfgMaxSim").value=(sf.max_similarity!=null?sf.max_similarity:"");
-  document.getElementById("cfgData").value=CFG.dataUrl||"";
-  document.getElementById("cfgGhOwner").value=CFG.ghOwner||"";
-  document.getElementById("cfgGhRepo").value=CFG.ghRepo||"";
-  document.getElementById("cfgGhToken").value=CFG.ghToken||"";
-  document.getElementById("cfgGenImages").checked=(CFG.genImages!==false);
+  _sv("cfgStrength",sf.strength||"표준");
+  _sc("cfgForceDraft",(sf.force_draft!==false));
+  _sc("cfgRelink",!!sf.relink_old);
+  _sv("cfgVerify",sf.verify_accuracy||"flag");
+  _sv("cfgRefresh",String(sf.refresh_days!=null?sf.refresh_days:0));
+  _sv("cfgDrip",((sf.drip_min_hours||0)+"-"+(sf.drip_max_hours||0)));
+  _sv("cfgMinChars",sf.min_chars||"");
+  _sv("cfgMaxSim",(sf.max_similarity!=null?sf.max_similarity:""));
+  _sv("cfgData",CFG.dataUrl||"");
+  _sv("cfgGhOwner",CFG.ghOwner||"");
+  _sv("cfgGhRepo",CFG.ghRepo||"");
+  _sv("cfgGhToken",CFG.ghToken||"");
+  _sc("cfgGenImages",(CFG.genImages!==false));
   refreshPauseBtn();
-  document.getElementById("cfgSite").value=CFG.site||"";
-  document.getElementById("cfgUser").value=CFG.user||"";
-  document.getElementById("cfgPass").value=CFG.pass||"";
-  document.getElementById("cfgStatus").value=CFG.status||"draft";
-  document.getElementById("cfgCoupang").checked=!!(CFG.coupang&&CFG.coupang.enabled);
-  document.getElementById("cfgCoupangWidget").value=(CFG.coupang&&CFG.coupang.widget_html)||"";
-  document.getElementById("cfgAffiliate").checked=!!(CFG.affiliate&&CFG.affiliate.enabled);
-  document.getElementById("cfgAffiliateLinks").value=linksToLines((CFG.affiliate&&CFG.affiliate.links)||[]);
-  document.getElementById("cfgContactEmail").value=CFG.contactEmail||"";
+  _sv("cfgSite",CFG.site||"");
+  _sv("cfgUser",CFG.user||"");
+  _sv("cfgPass",CFG.pass||"");
+  _sv("cfgStatus",CFG.status||"draft");
+  _sc("cfgCoupang",!!(CFG.coupang&&CFG.coupang.enabled));
+  _sv("cfgCoupangWidget",(CFG.coupang&&CFG.coupang.widget_html)||"");
+  _sc("cfgAffiliate",!!(CFG.affiliate&&CFG.affiliate.enabled));
+  _sv("cfgAffiliateLinks",linksToLines((CFG.affiliate&&CFG.affiliate.links)||[]));
+  _sv("cfgContactEmail",CFG.contactEmail||"");
   ensurePersona(false);                      // 비어 있으면 주제에 맞춰 자동으로 채운다
-  document.getElementById("cfgAuthorName").value=CFG.author||"";
-  document.getElementById("cfgAuthorBio").value=CFG.authorBio||"";
-  document.getElementById("cfgAuthorType").value=CFG.authorType||"Person";
+  _sv("cfgAuthorName",CFG.author||"");
+  _sv("cfgAuthorBio",CFG.authorBio||"");
+  _sv("cfgAuthorType",CFG.authorType||"Person");
   refreshArchLbl();
-  document.getElementById("cfgSyncUrl").value=CFG.supabaseUrl||"";
-  document.getElementById("cfgSyncKey").value=CFG.syncKey||"";
-  document.getElementById("cfgSyncPass").value=CFG.syncPass||"";
+  _sv("cfgSyncUrl",CFG.supabaseUrl||"");
+  _sv("cfgSyncKey",CFG.syncKey||"");
+  _sv("cfgSyncPass",CFG.syncPass||"");
   renderSyncBox();
-  document.getElementById("cfgSupaUrl").value=CFG.supabaseUrl||"";
-  document.getElementById("cfgSupaKey").value="";
-  document.getElementById("cfgSupaAccessToken").value="";
-  document.getElementById("cfgSupaDbPassword").value="";
-  document.getElementById("cfgIndexnow").value=(CFG.safety&&CFG.safety.indexnow_key)||"";
+  _sv("cfgSupaUrl",CFG.supabaseUrl||"");
+  _sv("cfgSupaKey","");
+  _sv("cfgSupaAccessToken","");
+  _sv("cfgSupaDbPassword","");
+  _sv("cfgIndexnow",(CFG.safety&&CFG.safety.indexnow_key)||"");
   fillSitemap(CFG.site||"");
   document.getElementById("sheetBg").classList.add("open");
   document.getElementById("sheet").classList.add("open");}
@@ -4868,9 +4872,16 @@ function settingsToSubtabs(){
   bar.innerHTML=secs.map(s=>`<button class="st" type="button" data-k="${s.k}">${escAttr(s.label)}</button>`).join("");
   if(title&&title.nextSibling) page.insertBefore(bar,title.nextSibling); else page.prepend(bar);
   bar.after(hint);
-  // 저장/닫기 버튼 줄은 항상 아래에 남기고, 그 앞에 섹션을 넣는다
-  const tail=page.querySelector(".actions");
-  secs.forEach(s=>{ if(tail) page.insertBefore(s.el,tail); else page.appendChild(s.el); });
+  // 저장/닫기 버튼 줄은 항상 아래에 남기고, 그 앞에 섹션을 넣는다.
+  // ⚠️ querySelector(".actions")를 쓰면 안 된다 — 다른 블록 안에 있는 버튼 줄이
+  //    먼저 잡히고, 그건 #sheet의 직계 자식이 아니라 insertBefore가 예외를 던진다.
+  //    그러면 설정 항목이 통째로 화면에 붙지 못하고 사라진다(실제 발생).
+  const tail=[...page.children].find(el=>el.classList
+    && el.classList.contains("actions") && el.querySelector("#cfgSave"));
+  secs.forEach(s=>{
+    try{ if(tail&&tail.parentNode===page) page.insertBefore(s.el,tail); else page.appendChild(s.el); }
+    catch(e){ page.appendChild(s.el); }
+  });
   SUBTABS.sheet={tabs:secs.map(s=>({k:s.k,label:s.label})),home:"g0"};
   bar.querySelectorAll(".st").forEach(b=>b.onclick=()=>showSub("sheet",b.dataset.k));
   page.dataset.subtabbed="1";
