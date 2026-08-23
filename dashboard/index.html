@@ -90,6 +90,27 @@
   #sheetBg,#statsBg,#adsBg{display:none !important}   /* 페이지엔 배경 덮개 불필요 */
   .page .actions>button[id$="Close"]{display:none}     /* 하단 탭으로 이동하므로 닫기 버튼 숨김 */
 
+  /* ── 상단 보조탭(3-2): 스크롤해도 사라지지 않게 고정 + 좌우 스와이프 ── */
+  .subtabs{position:sticky;top:0;z-index:18;display:flex;gap:4px;
+    padding:8px 0 8px;margin:0 0 4px;background:var(--bg);
+    border-bottom:1px solid var(--line);overflow:hidden}
+  .st{flex:1 1 0;min-width:0;padding:7px 4px;font-size:12px;border:1px solid var(--line);
+    background:var(--card);color:var(--muted);border-radius:9px;cursor:pointer;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+  .st.active{color:#fff;border-color:var(--accent);background:#241f3d}
+  .sub-sec{display:none}
+  .sub-sec.on{display:block}
+  .swipehint{font-size:10.5px;color:var(--muted);text-align:center;padding:2px 0 6px}
+  /* 현황 대시보드 카드 */
+  .dash{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+  .dcard{background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:10px 12px;min-width:0}
+  .dcard .dl{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dcard .dv{font-size:21px;font-weight:700;margin-top:2px;line-height:1.15;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dnext{border:1px solid var(--accent);background:#241f3d;border-radius:11px;padding:10px 12px;margin:10px 0}
+  .dnext .dl{font-size:11px;color:#b3a4ff}
+  .dnext .dv{font-size:14px;font-weight:700;margin-top:3px}
+
   /* ── 하단 탭바(2단계): 자주 쓰는 이동을 엄지가 닿는 곳으로 ── */
   .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:none;
     grid-template-columns:repeat(4,1fr);gap:0;
@@ -473,7 +494,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v43 · 페이지 전환 + 스와이프</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v44 · 상단 보조탭 + 현황 대시보드</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2838,8 +2859,119 @@ function syncViews(){
   mv.style.display=anyOpen?"none":"";
 }
 
-// ===== 좌우 스와이프로 탭 이동 =====
-// 첫 탭(글)에서 오른쪽으로 밀면 메인으로 빠져나온다.
+// ===== 상단 보조탭 (UI 3-2) =====
+// 한 화면을 길게 스크롤하는 대신, 목적별로 나눠 상단 탭으로 오간다.
+// 탭 줄은 sticky로 고정돼 아래로 스크롤해도 늘 손에 닿는다.
+const SUBTABS={
+  adsSheet:{
+    tabs:[
+      {k:"now",  label:"현황"},
+      {k:"check",label:"점검", ids:["adsCheck"]},
+      {k:"prep", label:"준비", ids:["adsMakePages","adsReviewMode","adsPlugScan"]},
+      {k:"apply",label:"신청", ids:["adsGuide","adsAnalyze","adsLogApply","adsTrackBtn"]},
+    ],
+    home:"now", render:()=>renderAdsDash(),
+  },
+  statsSheet:{
+    tabs:[
+      {k:"now",  label:"현황"},
+      {k:"guess",label:"가정값", ids:["stViews","stRpm"]},
+      {k:"real", label:"실측",   ids:["stRealViews","stRealRev","stWpCount"]},
+    ],
+    home:"now", render:()=>renderMoneyDash(),
+  },
+};
+function buildSubtabs(pageId){
+  const page=document.getElementById(pageId), cfg=SUBTABS[pageId];
+  if(!page||!cfg||page.dataset.subtabbed) return;
+  const title=page.querySelector("h2");
+  const fields=[...page.children].filter(el=>el!==title&&!el.classList.contains("subtabs"));
+  // 각 탭의 소속 판정: 지정된 id를 품고 있는 블록을 그 탭으로 보낸다
+  const owner=el=>{
+    for(const t of cfg.tabs){ if(t.ids&&t.ids.some(id=>el.querySelector&&el.querySelector("#"+id))) return t.k; }
+    return null;
+  };
+  const secs={}; cfg.tabs.forEach(t=>{
+    const d=document.createElement("div"); d.className="sub-sec"; d.dataset.k=t.k; secs[t.k]=d;
+  });
+  let lastK=cfg.home;
+  fields.forEach(el=>{
+    const k=owner(el); if(k) lastK=k;
+    // id가 안 잡히는 부속 블록(결과 표시 영역 등)은 직전 탭에 붙인다
+    secs[k||lastK].appendChild(el);
+  });
+  const bar=document.createElement("div"); bar.className="subtabs";
+  bar.innerHTML=cfg.tabs.map(t=>`<button class="st" type="button" data-k="${t.k}">${t.label}</button>`).join("");
+  const hint=document.createElement("div");
+  hint.className="swipehint"; hint.textContent="← 좌우로 밀어 탭 이동 →";
+  if(title&&title.nextSibling) page.insertBefore(bar,title.nextSibling); else page.prepend(bar);
+  bar.after(hint);
+  Object.values(secs).forEach(d=>page.appendChild(d));
+  bar.querySelectorAll(".st").forEach(b=>b.onclick=()=>showSub(pageId,b.dataset.k));
+  page.dataset.subtabbed="1"; page.dataset.sub=cfg.home;
+  showSub(pageId,cfg.home);
+}
+function showSub(pageId,k){
+  const page=document.getElementById(pageId), cfg=SUBTABS[pageId]; if(!page||!cfg) return;
+  page.dataset.sub=k;
+  page.querySelectorAll(".subtabs .st").forEach(b=>b.classList.toggle("active",b.dataset.k===k));
+  page.querySelectorAll(".sub-sec").forEach(d=>d.classList.toggle("on",d.dataset.k===k));
+  if(k===cfg.home&&cfg.render){ try{ cfg.render(); }catch(e){ console.warn(e); } }
+  window.scrollTo({top:0,behavior:"instant"});
+}
+function moveSub(pageId,dir){
+  const cfg=SUBTABS[pageId], page=document.getElementById(pageId); if(!cfg||!page) return false;
+  const ks=cfg.tabs.map(t=>t.k), i=ks.indexOf(page.dataset.sub||cfg.home);
+  const n=i+dir;
+  if(n<0||n>=ks.length) return false;
+  showSub(pageId,ks[n]); return true;
+}
+
+// ===== 현황 대시보드 =====
+function renderAdsDash(){
+  const page=document.getElementById("adsSheet");
+  let box=page.querySelector("#adsDash");
+  if(!box){ box=document.createElement("div"); box.id="adsDash";
+    page.querySelector('.sub-sec[data-k="now"]').prepend(box); }
+  const log=adsLog(), applies=log.filter(x=>x.kind==="apply").length;
+  const approved=!!CFG.adsenseApproved;
+  const posts=(DATA&&DATA.articles)?DATA.articles.filter(a=>a.status==="게시됨").length:0;
+  const next=approved?"수익 최적화 켜고 발행 재개":(applies?"반려 사유를 ④에 붙여넣어 원인 확인":"① 점검에서 템플릿성 4항목 통과시키기");
+  box.innerHTML=`
+    <div class="dash">
+      <div class="dcard"><div class="dl">승인 상태</div>
+        <div class="dv" style="color:${approved?"#33c27f":"#f0b429"}">${approved?"승인 완료":"심사 전"}</div></div>
+      <div class="dcard"><div class="dl">신청 횟수</div><div class="dv">${applies}회</div></div>
+      <div class="dcard"><div class="dl">공개 발행 글</div><div class="dv">${posts}편</div></div>
+      <div class="dcard"><div class="dl">기준 갱신</div><div class="dv" style="font-size:13px">${(ADS_RULES&&ADS_RULES.version)||"-"}</div></div>
+    </div>
+    <div class="dnext"><div class="dl">다음 할 일</div><div class="dv">${escAttr(next)}</div></div>`;
+}
+function renderMoneyDash(){
+  const page=document.getElementById("statsSheet");
+  let box=page.querySelector("#moneyDash");
+  if(!box){ box=document.createElement("div"); box.id="moneyDash";
+    page.querySelector('.sub-sec[data-k="now"]').prepend(box); }
+  const arts=(DATA&&DATA.articles)||[];
+  const pub=arts.filter(a=>a.status==="게시됨").length;
+  const won=n=>"₩"+Math.round(n||0).toLocaleString("ko-KR");
+  const realRev=+(CFG.stRealRev||0), views=+(CFG.stViews||0), rpm=+(CFG.stRpm||0);
+  const est=realRev>0?realRev:Math.round(pub*views*rpm/1000);
+  const ad=(typeof INS!=="undefined"&&INS&&INS.adsense)?INS.adsense:null;
+  const shown=ad&&ad.earnings?ad.earnings:est;
+  const basis=ad&&ad.earnings?"애드센스 실측":realRev>0?"직접 입력값":"가정값 추정";
+  box.innerHTML=`
+    <div class="dash">
+      <div class="dcard"><div class="dl">월 수익 (${basis})</div><div class="dv">${won(shown)}</div></div>
+      <div class="dcard"><div class="dl">공개 발행 글</div><div class="dv">${pub}편</div></div>
+      <div class="dcard"><div class="dl">글당 월 조회</div><div class="dv">${views||"-"}</div></div>
+      <div class="dcard"><div class="dl">RPM</div><div class="dv">${rpm?won(rpm):"-"}</div></div>
+    </div>
+    ${pub===0?`<div class="dnext"><div class="dl">아직 공개된 글이 없습니다</div>
+      <div class="dv">애드센스 승인 후 발행을 시작하면 여기에 실제 수치가 쌓입니다</div></div>`:""}`;
+}
+
+// ===== 하단 탭은 클릭 전용 / 스와이프는 상단 보조탭에만 =====
 const SWIPE_ORDER=["list","ads","stats","set"];
 function gotoTab(k){
   const bar=document.getElementById("tabbar"); if(!bar) return;
@@ -2849,6 +2981,11 @@ function gotoTab(k){
   if(k==="set") openSheet();
   else if(k==="stats") openStats();
   else if(k==="ads") openAds();
+  // 보조탭은 페이지를 처음 열 때 만들고, 이후엔 항상 '현황'부터 보여준다
+  if(k==="ads"||k==="stats"){
+    const pid=k==="ads"?"adsSheet":"statsSheet";
+    setTimeout(()=>{ buildSubtabs(pid); showSub(pid,SUBTABS[pid].home); },60);
+  }
   syncViews(); syncTabbar();
   window.scrollTo({top:0,behavior:"instant"});   // 탭 바꾸면 항상 맨 위부터
 }
@@ -2870,11 +3007,16 @@ function gotoTab(k){
     const dx=t.clientX-x0, dy=t.clientY-y0, dt=Date.now()-t0;
     if(dt>600) return;                                   // 너무 느리면 스크롤로 간주
     if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.6) return;
+    // 하단 탭은 항상 화면에 있으니 클릭으로 쓰고, 스와이프는 상단 보조탭 전용.
     const cur=currentTab();
-    const i=SWIPE_ORDER.indexOf(cur);
-    if(i<0) return;
-    if(dx<0){ if(i<SWIPE_ORDER.length-1) gotoTab(SWIPE_ORDER[i+1]); }   // 왼쪽으로 밀기 → 다음 탭
-    else    { if(i>0) gotoTab(SWIPE_ORDER[i-1]); else gotoTab("list"); } // 오른쪽 → 이전 탭 / 첫 탭이면 메인
+    const pageId=cur==="ads"?"adsSheet":cur==="stats"?"statsSheet":null;
+    if(!pageId) return;                                  // 메인·설정에서는 스와이프 없음
+    const page=document.getElementById(pageId);
+    const cfg=SUBTABS[pageId];
+    const dir=dx<0?1:-1;
+    if(moveSub(pageId,dir)) return;
+    // 첫 보조탭에서 더 오른쪽으로 밀면 메인으로 빠져나온다
+    if(dir===-1&&page.dataset.sub===cfg.home) gotoTab("list");
   },{passive:true});
 })();
 
