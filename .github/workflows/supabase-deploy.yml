@@ -27,7 +27,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: supabase/setup-cli@v2
         with:
@@ -64,6 +64,29 @@ jobs:
           fi
           echo "ref=$REF" >> "$GITHUB_OUTPUT"
           echo "project ref: $REF"
+
+      - name: 비밀번호 형태 점검 (값은 출력하지 않음)
+        env:
+          DBPW: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          # 비밀번호가 틀린 것인지, 공백/줄바꿈이 섞인 것인지 구분하기 위한 진단.
+          # 값 자체는 절대 찍지 않고 '모양'만 본다.
+          LEN=${#DBPW}
+          TRIMMED=$(printf '%s' "$DBPW" | tr -d '[:space:]')
+          TLEN=${#TRIMMED}
+          echo "길이: $LEN 자"
+          if [ "$LEN" -ne "$TLEN" ]; then
+            echo "::warning::공백 또는 줄바꿈이 $((LEN-TLEN))자 섞여 있습니다. 이것만으로도 인증이 실패합니다."
+          else
+            echo "공백/줄바꿈 없음"
+          fi
+          case "$DBPW" in
+            *[!a-zA-Z0-9]* ) echo "특수문자 포함됨" ;;
+            * ) echo "영문·숫자만" ;;
+          esac
+          if [ "$LEN" -lt 8 ]; then
+            echo "::error::비밀번호가 너무 짧습니다($LEN자). 잘못된 값일 가능성이 큽니다."
+          fi
 
       - name: Supabase 프로젝트 연결
         env:
