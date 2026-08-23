@@ -23,7 +23,7 @@
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{margin:0;background:var(--bg);color:var(--txt);
     font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",sans-serif;
-    padding-bottom:calc(72px + var(--safe-b));}
+    padding-bottom:calc(66px + var(--safe-b));}
   header{position:sticky;top:0;z-index:20;background:rgba(15,17,21,.92);
     backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid var(--line);
     padding:calc(10px + var(--safe-t)) 12px 10px;display:flex;align-items:center;gap:6px;
@@ -80,6 +80,22 @@
     color:var(--muted);border-radius:9px;cursor:pointer;white-space:nowrap;
     overflow:hidden;text-overflow:ellipsis}
   .ptab.active{color:#fff;border-color:var(--accent);background:#241f3d}
+
+  /* ── 하단 탭바(2단계): 자주 쓰는 이동을 엄지가 닿는 곳으로 ── */
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:none;
+    grid-template-columns:repeat(4,1fr);gap:0;
+    background:rgba(15,17,21,.96);backdrop-filter:saturate(140%) blur(10px);
+    border-top:1px solid var(--line);padding-bottom:var(--safe-b)}
+  .tabbar.on{display:grid}
+  .tb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    padding:8px 2px 6px;background:none;border:0;color:var(--muted);cursor:pointer;
+    font-size:10.5px;line-height:1.2;min-height:52px}
+  .tb .tbi{font-size:19px;line-height:1}
+  .tb.active{color:#fff}
+  .tb.active .tbi{filter:drop-shadow(0 0 6px rgba(124,92,255,.55))}
+  .tb .dot{position:absolute;transform:translate(14px,-10px);width:7px;height:7px;
+    border-radius:50%;background:var(--warn);display:none}
+  .tb.badge .dot{display:block}
 
   /* ── 설정 정리(1단계): 설명 접기 + 목적별 그룹 ── */
   .hint.fold{display:none}
@@ -448,7 +464,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v39 · 설정 그룹화 + 설명 접기</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v40 · 하단 탭바</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2786,6 +2802,82 @@ document.getElementById("usePwBtn").onclick=()=>{
   document.getElementById("faceUnlockBtn").style.display="none";
   document.getElementById("usePwBtn").style.display="none";
 };
+// ===== 하단 탭바 (UI 2단계) =====
+// 헤더 우측에 몰려 있던 아이콘을 엄지가 닿는 하단으로 옮긴다.
+// 각 탭은 기존 시트를 열고 닫을 뿐이라 기능 변경은 없다.
+const TABS=[
+  {k:"list",  ic:"📄", label:"글"},
+  {k:"ads",   ic:"🛡️", label:"승인"},
+  {k:"stats", ic:"📊", label:"수익"},
+  {k:"set",   ic:"⚙️", label:"설정"},
+];
+function closeAllSheets(){
+  try{ closeSheet(); }catch(e){}
+  try{ closeStats(); }catch(e){}
+  try{ closeAds(); }catch(e){}
+  try{ closeKeyWiz(); }catch(e){}
+}
+function currentTab(){
+  const on=id=>{const el=document.getElementById(id);return el&&el.classList.contains("open");};
+  if(on("sheet")) return "set";
+  if(on("statsSheet")) return "stats";
+  if(on("adsSheet")) return "ads";
+  return "list";
+}
+function syncTabbar(){
+  const bar=document.getElementById("tabbar"); if(!bar) return;
+  const ov=document.getElementById("loginOverlay");
+  const logged=!ov||ov.style.display==="none"||getComputedStyle(ov).display==="none";
+  bar.classList.toggle("on", !!logged);
+  const cur=currentTab();
+  bar.querySelectorAll(".tb").forEach(b=>b.classList.toggle("active", b.dataset.k===cur));
+  // 승인 탭: 아직 승인 전이면 점으로 표시해 다음 할 일을 알린다
+  const adsBtn=bar.querySelector('.tb[data-k="ads"]');
+  if(adsBtn) adsBtn.classList.toggle("badge", !CFG.adsenseApproved);
+}
+(function buildTabbar(){
+  const bar=document.createElement("nav");
+  bar.className="tabbar"; bar.id="tabbar"; bar.setAttribute("aria-label","주요 화면 이동");
+  bar.innerHTML=TABS.map(t=>
+    `<button class="tb" data-k="${t.k}" type="button" aria-label="${t.label}">
+       <span class="tbi" aria-hidden="true">${t.ic}</span><span class="dot"></span><span>${t.label}</span>
+     </button>`).join("");
+  document.body.appendChild(bar);
+  bar.querySelectorAll(".tb").forEach(b=>{
+    b.onclick=()=>{
+      const k=b.dataset.k, was=currentTab();
+      closeAllSheets();
+      if(k!==was){                       // 같은 탭을 다시 누르면 닫기(토글)
+        if(k==="set") openSheet();
+        else if(k==="stats") openStats();
+        else if(k==="ads") openAds();
+      }
+      setTimeout(syncTabbar,30);
+    };
+  });
+  // 시트를 X나 배경으로 닫아도 탭 상태가 맞도록 주기적으로 동기화
+  setInterval(syncTabbar, 600);
+  syncTabbar();
+})();
+// 헤더에서 하단 탭과 겹치는 아이콘 제거(🛡️ 📊 ⚙️) — 실행·새로고침·자동생성만 남긴다
+["adsBtn","statsBtn","gear"].forEach(id=>{
+  const el=document.getElementById(id); if(el) el.style.display="none";
+});
+// 🔑 AI 키 마법사는 초기 1회용 → 설정 '연결' 그룹 안으로 이동
+(function moveKeyWiz(){
+  const key=document.getElementById("keyBtn"); if(!key) return;
+  key.style.display="none";
+  const grp=[...document.querySelectorAll("#sheet .grp")].find(g=>g.querySelector(".gt")?.textContent==="연결");
+  if(!grp) return;
+  const wrap=document.createElement("div");
+  wrap.className="field";
+  wrap.innerHTML=`<label>🔑 AI 키 연결</label>
+    <button class="btn sm" type="button" style="width:100%">AI 키 연결 마법사 열기</button>
+    <div class="hint">글을 쓰려면 구글 Gemini 키가 필요합니다. 처음 한 번만 하면 됩니다.</div>`;
+  wrap.querySelector("button").onclick=()=>{ closeSheet(); setTimeout(()=>{openKeyWiz();syncTabbar();},220); };
+  grp.querySelector(".grp-b").prepend(wrap);
+})();
+
 gate();
 if(needLock()) faceUnlock();   // 잠금 상태면 진입하자마자 Face ID 시도
 
