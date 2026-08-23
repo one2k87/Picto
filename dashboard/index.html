@@ -685,7 +685,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v58 · 아이디 형식 자동 시도</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v59 · 러너 진행률·스크롤 로그</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -710,7 +710,13 @@
     <label>🧹 블로그 정리 러너 <span style="font-size:11px;color:var(--danger);font-weight:400">되돌릴 수 없음</span></label>
     <button class="btn sm" id="runnerBtn" style="width:100%;border-color:#e5484d;color:#ff9a9a">승인용으로 한 번에 정리</button>
     <div class="hint">태그 전량 삭제 · 빈 카테고리 삭제 · 태그라인 설정 · 색인 허용 · 필수 페이지 생성을 순서대로 실행합니다. <b>글은 삭제되지 않습니다.</b></div>
-    <div id="runnerBox" style="margin-top:8px;font-size:12.5px"></div>
+    <div id="runnerBar" style="display:none;margin-top:8px">
+      <div style="height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden">
+        <div id="runnerFill" style="height:100%;width:0%;border-radius:99px;background:var(--accent);transition:width .25s"></div>
+      </div>
+    </div>
+    <div id="runnerBox" style="margin-top:8px;font-size:12.5px;max-height:230px;overflow-y:auto;
+      -webkit-overflow-scrolling:touch;overscroll-behavior:contain"></div>
   </div>
   <div class="field">
     <label>🌱 처음 시작하시나요?</label>
@@ -2719,8 +2725,28 @@ async function wpRunner(){
   const box=document.getElementById("runnerBox");
   if(!wpReady()){ box.innerHTML='<span style="color:#ff6b4a">설정 › 연결에서 워드프레스 정보를 먼저 입력하세요.</span>'; return; }
   const base=wpBase(), H=wpAuth(), HJ=Object.assign({"Content-Type":"application/json"},H);
-  const log=[]; const say=(t,ok)=>{log.push({t,ok}); box.innerHTML=log.map(l=>
-    `<div style="margin:3px 0">${l.ok===true?"✅":l.ok===false?"❌":"⏳"} ${escAttr(l.t)}</div>`).join("");};
+  // key를 주면 같은 줄을 덮어쓴다. 진행률처럼 초당 여러 번 바뀌는 표시가
+  // 줄을 계속 쌓아 화면을 밀어내던 문제를 막는다.
+  const log=[];
+  const render=()=>{
+    box.innerHTML=log.map(l=>
+      `<div style="margin:3px 0">${l.ok===true?"✅":l.ok===false?"❌":"⏳"} ${escAttr(l.t)}</div>`).join("");
+    box.scrollTop=box.scrollHeight;   // 항상 최신 줄이 보이도록
+  };
+  const say=(t,ok,key)=>{
+    const last=log[log.length-1];
+    if(key && last && last.key===key){ last.t=t; last.ok=ok; }
+    else log.push({t,ok,key});
+    render();
+  };
+  // 상단 진행률 막대
+  const bar=document.getElementById("runnerBar"), fill=document.getElementById("runnerFill");
+  const prog=(cur,total)=>{
+    if(!bar||!fill) return;
+    if(!total){ bar.style.display="none"; return; }
+    bar.style.display="block";
+    fill.style.width=Math.min(100,Math.round(cur/total*100))+"%";
+  };
 
   const before={};
   try{
@@ -2785,11 +2811,14 @@ async function wpRunner(){
         fetch(`${base}/wp-json/wp/v2/tags/${t.id}?force=true`,{method:"DELETE",headers:H})
           .then(d=>d.ok).catch(()=>false)));
       res.forEach(ok=>ok?del++:fail++);
-      say(`태그 삭제 중… ${del} / ${before.tags||0}${fail?` (실패 ${fail})`:""}`);
+      const tot=before.tags||0;
+      prog(del,tot);
+      say(`태그 삭제 중… ${del}${tot?` / ${tot}`:""}${tot?` (${Math.round(del/tot*100)}%)`:""}${fail?` · 실패 ${fail}`:""}`,undefined,"tagdel");
     }
-    if(fail>50){ say(`실패가 ${fail}건이라 중단합니다. 위 '대안'으로 진행하세요`,false); break; }
+    if(fail>50){ say(`실패가 ${fail}건이라 중단합니다. 위 '대안'으로 진행하세요`,false); prog(0,0); break; }
   }
-  say(`태그 ${del}개 삭제${fail?` · 실패 ${fail}`:" 완료"}`, fail===0);
+  prog(0,0);
+  say(`태그 ${del}개 삭제${fail?` · 실패 ${fail}`:" 완료"}`, fail===0, "tagdel");
 
   // 2) 빈 카테고리 삭제
   say("빈 카테고리 정리 중…");
@@ -2839,6 +2868,7 @@ async function wpRunner(){
     after.tags=parseInt(r.headers.get("X-WP-Total")||"0",10);
   }catch(e){}
   say(`완료 — 태그 ${before.tags||0} → ${after.tags||0}개`,true);
+  prog(0,0);
   box.innerHTML+=`<div class="dnext" style="margin-top:10px"><div class="dl">다음 할 일</div>
     <div class="dv" style="font-size:12.5px;line-height:1.6">
     ① Rank Math → 일반 설정 → 태그·작성자·날짜 아카이브를 noindex로 (플러그인 설정이라 자동 불가)<br>
