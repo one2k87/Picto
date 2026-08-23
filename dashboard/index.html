@@ -741,7 +741,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v80 · 설정 항목 소실 수정</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v81 · 제목 짝맞춤 수정</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2891,8 +2891,12 @@ async function rewriteTitles(){
 - 과장·낚시 금지. 사실만.
 
 [출력 형식]
-번호. 새 제목
-(설명 없이 목록만)
+- 반드시 "번호. 제목" 형식의 줄만 출력하세요.
+- 머리말("다음은 요청하신…"), 맺음말, 설명, 코드블록(\`\`\`), 빈 줄 표시 모두 금지입니다.
+- 번호는 아래 [기존 제목]의 번호와 정확히 같아야 합니다. 순서를 바꾸지 마세요.
+- 예시:
+1. 실제 제목
+2. 실제 제목
 
 [기존 제목]
 ${olds}`;
@@ -2908,16 +2912,42 @@ ${olds}`;
     if(!out) throw new Error(j.error?.message||"빈 응답");
   }catch(e){ log.say("AI 호출 실패: "+escAttr(String(e).slice(0,120)), false); return; }
 
-  const news=out.split("\n").map(l=>l.replace(/^\s*\d+[.)]\s*/,"").trim()).filter(Boolean);
-  const pairs=targets.map((p,i)=>({id:p.id, old:stripText(p.title.rendered), neo:news[i]||""}))
-                     .filter(x=>x.neo && x.neo!==x.old);
+  // ⚠️ 줄 순서로 짝을 맞추면 안 된다. AI가 "다음은 요청하신 대로…" 같은 머리말을
+  //    한 줄 붙이는 순간 전부 한 칸씩 밀려 '엉뚱한 글에 남의 제목'이 적용된다.
+  //    반드시 번호를 읽어서 짝을 맞춘다. 번호 없는 줄은 버린다.
+  const byNum={};
+  out.split("\n").forEach(line=>{
+    const m=line.replace(/^[\s\-*>]+/,"").replace(/\*\*/g,"")
+                .match(/^(\d{1,3})\s*[.):]\s*(.+)$/);
+    if(!m) return;
+    const t=m[2].replace(/\s+/g," ").replace(/^["'“”‘’]|["'“”‘’]$/g,"").trim();
+    if(t.length>=6) byNum[+m[1]]=t;
+  });
+  const missing=[];
+  const pairs=targets.map((p,i)=>{
+    const neo=byNum[i+1]||"";
+    if(!neo) missing.push(i+1);
+    return {id:p.id, old:stripText(p.title.rendered), neo};
+  }).filter(x=>x.neo && x.neo!==x.old);
   if(!pairs.length){ log.say("쓸 만한 결과가 없습니다. 다시 시도해 주세요.", false); return; }
+
+  // 짝이 어긋났는지 스스로 점검한다. 제목을 바꿔도 핵심 명사는 남아야 하므로,
+  // 원제목과 겹치는 두 글자 이상 단어가 하나도 없으면 '밀림'을 의심한다.
+  const share=(a,b)=>{
+    const w=t=>new Set((t.match(/[가-힣]{2,}|[A-Za-z]{3,}|\d{2,}/g)||[]));
+    const A=w(a), B=w(b); let n=0; A.forEach(x=>{ if(B.has(x)) n++; }); return n;
+  };
+  const drift=pairs.filter(x=>share(x.old,x.neo)===0);
+  if(drift.length>pairs.length*0.3){
+    log.say(`제안이 원본과 어긋난 것으로 보입니다(${drift.length}/${pairs.length}건 무관). 적용하지 않고 중단합니다 — 다시 뽑아 주세요.`,false);
+    return;
+  }
 
   // 새 제목이 다시 규칙을 어기지 않는지 검사(AI가 지시를 어길 때가 있다)
   const bad=pairs.filter(x=>isClicheTitle(x.neo));
   const ends={}; pairs.forEach(x=>{const w=x.neo.split(/\s+/).pop(); ends[w]=(ends[w]||0)+1;});
   const dup=Object.entries(ends).filter(([,n])=>n>=2);
-  log.say(`제안 ${pairs.length}편 생성${bad.length?` · 규칙 위반 ${bad.length}편 제외`:""}${dup.length?` · 어미 중복 ${dup.length}종`:""}`, bad.length===0);
+  log.say(`제안 ${pairs.length}편 생성${missing.length?` · 누락 ${missing.length}편`:""}${bad.length?` · 규칙 위반 ${bad.length}편 제외`:""}${dup.length?` · 어미 중복 ${dup.length}종`:""}${drift.length?` · 확인 필요 ${drift.length}편`:""}`, bad.length===0&&missing.length===0);
 
   const good=pairs.filter(x=>!isClicheTitle(x.neo));
   window._titlePairs=good;
@@ -2925,10 +2955,14 @@ ${olds}`;
     <div class="wiz-note">적용할 제목만 체크하세요. <b>${good.length}편</b> 제안됐습니다.</div>
     <div style="max-height:300px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
                 border:1px solid var(--line);border-radius:10px;padding:8px">
-      ${good.map((x,i)=>`<label style="display:block;margin:8px 0;font-size:12.5px;line-height:1.5">
-        <input type="checkbox" class="tfix" data-i="${i}" checked style="width:auto;margin-right:6px">
+      ${good.map((x,i)=>{
+        const odd=share(x.old,x.neo)===0;
+        return `<label style="display:block;margin:8px 0;font-size:12.5px;line-height:1.5">
+        <input type="checkbox" class="tfix" data-i="${i}"${odd?"":" checked"} style="width:auto;margin-right:6px">
         <span style="color:var(--muted);text-decoration:line-through">${escAttr(x.old)}</span><br>
-        <span style="margin-left:20px">→ <b>${escAttr(x.neo)}</b></span></label>`).join("")}
+        <span style="margin-left:20px">→ <b>${escAttr(x.neo)}</b>${
+          odd?` <span style="color:var(--danger)">⚠️ 원본과 겹치는 말이 없습니다 — 확인하세요</span>`:""}</span></label>`;
+      }).join("")}
     </div>
     <button class="btn primary sm" style="width:100%;margin-top:8px" onclick="applyTitles()">체크한 제목 적용</button>
     <button class="btn sm" style="width:100%;margin-top:6px" onclick="rewriteTitles()">🎲 다시 뽑기</button>`;
