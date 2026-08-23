@@ -509,6 +509,37 @@
   padding-bottom:calc(10px + env(safe-area-inset-bottom));border-top:1px solid #a3435a}
 #errBar b{color:#fff}
 #errBar .x{float:right;cursor:pointer;opacity:.7;padding:0 4px}
+
+/* ===== 승인 프로그램: 세로 타임라인 ===== */
+.stp{position:relative;padding-left:34px;margin:0 0 2px}
+.stp:before{content:"";position:absolute;left:13px;top:26px;bottom:-6px;width:2px;background:var(--line)}
+.stp:last-child:before{display:none}
+.stp .dot{position:absolute;left:0;top:2px;width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;
+  background:var(--card);border:2px solid var(--line);color:var(--muted)}
+.stp.done .dot{background:var(--ok);border-color:var(--ok);color:#fff}
+.stp.now .dot{background:var(--accent);border-color:var(--accent);color:#fff;
+  box-shadow:0 0 0 5px var(--glow)}
+.stp .st-t{font-weight:800;font-size:14px;padding:4px 0;color:var(--muted)}
+.stp.done .st-t{color:var(--txt)}
+.stp.now .st-t{color:var(--txt);font-size:15px}
+.stp .st-b{display:none}
+.stp.now .st-b{display:block;background:var(--card);border:1px solid var(--accent);
+  border-radius:12px;padding:12px;margin:4px 0 12px}
+.stp.done .st-s{font-size:12px;color:var(--ok)}
+.stp .st-s{font-size:12px;color:var(--muted)}
+.stp.now .nowtag{display:inline-block;font-size:10px;font-weight:800;color:#fff;
+  background:var(--accent);border-radius:99px;padding:2px 8px;margin-left:6px;vertical-align:1px}
+
+/* ===== 작업 진행 배너 ===== */
+.workbar{display:none;background:var(--card);border:1px solid var(--accent);border-radius:14px;
+  padding:12px 14px;margin:0 0 10px}
+.workbar.on{display:block}
+.workbar .w-t{font-weight:800;font-size:14px;display:flex;align-items:center;gap:8px}
+.workbar .w-sp{width:14px;height:14px;border:2px solid var(--accent);border-top-color:transparent;
+  border-radius:50%;animation:wspin .8s linear infinite;flex:0 0 auto}
+@keyframes wspin{to{transform:rotate(360deg)}}
+.workbar .w-d{font-size:12px;color:var(--muted);margin-top:3px}
 </style>
 <!-- 구글 로그인(애드센스 상태 조회 전용, 읽기 권한만). 없어도 나머지 기능은 정상 동작 -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -741,7 +772,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v81 · 제목 짝맞춤 수정</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v82 · 승인 탭 타임라인</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2610,19 +2641,25 @@ function moveApprovalControls(){
   ["cfgSite","cfgUser","cfgPass","wpDiagBtn"].forEach(id=>{ const f=fieldOf(id); if(f) c.push(f); });
   c.reverse().forEach(el=>check.prepend(el));
 
-  // ② 준비 = 승인 프로그램(무엇을 할 차례인지 계산) + 개별 도구
+  // ② 준비 = 승인 프로그램만 보인다. 옮겨온 설정 필드는 프로그램의 버튼이
+  //    호출할 수 있도록 존재해야 하지만, 화면에서는 접힌 상자 안에 숨긴다.
+  //    (준비 탭이 '설정 목록'처럼 보이던 문제의 해결)
   const plan=document.createElement("div");
   plan.className="field"; plan.style.cssText="border:1px solid var(--accent);border-radius:12px;padding:12px";
-  plan.innerHTML=`<label>🧭 승인 프로그램 <span style="font-size:11px;color:var(--muted);font-weight:400">지금 할 차례만 펼칩니다</span></label>
+  plan.innerHTML=`<label>🧭 승인까지 가는 길 <span style="font-size:11px;color:var(--muted);font-weight:400">위에서 아래로 순서대로</span></label>
     <div id="prepPlan"><div class="hint">상태를 읽는 중…</div></div>
-    <button class="btn sm" style="width:100%;margin-top:8px" onclick="renderPrepPlan()">🔄 상태 다시 읽기</button>`;
+    <button class="btn sm" style="width:100%;margin-top:10px" onclick="renderPrepPlan()">🔄 상태 다시 읽기</button>`;
   prep.prepend(plan);
   setTimeout(()=>{ try{ renderPrepPlan(); }catch(e){ console.warn(e); } }, 300);
 
-  const pr=[head("② 개별 도구","위 프로그램이 안내하는 대로만 하셔도 됩니다. 아래는 직접 쓸 때의 도구입니다.")];
+  const det=document.createElement("details");
+  det.style.marginTop="10px";
+  det.innerHTML=`<summary class="hint" style="cursor:pointer">🔧 세부 도구 직접 열기 (평소엔 필요 없음)</summary>`;
+  const inner=document.createElement("div");
   ["nicheDetectBtn","cfgAuthorName","cfgContactEmail","runnerBtn","setupGuideBtn"]
-    .forEach(id=>{ const f=fieldOf(id); if(f) pr.push(f); });
-  pr.reverse().forEach(el=>prep.prepend(el));
+    .forEach(id=>{ const f=fieldOf(id); if(f) inner.appendChild(f); });
+  det.appendChild(inner);
+  prep.appendChild(det);
 
   // ③ 승인 탭에서 고친 값은 자동 저장
   // ⚠️ 여기서 한 번 사고가 났다. 입력칸을 CFG로 채우기 전에 자동 저장이 돌면
@@ -2675,7 +2712,21 @@ function moveApprovalControls(){
 /* ===== 공통 진행 로그 =====
    작업 로그가 줄마다 쌓이면 화면이 수백 줄로 늘어나 스크롤이 끝없이 길어진다.
    높이를 고정하고 그 안에서만 스크롤하게 하며, 같은 key의 줄은 덮어쓴다. */
-function makeLog(box, barBox){
+// 진행 중인 작업을 상단에 크게 보여주는 배너. box 앞에 자동 삽입된다.
+function workBanner(box,title){
+  let w=box.parentNode.querySelector(".workbar");
+  if(!w){ w=document.createElement("div"); w.className="workbar";
+    w.innerHTML='<div class="w-t"><span class="w-sp"></span><span class="w-title"></span></div><div class="w-d"></div>';
+    box.parentNode.insertBefore(w,box); }
+  return {
+    start(t,d){ w.classList.add("on"); w.querySelector(".w-title").textContent=t;
+      w.querySelector(".w-d").textContent=d||""; w.querySelector(".w-sp").style.display=""; },
+    update(d){ w.querySelector(".w-d").textContent=d; },
+    done(t){ w.querySelector(".w-sp").style.display="none";
+      w.querySelector(".w-title").textContent=t; setTimeout(()=>w.classList.remove("on"),2500); }
+  };
+}
+function makeLog(box, barBox, taskName){
   const lines=[];
   let fill=null;
   if(barBox){
@@ -2685,6 +2736,8 @@ function makeLog(box, barBox){
   }
   box.style.cssText="margin-top:8px;font-size:12.5px;max-height:220px;overflow-y:auto;"+
     "-webkit-overflow-scrolling:touch;overscroll-behavior:contain";
+  const wb=taskName?workBanner(box,taskName):null;
+  if(wb) wb.start(taskName,"");
   const render=()=>{
     box.innerHTML=lines.map(l=>`<div style="margin:3px 0">${
       l.ok===true?"✅":l.ok===false?"❌":"⏳"} ${l.t}</div>`).join("");
@@ -2695,8 +2748,10 @@ function makeLog(box, barBox){
       const last=lines[lines.length-1];
       if(key && last && last.key===key){ last.t=t; last.ok=ok; }
       else lines.push({t,ok,key});
+      if(wb) wb.update(t.replace(/<[^>]+>/g,""));
       render();
     },
+    finish(t){ if(wb) wb.done(t||"완료"); },
     prog(cur,total){
       if(!fill) return;
       if(!total){ barBox.style.display="none"; return; }
@@ -2754,60 +2809,50 @@ function renderPrepPlan(){
   const host=document.getElementById("prepPlan"); if(!host) return;
   host.innerHTML=`<div class="hint">상태를 읽는 중…</div>`;
   prepState().then(s=>{
-    const step=(n,title,done,desc,btn)=>`
-      <div class="field" style="border-left:3px solid ${done?"var(--ok)":"var(--accent)"};padding-left:10px">
-        <label>${done?"✅":"▶"} ${n}. ${title}</label>
-        <div class="hint">${desc}</div>
-        ${btn||""}</div>`;
-    const B=(id,t,cls)=>`<button class="btn ${cls||"sm"}" style="width:100%;margin-top:6px" onclick="${id}">${t}</button>`;
-    let h="";
-    h+=step(1,"주제 정하기", s.niche,
-      s.niche?`<b>${escAttr(CFG.niche.label)}</b>로 정해져 있습니다.`
-             :"승인은 한 분야만 깊게 다룰 때 잘 납니다. 블로그를 읽어 자동으로 골라드립니다.",
-      s.niche?"":B("document.getElementById('nicheDetectBtn').click()","🔍 내 블로그 보고 자동 추천","primary sm"));
-    h+=step(2,"글쓴이 정하기", s.author,
-      s.author?`<b>${escAttr(CFG.author)}</b> · ${escAttr((CFG.authorBio||"").slice(0,40))}…`
-              :"누가 썼는지가 강한 신뢰 신호입니다. 비워두면 주제에 맞춰 자동으로 채웁니다.",
-      s.author?"":B("ensurePersona(true);renderPrepPlan()","🎲 자동으로 정하기","primary sm"));
-    if(!s.wp){
-      h+=step(3,"블로그 연결", false,"‘점검’ 탭에서 주소·아이디·앱 비밀번호를 먼저 넣어주세요.","");
-      host.innerHTML=h; return;
-    }
+    // 각 단계: {t 제목, done, sub 한줄요약, body 열렸을 때 내용(현재 단계만)}
+    const B=(fn,label,cls)=>`<button class="btn ${cls||"sm"}" style="width:100%;margin-top:6px" onclick="${fn}">${label}</button>`;
     const has=s.posts>0;
-    if(has && !s.classified){
-      h+=step(3,"기존 글 정리", false,
-        `공개 글 ${s.posts}편이 있습니다. <b>먼저 1번에서 주제를 정해야</b> 어떤 글이 주제 안이고 밖인지 가릴 수 있습니다.`,"");
-      h+=step(4,"사이트 기본 갖추기", false,
-        "필수 페이지·플러그인·디자인을 정돈합니다.",
-        B("document.getElementById('runnerBtn').click()","🧹 한 번에 정리","sm")+
-        B("openDesignPlan()","🎨 디자인 제안 받기","sm"));
-      const sc0=s.check?`${s.check.score}/${s.check.total}`:"미실행";
-      h+=step(5,"점검 통과", false, `현재 점수 <b>${sc0}</b>.`,
-        B("gotoSub('adsSheet','check');setTimeout(()=>document.getElementById('adsCheck').click(),300)","🔄 점검 실행","sm"));
-      h+=step(6,"애드센스 신청", false,"‘신청’ 탭에서 진행합니다.",B("gotoSub('adsSheet','apply')","📮 신청 탭으로","sm"));
-      host.innerHTML=h; return;
-    }
-    h+=step(3, has?"기존 글 정리":"첫 글 만들기", has?(s.offNiche===0&&s.cliche===0):false,
-      has
-        ? (s.offNiche||s.cliche
-           ? `공개 글 ${s.posts}편 중 <b>주제 밖 ${s.offNiche}편</b>은 비공개로 돌리고,
-              <b>상투적 제목 ${s.cliche}편</b>은 다시 씁니다. 이 둘이 반려 1순위 원인입니다.`
-           : "주제도 정리됐고 상투적 제목도 없습니다.")
-        : `아직 글이 없습니다. 승인용 글 ${(CFG.approvalPlan&&CFG.approvalPlan.posts)||20}편을 예약해 하루 ${(CFG.approvalPlan&&CFG.approvalPlan.perDay)||1}편씩 발행합니다.`,
-      has ? (s.offNiche||s.cliche ? B("openContentFix()","🧭 기존 글 정리 시작","primary sm"):"")
-          : B("startApprovalPosts()","✍️ 승인용 글 생성 시작","primary sm"));
-    h+=step(4,"사이트 기본 갖추기", false,
-      "필수 페이지·플러그인·디자인을 정돈합니다. 디자인은 사이트마다 다르게 제안합니다.",
-      B("document.getElementById('runnerBtn').click()","🧹 한 번에 정리","sm")+
-      B("openDesignPlan()","🎨 디자인 제안 받기","sm"));
-    const sc=s.check?`${s.check.score}/${s.check.total}`:"미실행";
-    h+=step(5,"점검 통과", s.check&&s.check.score===s.check.total,
-      `현재 점수 <b>${sc}</b>. 만점이 되면 신청 단계로 넘어갑니다.`,
-      B("gotoSub('adsSheet','check');setTimeout(()=>document.getElementById('adsCheck').click(),300)","🔄 점검 실행","sm"));
-    h+=step(6,"애드센스 신청", false,
-      "신청 방법과 이력 관리는 ‘신청’ 탭에 있습니다.",
-      B("gotoSub('adsSheet','apply')","📮 신청 탭으로","sm"));
-    host.innerHTML=h;
+    const contentDone = has ? (s.classified && s.offNiche===0 && s.cliche===0) : false;
+    const checkDone = !!(s.check && s.check.score===s.check.total);
+
+    const steps=[
+      { t:"주제 정하기", done:s.niche,
+        sub:s.niche?CFG.niche.label:"승인은 한 분야만 깊게 다룰 때 잘 납니다",
+        body:B("document.getElementById('nicheDetectBtn').click()","🔍 내 블로그 보고 자동 추천","primary sm")
+            +B("document.getElementById('nicheRedo').click()","💬 질문으로 정하기","sm") },
+      { t:"글쓴이 정하기", done:s.author,
+        sub:s.author?`${CFG.author}`:"누가 썼는지가 신뢰 신호입니다",
+        body:B("ensurePersona(true);renderPrepPlan()","🎲 자동으로 정하기","primary sm") },
+      { t:has?"기존 글 정리":"첫 글 만들기", done:contentDone,
+        sub:!s.wp?"먼저 '점검' 탭에서 블로그를 연결하세요"
+           :!s.classified&&has?"1번에서 주제를 정하면 열립니다"
+           :has?(contentDone?"주제·제목 정리 완료"
+                :`주제 밖 ${s.offNiche}편 · 상투 제목 ${s.cliche}편 — 반려 1순위 원인`)
+           :"승인용 글을 예약 발행합니다",
+        body:has?(s.classified?B("openContentFix()","🧭 기존 글 정리 열기","primary sm"):"")
+                :B("startApprovalPosts()","✍️ 승인용 글 생성","primary sm") },
+      { t:"사이트 기본 갖추기", done:false,
+        sub:"필수 페이지·플러그인·디자인",
+        body:B("document.getElementById('runnerBtn').click()","🧹 한 번에 정리","primary sm")
+            +B("openDesignPlan()","🎨 디자인 제안","sm") },
+      { t:"점검 통과", done:checkDone,
+        sub:s.check?`현재 ${s.check.score}/${s.check.total}`:"아직 점검 전",
+        body:B("gotoSub('adsSheet','check');setTimeout(()=>document.getElementById('adsCheck').click(),300)","🔄 점검 실행","primary sm") },
+      { t:"애드센스 신청", done:false,
+        sub:"만점이 되면 신청합니다",
+        body:B("gotoSub('adsSheet','apply')","📮 신청 탭으로","primary sm") }
+    ];
+    // '지금 할 단계' = 앞에서부터 첫 미완료
+    let now=steps.findIndex(st=>!st.done); if(now<0) now=steps.length-1;
+    host.innerHTML=steps.map((st,i)=>{
+      const cls=st.done?"done":(i===now?"now":"");
+      return `<div class="stp ${cls}">
+        <div class="dot">${st.done?"✓":i+1}</div>
+        <div class="st-t">${st.t}${i===now?'<span class="nowtag">지금 여기</span>':""}</div>
+        <div class="st-s">${st.sub}</div>
+        <div class="st-b">${i===now?st.body:""}</div>
+      </div>`;
+    }).join("");
   }).catch(e=>{ host.innerHTML=`<div class="hint" style="color:var(--danger)">상태를 읽지 못했습니다: ${escAttr(String(e))}</div>`; });
 }
 function gotoSub(pid,k){ try{ showSub(pid,k); window.scrollTo({top:0,behavior:"smooth"}); }catch(e){} }
@@ -2825,7 +2870,7 @@ async function openContentFix(){
     <div id="fixBar"></div><div id="fixLog"></div>
     <div id="fixBody" style="margin-top:8px"></div>
     <button class="btn sm" style="width:100%;margin-top:8px" onclick="renderPrepPlan()">← 프로그램으로 돌아가기</button></div>`;
-  const log=makeLog(document.getElementById("fixLog"), document.getElementById("fixBar"));
+  const log=makeLog(document.getElementById("fixLog"), document.getElementById("fixBar"), "기존 글 정리");
   log.say("블로그를 읽는 중…");
   const s=await prepState();
   _fixCache=s;
@@ -2852,7 +2897,7 @@ async function hideOffNiche(){
     return;
   }
   if(!confirm(`주제 밖 글 ${s.offNiche}편을 비공개로 돌립니다.\n\n· 삭제가 아닙니다(비공개 = private)\n· 언제든 다시 공개할 수 있습니다\n\n진행할까요?`)) return;
-  const log=makeLog(document.getElementById("fixLog"), document.getElementById("fixBar"));
+  const log=makeLog(document.getElementById("fixLog"), document.getElementById("fixBar"), "주제 밖 글 비공개 전환");
   const base=wpBase(), HJ=Object.assign({"Content-Type":"application/json"},wpAuth());
   let done=0, fail=0;
   for(const p of s.offList){
@@ -2874,7 +2919,7 @@ async function hideOffNiche(){
 async function rewriteTitles(){
   const s=_fixCache; if(!s) return;
   const key=(CFG.llmKey||"").trim();
-  const log=makeLog(document.getElementById("fixLog"), document.getElementById("fixBar"));
+  const log=makeLog(document.getElementById("fixLog"), document.getElementById("fixBar"), "상투적 제목 다시 쓰기");
   if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return; }
   const targets=s.onList.filter(p=>isClicheTitle(stripText(p.title.rendered)));
   log.say(`제목 ${targets.length}편을 다시 쓰는 중…`);
@@ -2973,7 +3018,7 @@ async function applyTitles(){
   const picked=[...document.querySelectorAll(".tfix:checked")].map(c=>pairs[+c.dataset.i]).filter(Boolean);
   if(!picked.length){ toast("적용할 제목을 하나 이상 선택하세요"); return; }
   if(!confirm(`${picked.length}편의 제목을 바꿉니다.\n\n· 본문과 주소(slug)는 그대로입니다\n· 되돌리려면 워드프레스 리비전에서 복구할 수 있습니다\n\n진행할까요?`)) return;
-  const log=makeLog(document.getElementById("fixLog"), document.getElementById("fixBar"));
+  const log=makeLog(document.getElementById("fixLog"), document.getElementById("fixBar"), "새 제목 적용");
   const base=wpBase(), HJ=Object.assign({"Content-Type":"application/json"},wpAuth());
   let done=0, fail=0;
   for(const x of picked){
