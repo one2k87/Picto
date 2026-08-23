@@ -531,15 +531,19 @@
 .stp.now .nowtag{display:inline-block;font-size:10px;font-weight:800;color:#fff;
   background:var(--accent);border-radius:99px;padding:2px 8px;margin-left:6px;vertical-align:1px}
 
-/* ===== 작업 진행 배너 ===== */
-.workbar{display:none;background:var(--card);border:1px solid var(--accent);border-radius:14px;
-  padding:12px 14px;margin:0 0 10px}
-.workbar.on{display:block}
-.workbar .w-t{font-weight:800;font-size:14px;display:flex;align-items:center;gap:8px}
-.workbar .w-sp{width:14px;height:14px;border:2px solid var(--accent);border-top-color:transparent;
+/* ===== 작업 진행 배너 =====
+   스크롤을 따라 사라지지 않도록 화면에 고정한다. 위치는 JS가 헤더·서브탭의
+   실제 높이를 재서 그 '아래'로 잡으므로 메뉴를 가리지 않는다. */
+#workbar{position:fixed;left:8px;right:8px;z-index:16;display:none;
+  background:var(--card);border:1px solid var(--accent);border-radius:14px;
+  padding:10px 14px;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+#workbar.on{display:block}
+#workbar .w-t{font-weight:800;font-size:14px;display:flex;align-items:center;gap:8px}
+#workbar .w-sp{width:14px;height:14px;border:2px solid var(--accent);border-top-color:transparent;
   border-radius:50%;animation:wspin .8s linear infinite;flex:0 0 auto}
 @keyframes wspin{to{transform:rotate(360deg)}}
-.workbar .w-d{font-size:12px;color:var(--muted);margin-top:3px}
+#workbar .w-d{font-size:12px;color:var(--muted);margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 <!-- 구글 로그인(애드센스 상태 조회 전용, 읽기 권한만). 없어도 나머지 기능은 정상 동작 -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -772,7 +776,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v83 · 승인 탭 타임라인</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v84 · 작업 배너 화면 고정</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2712,18 +2716,34 @@ function moveApprovalControls(){
 /* ===== 공통 진행 로그 =====
    작업 로그가 줄마다 쌓이면 화면이 수백 줄로 늘어나 스크롤이 끝없이 길어진다.
    높이를 고정하고 그 안에서만 스크롤하게 하며, 같은 key의 줄은 덮어쓴다. */
-// 진행 중인 작업을 상단에 크게 보여주는 배너. box 앞에 자동 삽입된다.
-function workBanner(box,title){
-  let w=box.parentNode.querySelector(".workbar");
-  if(!w){ w=document.createElement("div"); w.className="workbar";
+// 진행 중인 작업 배너 — 전역 하나만 쓰고 화면에 고정한다.
+// 스크롤해도 보이되, 헤더·서브탭 '아래'에 자리잡아 메뉴를 가리지 않는다.
+function _workbarEl(){
+  let w=document.getElementById("workbar");
+  if(!w){
+    w=document.createElement("div"); w.id="workbar";
     w.innerHTML='<div class="w-t"><span class="w-sp"></span><span class="w-title"></span></div><div class="w-d"></div>';
-    box.parentNode.insertBefore(w,box); }
+    document.body.appendChild(w);
+  }
+  // 헤더 + (보이는) 서브탭의 실제 높이를 재서 바로 아래에 붙인다
+  let top=8;
+  const hd=document.querySelector("header");
+  if(hd) top=hd.getBoundingClientRect().bottom;
+  const st=[...document.querySelectorAll(".subtabs")].find(e=>e.offsetParent!==null);
+  if(st){ const r=st.getBoundingClientRect(); if(r.bottom>top) top=r.bottom; }
+  w.style.top=(top+6)+"px";
+  return w;
+}
+function workBanner(){
+  const w=_workbarEl();
   return {
     start(t,d){ w.classList.add("on"); w.querySelector(".w-title").textContent=t;
-      w.querySelector(".w-d").textContent=d||""; w.querySelector(".w-sp").style.display=""; },
+      w.querySelector(".w-d").textContent=d||""; w.querySelector(".w-sp").style.display="";
+      _workbarEl(); },
     update(d){ w.querySelector(".w-d").textContent=d; },
     done(t){ w.querySelector(".w-sp").style.display="none";
-      w.querySelector(".w-title").textContent=t; setTimeout(()=>w.classList.remove("on"),2500); }
+      w.querySelector(".w-title").textContent=t||"완료";
+      setTimeout(()=>w.classList.remove("on"),2500); }
   };
 }
 function makeLog(box, barBox, taskName){
@@ -2736,7 +2756,7 @@ function makeLog(box, barBox, taskName){
   }
   box.style.cssText="margin-top:8px;font-size:12.5px;max-height:220px;overflow-y:auto;"+
     "-webkit-overflow-scrolling:touch;overscroll-behavior:contain";
-  const wb=taskName?workBanner(box,taskName):null;
+  const wb=taskName?workBanner():null;
   if(wb) wb.start(taskName,"");
   const render=()=>{
     box.innerHTML=lines.map(l=>`<div style="margin:3px 0">${
