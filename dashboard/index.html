@@ -237,6 +237,36 @@
   .fab.busy{background:var(--card2);color:var(--accent);border:2px solid var(--accent)}
   .fab.busy .i{animation:spin 1s linear infinite}
 
+  /* ── 카드 스와이프 액션 ── */
+  .card{touch-action:pan-y}
+  .card.sw{transition:none;z-index:2}
+  .card.snap{transition:transform .22s cubic-bezier(.34,1.3,.64,1)}
+  .card::after{content:attr(data-act);position:absolute;top:50%;transform:translateY(-50%);
+    font-size:12px;font-weight:700;letter-spacing:.02em;opacity:0;transition:opacity .12s;
+    pointer-events:none;white-space:nowrap}
+  .card.act-r::after{left:-84px;color:var(--ok);opacity:1}
+  .card.act-l::after{right:-84px;color:var(--accent);opacity:1}
+  .card.fire{opacity:.45;transition:opacity .2s,transform .22s}
+
+  /* ── 검색줄: 상단 탭 아래에 고정 ── */
+  #searchWrap{position:sticky;top:44px;z-index:17;background:var(--bg);
+    padding:6px 0 8px;display:flex;gap:6px;align-items:center}
+  #searchWrap .sfield{position:relative;flex:1;min-width:0}
+  #searchWrap .sfield .i{position:absolute;left:10px;top:50%;transform:translateY(-50%);
+    width:15px;height:15px;color:var(--muted);pointer-events:none}
+  #fSearch{width:100%;padding:9px 32px 9px 31px !important;border-radius:999px !important}
+  #searchClear{position:absolute;right:6px;top:50%;transform:translateY(-50%);
+    width:22px;height:22px;border-radius:50%;border:0;background:var(--card2);
+    color:var(--muted);font-size:13px;line-height:1;cursor:pointer;display:none}
+  #searchClear.on{display:grid;place-items:center}
+  #searchCount{font-size:11px;color:var(--muted);white-space:nowrap;flex:0 0 auto}
+
+  /* ── 토스트: 아이콘 + 종류별 색 ── */
+  .toast{display:flex;align-items:center;gap:8px;justify-content:center}
+  .toast .i{width:16px;height:16px;flex:0 0 auto;stroke-width:2.6}
+  .toast.info{background:var(--accent);color:#1a1430}
+  .toast.warn{background:var(--warn);color:#3a2a06}
+
   /* ── 로딩 스켈레톤 ── */
   .skcard{background:var(--card);border:1px solid var(--line);border-radius:16px;
     padding:14px 14px 14px 16px;margin:8px 0;display:flex;flex-direction:column;gap:9px}
@@ -655,7 +685,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v49 · 새로고침·FAB·스켈레톤</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v50 · 카드 스와이프·검색·토스트</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1239,8 +1269,23 @@ async function verifyLicense(key){
   return {ok:false, msg:"검증 실패"};
 }
 
-function toast(m,err){const t=document.getElementById("toast");t.textContent=m;
-  t.className="toast show"+(err?" err":"");setTimeout(()=>t.className="toast",1700);}
+// 토스트: 종류별 아이콘·색으로 성공/실패를 즉시 구분한다.
+// 기존 호출부 호환 — toast(msg) 성공, toast(msg,1) 실패, toast(msg,"info"|"warn") 확장.
+const TOAST_ICON={
+  ok:'<path d="M4 12.5l5 5L20 6.5"/>',
+  err:'<path d="M18 6L6 18M6 6l12 12"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6v.6"/>',
+  warn:'<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17v.6"/>',
+};
+function toast(m,kind){
+  const t=document.getElementById("toast"); if(!t) return;
+  const k=kind===true||kind===1?"err":(kind==="info"||kind==="warn"?kind:"ok");
+  const cls=k==="err"?"err":k==="ok"?"":k;
+  t.innerHTML=`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TOAST_ICON[k]}</svg><span>${escAttr(m)}</span>`;
+  t.className="toast show "+cls;
+  clearTimeout(t._h); t._h=setTimeout(()=>t.className="toast",1900);
+}
 
 const SAMPLE={generated_at:"2026-07-03T07:00:00",categories:["금융/재테크","건강/생활","경제/IT"],auto_publish:false,total_all:3,articles:[
   {kind:"long",category:"금융/재테크",keyword:"무직자 소액 비상금 대출 조건",status:"복붙대기",post_url:"",
@@ -1427,6 +1472,7 @@ function render(){
   const nArc=archivedCount(), chArc=document.getElementById("chipArchive");
   if(chArc){ chArc.style.display=nArc?"":"none"; c("c-archive",nArc); }
   if(window.refreshKindTabs) try{ window.refreshKindTabs(); }catch(e){}
+  if(window.syncSearchBar) try{ window.syncSearchBar(); }catch(e){}
   const cats=(DATA&&DATA.categories)?DATA.categories.length:[...new Set(arts.map(a=>a.category))].length;
   document.getElementById("genat").textContent=DATA?
     ("📂 카테고리 "+cats+"개 · 생성 "+new Date(DATA.generated_at).toLocaleString("ko-KR")
@@ -3385,7 +3431,7 @@ function gotoTab(k){
     // 가로 스크롤 영역이나 입력 중일 땐 스와이프를 잡지 않는다
     // (target이 document/텍스트노드일 수도 있으므로 방어적으로 처리)
     if(!el||typeof el.closest!=="function") return true;
-    return !el.closest("input,textarea,select,.filters,.grp-h");
+    return !el.closest("input,textarea,select,.filters,.grp-h,.card,#searchWrap");
   };
   document.addEventListener("touchstart",e=>{
     if(e.touches.length!==1||!START(e.target)) { tracking=false; return; }
@@ -3495,6 +3541,86 @@ function moveKeyWiz(){
   wrap.querySelector("button").onclick=()=>{ closeSheet(); setTimeout(()=>{openKeyWiz();syncTabbar();},220); };
   grp.querySelector(".grp-b").prepend(wrap);
 }
+
+// ===== 카드 스와이프 액션 =====
+// 오른쪽으로 밀기 → 미발행이면 게시 / 발행글이면 열기
+// 왼쪽으로 밀기  → 선택 토글(일괄 작업용)
+(function cardSwipe(){
+  const grid=document.getElementById("grid"); if(!grid) return;
+  const TH=78; let card=null,x0=0,y0=0,dx=0,locked=null;
+  const label=(c,d)=>{
+    const pub=c.classList.contains("s-pub");
+    return d>0?(pub?"열기":"게시하기"):(c.classList.contains("sel")?"선택 해제":"선택");
+  };
+  grid.addEventListener("touchstart",e=>{
+    if(e.touches.length!==1){card=null;return;}
+    const c=e.target.closest(".card"); if(!c||e.target.closest("a,button,input")){card=null;return;}
+    card=c; x0=e.touches[0].clientX; y0=e.touches[0].clientY; dx=0; locked=null;
+    card.classList.remove("snap");
+  },{passive:true});
+  grid.addEventListener("touchmove",e=>{
+    if(!card) return;
+    const t=e.touches[0]; dx=t.clientX-x0;
+    const dy=t.clientY-y0;
+    if(locked===null){ locked=Math.abs(dx)>Math.abs(dy)*1.3&&Math.abs(dx)>10?"x":"y"; }
+    if(locked!=="x"){ return; }
+    card.classList.add("sw");
+    const shown=Math.max(-120,Math.min(120,dx));
+    card.style.transform=`translateX(${shown}px)`;
+    card.dataset.act=label(card,dx);
+    card.classList.toggle("act-r",dx>18);
+    card.classList.toggle("act-l",dx<-18);
+  },{passive:true});
+  grid.addEventListener("touchend",()=>{
+    if(!card) return;
+    const c=card, d=dx; card=null;
+    c.classList.remove("sw"); c.classList.add("snap");
+    c.style.transform="";
+    setTimeout(()=>c.classList.remove("act-r","act-l","snap"),260);
+    if(Math.abs(d)<TH||locked!=="x") return;
+    const idx=[...grid.children].indexOf(c);
+    const a=visible()[idx]; if(!a) return;
+    if(d>0){
+      if(c.classList.contains("s-pub")){
+        if(a.post_url){ window.open(a.post_url,"_blank","noopener"); toast("글을 열었습니다","info"); }
+        else toast("주소가 없습니다",1);
+      }else{
+        c.classList.add("fire");
+        try{ bulkPublish([a],"이 글"); }catch(e){ toast("게시 실패",1); }
+      }
+    }else{
+      if(SEL.has(a)) SEL.delete(a); else SEL.add(a);
+      c.classList.toggle("sel",SEL.has(a));
+      try{ updateBulkBar(); }catch(e){}
+      toast(SEL.has(a)?"선택됨":"선택 해제","info");
+    }
+  },{passive:true});
+})();
+
+// ===== 검색줄 개선: 상단 고정 + 지우기 + 결과 수 =====
+(function searchBar(){
+  const inp=document.getElementById("fSearch"); if(!inp) return;
+  const wrap=document.createElement("div"); wrap.id="searchWrap";
+  const field=document.createElement("div"); field.className="sfield";
+  inp.parentNode.insertBefore(wrap,inp);
+  field.innerHTML=`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>`;
+  field.appendChild(inp);
+  const clr=document.createElement("button");
+  clr.id="searchClear"; clr.type="button"; clr.textContent="×"; clr.setAttribute("aria-label","검색어 지우기");
+  field.appendChild(clr);
+  const cnt=document.createElement("span"); cnt.id="searchCount";
+  wrap.appendChild(field); wrap.appendChild(cnt);
+  inp.placeholder="제목·키워드 검색";
+  const sync=()=>{
+    const has=!!inp.value.trim();
+    clr.classList.toggle("on",has);
+    cnt.textContent=has?`${visible().length}건`:"";
+  };
+  inp.addEventListener("input",sync);
+  clr.onclick=()=>{ inp.value=""; fSearch=""; render(); sync(); inp.focus(); };
+  window.syncSearchBar=sync; sync();
+})();
 
 // ===== 당겨서 새로고침 =====
 (function pullToRefresh(){
