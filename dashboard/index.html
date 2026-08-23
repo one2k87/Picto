@@ -734,7 +734,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v69 · 니치 자동 판별</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v70 · 승인 탭 통합</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2504,6 +2504,72 @@ function nicheDetectHtml(res){
     승인 뒤에 이 주제로 넓히는 편이 안전합니다.</div>`:""}
   <div class="wiz-note">고른 분야 <b>하나로만</b> 승인을 받고, 통과한 뒤에 램프 엔진이 3주에 걸쳐 넓힙니다.
     나머지 글을 지울 필요는 없습니다.</div>`;
+}
+
+/* ===== 승인 관련 조작을 전부 '승인' 탭으로 모은다 =====
+   설정 탭은 값을 보관하는 곳이고, 승인 탭은 승인을 위해 '하는' 곳이다.
+   두 곳에 같은 입력칸을 복제하면 id가 겹쳐 저장이 깨지므로, 복제 대신
+   설정에 있던 DOM 블록을 통째로 옮긴다. id가 그대로라 기존 저장·불러오기
+   코드(openSheet / cfgSave)는 손대지 않아도 계속 동작한다.
+   대신 승인 탭에서 고친 값은 저장 버튼을 누르러 설정까지 갈 필요가 없도록
+   입력이 멈추면 자동으로 저장한다. */
+function fieldOf(id){ const e=document.getElementById(id); return e?e.closest(".field"):null; }
+
+function moveApprovalControls(){
+  const ads=document.getElementById("adsSheet"); if(!ads) return false;
+  const check=ads.querySelector('.sub-sec[data-k="check"]');
+  const prep =ads.querySelector('.sub-sec[data-k="prep"]');
+  if(!check||!prep) return false;                       // 서브탭이 아직 안 만들어졌으면 나중에 다시
+  if(ads.dataset.merged) return true;
+
+  const head=(t,d)=>{ const h=document.createElement("div"); h.className="field";
+    h.innerHTML=`<label>${t}</label><div class="hint">${d}</div>`; return h; };
+
+  // ① 점검 = 블로그 연결 + 연결 진단
+  const c=[head("① 블로그 연결","여기 넣은 값은 <b>자동으로 저장</b>됩니다. 설정 탭에 따로 옮겨 적을 필요가 없습니다.")];
+  ["cfgSite","cfgUser","cfgPass","wpDiagBtn"].forEach(id=>{ const f=fieldOf(id); if(f) c.push(f); });
+  c.reverse().forEach(el=>check.prepend(el));
+
+  // ② 준비 = 주제 → 글쓴이 → 연락처 → 한 번에 정리
+  const pr=[head("② 승인 준비","주제를 좁히고, 글쓴이를 정하고, 블로그를 정돈하는 순서입니다.")];
+  ["nicheDetectBtn","cfgAuthorName","cfgContactEmail","runnerBtn","setupGuideBtn"]
+    .forEach(id=>{ const f=fieldOf(id); if(f) pr.push(f); });
+  pr.reverse().forEach(el=>prep.prepend(el));
+
+  // ③ 승인 탭에서 고친 값은 자동 저장
+  const AUTO=["cfgSite","cfgUser","cfgPass","cfgContactEmail","cfgAuthorName","cfgAuthorBio"];
+  const badge=document.createElement("div");
+  badge.className="hint"; badge.style.cssText="text-align:right;opacity:0;transition:opacity .3s";
+  badge.textContent="설정에 저장됨 ✓";
+  check.prepend(badge);
+  let t=null;
+  const flush=()=>{
+    const g=id=>{const e=document.getElementById(id); return e?e.value.trim():"";};
+    CFG.site=g("cfgSite"); CFG.user=g("cfgUser"); CFG.pass=g("cfgPass");
+    CFG.contactEmail=g("cfgContactEmail");
+    const an=g("cfgAuthorName"), ab=g("cfgAuthorBio");
+    if((an&&an!==CFG.author)||(ab&&ab!==CFG.authorBio)) CFG.authorAuto=false;
+    CFG.author=an; CFG.authorBio=ab;
+    saveCfg();
+    badge.style.opacity="1"; setTimeout(()=>badge.style.opacity="0",1400);
+  };
+  AUTO.forEach(id=>{ const e=document.getElementById(id); if(!e) return;
+    e.addEventListener("input",()=>{ clearTimeout(t); t=setTimeout(flush,700); });
+    e.addEventListener("change",flush);
+  });
+
+  ads.dataset.merged="1";
+  // 설정 탭에는 어디로 갔는지 표시를 남긴다
+  const sheet=document.getElementById("sheet");
+  const title=sheet&&sheet.querySelector("h2");
+  if(title && !document.getElementById("moveNotice")){
+    const d=document.createElement("div");
+    d.id="moveNotice"; d.className="wiz-note"; d.style.margin="10px 0 0";
+    d.innerHTML=`블로그 연결·진단·주제·정리는 <b>🛡️ 승인 탭</b>으로 옮겼습니다.
+      승인에 필요한 일은 그 탭 안에서 전부 끝납니다. 여기는 나머지 설정을 보관하는 곳입니다.`;
+    title.after(d);
+  }
+  return true;
 }
 
 function pageHtml(slug){
@@ -5155,6 +5221,14 @@ function wizBind(){
 }
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",wizBind);
 else wizBind();
+
+// 승인 탭 통합 — 승인 탭의 서브탭이 만들어진 뒤라야 옮길 수 있다
+(function mergeApproval(){
+  let tries=0;
+  const go=()=>{ try{ if(moveApprovalControls()) return; }catch(e){ console.warn("승인 탭 통합 실패:",e); return; }
+    if(++tries<25) setTimeout(go,200); };
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",go); else go();
+})();
 
 
 applyPlanUI();
