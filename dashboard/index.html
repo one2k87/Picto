@@ -734,7 +734,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v63 · 필수 페이지 자동 보완</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v64 · 작성자 자동 추천</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -959,12 +959,18 @@
       — 예전처럼 "[여기에 입력하세요]" 같은 문구가 공개되는 일을 막기 위해서입니다.</div>
   </div>
   <div class="field">
-    <div class="hint" style="margin-bottom:8px">금융·건강 글은 "누가 썼는지"가 신뢰 신호(E-E-A-T)예요. 실명 노출 부담 없이 <b>필명</b>으로 설정하는 걸 추천드려요. 아래 값은 추천 기본값이며 자유롭게 바꿔도 됩니다.</div>
+    <div class="hint" style="margin-bottom:8px">"누가 썼는지"는 강한 신뢰 신호(E-E-A-T)입니다. 실명 부담 없이 <b>필명</b>으로 두셔도 됩니다.
+      <b>비워두면 주제에 맞춰 자동으로 채웁니다.</b></div>
     <label>작성자 이름(필명)</label>
-    <input id="cfgAuthorName" placeholder="예: 정다인 에디터">
+    <input id="cfgAuthorName" placeholder="비워두면 자동 추천">
     <label style="margin-top:8px;display:block">한 줄 소개</label>
-    <input id="cfgAuthorBio" placeholder="예: 생활 속 금융·건강 정보를 조사하고 정리해 전달합니다.">
-    <div class="hint">과장된 자격("의사 15년 경력" 등)은 쓰지 마세요 — 실제와 다르면 오히려 정책 위반입니다. "정보를 조사·정리해 전달"처럼 사실 그대로가 안전해요.</div>
+    <input id="cfgAuthorBio" placeholder="비워두면 주제에 맞춰 자동 추천">
+    <div class="actions" style="margin-top:8px">
+      <button class="btn sm" id="personaSuggest" style="flex:1">🎲 다른 추천 받기</button>
+    </div>
+    <div class="hint">추천 문구는 <b>자격이 아니라 방법</b>을 말합니다 — 무엇을 근거로 삼고 어떻게 확인하는지.
+      "의사 15년 경력" 같은 없는 자격은 넣지 마세요. 사실과 다르면 그 자체로 정책 위반이고, 되돌리기 어렵습니다.
+      직접 고치시면 그 값이 우선되고 자동 추천은 멈춥니다.</div>
     <label style="margin-top:8px;display:block">표시 유형</label>
     <select id="cfgAuthorType">
       <option value="Person">Person (실명/필명 저자 — 신뢰 신호 강함, 추천)</option>
@@ -1711,8 +1717,9 @@ function openSheet(){
   document.getElementById("cfgAffiliate").checked=!!(CFG.affiliate&&CFG.affiliate.enabled);
   document.getElementById("cfgAffiliateLinks").value=linksToLines((CFG.affiliate&&CFG.affiliate.links)||[]);
   document.getElementById("cfgContactEmail").value=CFG.contactEmail||"";
-  document.getElementById("cfgAuthorName").value=CFG.author||"정다인 에디터";
-  document.getElementById("cfgAuthorBio").value=CFG.authorBio||"생활 속 금융·건강 정보를 조사하고 정리해 전달합니다.";
+  ensurePersona(false);                      // 비어 있으면 주제에 맞춰 자동으로 채운다
+  document.getElementById("cfgAuthorName").value=CFG.author||"";
+  document.getElementById("cfgAuthorBio").value=CFG.authorBio||"";
   document.getElementById("cfgAuthorType").value=CFG.authorType||"Person";
   refreshArchLbl();
   document.getElementById("cfgSupaUrl").value=CFG.supabaseUrl||"";
@@ -1807,8 +1814,12 @@ document.getElementById("cfgSave").onclick=()=>{
     links:linesToLinks(document.getElementById("cfgAffiliateLinks").value)
   });
   CFG.contactEmail=document.getElementById("cfgContactEmail").value.trim();
-  CFG.author=document.getElementById("cfgAuthorName").value.trim();
-  CFG.authorBio=document.getElementById("cfgAuthorBio").value.trim();
+  const _an=document.getElementById("cfgAuthorName").value.trim();
+  const _ab=document.getElementById("cfgAuthorBio").value.trim();
+  // 값을 손으로 바꿨다면 자동 추천을 잠근다(니치가 바뀌어도 덮어쓰지 않음)
+  if((_an&&_an!==CFG.author)||(_ab&&_ab!==CFG.authorBio)) CFG.authorAuto=false;
+  CFG.author=_an; CFG.authorBio=_ab;
+  if(!CFG.author||!CFG.authorBio){ CFG.authorAuto=true; ensurePersona(false); }
   CFG.authorType=document.getElementById("cfgAuthorType").value;
   CFG.supabaseUrl=document.getElementById("cfgSupaUrl").value.trim();
   CFG.safety=Object.assign({}, CFG.safety, {indexnow_key:document.getElementById("cfgIndexnow").value.trim()});
@@ -2349,6 +2360,67 @@ const REQ_PAGES=[
   {slug:"terms", title:"이용약관", keys:["이용약관","terms"]},
   {slug:"disclaimer", title:"면책조항", keys:["면책","disclaimer"]},
 ];
+/* ===== 작성자 페르소나 자동 추천 =====
+   E-E-A-T를 올리려고 없는 자격을 지어내면(‘세무사 10년’ 같은 것) 오히려
+   구글 정책 위반이고, 들키면 복구가 안 된다. 그래서 여기서 만드는 소개는
+   전부 **자격이 아니라 방법**을 말한다 — 무엇을 근거로 삼고, 어떻게 확인하고,
+   틀리면 어떻게 고치는지. 이건 거짓이 아니면서도 신뢰 신호로 작동한다.
+   금지: 경력·연차·자격증·기관 재직·‘직접 겪어본’ 류의 단정. */
+const PERSONA_SUR   = ["김","이","박","정","윤","한","서","임","오","강","조","신","황","안"];
+const PERSONA_GIVEN = ["다인","서준","하람","시온","윤슬","가온","はる".replace(/[^가-힣]/g,"")||"준하",
+                       "민서","예온","도윤","한결","소윤","지우","연우","새힘"].filter(Boolean);
+
+// 니치별 한 줄 소개. 각 항목은 '무엇을 어떻게 하는지'만 말한다.
+const PERSONA_BIO = {
+  gov:       ["지원 제도 공고를 읽고 신청 조건과 서류를 순서대로 정리합니다. 기준이 자주 바뀌는 항목은 확인한 날짜를 함께 남깁니다.",
+              "흩어져 있는 지원금 정보를 한 자리에 모아 정리합니다. 애매한 부분은 단정하지 않고 어디에 문의해야 하는지를 적습니다."],
+  interior:  ["집을 고칠 때 필요한 자재와 순서, 대략의 비용을 찾아 정리합니다. 전기·가스처럼 위험한 작업은 전문가에게 맡기시라고 적습니다.",
+              "셀프 시공에서 자주 막히는 지점과 대안을 모아 둡니다. 제품과 가격은 확인한 시점을 함께 남깁니다."],
+  exam:      ["시험 일정과 응시 조건, 교재와 공부 순서를 찾아 정리합니다. 바뀌는 정보는 시행처 공고를 다시 확인해 고칩니다.",
+              "자격증 준비에 필요한 정보를 한 번에 볼 수 있게 모읍니다. 합격을 보장하는 방법은 없다고 생각하고, 선택지를 비교해 보여드립니다."],
+  moving:    ["이사와 전월세 계약에서 놓치기 쉬운 절차와 서류를 정리합니다. 금액과 기준은 확인한 날짜를 함께 적습니다.",
+              "계약부터 입주까지 순서대로 해야 할 일을 정리합니다. 분쟁이 잦은 부분은 관련 규정을 함께 표시합니다."],
+  appliance: ["가전과 생활용품을 고를 때 비교할 기준을 정리합니다. 가격과 사양은 확인한 시점을 함께 남깁니다.",
+              "제품 사양과 실제 사용 조건을 나눠서 정리합니다. 광고 문구와 실제 스펙이 다른 부분을 짚습니다."],
+  car:       ["차량 소모품 교체 주기와 정비 비용의 기준을 찾아 정리합니다. 견적은 지역과 차종에 따라 다르다는 점을 함께 적습니다.",
+              "정비와 유지 관리에서 자주 나오는 질문을 모아 정리합니다. 안전과 관련된 작업은 정비소 점검을 권합니다."],
+  pet:       ["반려동물 돌봄에 필요한 정보와 비용의 기준을 정리합니다. 건강 문제는 반드시 수의사 진료를 권합니다.",
+              "예방접종과 사료, 병원비처럼 미리 알아두면 좋은 것들을 모아 둡니다. 진단과 처방은 다루지 않습니다."],
+  insurance: ["보험 약관과 청구 절차에서 헷갈리는 부분을 찾아 정리합니다. 가입 권유는 하지 않으며, 조건은 개인마다 다르다는 점을 함께 적습니다.",
+              "공식 약관과 감독기관 자료를 근거로 절차를 정리합니다. 개별 판단은 해당 보험사에 확인하시라고 안내합니다."],
+  health:    ["건강검진 항목과 비용, 절차처럼 의학적 판단이 필요 없는 부분을 정리합니다. 증상과 치료는 다루지 않고 병원 진료를 권합니다.",
+              "검진과 예방접종 일정 같은 행정적인 정보를 모아 둡니다. 진단이나 처방에 관한 내용은 쓰지 않습니다."],
+  plant:     ["식물을 키우며 찾아본 관리 방법과 문제 해결법을 기록으로 남깁니다. 환경에 따라 결과가 다를 수 있다는 점을 함께 적습니다."],
+  cook:      ["만들어 본 음식의 재료와 순서를 기록으로 남깁니다. 계량과 시간은 조리 기구에 따라 달라질 수 있습니다."],
+  walk:      ["다녀온 곳의 위치와 교통, 소요 시간을 기록으로 남깁니다. 운영 시간과 요금은 확인한 날짜를 함께 적습니다."],
+  hobby:     ["취미를 시작할 때 필요한 준비물과 순서를 찾아 정리합니다. 비용은 확인한 시점 기준으로 적습니다."],
+  _default:  ["찾아본 정보를 출처와 함께 순서대로 정리합니다. 기준이 바뀌는 내용은 확인한 날짜를 남기고, 달라지면 글을 고칩니다.",
+              "공식 자료를 근거로 정리하고, 확실하지 않은 부분은 단정하지 않습니다. 잘못된 내용은 제보를 받아 바로잡습니다."]
+};
+
+function _pseudo(seed){ let h=0; for(const c of String(seed||Math.random())) h=(h*31+c.charCodeAt(0))>>>0; return h; }
+function suggestPersona(seed){
+  const key=(CFG.niche&&CFG.niche.key)||"";
+  const bios=PERSONA_BIO[key]||PERSONA_BIO._default;
+  const h=_pseudo(seed!=null?seed:Date.now()+Math.random());
+  return {
+    name: PERSONA_SUR[h%PERSONA_SUR.length] + PERSONA_GIVEN[(h>>4)%PERSONA_GIVEN.length],
+    bio:  bios[(h>>8)%bios.length]
+  };
+}
+// 비어 있으면 채우고, 자동으로 채운 값이면 니치가 바뀔 때 소개도 따라 바꾼다.
+function ensurePersona(force){
+  const auto = CFG.authorAuto !== false;              // 사용자가 직접 고치면 false로 잠김
+  if(!force && CFG.author && CFG.authorBio && !auto) return;
+  const p = suggestPersona(CFG.author||undefined);
+  if(force || !CFG.author){ CFG.author = p.name; CFG.authorAuto = true; }
+  if(force || !CFG.authorBio || auto){ CFG.authorBio = p.bio; }
+  saveCfg();
+  const i1=document.getElementById("cfgAuthorName"), i2=document.getElementById("cfgAuthorBio");
+  if(i1) i1.value=CFG.author; if(i2) i2.value=CFG.authorBio;
+  return p;
+}
+
 function pageHtml(slug){
   // ⚠️ 이 함수는 절대 '[여기에 입력하세요]' 같은 플레이스홀더를 만들면 안 된다.
   // 예전 버전이 그런 문구를 그대로 공개 발행해 애드센스 심사에 노출된 적이 있다.
@@ -3093,6 +3165,11 @@ async function renderGuide(){
       <div class="hint">${escAttr(f.a)}</div></div>`).join("")}
     <div class="hint" style="margin-top:8px">기준 ${escAttr(g.updated||"")} · 가격은 변동될 수 있으니 결제 화면에서 다시 확인하세요.</div>`;
 }
+(function personaBtn(){
+  const b=document.getElementById("personaSuggest"); if(!b) return;
+  b.onclick=()=>{ const p=ensurePersona(true); CFG.authorAuto=true; saveCfg();
+    toast(`${p.name} · 추천을 새로 뽑았습니다`); };
+})();
 (function wpDiagBtn(){
   const b=document.getElementById("wpDiagBtn");
   if(b) b.onclick=()=>wpDiagnose();
@@ -3637,6 +3714,7 @@ function applyNichePlan(){
   CFG.categories=[{name:n.label, desc:(n.why||"")+" 세부: "+subs.join(", "),
                    wp_category:n.label.split("·")[0]}];
   CFG.approvalPlan={posts:sp.approval_posts,queue:sp.queue_posts,perDay:sp.per_day,rework:sp.rework};
+  ensurePersona(false);   // 자동으로 채운 소개라면 새 주제에 맞게 다시 쓴다
   saveCfg();
   finishOnboard();
   toast(`${n.label}(으)로 설정했습니다 ✓`);
@@ -4744,19 +4822,31 @@ function wizSteps(){
     id:"author", icon:"✍️", q:"글쓴이는 누구로 할까요?",
     help:"누가 썼는지가 없는 사이트는 애드센스에서 '신뢰할 수 없는 콘텐츠'로 분류되기 쉽습니다. 본명이 아니어도 됩니다.",
     render(el){
+      ensurePersona(false);                       // 비어 있으면 주제에 맞춰 미리 채워 둔다
       el.innerHTML = `
-        <input id="wzAName" placeholder="예: 정다인" value="${escAttr(CFG.author||"")}">
-        <textarea id="wzABio" rows="3" placeholder="예: 생활 속 금융·행정 정보를 직접 확인하고 정리합니다">${escAttr(CFG.authorBio||"")}</textarea>
+        <input id="wzAName" placeholder="비워두면 자동 추천" value="${escAttr(CFG.author||"")}">
+        <textarea id="wzABio" rows="3" placeholder="비워두면 자동 추천">${escAttr(CFG.authorBio||"")}</textarea>
+        <button class="wiz-opt" id="wzAReroll" style="margin-top:4px">
+          <span class="oi">🎲</span><span><span class="ot">다른 추천 받기</span>
+          <span class="od">주제에 맞는 다른 문구로 바꿉니다</span></span></button>
         <div class="wiz-note">
-          한 줄 소개에는 <b>무엇을 어떻게 확인하는지</b>를 적으세요.
-          "전문가입니다" 보다 "직접 신청해보고 정리합니다" 가 훨씬 강한 신호입니다.
+          추천 문구는 <b>자격이 아니라 방법</b>을 말합니다 — 무엇을 근거로 삼고 어떻게 확인하는지.
+          없는 경력이나 자격을 적으면 그 자체로 정책 위반이라 되돌리기 어렵습니다.
+          그대로 쓰셔도 되고, 사실에 맞게 고치셔도 됩니다.
         </div>`;
+      el.querySelector("#wzAReroll").onclick=()=>{
+        const p=ensurePersona(true);
+        el.querySelector("#wzAName").value=p.name;
+        el.querySelector("#wzABio").value=p.bio;
+      };
     },
     next(){
       const n=(document.getElementById("wzAName").value||"").trim();
       const bio=(document.getElementById("wzABio").value||"").trim();
-      if(!n){ toast("이름을 넣어주세요"); return false; }
-      CFG.author=n; CFG.authorBio=bio; saveCfg(); return true;
+      if((n&&n!==CFG.author)||(bio&&bio!==CFG.authorBio)) CFG.authorAuto=false;
+      CFG.author=n; CFG.authorBio=bio;
+      if(!n||!bio){ CFG.authorAuto=true; ensurePersona(false); }   // 비워두면 자동으로 채운다
+      saveCfg(); return true;
     },
     skip:true
   },
