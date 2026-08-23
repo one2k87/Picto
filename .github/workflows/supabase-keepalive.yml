@@ -1,0 +1,44 @@
+name: Supabase 정지 방지 핑
+
+# 왜 필요한가
+#   Supabase 무료 플랜은 **7일 동안 DB 요청이 없으면 프로젝트를 정지**시킨다.
+#   정지되면 대시보드에서 사람이 직접 깨워야 하고, 그 사이 설정 동기화가 전부
+#   실패한다. 앱을 매일 열면 자연히 방지되지만, 여행·바쁜 주에는 그 가정이 깨진다.
+#
+# 무엇을 하나
+#   공개(publishable) 키로 읽기 전용 RPC를 하루 한 번 호출한다.
+#   존재하지 않는 slot을 조회하므로 데이터를 건드리지 않고, 빈 배열만 돌아온다.
+#   비밀값이 필요 없어 시크릿을 쓰지 않는다.
+
+on:
+  schedule:
+    - cron: "0 3 * * *"        # 매일 12:00 KST
+  workflow_dispatch: {}
+
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: DB 깨우기 (읽기 전용)
+        env:
+          URL: https://nsojjjwbaddasdnknekc.supabase.co
+          KEY: sb_publishable_fIxl_Y3EX74XYamuBhPFlw_i8zGAHl3
+        run: |
+          # 64자리 더미 slot — 실제로 존재할 수 없는 값이라 항상 [] 를 받는다
+          SLOT=$(printf '0%.0s' $(seq 1 64))
+          CODE=$(curl -s -o /tmp/out.txt -w '%{http_code}' \
+            -X POST "$URL/rest/v1/rpc/settings_get" \
+            -H "apikey: $KEY" -H "Authorization: Bearer $KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"p_slot\":\"$SLOT\"}")
+          echo "HTTP $CODE"
+          head -c 200 /tmp/out.txt; echo
+          if [ "$CODE" != "200" ]; then
+            echo "::error::Supabase 응답이 정상이 아닙니다(HTTP $CODE). 프로젝트가 이미 정지됐거나 스키마가 배포되지 않았을 수 있습니다."
+            exit 1
+          fi
+          echo "정상 — 정지 타이머가 초기화되었습니다."
