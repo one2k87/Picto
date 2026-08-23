@@ -206,6 +206,45 @@
   .ring .rtxt{font-size:12px;color:var(--muted);line-height:1.5;min-width:0}
   .ring .rtxt b{display:block;font-size:15px;color:var(--txt)}
 
+  /* ── 설정 화면 밀도 조정: 세로 여백을 줄여 한 탭에 더 담는다 ── */
+  .page .field{margin-bottom:9px}
+  .page .field label{margin-bottom:3px}
+  .page .hint{margin-top:3px;line-height:1.45}
+  .page .field input,.page .field select{padding:9px 11px}
+  .page .hintbtn{margin-top:2px}
+
+  /* ── 당겨서 새로고침 ── */
+  #ptr{position:fixed;left:0;right:0;top:0;z-index:19;display:flex;justify-content:center;
+    pointer-events:none;transform:translateY(-56px);transition:transform .22s cubic-bezier(.4,0,.2,1)}
+  #ptr.show{transform:translateY(calc(var(--safe-t) + 6px))}
+  #ptr .pc{display:flex;align-items:center;gap:7px;background:var(--card);
+    border:1px solid var(--accent);border-radius:999px;padding:7px 14px;font-size:12px;
+    color:var(--accent);box-shadow:0 4px 18px var(--glow)}
+  #ptr .pi{width:15px;height:15px;border:2px solid var(--accent);border-top-color:transparent;
+    border-radius:50%;transition:transform .1s}
+  #ptr.load .pi{animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ── 실행 FAB: 이 앱의 핵심 행동을 엄지 자리로 ── */
+  .fab{position:fixed;right:16px;z-index:29;width:56px;height:56px;border-radius:50%;
+    border:0;background:var(--accent);color:#1a1430;display:none;
+    place-items:center;cursor:pointer;box-shadow:0 6px 22px var(--glow);
+    bottom:calc(70px + var(--safe-b));
+    transition:transform .18s cubic-bezier(.34,1.5,.6,1),opacity .2s}
+  .fab.on{display:grid;animation:fadeUp .3s ease-out}
+  .fab:active{transform:scale(.9)}
+  .fab .i{width:25px;height:25px;stroke-width:2.2}
+  .fab.busy{background:var(--card2);color:var(--accent);border:2px solid var(--accent)}
+  .fab.busy .i{animation:spin 1s linear infinite}
+
+  /* ── 로딩 스켈레톤 ── */
+  .skcard{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:14px 14px 14px 16px;margin:8px 0;display:flex;flex-direction:column;gap:9px}
+  .skcard .skel:nth-child(1){width:38%;height:11px}
+  .skcard .skel:nth-child(2){width:92%;height:15px}
+  .skcard .skel:nth-child(3){width:68%;height:15px}
+  .skcard .skel:nth-child(4){width:50%;height:10px}
+
   /* ── 세련도 보정: 부드러운 그림자·눌림·전환 ── */
   .card{transition:transform .16s cubic-bezier(.34,1.4,.64,1),border-color .16s,box-shadow .16s}
   .card:active{transform:scale(.988)}
@@ -616,7 +655,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v48 · 설정·목록 서브탭</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v49 · 새로고침·FAB·스켈레톤</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -3060,7 +3099,24 @@ function buildSubtabs(pageId){
   showSub(pageId,cfg.home);
 }
 // 설정: 아코디언 그룹(1단계) → 상단 서브탭(3-3)
-// 그룹 헤더를 없애고 본문만 남겨 탭으로 오가게 한다.
+// 큰 그룹은 성격이 다른 덩어리로 한 번 더 쪼갠다(콘텐츠→주제/품질/작성자, 고급→연동/앱).
+// 쪼개는 기준은 그룹 본문 안의 h2 구분선이다.
+const SPLIT_GROUPS={
+  "콘텐츠":[{label:"주제",until:"품질·안전"},{label:"품질",until:"작성자"},{label:"작성자"}],
+  "고급":[{label:"연동",until:"앱 · 데이터"},{label:"앱"}],
+};
+function splitGroupBody(body,plan){
+  // h2 제목을 경계로 본문을 여러 조각으로 나눈다
+  const kids=[...body.children], out=plan.map(p=>({label:p.label,nodes:[]}));
+  let idx=0;
+  for(const el of kids){
+    const isH=el.tagName==="H2";
+    const nextKey=plan[idx]&&plan[idx].until;
+    if(isH&&nextKey&&(el.textContent||"").includes(nextKey)) idx=Math.min(idx+1,out.length-1);
+    out[idx].nodes.push(el);
+  }
+  return out.filter(o=>o.nodes.length);
+}
 function settingsToSubtabs(){
   const page=document.getElementById("sheet");
   if(!page||page.dataset.subtabbed) return;
@@ -3070,14 +3126,19 @@ function settingsToSubtabs(){
   const bar=document.createElement("div"); bar.className="subtabs";
   const hint=document.createElement("div");
   hint.className="swipehint"; hint.textContent="← 좌우로 밀어 탭 이동 →";
-  const secs=[];
-  grps.forEach((g,i)=>{
-    const name=g.querySelector(".gt")?.textContent||("그룹"+i);
+  const secs=[]; let seq=0;
+  grps.forEach(g=>{
+    const name=g.querySelector(".gt")?.textContent||("그룹"+seq);
     const body=g.querySelector(".grp-b");
-    const d=document.createElement("div");
-    d.className="sub-sec"; d.dataset.k="g"+i;
-    while(body&&body.firstChild) d.appendChild(body.firstChild);
-    secs.push({k:"g"+i,label:name,el:d});
+    const plan=SPLIT_GROUPS[name];
+    const parts=plan&&body?splitGroupBody(body,plan)
+      :[{label:name,nodes:body?[...body.children]:[]}];
+    parts.forEach(pt=>{
+      const d=document.createElement("div");
+      d.className="sub-sec"; d.dataset.k="g"+seq;
+      pt.nodes.forEach(n=>d.appendChild(n));
+      secs.push({k:"g"+seq,label:pt.label,el:d}); seq++;
+    });
     g.remove();
   });
   bar.innerHTML=secs.map(s=>`<button class="st" type="button" data-k="${s.k}">${escAttr(s.label)}</button>`).join("");
@@ -3434,6 +3495,64 @@ function moveKeyWiz(){
   wrap.querySelector("button").onclick=()=>{ closeSheet(); setTimeout(()=>{openKeyWiz();syncTabbar();},220); };
   grp.querySelector(".grp-b").prepend(wrap);
 }
+
+// ===== 당겨서 새로고침 =====
+(function pullToRefresh(){
+  const ind=document.createElement("div"); ind.id="ptr";
+  ind.innerHTML=`<div class="pc"><span class="pi"></span><span class="pt">당겨서 새로고침</span></div>`;
+  document.body.appendChild(ind);
+  const TH=72; let y0=0, pulling=false, ready=false;
+  const txt=ind.querySelector(".pt"), spin=ind.querySelector(".pi");
+  document.addEventListener("touchstart",e=>{
+    if(window.scrollY>2||e.touches.length!==1||ind.classList.contains("load")){pulling=false;return;}
+    y0=e.touches[0].clientY; pulling=true; ready=false;
+  },{passive:true});
+  document.addEventListener("touchmove",e=>{
+    if(!pulling) return;
+    const dy=e.touches[0].clientY-y0;
+    if(dy<=0){ ind.classList.remove("show"); return; }
+    ind.classList.add("show");
+    ready=dy>=TH;
+    txt.textContent=ready?"놓으면 새로고침":"당겨서 새로고침";
+    spin.style.transform=`rotate(${Math.min(dy/TH,1)*270}deg)`;
+  },{passive:true});
+  document.addEventListener("touchend",async()=>{
+    if(!pulling) return; pulling=false;
+    if(!ready){ ind.classList.remove("show"); return; }
+    ind.classList.add("load"); txt.textContent="불러오는 중…";
+    try{ showSkeleton(); await loadData(); }catch(e){}
+    setTimeout(()=>{ ind.classList.remove("show","load"); spin.style.transform=""; },420);
+  },{passive:true});
+})();
+
+// ===== 로딩 스켈레톤 =====
+function showSkeleton(n){
+  const grid=document.getElementById("grid"); if(!grid) return;
+  const empty=document.getElementById("empty"); if(empty) empty.style.display="none";
+  grid.innerHTML=Array.from({length:n||3},()=>
+    `<div class="skcard"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>`).join("");
+}
+
+// ===== 실행 FAB =====
+(function runFab(){
+  const fab=document.createElement("button");
+  fab.className="fab"; fab.id="runFab"; fab.type="button";
+  fab.setAttribute("aria-label","지금 생성 실행");
+  fab.innerHTML=svgIcon("play");
+  document.body.appendChild(fab);
+  fab.onclick=()=>{ const b=document.getElementById("runBtn"); if(b) b.click(); };
+  // 메인 화면에서만 노출하고, 실행 중이면 회전 표시
+  setInterval(()=>{
+    const onList=currentTab()==="list";
+    const logged=(()=>{const o=document.getElementById("loginOverlay");
+      return !o||getComputedStyle(o).display==="none";})();
+    fab.classList.toggle("on", onList&&logged);
+    const busy=typeof RUNNING!=="undefined"&&RUNNING;
+    fab.classList.toggle("busy",!!busy);
+    if(busy&&!fab.dataset.b){ fab.dataset.b="1"; fab.innerHTML=svgIcon("refresh"); }
+    if(!busy&&fab.dataset.b){ delete fab.dataset.b; fab.innerHTML=svgIcon("play"); }
+  },700);
+})();
 
 gate();
 if(needLock()) faceUnlock();   // 잠금 상태면 진입하자마자 Face ID 시도
