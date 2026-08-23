@@ -26,6 +26,7 @@ import metrics
 import images
 import quality
 import strategy
+import ramp
 import accuracy
 import monitor
 import notify
@@ -762,9 +763,21 @@ def run():
     # 이미지 비용 상한: 실행 1회당 최대 개수(카테고리 합산)
     img_budget = {"used": 0, "max": int(cfg.get("images", {}).get("max_per_run", 10 ** 9))}
 
+    # 승인→수익 램프: 단계에 맞춰 광고·발행량·깊이를 config에 덮어쓴다
+    ramp.apply_to_config(cfg)
+    _bias = cfg.get("_ramp_intent_bias", "auto")
+
     # 오늘의 의도 배분(strategy.json 기반). 수익형/누적형을 요일별로 다르게 쓴다.
     _plan = strategy.load_plan()
     _todo = strategy.today_intents(_plan)
+    # 램프 단계가 의도를 강제하면(승인 준비·전환 초기) 그쪽을 우선한다
+    _ppd = int(cfg.get("_ramp_posts_per_day", 5))
+    if _bias == "evergreen":
+        _todo = {"revenue": 0, "evergreen": _ppd}
+    elif _bias == "revenue":
+        _todo = {"revenue": max(1, _ppd - 1), "evergreen": 1}
+    elif _bias == "balanced":
+        _todo = {"revenue": _ppd // 2, "evergreen": _ppd - _ppd // 2}
     _order = (["revenue"] * _todo.get("revenue", 0)) + (["evergreen"] * _todo.get("evergreen", 0))
     random.shuffle(_order)                      # 같은 의도가 몰려 보이지 않게 섞는다
     cfg["_intent_queue"] = _order
