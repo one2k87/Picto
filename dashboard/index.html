@@ -26,13 +26,21 @@
     padding-bottom:calc(72px + var(--safe-b));}
   header{position:sticky;top:0;z-index:20;background:rgba(15,17,21,.92);
     backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid var(--line);
-    padding:calc(12px + var(--safe-t)) 16px 12px;display:flex;align-items:center;gap:12px}
-  h1{font-size:16px;margin:0;font-weight:700;line-height:1.2}
-  .sub{color:var(--muted);font-size:11px;margin-top:2px}
-  .spacer{flex:1}
-  .icon-btn{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);
-    background:var(--card2);color:var(--txt);font-size:17px;display:grid;place-items:center;cursor:pointer}
-  .run-wrap{position:relative;width:38px;height:38px;flex:0 0 auto}
+    padding:calc(10px + var(--safe-t)) 12px 10px;display:flex;align-items:center;gap:6px;
+    max-width:100%;overflow:hidden}
+  h1{font-size:16px;margin:0;font-weight:700;line-height:1.2;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* 제목 블록은 줄어들 수 있어야 아이콘이 화면 밖으로 밀리지 않는다 */
+  header>div:not(.spacer):not(.run-wrap){min-width:0;overflow:hidden}
+  .sub{color:var(--muted);font-size:11px;margin-top:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .spacer{flex:1 1 auto;min-width:0}
+  .icon-btn{width:34px;height:34px;flex:0 0 auto;border-radius:10px;border:1px solid var(--line);
+    background:var(--card2);color:var(--txt);font-size:16px;line-height:1;
+    display:grid;place-items:center;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;transition:transform .12s,border-color .12s,background .12s}
+  .icon-btn:active{transform:scale(.92);border-color:var(--accent);background:#241f3d}
+  .run-wrap{position:relative;width:34px;height:34px;flex:0 0 auto}
   .run-ring{position:absolute;inset:-3px;width:44px;height:44px;transform:rotate(-90deg);
     pointer-events:none;opacity:0;transition:opacity .2s}
   .run-wrap.running .run-ring{opacity:1}
@@ -73,13 +81,30 @@
     overflow:hidden;text-overflow:ellipsis}
   .ptab.active{color:#fff;border-color:var(--accent);background:#241f3d}
 
+  /* 가로 스크롤 원천 차단 — 어떤 요소도 화면 밖으로 못 나가게 */
+  html,body{max-width:100%;overflow-x:hidden}
+  img,svg,video,table{max-width:100%}
+
   /* 좁은 화면(아이폰 등): 한 화면에 들어오도록 여백·글자 축소 */
   @media (max-width:430px){
+    header{gap:5px;padding-left:10px;padding-right:10px}
+    .icon-btn{width:31px;height:31px;font-size:15px;border-radius:9px}
+    .run-wrap,.run-ring{width:31px;height:31px}
+    .run-ring{inset:-3px;width:37px;height:37px}
+    h1{font-size:15px}
+    .sub{font-size:10px}
     .filters{padding:5px 10px 3px;gap:4px}
     .chip{font-size:10.5px;padding:3px 7px}
     .ptab{font-size:11px;padding:7px 2px}
     .sec-div,.bulkbar{margin-left:10px;margin-right:10px}
     #panelTabs{margin-left:10px !important;margin-right:10px !important}
+    .card,.toolbar{margin-left:10px !important;margin-right:10px !important}
+  }
+  /* 아주 좁은 기기(아이폰 SE 등) */
+  @media (max-width:360px){
+    header{gap:4px}
+    .icon-btn{width:29px;height:29px;font-size:14px}
+    .run-wrap{width:29px;height:29px}
   }
 
   .bulkbar{display:flex;gap:8px;padding:6px 16px 2px;flex-wrap:wrap;align-items:center}
@@ -404,7 +429,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v37 · 모바일 레이아웃 + 보관함</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v38 · 모바일 UI 정리</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
