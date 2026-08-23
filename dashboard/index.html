@@ -81,6 +81,15 @@
     overflow:hidden;text-overflow:ellipsis}
   .ptab.active{color:#fff;border-color:var(--accent);background:#241f3d}
 
+  /* ── 페이지 전환(3-1): 모달 시트를 전체 화면 페이지로 ──
+     기존 open 클래스 토글을 그대로 쓰므로 열고닫는 함수는 수정하지 않는다 */
+  .page{display:none;position:static;transform:none;max-height:none;
+    background:transparent;border:0;border-radius:0;padding:8px 14px 20px}
+  .page.open{display:block}
+  .page>h2:first-child{margin-top:4px}
+  #sheetBg,#statsBg,#adsBg{display:none !important}   /* 페이지엔 배경 덮개 불필요 */
+  .page .actions>button[id$="Close"]{display:none}     /* 하단 탭으로 이동하므로 닫기 버튼 숨김 */
+
   /* ── 하단 탭바(2단계): 자주 쓰는 이동을 엄지가 닿는 곳으로 ── */
   .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:none;
     grid-template-columns:repeat(4,1fr);gap:0;
@@ -464,7 +473,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v41 · 하단 탭바</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v42 · 페이지 전환 + 스와이프</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2802,6 +2811,71 @@ document.getElementById("usePwBtn").onclick=()=>{
   document.getElementById("faceUnlockBtn").style.display="none";
   document.getElementById("usePwBtn").style.display="none";
 };
+// ===== 페이지 전환 (UI 3-1) =====
+// 설정·승인·수익 시트를 '아래에서 올라오는 팝업'이 아니라 전체 화면 페이지로 바꾼다.
+// .sheet → .page 로 클래스만 교체하고, 기존 open/close 함수(=.open 토글)는 그대로 쓴다.
+const PAGE_IDS=["sheet","statsSheet","adsSheet"];   // keySheet는 일시 작업이라 모달 유지
+(function toPages(){
+  PAGE_IDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ el.classList.remove("sheet"); el.classList.add("page"); }
+  });
+  // 메인(글 목록)을 한 덩어리로 묶어 페이지와 교대로 보이게 한다
+  const skipTag=new Set(["HEADER","SCRIPT","STYLE","NAV","LINK"]);
+  const skipId=new Set(["tabbar","loginOverlay","obBg","obCard","keySheet","keyBg"]);
+  const nodes=[...document.body.children].filter(el=>
+    !skipTag.has(el.tagName) && !skipId.has(el.id) &&
+    !el.classList.contains("page") && !el.classList.contains("sheet") &&
+    !el.classList.contains("sheet-bg") && !el.classList.contains("toast"));
+  if(!nodes.length) return;
+  const wrap=document.createElement("div"); wrap.id="mainView";
+  document.body.insertBefore(wrap,nodes[0]);
+  nodes.forEach(n=>wrap.appendChild(n));
+})();
+function syncViews(){
+  const mv=document.getElementById("mainView"); if(!mv) return;
+  const anyOpen=PAGE_IDS.some(id=>{const e=document.getElementById(id);return e&&e.classList.contains("open");});
+  mv.style.display=anyOpen?"none":"";
+}
+
+// ===== 좌우 스와이프로 탭 이동 =====
+// 첫 탭(글)에서 오른쪽으로 밀면 메인으로 빠져나온다.
+const SWIPE_ORDER=["list","ads","stats","set"];
+function gotoTab(k){
+  const bar=document.getElementById("tabbar"); if(!bar) return;
+  const btn=bar.querySelector(`.tb[data-k="${k}"]`);
+  if(!btn) return;
+  closeAllSheets();
+  if(k==="set") openSheet();
+  else if(k==="stats") openStats();
+  else if(k==="ads") openAds();
+  syncViews(); syncTabbar();
+  window.scrollTo({top:0,behavior:"instant"});   // 탭 바꾸면 항상 맨 위부터
+}
+(function enableSwipe(){
+  let x0=0,y0=0,t0=0,tracking=false;
+  const START=el=>{
+    // 가로 스크롤 영역이나 입력 중일 땐 스와이프를 잡지 않는다
+    return !el.closest("input,textarea,select,.filters");
+  };
+  document.addEventListener("touchstart",e=>{
+    if(e.touches.length!==1||!START(e.target)) { tracking=false; return; }
+    const t=e.touches[0]; x0=t.clientX; y0=t.clientY; t0=Date.now(); tracking=true;
+  },{passive:true});
+  document.addEventListener("touchend",e=>{
+    if(!tracking) return; tracking=false;
+    const t=e.changedTouches[0];
+    const dx=t.clientX-x0, dy=t.clientY-y0, dt=Date.now()-t0;
+    if(dt>600) return;                                   // 너무 느리면 스크롤로 간주
+    if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.6) return;
+    const cur=currentTab();
+    const i=SWIPE_ORDER.indexOf(cur);
+    if(i<0) return;
+    if(dx<0){ if(i<SWIPE_ORDER.length-1) gotoTab(SWIPE_ORDER[i+1]); }   // 왼쪽으로 밀기 → 다음 탭
+    else    { if(i>0) gotoTab(SWIPE_ORDER[i-1]); else gotoTab("list"); } // 오른쪽 → 이전 탭 / 첫 탭이면 메인
+  },{passive:true});
+})();
+
 // ===== 하단 탭바 (UI 2단계) =====
 // 헤더 우측에 몰려 있던 아이콘을 엄지가 닿는 하단으로 옮긴다.
 // 각 탭은 기존 시트를 열고 닫을 뿐이라 기능 변경은 없다.
@@ -2844,20 +2918,10 @@ function syncTabbar(){
      </button>`).join("");
   document.body.appendChild(bar);
   bar.querySelectorAll(".tb").forEach(b=>{
-    b.onclick=()=>{
-      const k=b.dataset.k, was=currentTab();
-      closeAllSheets();
-      if(k!==was){                       // 같은 탭을 다시 누르면 닫기(토글)
-        if(k==="set") openSheet();
-        else if(k==="stats") openStats();
-        else if(k==="ads") openAds();
-      }
-      setTimeout(syncTabbar,30);
-    };
+    b.onclick=()=>{ gotoTab(b.dataset.k); };   // 페이지 전환(같은 탭 재탭도 그 화면 유지)
   });
-  // 시트를 X나 배경으로 닫아도 탭 상태가 맞도록 주기적으로 동기화
-  setInterval(syncTabbar, 600);
-  syncTabbar();
+  setInterval(()=>{syncTabbar();syncViews();}, 600);
+  syncTabbar(); syncViews();
 })();
 // 헤더에서 하단 탭과 겹치는 아이콘 제거(🛡️ 📊 ⚙️) — 실행·새로고침·자동생성만 남긴다
 ["adsBtn","statsBtn","gear"].forEach(id=>{
