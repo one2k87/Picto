@@ -685,7 +685,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v57 · 아이디 입력 경고</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v58 · 아이디 형식 자동 시도</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -853,8 +853,8 @@
   <div class="field">
     <label>아이디</label>
     <input id="cfgUser" placeholder="wp_id" autocapitalize="off">
-    <div class="hint">⚠️ <b>이메일이 아니라 로그인 아이디</b>입니다. 워드프레스 → 사용자 → 프로필의 '사용자 이름'을 그대로 넣으세요.
-      이메일을 넣으면 401 오류가 납니다(가장 흔한 실수).</div>
+    <div class="hint">워드프레스에 <b>실제로 로그인할 때 쓰는 값</b>을 넣으세요. 계정에 따라 <b>아이디</b>일 수도, <b>이메일</b>일 수도 있습니다
+      (워드프레스는 둘 다 받습니다). 401이 나면 아래 진단에서 반대쪽 형식도 자동으로 시도합니다.</div>
     <div id="cfgUserWarn" class="hint" style="display:none;color:var(--danger)"></div>
   </div>
   <div class="field">
@@ -2639,7 +2639,7 @@ async function wpDiagnose(){
   box.innerHTML="확인 중…";
   add(`사이트 주소: ${escAttr(base||"(비어 있음)")}`, !!base);
   add(`아이디: ${escAttr(user||"(비어 있음)")}`, !!user,
-      user.includes("@")?"⚠️ 이메일 주소로 보입니다. <b>워드프레스 로그인 아이디</b>여야 합니다(이메일 아님).":"");
+      user.includes("@")?"이메일 형식입니다(워드프레스는 이메일 로그인도 받으므로 정상일 수 있습니다).":"");
   const hasSpace=/\s/.test(pass);
   add(`비밀번호: ${pass?pass.length+"자":"(비어 있음)"}`, !!pass,
       hasSpace?"공백이 포함돼 있습니다. 워드프레스가 보여주는 형태 그대로라 정상입니다(자동으로 제거해 시도합니다).":"");
@@ -2655,15 +2655,25 @@ async function wpDiagnose(){
   }catch(e){ add("사이트에 연결하지 못했습니다",false,escAttr(String(e).slice(0,120))); return; }
 
   // 2) 인증 테스트 — 공백 제거본과 원본을 모두 시도
-  const variants=[["공백 제거", pass.replace(/\s/g,"")], ["입력 그대로", pass]];
+  // 아이디는 '입력값'과 '반대 형식'(이메일↔아이디)을, 비밀번호는 공백 제거본과 원본을 조합해 시도한다.
+  // 워드프레스는 로그인 식별자로 아이디와 이메일을 모두 받으므로 어느 쪽이 맞는지 미리 단정하지 않는다.
+  const users=[user];
+  // 이메일을 넣었다면 앞부분(아이디 후보)도 시도한다.
+  // 반대로 아이디만 넣은 경우엔 이메일 도메인을 추측할 수 없으므로 실패 시 안내로 넘긴다.
+  if(user.includes("@")) users.push(user.split("@")[0]);
+  const variants=[];
+  for(const u of users){
+    variants.push([`${u} · 공백 제거`, pass.replace(/\s/g,""), u]);
+    variants.push([`${u} · 입력 그대로`, pass, u]);
+  }
   let okAuth=null;
-  for(const [label,pw] of variants){
+  for(const [label,pw,uid] of variants){
     try{
-      const h={Authorization:"Basic "+btoa(user+":"+pw)};
+      const h={Authorization:"Basic "+btoa(uid+":"+pw)};
       const r=await fetch(base+"/wp-json/wp/v2/users/me?context=edit",{headers:h});
       if(r.ok){
         const me=await r.json();
-        okAuth={label,pw,me};
+        okAuth={label,pw,me,uid};
         add(`인증 성공 (${label}) — ${escAttr(me.name||"")} / 권한: ${(me.roles||[]).join(", ")||"?"}`,true);
         break;
       }else{
@@ -2676,8 +2686,8 @@ async function wpDiagnose(){
   if(!okAuth){
     box.innerHTML+=`<div class="dnext" style="margin-top:10px"><div class="dl">확인할 것</div>
       <div class="dv" style="font-size:12.5px;line-height:1.7">
-      1. <b>아이디</b>가 워드프레스 <u>로그인 아이디</u>인지 (이메일·표시이름 아님).<br>
-         워드프레스 → 사용자 → 프로필에서 '사용자 이름'을 확인하세요.<br>
+      1. <b>아이디</b>를 반대 형식으로 바꿔보세요. 아이디를 넣었다면 <u>이메일</u>을,
+         이메일을 넣었다면 <u>아이디</u>를 (워드프레스는 둘 다 받지만 계정마다 다릅니다).<br>
       2. 응용 프로그램 비밀번호를 <b>새로 발급</b>해 다시 넣어보세요.
          (사용자 → 프로필 → 맨 아래 응용 프로그램 비밀번호)<br>
       3. 위 두 가지가 맞는데도 401이면 <b>서버가 인증 헤더를 차단</b>하는 경우입니다.
@@ -2693,9 +2703,12 @@ async function wpDiagnose(){
       canTag?"":"관리자 계정으로 발급한 응용 프로그램 비밀번호를 쓰세요.");
 
   // 4) 실제 삭제 가능 여부는 건드리지 않고 확인만
-  if(canTag && okAuth.label==="공백 제거" && /\s/.test(CFG.pass||"")){
-    CFG.pass=okAuth.pw; saveCfg();
-    add("공백을 제거한 비밀번호로 설정을 저장했습니다. 이제 러너를 다시 실행하세요.",true);
+  // 통한 조합을 그대로 저장해 다음부터 바로 되게 한다
+  if(canTag && (okAuth.pw!==CFG.pass || okAuth.uid!==CFG.user)){
+    CFG.pass=okAuth.pw; CFG.user=okAuth.uid; saveCfg();
+    const i1=document.getElementById("cfgUser"), i2=document.getElementById("cfgPass");
+    if(i1) i1.value=okAuth.uid; if(i2) i2.value=okAuth.pw;
+    add(`통한 조합(${escAttr(okAuth.uid)})으로 설정을 저장했습니다. 이제 러너를 실행하세요.`,true);
   }
 }
 
@@ -2882,18 +2895,6 @@ async function renderGuide(){
       <div class="hint">${escAttr(f.a)}</div></div>`).join("")}
     <div class="hint" style="margin-top:8px">기준 ${escAttr(g.updated||"")} · 가격은 변동될 수 있으니 결제 화면에서 다시 확인하세요.</div>`;
 }
-(function userFieldGuard(){
-  const el=document.getElementById("cfgUser"), w=document.getElementById("cfgUserWarn");
-  if(!el||!w) return;
-  const check=()=>{
-    const v=(el.value||"").trim();
-    const bad=v.includes("@");
-    w.style.display=bad?"block":"none";
-    w.innerHTML=bad?"❌ 이메일 주소가 입력됐습니다. <b>로그인 아이디</b>로 바꾸세요 — 이대로 저장하면 인증이 실패합니다.":"";
-    el.style.borderColor=bad?"var(--danger)":"";
-  };
-  el.addEventListener("input",check); check();
-})();
 (function wpDiagBtn(){
   const b=document.getElementById("wpDiagBtn");
   if(b) b.onclick=()=>wpDiagnose();
