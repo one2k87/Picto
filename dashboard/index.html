@@ -616,7 +616,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v47 · 설정·목록 서브탭</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v48 · 설정·목록 서브탭</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1436,7 +1436,8 @@ function render(){
     </div>`;}).join("");
   updateBulkBar();
 }
-function c(id,v){document.getElementById(id).textContent=v;}
+// 카운터 갱신. 상단 탭으로 바뀌며 사라진 요소가 있어도 render()가 멈추지 않도록 null 안전.
+function c(id,v){const el=document.getElementById(id); if(el) el.textContent=v;}
 
 // 필터
 document.querySelectorAll(".chip[data-f]").forEach(ch=>ch.onclick=()=>{
