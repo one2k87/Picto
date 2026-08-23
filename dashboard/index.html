@@ -734,7 +734,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v77 · 자동 동기화</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v78 · 첫 동기화는 합치기</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1001,6 +1001,7 @@
       <summary class="hint" style="cursor:pointer">수동 조작 · 직접 지정 (평소엔 볼 일 없음)</summary>
       <div class="actions" style="margin-top:8px;gap:6px">
         <button class="btn sm" id="syncPushBtn" style="flex:1">⬆️ 지금 올리기</button>
+        <button class="btn sm" id="syncMergeBtn" style="flex:1">🔀 합치기</button>
         <button class="btn sm" id="syncPullBtn" style="flex:1">⬇️ 서버 것으로 덮기</button>
       </div>
       <label style="margin-top:8px;display:block">Supabase 주소 (비우면 기본값)</label>
@@ -3114,6 +3115,14 @@ async function syncPush(silent){
   }catch(e){ if(!silent) toast("올리기 실패: "+String(e.message||e).slice(0,90),1); return false; }
 }
 
+// 비어 있는 값인지 판단(false와 0은 '값 있음'으로 본다)
+function _blank(v){
+  if(v===undefined||v===null||v==="") return true;
+  if(Array.isArray(v)) return v.length===0;
+  if(typeof v==="object") return Object.keys(v).length===0;
+  return false;
+}
+
 // force=false면 '서버가 더 최신일 때만' 덮어쓴다. 자동 동기화는 항상 이 모드.
 async function syncPull(silent, force){
   if(!syncReady()){ if(!silent) toast("암호 문구를 먼저 정해주세요",1); return false; }
@@ -3138,15 +3147,35 @@ async function syncPull(silent, force){
     let obj;
     try{ obj=await syncDecrypt(row.payload, CFG.syncPass, slot); }
     catch(e){ if(!silent) toast("암호 문구가 다릅니다",1); return false; }
+
+    // ⚠️ 이 기기에서 처음 동기화하는 경우에는 덮어쓰지 않고 '합친다'.
+    //    폰에는 Gemini 키가 있고 PC에는 없는 것처럼, 기기마다 채워진 항목이
+    //    다를 수 있다. 시각만 보고 덮으면 한쪽에만 있던 값이 사라진다.
+    //    합치기에서는 이 기기가 비워둔 칸만 서버 값으로 채운다.
+    const firstTime = !CFG.syncAt;
     const keep={syncPass:CFG.syncPass, syncKey:CFG.syncKey, supabaseUrl:CFG.supabaseUrl};
-    for(const k of Object.keys(obj)) if(!SYNC_SKIP.includes(k)) CFG[k]=obj[k];
+    let filled=0, kept=0;
+    if(firstTime && !force){
+      for(const k of Object.keys(obj)){
+        if(SYNC_SKIP.includes(k)) continue;
+        if(_blank(CFG[k]) && !_blank(obj[k])){ CFG[k]=obj[k]; filled++; }
+        else if(!_blank(CFG[k]) && !_blank(obj[k]) && JSON.stringify(CFG[k])!==JSON.stringify(obj[k])) kept++;
+      }
+    } else {
+      for(const k of Object.keys(obj)) if(!SYNC_SKIP.includes(k)) CFG[k]=obj[k];
+    }
     Object.assign(CFG, keep);
     CFG.syncAt=row.updated_at; CFG.cfgTouchedAt=row.updated_at;
     _syncApplying=true; saveCfg(); _syncApplying=false;
     try{ openSheet(); }catch(e){}
     try{ fillApprovalFields(); }catch(e){}
     renderSyncBox();
-    if(!silent) toast(`${row.device||"다른 기기"}의 설정을 받았습니다 ✓`);
+    if(firstTime && !force){
+      // 합친 결과를 서버에 올려 두 기기의 값을 하나로 모은다
+      await syncPush(true);
+      toast(`${row.device||"다른 기기"}의 설정과 합쳤습니다 — 빈 칸 ${filled}개 채움${kept?`, 이 기기 값 ${kept}개 유지`:""}`);
+    }
+    else if(!silent) toast(`${row.device||"다른 기기"}의 설정을 받았습니다 ✓`);
     else toast(`${row.device||"다른 기기"}에서 바뀐 설정을 반영했습니다`);
     return true;
   }catch(e){ if(!silent) toast("받기 실패: "+String(e.message||e).slice(0,90),1); return false; }
@@ -3980,6 +4009,13 @@ async function renderGuide(){
 (function syncBtns(){
   const p=document.getElementById("syncPushBtn"), q=document.getElementById("syncPullBtn");
   if(p) p.onclick=()=>syncPush(false);
+  const mg=document.getElementById("syncMergeBtn");
+  if(mg) mg.onclick=async()=>{
+    const sv=CFG.syncAt; CFG.syncAt=null;      // 합치기 모드로 한 번 실행
+    const ok=await syncPull(true,false);
+    if(!ok) CFG.syncAt=sv;
+    saveCfg(); renderSyncBox();
+  };
   if(q) q.onclick=()=>{ if(confirm("서버의 설정으로 이 기기를 덮어씁니다.\n\n이 기기에서만 바꾼 값이 있으면 사라집니다.\n계속할까요?")) syncPull(false,true); };
   // 암호 문구를 넣는 순간 바로 켜지도록
   const pw=document.getElementById("cfgSyncPass");
