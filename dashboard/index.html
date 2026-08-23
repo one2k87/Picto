@@ -464,7 +464,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v40 · 하단 탭바</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v41 · 하단 탭바</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2864,11 +2864,12 @@ function syncTabbar(){
   const el=document.getElementById(id); if(el) el.style.display="none";
 });
 // 🔑 AI 키 마법사는 초기 1회용 → 설정 '연결' 그룹 안으로 이동
-(function moveKeyWiz(){
-  const key=document.getElementById("keyBtn"); if(!key) return;
-  key.style.display="none";
+// (그룹이 만들어진 뒤에 실행해야 하므로 organizeSettings() 다음에 호출한다)
+function moveKeyWiz(){
+  const key=document.getElementById("keyBtn"); if(!key||key.dataset.moved) return;
   const grp=[...document.querySelectorAll("#sheet .grp")].find(g=>g.querySelector(".gt")?.textContent==="연결");
   if(!grp) return;
+  key.dataset.moved="1"; key.style.display="none";
   const wrap=document.createElement("div");
   wrap.className="field";
   wrap.innerHTML=`<label>🔑 AI 키 연결</label>
@@ -2876,7 +2877,7 @@ function syncTabbar(){
     <div class="hint">글을 쓰려면 구글 Gemini 키가 필요합니다. 처음 한 번만 하면 됩니다.</div>`;
   wrap.querySelector("button").onclick=()=>{ closeSheet(); setTimeout(()=>{openKeyWiz();syncTabbar();},220); };
   grp.querySelector(".grp-b").prepend(wrap);
-})();
+}
 
 gate();
 if(needLock()) faceUnlock();   // 잠금 상태면 진입하자마자 Face ID 시도
@@ -2942,7 +2943,7 @@ function foldHints(root){
     h.parentNode.insertBefore(b,h);
   });
 }
-try{ organizeSettings(); foldHints(document.getElementById("sheet")); }
+try{ organizeSettings(); moveKeyWiz(); foldHints(document.getElementById("sheet")); }
 catch(e){ console.warn("설정 정리 건너뜀:",e); }
 
 applyPlanUI();
