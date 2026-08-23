@@ -100,15 +100,13 @@ def _singles(n):
 #   건강/생활   → 짝수날에만 1편
 # → 홀수날: 경제/IT 4 + 금융 1 = 5편 / 짝수날: 경제/IT 4 + 건강 1 = 5편
 DEFAULT_CATS = [
-    {"name": "경제/IT", "wp_category": "경제IT",
-     "desc": "물가·금리·부동산 경제, AI 도구, 클라우드, 앱/프로그램 사용법 등 경제/IT 주제",
-     "counts": _singles(4), "active_days": "all"},
-    {"name": "금융/재테크", "wp_category": "금융",
-     "desc": "신용카드, 대출, 정부지원금, 연금, 세금, 청약, 재테크, 주식/ETF 등 고단가 금융 주제",
-     "counts": _singles(1), "active_days": "odd"},
-    {"name": "건강/생활", "wp_category": "건강",
-     "desc": "다이어트, 영양제, 탈모, 피부, 수면, 홈트, 건강검진 등 고단가 건강·생활 주제",
-     "counts": _singles(1), "active_days": "even"},
+    # 승인 단계 기본값: 니치 하나로 좁힌다(주제 분산이 반려 사유).
+    # 자격증·시험 준비 — 승인 점수 87, 포화 낮음, 교재·인강 제휴로 RPM 중간.
+    # 공부 과정·오답 정리가 그 자체로 고유 콘텐츠라 '가치 없는 콘텐츠' 판정을 피하기 쉽다.
+    {"name": "자격증·시험 준비", "wp_category": "자격증",
+     "desc": "시험 일정·응시료, 교재 비교, 독학 커리큘럼, 기출 분석, 합격 후 활용. "
+             "실제 확인한 공고·요강을 근거로 쓰고, 겪지 않은 경험은 지어내지 않는다.",
+     "counts": _singles(1), "active_days": "all"},
 ]
 try:
     categories = json.loads(envs("CATEGORIES_JSON", "")) or DEFAULT_CATS
