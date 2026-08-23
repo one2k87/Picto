@@ -34,7 +34,7 @@ import supabase_client
 from llm import chat
 from generator import generate_article, generate_series
 from publisher import (publish_to_wordpress, upload_media, add_update_banner,
-                       submit_indexnow, get_post, update_post_content)
+                       submit_indexnow, get_post, update_post_content, trash_post)
 from sheets import log_rows
 
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -450,30 +450,31 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
             # 보류 사유를 두 갈래로 나눈다.
             #   discard(주제 중복) = 고쳐도 또 겹침 → 즉시 폐기, 다시 쓰지 않음
             #   retry(분량·구조·템플릿) = 고쳐서 다시 쓸 수 있음 → 재생성 대기
+            # 운영 방침: 품질 게이트에 걸린 글은 사유를 불문하고 즉시 폐기한다.
+            # (사유는 quality_log.json에 남겨 생성 로직을 고치는 근거로만 쓴다)
             reason = a.get("quality_reason", "")
             _log_hold(cfg, a, reason)
-            items = quality.classify(reason)
-            a["hold_detail"] = items          # 앱이 '왜 보류됐는지'를 그대로 보여줄 수 있게
-            if quality.is_discard(reason):
-                a["status"] = "폐기"
-                a["discarded"] = True
-                a["post_url"] = ""
-                print(f"  · 폐기(주제 중복, 재작성 안 함): {a['keyword']} — {reason}")
+            a["hold_detail"] = quality.classify(reason)
+            a["status"] = "폐기"
+            a["discarded"] = True
+            a["post_url"] = ""
+            # 이미 워드프레스에 초안이 올라갔다면 휴지통으로 보낸다(복구 가능)
+            if a.get("post_id") and wp_cfg.get("enabled"):
+                if trash_post(wp_cfg, a["post_id"]):
+                    a["trashed"] = True
+                    print(f"  · 폐기 → 워드프레스 휴지통: {a['keyword']} — {reason}")
+                else:
+                    print(f"  · 폐기(휴지통 이동 실패, 수동 확인 필요): {a['keyword']} — {reason}")
             else:
-                a["status"] = "재생성대기"
-                a["retry_queued"] = True
-                a["post_url"] = ""
-                fixes = " / ".join(c["fix"] for c in items) or "원인 확인 후 재생성"
-                print(f"  · 재생성대기: {a['keyword']} — {reason}")
-                print(f"      ↳ 조치: {fixes}")
+                print(f"  · 폐기: {a['keyword']} — {reason}")
         else:
             a["status"] = "복붙대기"
             a["post_url"] = ""
         a["copy_file"] = save_copy_html(a)
         out.append(a)
     print(f"  → [{name}] 슬롯 {sum(slot_count.values())}건 · 글 {len(out)}편"
-          f"(재생성대기 {sum(1 for a in out if a.get('status')=='재생성대기')}편 · "
-          f"폐기 {sum(1 for a in out if a.get('status')=='폐기')}편)")
+          f"(폐기 {sum(1 for a in out if a.get('status')=='폐기')}편 · "
+          f"휴지통 {sum(1 for a in out if a.get('trashed'))}편)")
     return out
 
 
@@ -563,6 +564,7 @@ def _relink_old_posts(new_articles, hist, wp_cfg):
         ka = _kw_set(a.get("keyword", ""))
         if not ka:
             continue
+        linked = 0
         for h in olds:
             if h.get("category") != a.get("category"):
                 continue
@@ -570,11 +572,14 @@ def _relink_old_posts(new_articles, hist, wp_cfg):
             if not kb:
                 continue
             sim = len(ka & kb) / len(ka | kb)
-            # 주제가 충분히 겹치고(70%+), 서로 다른 글일 때만
-            if sim >= 0.7 and h.get("post_id") != a.get("post_id"):
+            # 주제가 겹치면 옛 글 상단에 새 글 링크를 단다.
+            # 제도·정책이 바뀌면 표현이 달라져 완전 일치하지 않으므로 기준을 55%로 둔다.
+            if sim >= 0.55 and h.get("post_id") != a.get("post_id"):
                 if add_update_banner(wp_cfg, h["post_id"], a["post_url"], a["title"]):
                     done += 1
-                break
+                    linked += 1
+                    if linked >= 3:      # 한 새 글이 옛 글 3개까지 갱신 표시
+                        break
     if done:
         print(f"  · 예전글 {done}건에 최신글 링크 배너 추가")
 

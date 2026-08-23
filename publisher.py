@@ -267,3 +267,27 @@ def add_update_banner(wp_cfg, post_id, new_url, new_title):
     except Exception as e:
         print(f"[wp] 배너 예외: {e}")
     return False
+
+
+def trash_post(wp_cfg, post_id):
+    """글을 워드프레스 휴지통으로 보낸다(완전 삭제 아님 — 30일 내 복구 가능).
+
+    force 파라미터를 쓰지 않는 것이 핵심이다. force=true면 즉시 영구 삭제되므로
+    이 함수에서는 절대 넘기지 않는다.
+    """
+    if not post_id:
+        return False
+    base_url = wp_cfg.get("site_url", "").rstrip("/")
+    if not base_url:
+        return False
+    headers = _auth_header(wp_cfg.get("username", ""), wp_cfg.get("app_password", ""))
+    try:
+        r = requests.delete(f"{base_url}/wp-json/wp/v2/posts/{post_id}",
+                            headers=headers, timeout=30)
+        if r.status_code in (200, 201):
+            return True
+        print(f"[wp] 휴지통 이동 실패 {r.status_code} (post {post_id})")
+        return False
+    except Exception as e:
+        print(f"[wp] 휴지통 이동 오류: {e}")
+        return False

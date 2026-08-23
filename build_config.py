@@ -73,7 +73,10 @@ def _safety_block():
         "stuffing_count": envi("QUALITY_STUFFING_COUNT", 8),
         "max_keyword_density": envf("QUALITY_MAX_DENSITY", 0.03),
         "max_similarity": envf("QUALITY_MAX_SIMILARITY", p["max_similarity"]),
-        "verify_accuracy": envs("VERIFY_ACCURACY", p["verify_accuracy"]),
+        # 최신성 검증은 항상 수행한다. 제도·금액은 수시로 바뀌어 '틀린 정보'가
+        # 애드센스 정책 위반이자 신뢰 손상으로 직결되므로 off를 허용하지 않는다.
+        "verify_accuracy": (lambda v: "flag" if str(v).lower() == "off" else v)(
+            envs("VERIFY_ACCURACY", p["verify_accuracy"] if p["verify_accuracy"] != "off" else "flag")),
         "auto_revise": b("AUTO_REVISE", True),
         "relink_old": b("RELINK_OLD", True),           # 옛글↔새글 자동 내부링크(무비용, 신선도 신호)
         "refresh_days": envi("REFRESH_DAYS", 60),       # 60일 지난 글을 주기적으로 최신화(사람 손 안 감)

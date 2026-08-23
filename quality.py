@@ -4,9 +4,10 @@ quality.py - 발행 전 자동 품질 게이트 (애드센스 '대량 저품질'
 - 템플릿성 검사(제목 어미 반복 / 도입부 상투 구문) — 애드센스 반려 1순위 원인.
 - 기준 미달이면 발행 보류(초안 유지) 대상으로 표시한다.
 
-보류 사유는 두 갈래로 나뉜다(main.py가 이 분류를 보고 처리 방향을 정한다):
-  · retry  = 고쳐서 다시 쓸 수 있음(분량·소제목·키워드·템플릿)  → 재생성 큐
-  · discard = 고쳐도 같은 문제가 남음(주제 중복)                → 즉시 폐기
+운영 방침(2026-08): 게이트에 걸린 글은 사유를 불문하고 **즉시 폐기**하고,
+워드프레스에 이미 올라간 초안은 휴지통으로 보낸다. REASON_META의 retry/discard
+구분은 폐기 여부를 정하는 데 쓰지 않고, quality_log.json에 사유를 남겨
+'생성 로직 어디를 고쳐야 하는가'를 파악하는 용도로만 쓴다.
 """
 
 import re
@@ -48,8 +49,13 @@ def classify(reason_str):
 
 
 def is_discard(reason_str):
-    """폐기 대상이면 True(고쳐도 소용없는 사유가 하나라도 있으면 폐기)."""
-    return any(c["kind"] == "discard" for c in classify(reason_str))
+    """운영 방침(2026-08): 품질 게이트에 걸린 글은 사유를 불문하고 폐기한다.
+
+    재생성 큐를 두면 같은 결함이 조금씩 다른 형태로 반복 유입되는 데다,
+    사람이 큐를 비우지 못하면 그대로 쌓인다. 사유는 REASON_META 분류로
+    quality_log.json에 남겨 '생성 로직을 고치는 근거'로만 쓴다.
+    """
+    return bool((reason_str or "").strip())
 
 
 def title_ending(title):
