@@ -734,7 +734,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v61 · 설정 마법사</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v62 · 설정 마법사</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -4750,10 +4750,13 @@ async function wizNextStep(){
   const list=wizVisible(), st=list[WIZ.i];
   const btn=document.getElementById("wizNext");
   if(st && st.next){
+    // 실패했을 때 화면을 다시 그리면 방금 띄운 오류 설명이 지워진다.
+    // 버튼 상태만 되돌리고 화면은 그대로 둔다.
+    const label=btn.textContent;
     btn.disabled=true; btn.textContent="확인 중…";
     let ok=false;
-    try{ ok=await st.next(); }catch(e){ console.warn(e); }
-    btn.disabled=false; wizRender();
+    try{ ok=await st.next(); }catch(e){ console.warn("마법사 검증 오류:",e); }
+    btn.disabled=false; btn.textContent=label;
     if(!ok) return;
   }
   if(st && st.id==="other"){ WIZ.i=Math.max(0,WIZ.i-1); WIZ.data.has=""; wizRender(); return; }
