@@ -734,7 +734,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v74 · 승인 프로그램</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v75 · 승인 프로그램</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2667,6 +2667,10 @@ async function prepState(){
     const kws=(det&&det.detect)||[];
     const mine=new Set(cats.filter(c=>kws.some(k=>((c.name||"")+(c.description||"")).includes(k))).map(c=>c.id));
     if(want) mine.add(want);
+    // 주제가 없거나 주제에 해당하는 카테고리를 하나도 못 찾으면 분류하지 않는다.
+    // 이걸 안 막으면 '주제 밖'에 전체 글이 걸려 통째로 비공개가 되는 사고가 난다.
+    if(!s.niche || mine.size===0){ s.classified=false; return s; }
+    s.classified=true;
     s.mineCatIds=[...mine];
     s.mineCatNames=cats.filter(c=>mine.has(c.id)).map(c=>c.name);
     s.offList=list.filter(p=>!(p.categories||[]).some(c=>mine.has(c)));
@@ -2708,6 +2712,19 @@ function renderPrepPlan(){
       host.innerHTML=h; return;
     }
     const has=s.posts>0;
+    if(has && !s.classified){
+      h+=step(3,"기존 글 정리", false,
+        `공개 글 ${s.posts}편이 있습니다. <b>먼저 1번에서 주제를 정해야</b> 어떤 글이 주제 안이고 밖인지 가릴 수 있습니다.`,"");
+      h+=step(4,"사이트 기본 갖추기", false,
+        "필수 페이지·플러그인·디자인을 정돈합니다.",
+        B("document.getElementById('runnerBtn').click()","🧹 한 번에 정리","sm")+
+        B("openDesignPlan()","🎨 디자인 제안 받기","sm"));
+      const sc0=s.check?`${s.check.score}/${s.check.total}`:"미실행";
+      h+=step(5,"점검 통과", false, `현재 점수 <b>${sc0}</b>.`,
+        B("gotoSub('adsSheet','check');setTimeout(()=>document.getElementById('adsCheck').click(),300)","🔄 점검 실행","sm"));
+      h+=step(6,"애드센스 신청", false,"‘신청’ 탭에서 진행합니다.",B("gotoSub('adsSheet','apply')","📮 신청 탭으로","sm"));
+      host.innerHTML=h; return;
+    }
     h+=step(3, has?"기존 글 정리":"첫 글 만들기", has?(s.offNiche===0&&s.cliche===0):false,
       has
         ? (s.offNiche||s.cliche
@@ -2740,6 +2757,7 @@ function gotoSub(pid,k){ try{ showSub(pid,k); window.scrollTo({top:0,behavior:"s
 let _fixCache=null;
 
 async function openContentFix(){
+  if(!CFG.niche){ toast("먼저 주제를 정해주세요",1); renderPrepPlan(); return; }
   const host=document.getElementById("prepPlan");
   host.innerHTML=`<div class="field"><label>🧭 기존 글 정리</label>
     <div id="fixBar"></div><div id="fixLog"></div>
@@ -2765,6 +2783,12 @@ async function openContentFix(){
 
 async function hideOffNiche(){
   const s=_fixCache; if(!s||!s.offList) return;
+  if(!s.classified){ toast("먼저 주제를 정해주세요",1); return; }
+  if(s.offList.length>=s.posts){                    // 전량이 '주제 밖'이면 분류가 잘못된 것
+    toast("분류가 이상합니다 — 전체 글이 주제 밖으로 잡혔습니다",1);
+    alert("공개 글 전체가 '주제 밖'으로 분류됐습니다.\n\n주제 카테고리를 못 찾은 상태일 가능성이 높아 중단합니다.\n1번에서 주제를 다시 정하거나, 워드프레스 카테고리 이름을 확인해 주세요.");
+    return;
+  }
   if(!confirm(`주제 밖 글 ${s.offNiche}편을 비공개로 돌립니다.\n\n· 삭제가 아닙니다(비공개 = private)\n· 언제든 다시 공개할 수 있습니다\n\n진행할까요?`)) return;
   const log=makeLog(document.getElementById("fixLog"), document.getElementById("fixBar"));
   const base=wpBase(), HJ=Object.assign({"Content-Type":"application/json"},wpAuth());
