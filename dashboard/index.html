@@ -685,7 +685,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v52 · 니치 확정 마법사</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v53 · 초보자 개설 안내</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -700,6 +700,12 @@
       결제 후 받은 키를 넣고 '키 확인'을 누르세요.</div>
   </div>
 
+  <div class="field">
+    <label>🌱 처음 시작하시나요?</label>
+    <button class="btn sm" id="setupGuideBtn" style="width:100%">블로그 개설부터 안내받기</button>
+    <div class="hint">도메인·호스팅이 뭔지 몰라도 됩니다. 무엇을 사고 얼마가 드는지 순서대로 알려드립니다.</div>
+    <div id="setupGuideBox" style="margin-top:8px;font-size:13px"></div>
+  </div>
   <div class="field">
     <label>🎯 승인 니치</label>
     <div id="nicheNow" class="hint" style="margin-bottom:6px"></div>
@@ -2605,6 +2611,59 @@ document.getElementById("wpTrashDrafts").onclick=async()=>{
                    :"아직 정하지 않았습니다.";
   }
 })();
+// ===== 초보자 개설 안내 =====
+let GUIDE=null;
+async function loadGuide(){
+  if(GUIDE) return GUIDE;
+  const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+  for(const u of [`https://raw.githubusercontent.com/${owner}/${repo}/main/dashboard/data/setup_guide.json`,
+                  "./data/setup_guide.json"]){
+    try{ const r=await fetch(u,{cache:"no-store"}); if(r.ok){ GUIDE=await r.json(); return GUIDE; } }catch(e){}
+  }
+  return null;
+}
+async function renderGuide(){
+  const box=document.getElementById("setupGuideBox"); if(!box) return;
+  box.innerHTML='<div class="skel" style="height:50px"></div>';
+  const g=await loadGuide();
+  if(!g){ box.innerHTML='<span class="hint">안내를 불러오지 못했습니다.</span>'; return; }
+  const rec=(g.hosting_options||[]).find(h=>h.recommend)||{};
+  const ct=g.cost_table||{};
+  box.innerHTML=`
+    <div class="dnext" style="margin-bottom:10px"><div class="dl">먼저 알아두실 점</div>
+      <div class="dv" style="font-size:12.5px;line-height:1.6">${escAttr(g.warning||"")}</div></div>
+
+    <div class="dl" style="font-size:11px;color:var(--muted)">추천 호스팅</div>
+    <div style="border:1px solid var(--accent);border-radius:11px;padding:10px 12px;margin:6px 0">
+      <b>${escAttr(rec.name||"")}</b> <span class="hint">${escAttr(rec.price_note||"")}</span>
+      <div class="hint" style="margin-top:4px">${(rec.pros||[]).map(x=>"· "+escAttr(x)).join("<br>")}</div>
+      <a class="btn sm" style="margin-top:7px;padding:2px 10px;font-size:11px" href="${rec.url}" target="_blank" rel="noopener">사이트 열기</a>
+    </div>
+
+    <div class="dl" style="font-size:11px;color:var(--muted);margin-top:10px">${escAttr(ct.title||"비용")}</div>
+    <div class="bars">${(ct.rows||[]).map(r=>
+      `<div class="bar"><span class="bl" style="width:110px">${escAttr(r.item)}</span>
+       <span style="flex:1"></span><span class="bn" style="width:auto">${escAttr(r.cost)}</span></div>`).join("")}</div>
+    <div class="hint"><b>${escAttr(ct.total||"")}</b><br>${escAttr(ct.comment||"")}</div>
+
+    <div class="dl" style="font-size:11px;color:var(--muted);margin-top:12px">전체 ${(g.steps||[]).length}단계</div>
+    ${(g.steps||[]).map(st=>{
+      const auto=String(st.who).includes("자동");
+      return `<div style="margin:7px 0;padding:9px 11px;border-left:3px solid ${auto?"var(--ok)":"var(--accent)"};background:var(--card2)">
+        <div><b style="font-size:12.5px">${st.n}. ${escAttr(st.title)}</b>
+          <span style="font-size:10.5px;color:${auto?"var(--ok)":"var(--accent)"}"> ${escAttr(st.who)} · ${st.mins}분</span></div>
+        <div class="hint" style="margin-top:3px">${escAttr(st.detail)}</div>
+        <div class="hint" style="opacity:.8">💡 ${escAttr(st.tip)}</div></div>`;}).join("")}
+
+    <div class="dl" style="font-size:11px;color:var(--muted);margin-top:12px">자주 묻는 질문</div>
+    ${(g.faq||[]).map(f=>`<div style="margin:6px 0"><b style="font-size:12.5px">${escAttr(f.q)}</b>
+      <div class="hint">${escAttr(f.a)}</div></div>`).join("")}
+    <div class="hint" style="margin-top:8px">기준 ${escAttr(g.updated||"")} · 가격은 변동될 수 있으니 결제 화면에서 다시 확인하세요.</div>`;
+}
+(function guideBtn(){
+  const b=document.getElementById("setupGuideBtn");
+  if(b) b.onclick=()=>renderGuide();
+})();
 document.getElementById("adsPlugScan").onclick=adsPluginScan;
 document.getElementById("adsPlugInstall").onclick=adsPluginInstall;
 document.getElementById("adsGuide").onclick=adsShowGuide;
@@ -3008,9 +3067,18 @@ function planSpec(){
 function rankNiches(){
   if(!NICHES) return [];
   const exp=new Set(_ans.exp||[]);
+  const B=NICHES.balancing||{};
+  const usage=B.usage||{};
   return NICHES.catalog.map(n=>{
     const hit=(n.exp||[]).filter(e=>exp.has(e)).length;
-    return {...n, _score:n.approval_score + hit*12, _matched:hit>0};
+    // 쏠림 방지: 이미 쓰는 사람이 많은 니치는 추천 점수를 깎는다.
+    // 같은 니치에 몰리면 이용자끼리 같은 키워드로 경쟁하게 되므로,
+    // 롱테일 공간이 넓은 쪽으로 자연스럽게 분산시킨다.
+    const used=usage[n.key]||0;
+    const penalty=Math.min(B.max_penalty||30,(B.penalty_per_user||3)*used);
+    const capped=used>=(B.soft_cap||12);
+    return {...n, _score:n.approval_score + hit*12 - penalty,
+            _matched:hit>0, _used:used, _capped:capped};
   }).sort((a,b)=>b._score-a._score);
 }
 function nicheCardHtml(n,sel){
@@ -3022,6 +3090,9 @@ function nicheCardHtml(n,sel){
       ${n._matched?`<span style="font-size:10px;background:var(--bg-ok,#1e3a2a);color:var(--ok);padding:2px 7px;border-radius:9px">내 경험</span>`:""}
       <span style="flex:1"></span>
       <span style="font-size:11px;color:${warn?"var(--danger)":"var(--ok)"}">승인 ${n.approval_score}</span>
+    </div>
+    ${n._capped?`<div class="hint" style="color:var(--warn);margin-top:4px">⚠️ ${escAttr((NICHES.balancing||{}).cap_message||"이용자가 많은 분야입니다")}</div>`:""}
+    <div style="display:none">
     </div>
     <div class="hint" style="margin-top:4px">${n.why}</div>
     <div class="hint" style="margin-top:3px;opacity:.8">포화 ${n.saturation} · 광고단가 ${n.rpm}</div>
