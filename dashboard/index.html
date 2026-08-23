@@ -453,6 +453,55 @@
     z-index:60;opacity:0;transition:.25s;pointer-events:none;max-width:90vw;text-align:center}
   .toast.show{opacity:1}
   .toast.err{background:var(--danger);color:#fff}
+
+/* ===== 설정 마법사 ===== */
+.wiz{position:fixed;inset:0;z-index:9000;background:var(--bg);display:none;
+  flex-direction:column;padding-top:var(--safe-t);padding-bottom:var(--safe-b)}
+.wiz.on{display:flex}
+.wiz-top{display:flex;align-items:center;gap:10px;padding:12px 16px 8px}
+.wiz-x{background:none;border:0;color:var(--muted);font-size:22px;line-height:1;padding:4px 6px;cursor:pointer}
+.wiz-step{font-size:12px;color:var(--muted);font-weight:700;margin-left:auto}
+.wiz-bar{height:4px;background:var(--line);border-radius:99px;margin:0 16px}
+.wiz-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+.wiz-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:22px 18px 12px}
+.wiz-ico{font-size:38px;line-height:1;margin-bottom:12px}
+.wiz-q{font-size:21px;font-weight:800;line-height:1.4;margin:0 0 8px;letter-spacing:-.3px}
+.wiz-help{font-size:13.5px;color:var(--muted);line-height:1.65;margin-bottom:18px}
+.wiz-opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  background:var(--card);border:2px solid var(--line);border-radius:14px;
+  padding:15px 16px;margin-bottom:10px;color:var(--txt);font-size:15px;cursor:pointer;
+  transition:border-color .15s,background .15s}
+.wiz-opt:active{transform:scale(.99)}
+.wiz-opt.sel{border-color:var(--accent);background:var(--card2)}
+.wiz-opt .oi{font-size:22px;flex:0 0 auto}
+.wiz-opt .ot{font-weight:700}
+.wiz-opt .od{font-size:12.5px;color:var(--muted);margin-top:2px;font-weight:400}
+.wiz input,.wiz textarea,.wiz select{width:100%;background:var(--card);border:2px solid var(--line);
+  border-radius:12px;padding:14px;color:var(--txt);font-size:16px;margin-bottom:6px}
+.wiz input:focus,.wiz textarea:focus{outline:none;border-color:var(--accent)}
+.wiz-note{font-size:12.5px;color:var(--muted);line-height:1.7;background:var(--card);
+  border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin:12px 0}
+.wiz-note b{color:var(--txt)}
+.wiz-res{font-size:13px;line-height:1.6;margin:10px 0;padding:12px 14px;border-radius:12px;display:none}
+.wiz-res.on{display:block}
+.wiz-res.ok{background:rgba(159,216,180,.13);border:1px solid var(--ok);color:var(--ok)}
+.wiz-res.no{background:rgba(240,160,173,.13);border:1px solid var(--danger);color:var(--danger)}
+.wiz-res.wait{background:var(--card);border:1px solid var(--line);color:var(--muted)}
+.wiz-nav{display:flex;gap:10px;padding:12px 16px 18px;border-top:1px solid var(--line);background:var(--bg)}
+.wiz-nav .btn{flex:1;padding:15px;font-size:15px;font-weight:700;border-radius:13px}
+.wiz-nav .btn.ghost{flex:0 0 auto;min-width:84px}
+.wiz-sum{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.wiz-sum .r{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);font-size:14px}
+.wiz-sum .r:last-child{border-bottom:0}
+.wiz-sum .r .v{margin-left:auto;color:var(--muted);font-size:12.5px;max-width:52%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wizcta{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
+  background:linear-gradient(135deg,var(--accent-2),var(--accent));border:0;border-radius:15px;
+  padding:16px;color:#fff;margin-bottom:14px;box-shadow:0 6px 18px var(--glow)}
+.wizcta .ci{font-size:26px}
+.wizcta .ct{font-weight:800;font-size:15.5px}
+.wizcta .cd{font-size:12.5px;opacity:.9;margin-top:2px}
+.wizcta .cg{margin-left:auto;font-size:20px;opacity:.85}
 </style>
 <!-- 구글 로그인(애드센스 상태 조회 전용, 읽기 권한만). 없어도 나머지 기능은 정상 동작 -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -685,7 +734,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v59 · 러너 진행률·스크롤 로그</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v60 · 설정 마법사</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -3679,10 +3728,8 @@ function buildSubtabs(pageId){
 // 설정: 아코디언 그룹(1단계) → 상단 서브탭(3-3)
 // 큰 그룹은 성격이 다른 덩어리로 한 번 더 쪼갠다(콘텐츠→주제/품질/작성자, 고급→연동/앱).
 // 쪼개는 기준은 그룹 본문 안의 h2 구분선이다.
-const SPLIT_GROUPS={
-  "콘텐츠":[{label:"주제",until:"품질·안전"},{label:"품질",until:"작성자"},{label:"작성자"}],
-  "고급":[{label:"연동",until:"앱 · 데이터"},{label:"앱"}],
-};
+// 그룹을 더 쪼개면 서브탭이 늘어난다. 마법사가 생긴 뒤로는 쪼개지 않는다.
+const SPLIT_GROUPS={};
 function splitGroupBody(body,plan){
   // h2 제목을 경계로 본문을 여러 조각으로 나눈다
   const kids=[...body.children], out=plan.map(p=>({label:p.label,nodes:[]}));
@@ -4267,12 +4314,14 @@ if(needLock()) faceUnlock();   // 잠금 상태면 진입하자마자 Face ID �
 // ===== 설정 화면 정리 (UI 1단계) =====
 // 기존 HTML을 다시 쓰지 않고, 로드 후 DOM을 목적별 그룹으로 재배치한다.
 // (요소를 옮기는 것이라 위에서 붙인 이벤트 핸들러는 그대로 유지된다)
+// 서브탭은 4개까지만. 그 이상은 "어디에 뭐가 있는지" 를 사람이 기억하지 못한다.
+// 세부 항목은 마법사(setupWizard)가 순서대로 물어보므로, 여기서는 나중에 고칠 때
+// 찾아갈 수 있을 정도의 큰 덩어리로만 나눈다.
 const SETTING_GROUPS=[
-  {key:"connect", t:"연결",   d:"블로그·실행 환경",        open:true,  match:["워드프레스","생성 실행"]},
-  {key:"content", t:"콘텐츠", d:"카테고리·품질·작성자",     open:false, match:["__TOP__","품질·안전","작성자 정보"]},
-  {key:"money",   t:"수익",   d:"쿠팡·제휴",               open:false, match:["쿠팡","제휴 SaaS"]},
-  {key:"expose",  t:"노출",   d:"검색엔진 등록",            open:false, match:["검색엔진"]},
-  {key:"adv",     t:"고급",   d:"Supabase·백업·데이터",     open:false, match:["Supabase","앱 · 데이터"]},
+  {key:"connect", t:"연결",   d:"블로그·실행",       open:true,  match:["워드프레스","생성 실행"]},
+  {key:"content", t:"콘텐츠", d:"주제·품질·작성자",   open:false, match:["__TOP__","품질·안전","작성자 정보"]},
+  {key:"money",   t:"수익",   d:"쿠팡·제휴",         open:false, match:["쿠팡","제휴 SaaS"]},
+  {key:"adv",     t:"고급",   d:"검색등록·연동·데이터", open:false, match:["검색엔진","Supabase","앱 · 데이터"]},
 ];
 function organizeSettings(){
   const sheet=document.getElementById("sheet");
@@ -4329,10 +4378,449 @@ try{ organizeSettings(); moveKeyWiz(); foldHints(document.getElementById("sheet"
      settingsToSubtabs(); buildKindTabs(); }
 catch(e){ console.warn("설정 정리 건너뜀:",e); }
 
+/* ===================== 설정 마법사 =====================
+   설정이 여기저기 흩어져 있으면 "무엇을 아직 안 했는지"를 아무도 모른다.
+   그래서 순서가 정해진 질문 한 줄씩으로 바꾼다. 각 단계는
+     ① 하나만 묻고 ② 그 자리에서 검증하고 ③ 통과해야 다음으로 넘어간다.
+   설정 탭의 입력칸은 그대로 남는다(고칠 때 찾아가는 용도).
+   ---------------------------------------------------------------- */
+
+const WIZ = { i:0, steps:[], data:{} };
+
+// 단계 정의. body(el)에 화면을 그리고, next()가 true를 반환해야 넘어간다.
+// skip:true 면 '건너뛰기'가 뜬다. when()이 false면 그 단계는 건너뛴다.
+function wizSteps(){
+  return [
+  // ── 0. 시작 ──────────────────────────────────────────────
+  {
+    id:"intro", icon:"🧭", q:"설정을 순서대로 끝내드릴게요",
+    help:"흩어진 설정을 하나씩 물어보고 그 자리에서 확인합니다. 이미 넣은 값은 그대로 두고 빠진 것만 채웁니다. 5~10분이면 끝납니다.",
+    render(el){
+      const done = wizAudit();
+      el.innerHTML = `<div class="wiz-sum">${done.map(d=>
+        `<div class="r"><span>${d.ok?"✅":"⬜"}</span><span>${escAttr(d.label)}</span>
+         <span class="v">${escAttr(d.val||"미설정")}</span></div>`).join("")}</div>
+        <div class="wiz-note">중간에 닫아도 <b>넣은 값은 저장</b>됩니다. 다시 열면 이어서 진행합니다.</div>`;
+    },
+    nextLabel:"시작하기"
+  },
+
+  // ── 1. 블로그 유무 (역질문) ───────────────────────────────
+  {
+    id:"has", icon:"🌐", q:"운영 중인 블로그가 있으신가요?",
+    help:"Scripto는 워드프레스 블로그에 글을 올립니다. 아직 없으시면 만드는 방법부터 안내해 드릴게요.",
+    render(el){
+      const cur = WIZ.data.has || (CFG.site ? "yes" : "");
+      el.innerHTML = `
+        <button class="wiz-opt${cur==="yes"?" sel":""}" data-v="yes">
+          <span class="oi">✅</span><span><span class="ot">있습니다</span>
+          <span class="od">워드프레스 블로그 주소를 알고 있어요</span></span></button>
+        <button class="wiz-opt${cur==="no"?" sel":""}" data-v="no">
+          <span class="oi">🆕</span><span><span class="ot">없습니다</span>
+          <span class="od">지금부터 만들어야 해요</span></span></button>
+        <button class="wiz-opt${cur==="other"?" sel":""}" data-v="other">
+          <span class="oi">🤔</span><span><span class="ot">네이버·티스토리 블로그가 있어요</span>
+          <span class="od">워드프레스는 아닙니다</span></span></button>`;
+      el.querySelectorAll(".wiz-opt").forEach(b=>b.onclick=()=>{
+        WIZ.data.has=b.dataset.v;
+        el.querySelectorAll(".wiz-opt").forEach(x=>x.classList.remove("sel"));
+        b.classList.add("sel");
+        wizNextStep();
+      });
+    },
+    next(){ if(!WIZ.data.has){ toast("하나를 골라주세요"); return false; } return true; }
+  },
+
+  // ── 1-b. 블로그가 없을 때 안내 ────────────────────────────
+  {
+    id:"make", icon:"🏗️", q:"블로그부터 만들어야 합니다",
+    help:"워드프레스 블로그 하나를 띄우는 데 필요한 것은 두 가지, 도메인과 호스팅입니다.",
+    when(){ return WIZ.data.has==="no"; },
+    render(el){
+      el.innerHTML = `
+        <div class="wiz-note">
+          <b>① 도메인 (주소)</b><br>
+          가비아·카페24에서 <b>.com 약 23,500원/년</b>. 짧은 영문으로, 하이픈과 숫자는 피하세요.<br>
+          ⚠️ <b>.shop·.store 550원 특가는 피하세요</b> — 갱신이 7만~9만원입니다.
+        </div>
+        <div class="wiz-note">
+          <b>② 호스팅 (서버)</b><br>
+          · <b>카페24 워드프레스 광호스팅</b> 월 5,500원 — 국내, 자동설치, 초보에게 무난<br>
+          · <b>Cloudways</b> 월 $14~ — 빠르지만 영문 화면
+        </div>
+        <div class="wiz-note">
+          <b>순서</b><br>
+          1. 도메인 구입 → <b>자동 갱신 켜기</b><br>
+          2. 호스팅 신청 (워드프레스 자동 설치 선택)<br>
+          3. 도메인 연결 → <b>무료 SSL(https) 신청</b><br>
+          4. 워드프레스 관리자 로그인 확인<br>
+          여기까지 하고 다시 오시면 나머지는 제가 다 합니다.
+        </div>`;
+    },
+    nextLabel:"만들고 왔어요"
+  },
+
+  // ── 1-c. 워드프레스가 아닐 때 ─────────────────────────────
+  {
+    id:"other", icon:"⚠️", q:"네이버·티스토리는 연결할 수 없습니다",
+    help:"두 곳 모두 외부 프로그램이 글을 올릴 수 있는 통로(API)를 막아두었습니다. 티스토리 API는 2024년 2월에 종료됐습니다.",
+    when(){ return WIZ.data.has==="other"; },
+    render(el){
+      el.innerHTML = `
+        <div class="wiz-note">
+          <b>애드센스 관점에서도 워드프레스가 유리합니다.</b><br>
+          네이버 블로그는 애드센스를 붙일 수 없고, 티스토리는 자체 광고가 먼저 붙습니다.
+          내 도메인으로 된 워드프레스라야 광고 수익이 온전히 내 것이 됩니다.
+        </div>
+        <div class="wiz-note">
+          기존 글은 그대로 두고, <b>워드프레스를 새로 하나 만드는 것</b>을 권합니다.
+          이전 단계로 돌아가 <b>'없습니다'</b>를 고르시면 만드는 방법을 안내해 드립니다.
+        </div>`;
+    },
+    nextLabel:"이전으로"
+  },
+
+  // ── 2. 블로그 주소 ────────────────────────────────────────
+  {
+    id:"site", icon:"🔗", q:"블로그 주소를 알려주세요",
+    help:"주소창에 보이는 그대로 넣으시면 됩니다. 끝에 / 는 없어도 됩니다.",
+    when(){ return WIZ.data.has!=="other"; },
+    render(el){
+      el.innerHTML = `
+        <input id="wzSite" placeholder="https://example.com" autocapitalize="off"
+          inputmode="url" value="${escAttr(CFG.site||"")}">
+        <div class="wiz-note">예: <b>https://wontheland.com</b> · 관리자 주소(/wp-admin)가 아니라 <b>블로그 첫 화면 주소</b>입니다.</div>
+        <div class="wiz-res" id="wzSiteRes"></div>`;
+    },
+    async next(){
+      const v=(document.getElementById("wzSite").value||"").trim().replace(/\/+$/,"");
+      const r=document.getElementById("wzSiteRes");
+      if(!/^https?:\/\/.+\..+/.test(v)){ wizRes(r,"no","주소 형식이 아닙니다. <b>https://</b> 로 시작해야 합니다."); return false; }
+      if(!v.startsWith("https://")) wizRes(r,"wait","⚠️ https가 아닙니다. 애드센스는 https를 요구합니다. 일단 진행하되 SSL을 꼭 설치하세요.");
+      else wizRes(r,"wait","연결 확인 중…");
+      try{
+        const res=await fetch(v+"/wp-json/",{method:"GET"});
+        if(!res.ok) throw new Error(res.status);
+        const j=await res.json();
+        CFG.site=v; saveCfg();
+        wizRes(r,"ok",`연결됐습니다 — <b>${escAttr(j.name||"이름 없음")}</b>`);
+        await wizPause(700); return true;
+      }catch(e){
+        wizRes(r,"no",`워드프레스에 닿지 못했습니다.<br>
+          · 주소 오타가 없는지<br>
+          · 워드프레스가 맞는지 (네이버·티스토리는 안 됩니다)<br>
+          · 보안 플러그인이 REST API를 막고 있지 않은지<br>
+          그래도 계속하려면 <b>다음</b>을 한 번 더 누르세요.`);
+        if(WIZ.data._siteForce){ CFG.site=v; saveCfg(); return true; }
+        WIZ.data._siteForce=true; return false;
+      }
+    }
+  },
+
+  // ── 3. 로그인 아이디 ──────────────────────────────────────
+  {
+    id:"user", icon:"👤", q:"워드프레스 로그인 아이디는 무엇인가요?",
+    help:"워드프레스에 로그인할 때 실제로 입력하는 값입니다.",
+    when(){ return WIZ.data.has!=="other"; },
+    render(el){
+      el.innerHTML = `
+        <input id="wzUser" placeholder="wp_id 또는 you@example.com" autocapitalize="off"
+          value="${escAttr(CFG.user||"")}">
+        <div class="wiz-note">
+          워드프레스는 <b>아이디와 이메일을 모두</b> 로그인 값으로 받습니다.
+          계정마다 어느 쪽이 통하는지 다르니, 평소에 로그인할 때 넣는 값을 그대로 쓰세요.
+          다음 단계에서 <b>양쪽 다 자동으로 시도</b>합니다.
+        </div>`;
+    },
+    next(){
+      const v=(document.getElementById("wzUser").value||"").trim();
+      if(!v){ toast("아이디를 넣어주세요"); return false; }
+      CFG.user=v; saveCfg(); return true;
+    }
+  },
+
+  // ── 4. 응용 프로그램 비밀번호 ─────────────────────────────
+  {
+    id:"pass", icon:"🔑", q:"응용 프로그램 비밀번호를 발급해 주세요",
+    help:"로그인 비밀번호가 아닙니다. 워드프레스가 외부 앱에 따로 내주는 24자리 전용 비밀번호입니다.",
+    when(){ return WIZ.data.has!=="other"; },
+    render(el){
+      const base=(CFG.site||"").replace(/\/+$/,"");
+      el.innerHTML = `
+        <div class="wiz-note">
+          <b>발급 방법</b><br>
+          1. 워드프레스 관리자 → <b>사용자 → 프로필</b><br>
+          2. 맨 아래 <b>응용 프로그램 비밀번호</b><br>
+          3. 이름에 <b>Scripto</b> 입력 → <b>새로운 응용 프로그램 비밀번호 추가</b><br>
+          4. 나타나는 24자리를 복사 (<b>창을 닫으면 다시 못 봅니다</b>)
+          ${base?`<br><br><a href="${escAttr(base)}/wp-admin/profile.php#application-passwords-section"
+            target="_blank" rel="noopener" style="color:var(--accent);font-weight:700">→ 프로필 화면 열기</a>`:""}
+        </div>
+        <input id="wzPass" placeholder="xxxx xxxx xxxx xxxx xxxx xxxx" autocapitalize="off"
+          value="${escAttr(CFG.pass||"")}">
+        <div class="wiz-note">띄어쓰기는 있어도 없어도 됩니다. 자동으로 정리합니다.</div>
+        <div class="wiz-res" id="wzPassRes"></div>`;
+    },
+    async next(){
+      const raw=(document.getElementById("wzPass").value||"").trim();
+      const r=document.getElementById("wzPassRes");
+      if(!raw){ toast("비밀번호를 넣어주세요"); return false; }
+      const base=(CFG.site||"").replace(/\/+$/,"");
+      const user=CFG.user||"";
+      // 아이디 두 형식 × 비밀번호 두 형식을 순서대로 시도한다
+      const users=[user]; if(user.includes("@")) users.push(user.split("@")[0]);
+      const combos=[];
+      users.forEach(u=>{ combos.push([u,raw.replace(/\s/g,"")]); combos.push([u,raw]); });
+      wizRes(r,"wait","인증 확인 중…");
+      for(const [u,pw] of combos){
+        try{
+          const res=await fetch(base+"/wp-json/wp/v2/users/me?context=edit",
+            {headers:{Authorization:"Basic "+btoa(u+":"+pw)}});
+          if(res.ok){
+            const me=await res.json();
+            CFG.user=u; CFG.pass=pw; saveCfg();
+            const admin=(me.capabilities&&me.capabilities.manage_options);
+            wizRes(r,"ok",`인증 성공 — <b>${escAttr(me.name||u)}</b>${admin?" (관리자)":""}
+              ${admin?"":"<br>⚠️ 관리자 권한이 아닙니다. 태그 정리·설정 변경이 막힐 수 있습니다."}`);
+            await wizPause(800); return true;
+          }
+        }catch(e){}
+      }
+      wizRes(r,"no",`4가지 조합을 모두 시도했지만 실패했습니다.<br>
+        · 비밀번호를 <b>새로 발급</b>해서 다시 넣어보세요 (가장 흔한 해결)<br>
+        · 아이디를 <b>반대 형식</b>으로 바꿔보세요 (이전 단계)<br>
+        · 보안 플러그인이 REST API 인증을 막고 있을 수 있습니다`);
+      return false;
+    }
+  },
+
+  // ── 5. 주제 ───────────────────────────────────────────────
+  {
+    id:"niche", icon:"🎯", q:"어떤 주제로 쓸까요?",
+    help:"애드센스는 '한 분야를 깊이 다루는 사이트'를 좋아합니다. 주제가 흩어지면 반려 사유가 됩니다.",
+    render(el){
+      const n=CFG.niche;
+      el.innerHTML = `
+        ${n?`<div class="wiz-res ok on">현재 주제 — <b>${escAttr(n.label||n.key||"")}</b></div>`:""}
+        <button class="wiz-opt" data-v="wiz">
+          <span class="oi">🪄</span><span><span class="ot">Scripto가 골라줄게요</span>
+          <span class="od">몇 가지 물어보고 승인 확률이 높은 주제를 정합니다</span></span></button>
+        <button class="wiz-opt" data-v="keep">
+          <span class="oi">✔️</span><span><span class="ot">${n?"지금 주제 그대로":"나중에 정할게요"}</span>
+          <span class="od">${n?"바꾸지 않고 넘어갑니다":"설정 탭에서 언제든 정할 수 있습니다"}</span></span></button>`;
+      el.querySelectorAll(".wiz-opt").forEach(b=>b.onclick=()=>{
+        if(b.dataset.v==="wiz"){
+          // 니치 마법사는 별도 화면이라 설정 마법사를 닫고 넘긴다.
+          closeWizard();
+          const t=document.getElementById("nicheRedo");
+          if(t) t.click(); else toast("설정 → 콘텐츠에서 '니치 다시 정하기'를 눌러주세요");
+        } else wizNextStep();
+      });
+    },
+    skip:true
+  },
+
+  // ── 6. 작성자 ─────────────────────────────────────────────
+  {
+    id:"author", icon:"✍️", q:"글쓴이는 누구로 할까요?",
+    help:"누가 썼는지가 없는 사이트는 애드센스에서 '신뢰할 수 없는 콘텐츠'로 분류되기 쉽습니다. 본명이 아니어도 됩니다.",
+    render(el){
+      el.innerHTML = `
+        <input id="wzAName" placeholder="예: 정다인" value="${escAttr(CFG.author||"")}">
+        <textarea id="wzABio" rows="3" placeholder="예: 생활 속 금융·행정 정보를 직접 확인하고 정리합니다">${escAttr(CFG.authorBio||"")}</textarea>
+        <div class="wiz-note">
+          한 줄 소개에는 <b>무엇을 어떻게 확인하는지</b>를 적으세요.
+          "전문가입니다" 보다 "직접 신청해보고 정리합니다" 가 훨씬 강한 신호입니다.
+        </div>`;
+    },
+    next(){
+      const n=(document.getElementById("wzAName").value||"").trim();
+      const bio=(document.getElementById("wzABio").value||"").trim();
+      if(!n){ toast("이름을 넣어주세요"); return false; }
+      CFG.author=n; CFG.authorBio=bio; saveCfg(); return true;
+    },
+    skip:true
+  },
+
+  // ── 7. 자동 실행 ──────────────────────────────────────────
+  {
+    id:"auto", icon:"⚙️", q:"글 생성을 자동으로 돌릴까요?",
+    help:"GitHub Actions가 정해진 시각에 글을 만들어 올립니다. 지금 안 하셔도 되고, 나중에 설정 → 연결에서 켜도 됩니다.",
+    render(el){
+      el.innerHTML = `
+        <input id="wzOwner" placeholder="GitHub 사용자명" autocapitalize="off" value="${escAttr(CFG.ghOwner||"")}">
+        <input id="wzRepo" placeholder="저장소 이름 (예: Scripto)" autocapitalize="off" value="${escAttr(CFG.ghRepo||"")}">
+        <input id="wzTok" placeholder="개인 접근 토큰 (ghp_...)" autocapitalize="off" value="${escAttr(CFG.ghToken||"")}">
+        <div class="wiz-note">
+          토큰은 GitHub → Settings → Developer settings → <b>Personal access tokens</b> 에서 만듭니다.
+          권한은 <b>repo</b> 와 <b>workflow</b> 두 개면 충분합니다.
+        </div>
+        <div class="wiz-res" id="wzAutoRes"></div>`;
+    },
+    async next(){
+      const o=(document.getElementById("wzOwner").value||"").trim();
+      const rp=(document.getElementById("wzRepo").value||"").trim();
+      const t=(document.getElementById("wzTok").value||"").trim();
+      const r=document.getElementById("wzAutoRes");
+      if(!o||!rp||!t){ CFG.ghOwner=o; CFG.ghRepo=rp; CFG.ghToken=t; saveCfg(); return true; }
+      wizRes(r,"wait","저장소 접근 확인 중…");
+      try{
+        const res=await fetch(`https://api.github.com/repos/${o}/${rp}`,
+          {headers:{Authorization:"Bearer "+t, Accept:"application/vnd.github+json"}});
+        if(!res.ok) throw new Error(res.status);
+        CFG.ghOwner=o; CFG.ghRepo=rp; CFG.ghToken=t; saveCfg();
+        wizRes(r,"ok","저장소에 연결됐습니다.");
+        await wizPause(700); return true;
+      }catch(e){
+        wizRes(r,"no","접근하지 못했습니다. 사용자명·저장소 이름·토큰 권한(repo, workflow)을 확인하세요. 건너뛰어도 됩니다.");
+        return false;
+      }
+    },
+    skip:true
+  },
+
+  // ── 8. 완료 ───────────────────────────────────────────────
+  {
+    id:"done", icon:"🎉", q:"설정이 끝났습니다",
+    help:"빠진 항목이 있으면 아래에 표시됩니다. 설정 탭에서 언제든 고칠 수 있습니다.",
+    render(el){
+      const a=wizAudit(), miss=a.filter(x=>!x.ok);
+      el.innerHTML = `
+        <div class="wiz-sum">${a.map(d=>
+          `<div class="r"><span>${d.ok?"✅":"⬜"}</span><span>${escAttr(d.label)}</span>
+           <span class="v">${escAttr(d.val||"미설정")}</span></div>`).join("")}</div>
+        ${miss.length
+          ? `<div class="wiz-res no on">아직 ${miss.length}개가 비어 있습니다 — ${miss.map(m=>escAttr(m.label)).join(", ")}</div>`
+          : `<div class="wiz-res ok on">필요한 값이 모두 채워졌습니다.</div>`}
+        <div class="wiz-note">
+          <b>다음에 할 일</b><br>
+          1. 🛡️ 승인 탭에서 <b>진단</b> 실행<br>
+          2. 문제가 나오면 <b>승인용으로 한 번에 정리</b><br>
+          3. 주제에 맞는 글을 쌓고 애드센스 신청
+        </div>`;
+    },
+    nextLabel:"완료"
+  }
+  ];
+}
+
+/* ── 유틸 ─────────────────────────────────────────────── */
+function wizRes(el,kind,html){ if(!el) return; el.className="wiz-res on "+kind; el.innerHTML=html; }
+function wizPause(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+// 지금 무엇이 채워져 있는지 한눈에
+function wizAudit(){
+  const n=CFG.niche;
+  return [
+    {label:"블로그 주소",   ok:!!CFG.site,   val:CFG.site},
+    {label:"로그인 아이디", ok:!!CFG.user,   val:CFG.user},
+    {label:"앱 비밀번호",   ok:!!CFG.pass,   val:CFG.pass?"●●●● 저장됨":""},
+    {label:"주제",          ok:!!n,          val:n?(n.label||n.key):""},
+    {label:"글쓴이",        ok:!!CFG.author, val:CFG.author},
+    {label:"자동 실행",     ok:!!(CFG.ghOwner&&CFG.ghRepo&&CFG.ghToken),
+      val:(CFG.ghOwner&&CFG.ghRepo)?`${CFG.ghOwner}/${CFG.ghRepo}`:""}
+  ];
+}
+
+/* ── 진행 제어 ─────────────────────────────────────────── */
+function wizVisible(){ return WIZ.steps.filter(s=>!s.when||s.when()); }
+
+function wizRender(){
+  const list=wizVisible(), st=list[WIZ.i];
+  if(!st) return;
+  const body=document.getElementById("wizBody");
+  body.innerHTML=`<div class="wiz-ico">${st.icon||"•"}</div>
+    <h2 class="wiz-q">${st.q}</h2>
+    <div class="wiz-help">${st.help||""}</div>
+    <div id="wizSlot"></div>`;
+  const slot=document.getElementById("wizSlot");
+  try{ st.render && st.render(slot); }catch(e){ console.warn("마법사 단계 오류:",e); }
+  body.scrollTop=0;
+
+  document.getElementById("wizStep").textContent=`${WIZ.i+1} / ${list.length}`;
+  document.getElementById("wizFill").style.width=Math.round((WIZ.i+1)/list.length*100)+"%";
+  const prev=document.getElementById("wizPrev"), next=document.getElementById("wizNext");
+  prev.style.visibility = WIZ.i===0 ? "hidden" : "visible";
+  next.textContent = st.nextLabel || (st.skip ? "다음" : "다음");
+  prev.textContent = st.skip ? "건너뛰기" : "이전";
+  prev.dataset.mode = st.skip ? "skip" : "back";
+}
+
+async function wizNextStep(){
+  const list=wizVisible(), st=list[WIZ.i];
+  const btn=document.getElementById("wizNext");
+  if(st && st.next){
+    btn.disabled=true; btn.textContent="확인 중…";
+    let ok=false;
+    try{ ok=await st.next(); }catch(e){ console.warn(e); }
+    btn.disabled=false; wizRender();
+    if(!ok) return;
+  }
+  if(st && st.id==="other"){ WIZ.i=Math.max(0,WIZ.i-1); WIZ.data.has=""; wizRender(); return; }
+  if(WIZ.i>=list.length-1){ closeWizard(); toast("설정을 저장했습니다","ok"); try{ openSheet(); }catch(e){} return; }
+  WIZ.i++; wizRender();
+}
+
+function startWizard(){
+  WIZ.steps=wizSteps(); WIZ.i=0; WIZ.data={};
+  document.getElementById("wiz").classList.add("on");
+  document.body.style.overflow="hidden";
+  wizRender();
+}
+function closeWizard(){
+  document.getElementById("wiz").classList.remove("on");
+  document.body.style.overflow="";
+}
+
+/* ── 버튼 연결 ─────────────────────────────────────────── */
+(function wizBind(){
+  const w=document.getElementById("wiz"); if(!w) return;
+  document.getElementById("wizX").onclick=()=>{
+    if(WIZ.i>0 && !confirm("마법사를 닫을까요?\n\n지금까지 넣은 값은 저장되어 있습니다.")) return;
+    closeWizard();
+  };
+  document.getElementById("wizNext").onclick=wizNextStep;
+  document.getElementById("wizPrev").onclick=()=>{
+    const mode=document.getElementById("wizPrev").dataset.mode;
+    if(mode==="skip"){ const l=wizVisible(); if(WIZ.i>=l.length-1) return closeWizard(); WIZ.i++; wizRender(); }
+    else if(WIZ.i>0){ WIZ.i--; wizRender(); }
+  };
+
+  // 설정 탭 맨 위에 시작 버튼을 꽂는다
+  const sheet=document.getElementById("sheet");
+  const title=sheet&&sheet.querySelector("h2");
+  if(title){
+    const a=wizAudit(), miss=a.filter(x=>!x.ok).length;
+    const cta=document.createElement("button");
+    cta.type="button"; cta.className="wizcta"; cta.id="wizStart";
+    cta.innerHTML=`<span class="ci">🧭</span>
+      <span><span class="ct">설정 마법사</span>
+      <span class="cd">${miss?`빠진 항목 ${miss}개 — 순서대로 물어보고 채웁니다`:"항목을 순서대로 다시 확인합니다"}</span></span>
+      <span class="cg">›</span>`;
+    cta.onclick=startWizard;
+    title.after(cta);
+  }
+})();
+
+
 applyPlanUI();
 refreshPauseBtn();               // 메인 상단 '매일 자동 생성' 토글 상태 표시
 loadData();
 setTimeout(maybeOnboard, 800);   // 첫 실행이면 온보딩 위저드
 </script>
+
+<!-- ===== 설정 마법사 ===== -->
+<div class="wiz" id="wiz" role="dialog" aria-modal="true" aria-label="설정 마법사">
+  <div class="wiz-top">
+    <button class="wiz-x" id="wizX" aria-label="닫기">✕</button>
+    <span class="wiz-step" id="wizStep"></span>
+  </div>
+  <div class="wiz-bar"><div class="wiz-fill" id="wizFill"></div></div>
+  <div class="wiz-body" id="wizBody"></div>
+  <div class="wiz-nav">
+    <button class="btn ghost" id="wizPrev" type="button">이전</button>
+    <button class="btn primary" id="wizNext" type="button">다음</button>
+  </div>
+</div>
 </body>
 </html>
