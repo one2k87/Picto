@@ -1,5 +1,66 @@
 {
-  "updated_at": "2026-08-23",
+  "updated_at": "2026-08-24",
+  "search_console": {
+    "queries": [
+      {
+        "query": "알루미늄 두겁",
+        "clicks": 0,
+        "impressions": 1
+      }
+    ],
+    "pages": [
+      {
+        "page": "https://wontheland.com/%EC%98%A5%EC%83%81-%ED%8C%8C%EB%9D%BC%ED%8E%AB-%EC%83%81%EB%B6%80-%EC%95%8C%EB%A3%A8%EB%AF%B8%EB%8A%84-%EB%91%90%EA%B2%81-%EC%8B%9C%EA%B3%B5-%EC%8B%9C-%EC%9D%B4%EC%9D%8C%EC%83%88-%EC%97%B4%ED%8C%BD/",
+        "clicks": 1,
+        "impressions": 27
+      },
+      {
+        "page": "https://wontheland.com/",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
+        "page": "https://wontheland.com/%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4%EC%B2%98%EB%A6%AC%EB%B0%A9%EC%B9%A8/",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
+        "page": "https://wontheland.com/%EB%82%B4%EB%B6%80-%EC%B0%BD%EA%B3%A0-%EC%A4%91%EB%9F%89%EB%AC%BC-%EC%A0%81%EC%9E%AC%EC%9A%A9-%ED%8C%8C%EB%A0%88%ED%8A%B8-%EB%9E%99-%ED%8F%AC%EC%8A%A4%ED%8A%B8-%EA%B3%A0%EC%A0%95%EC%9A%A9-%EB%B0%94/",
+        "clicks": 0,
+        "impressions": 9
+      },
+      {
+        "page": "https://wontheland.com/%EB%85%B8%EC%9D%B8-%EC%8B%A4%EB%AA%85%EC%98%88%EB%B0%A9%EC%82%AC%EC%97%85-%EC%95%88%EA%B2%80%EC%A7%84-%EB%AC%B4%EB%A3%8C-%EA%B2%80%EC%82%AC-%EB%B0%8F-%EB%A7%9D%EB%A7%89%EC%A7%88%ED%99%98-%EC%88%98/",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
+        "page": "https://wontheland.com/%EB%8B%A4%EB%9D%BD%EB%B0%A9-%EC%B2%9C%EC%9E%A5-%EB%A7%A4%EC%9E%85%ED%98%95-%EC%9B%90%ED%98%95-%EC%A0%90%EA%B2%80%EA%B5%AC-%ED%83%80%EA%B3%B5-%EC%8B%9C-%EB%82%B4%EB%B6%80-%EA%B2%BD%EB%9F%89%EC%B2%A0/",
+        "clicks": 0,
+        "impressions": 4
+      },
+      {
+        "page": "https://wontheland.com/%EB%93%9C%EB%A0%88%EC%8A%A4%EB%A3%B8-%EB%B6%99%EB%B0%95%EC%9D%B4%EC%9E%A5-%EB%8F%84%EC%96%B4-%EC%88%98%ED%8F%89-%EC%A1%B0%EC%A0%95%EC%9A%A9-%EC%88%A8%EC%9D%80-%EA%B2%BD%EC%B2%A9-%EC%A0%84%ED%9B%84/",
+        "clicks": 0,
+        "impressions": 7
+      },
+      {
+        "page": "https://wontheland.com/%EB%93%9C%EB%A0%88%EC%8A%A4%EB%A3%B8-%EC%95%84%EC%9D%BC%EB%9E%9C%EB%93%9C-%EC%88%98%EB%82%A9%EC%9E%A5-%EC%84%9C%EB%9E%8D-%EC%9B%90%EB%AA%A9-%EC%95%9E%ED%8C%90-%EC%9C%A0%EA%B2%A9-%EC%A1%B0%EC%A0%95/",
+        "clicks": 0,
+        "impressions": 2
+      },
+      {
+        "page": "https://wontheland.com/%EB%93%9C%EB%A0%88%EC%8A%A4%EB%A3%B8-%EC%9D%98%EB%A5%98-%EC%88%98%EB%82%A9%EC%9A%A9-%EB%A9%94%EC%89%AC-%EC%85%94%EC%B8%A0%EB%A0%89-%EB%A0%88%EC%9D%BC-%ED%94%84%EB%A0%88%EC%9E%84-%EC%A2%8C%EC%9A%B0/",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
+        "page": "https://wontheland.com/%EB%AC%B8%EC%9D%98%ED%95%98%EA%B8%B0/",
+        "clicks": 0,
+        "impressions": 3
+      }
+    ]
+  },
   "ga4": {
     "top_pages": [
       {
@@ -14,8 +75,8 @@
       },
       {
         "title": "보일러실 내 벽면 단열재 석고보드 2P 복합 시공 시 이음새 교차 배치 규칙 준수 및 크랙 차단 기술 조항 - 원더랜드 블로그",
-        "views": 4,
-        "users": 4
+        "views": 5,
+        "users": 5
       },
       {
         "title": "내부 창고 중량물 적재용 파레트 랙 포스트 고정용 바닥 앵커 볼트 타공 및 수평 조절 플레이트 매칭 기술 - 원더랜드 블로그",
