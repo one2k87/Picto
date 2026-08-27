@@ -776,7 +776,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v86 · 잘린 제목 자동 탐지</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v87 · 러너 완료가 타임라인에 반영</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -3952,14 +3952,17 @@ async function wpRunner(){
   }catch(e){}
   say(`시작 — 공개 글 ${before.posts||0}편 · 태그 ${before.tags||0}개`,true);
 
-  // 1) 태그 전량 삭제
-  if(!confirm(`태그 ${before.tags||0}개를 모두 삭제합니다.\n\n· 글은 삭제되지 않습니다(태그 연결만 끊김)\n· 복구되지 않습니다\n\n진행할까요?`)){
+  // 1) 태그 전량 삭제 — 이미 0개면 물어볼 것도 없다
+  if((before.tags||0)===0){
+    say("태그 없음 — 삭제 단계 건너뜀",true);
+  } else if(!confirm(`태그 ${before.tags||0}개를 모두 삭제합니다.\n\n· 글은 삭제되지 않습니다(태그 연결만 끊김)\n· 복구되지 않습니다\n\n진행할까요?`)){
     say("사용자가 취소했습니다",false); return; }
 
   // ── 먼저 딱 1개만 지워보고 실패하면 '왜'를 그대로 보여준다 ──
   // 추측으로 재시도하면 원인을 영영 못 찾는다.
-  say("삭제 권한 확인 중… (1개 시험 삭제)");
   let probe=null;
+  if((before.tags||0)>0){
+  say("삭제 권한 확인 중… (1개 시험 삭제)");
   try{
     const one=await (await fetch(base+"/wp-json/wp/v2/tags?per_page=1&_fields=id",{headers:H})).json();
     if(Array.isArray(one)&&one.length){
@@ -3987,7 +3990,9 @@ async function wpRunner(){
       4. 2~3번을 태그가 0이 될 때까지 반복 (1,976개면 두세 번)</div></div>`;
     return;
   }
+  } // tags>0
   let del=probe&&probe.ok?1:0, fail=0, guard=0;
+  if((before.tags||0)===0) guard=999;               // 삭제 루프 진입 안 함
 
   // 순차 삭제는 2,000개에 10분 넘게 걸리고, 그 사이 모바일 브라우저가
   // 백그라운드 탭을 잠재우면 중간에 멈춘다. 5개씩 병렬로 보내 시간을 줄인다.
@@ -4093,8 +4098,10 @@ async function wpRunner(){
   }catch(e){}
   say(`완료 — 태그 ${before.tags||0} → ${after.tags||0}개`,true);
   prog(0,0);
+  CFG.runnerAt=new Date().toISOString(); saveCfg();   // 타임라인 4단계 완료 판정 근거
   // 정리 결과가 점검 점수에 어떻게 반영됐는지 바로 보여준다
-  try{ await adsCheck(); say("점검을 다시 실행했습니다 — 위 '① 사이트 점검' 결과를 확인하세요",true); }catch(e){}
+  try{ await adsCheck(); say("점검을 다시 실행했습니다",true); }catch(e){}
+  try{ renderPrepPlan(); }catch(e){}                   // '지금 여기'를 다음 단계로
   box.innerHTML+=`<div class="dnext" style="margin-top:10px"><div class="dl">다음 할 일</div>
     <div class="dv" style="font-size:12.5px;line-height:1.6">
     ① Rank Math → 일반 설정 → 태그·작성자·날짜 아카이브를 noindex로 (플러그인 설정이라 자동 불가)<br>
