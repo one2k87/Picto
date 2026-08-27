@@ -776,7 +776,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v89 · 4단계 완료 판정 수정</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v90 · 신청 탭 순서 재배치</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2699,6 +2699,37 @@ function moveApprovalControls(){
   });
 
   fillApprovalFields();          // 저장돼 있던 값을 화면에 올린다(설정을 안 열었어도)
+
+  // ── 신청 탭을 실제 진행 순서대로 재배치 ─────────────────────────
+  // 반려 사유 분석이 맨 위에 있었는데, 그건 '신청하고 반려된 뒤'에나 쓰는
+  // 도구다. 처음 온 사람이 맨 먼저 보는 건 '어떻게 신청하는가'여야 한다.
+  // 순서: ①절차 안내 → ②심사 모드(신청 직전 필수) → ③신청 이력 기록
+  //       → ④상태 자동 추적 → ⑤반려 분석(반려됐을 때만, 맨 아래)
+  const apply=ads.querySelector('.sub-sec[data-k="apply"]');
+  if(apply){
+    ["adsGuide","adsReviewMode","adsLogApply","adsTrackBtn","adsAnalyze"]
+      .forEach(id=>{ const f=fieldOf(id); if(f) apply.appendChild(f); });
+  }
+  // 번호를 탭 안 순서에 맞게 다시 붙인다(옛 전역 번호 ④⑥⑦⑧의 잔재 정리)
+  const relabel=(id, from, to)=>{
+    const f=fieldOf(id); if(!f) return;
+    const lb=f.querySelector("label");
+    if(lb && lb.firstChild && lb.firstChild.nodeType===3)
+      lb.firstChild.textContent=lb.firstChild.textContent.replace(from, to);
+  };
+  relabel("adsGuide","⑦ 신청 절차 안내","① 신청 절차 안내");
+  relabel("adsLogApply","⑥ 신청 이력","③ 신청 이력");
+  relabel("adsTrackBtn","⑧ 승인 상태 자동 추적","④ 승인 상태 자동 추적");
+  relabel("adsAnalyze","④ 반려 사유 분석 & 보완","⑤ 반려 사유 분석 (반려 메일을 받았을 때만)");
+  const rvBtn=document.getElementById("adsReviewMode");
+  if(rvBtn) rvBtn.textContent=rvBtn.textContent.replace(/^[③②]\s*/,"② ").replace("(대량 생성 정지 + 엄격)","(신청 직전 필수 — 대량 생성 정지)");
+  const mkBtn=document.getElementById("adsMakePages");
+  if(mkBtn) mkBtn.textContent=mkBtn.textContent.replace(/^②\s*/,"① ");
+  const pg=fieldOf("adsPlugScan");
+  if(pg){ const lb=pg.querySelector("label");
+    if(lb&&lb.firstChild&&lb.firstChild.nodeType===3)
+      lb.firstChild.textContent=lb.firstChild.textContent.replace("⑤ 필수 플러그인","② 필수 플러그인"); }
+
   ads.dataset.merged="1";
   // 설정 탭에는 어디로 갔는지 표시를 남긴다
   const sheet=document.getElementById("sheet");
@@ -4927,8 +4958,8 @@ const SUBTABS={
     tabs:[
       {k:"now",  label:"현황"},
       {k:"check",label:"점검", ids:["adsCheck"]},
-      {k:"prep", label:"준비", ids:["adsMakePages","adsReviewMode","adsPlugScan"]},
-      {k:"apply",label:"신청", ids:["adsGuide","adsAnalyze","adsLogApply","adsTrackBtn"]},
+      {k:"prep", label:"준비", ids:["adsMakePages","adsPlugScan"]},
+      {k:"apply",label:"신청", ids:["adsGuide","adsReviewMode","adsAnalyze","adsLogApply","adsTrackBtn"]},
     ],
     home:"now", render:()=>renderAdsDash(),
   },
