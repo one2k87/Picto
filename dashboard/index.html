@@ -776,7 +776,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v90 · 신청 탭 순서 재배치</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v91 · 신청 탭이 상태를 따라감</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2107,6 +2107,8 @@ function adsAddEntry(kind){
   log.push({kind, note:note.trim(), at:new Date().toISOString().slice(0,10)});
   adsLogSave(log);
   if(kind==="approve"){ CFG.adsenseApproved=true; saveCfg(); refreshApprovedUI(); toast("승인 기록됨 🎉"); }
+  // 기록 즉시 신청 탭을 새 국면으로 재배치(다음에 열 때가 아니라 지금)
+  try{ applyStateLayout(); }catch(e){}
 }
 function renderAdsHistory(){
   const box=document.getElementById("adsHistory"); if(!box) return;
@@ -2630,6 +2632,32 @@ function fillApprovalFields(){
                    :"아직 정하지 않았습니다."; }
 }
 
+// 신청 탭을 '지금 국면'에 맞게 재배치한다. 결과를 기록하는 즉시 호출돼
+// 미신청→심사중→반려→재신청→승인의 루프를 화면이 그대로 따라간다.
+function applyStateLayout(ads){
+  ads=ads||document.getElementById("adsSheet"); if(!ads) return;
+  const applySec=ads.querySelector('.sub-sec[data-k="apply"]'); if(!applySec) return;
+  const log=(typeof adsLog==="function")?adsLog():[];
+  const lastKind=log.length?log[log.length-1].kind:"none";
+  const n=log.filter(e=>e.kind==="apply").length;
+  const ORDER={
+    none:    ["adsGuide","adsReviewMode","adsLogApply","adsTrackBtn","adsAnalyze"],
+    apply:   ["adsTrackBtn","adsLogApply","adsAnalyze","adsGuide","adsReviewMode"],
+    reject:  ["adsAnalyze","adsGuide","adsReviewMode","adsLogApply","adsTrackBtn"],
+    approve: ["adsLogApply","adsTrackBtn","adsGuide","adsReviewMode","adsAnalyze"]
+  };
+  (ORDER[lastKind]||ORDER.none).forEach(id=>{ const f=fieldOf(id); if(f) applySec.appendChild(f); });
+  let head=document.getElementById("applyStateHead");
+  if(!head){ head=document.createElement("div"); head.id="applyStateHead"; head.className="wiz-note"; }
+  applySec.prepend(head);
+  head.innerHTML=({
+    none:   `🚀 <b>첫 신청 준비</b> — 아래 순서대로 진행하세요. 반려 분석은 결과가 나온 뒤에 쓰는 도구라 맨 아래 있습니다.`,
+    apply:  `⏳ <b>${n}회차 심사 중</b> — 보통 며칠~2주 걸립니다. 결과 메일이 오면 아래에서 <b>승인됨/반려됨</b>을 기록하세요.`,
+    reject: `🔁 <b>반려 후 보완 단계</b> — 반려 메일의 사유를 맨 위 분석기에 붙여넣으세요. 보완 → 점검 만점 → 재신청 순서입니다.`,
+    approve:`🎉 <b>승인 완료!</b> — 이제 수익 탭의 램프가 3주에 걸쳐 광고·발행량을 끌어올립니다. 이 기록 자체가 다음 고객에게 최고의 증거입니다.`
+  })[lastKind]||"";
+}
+
 function moveApprovalControls(){
   const ads=document.getElementById("adsSheet"); if(!ads) return false;
   const check=ads.querySelector('.sub-sec[data-k="check"]');
@@ -2705,11 +2733,12 @@ function moveApprovalControls(){
   // 도구다. 처음 온 사람이 맨 먼저 보는 건 '어떻게 신청하는가'여야 한다.
   // 순서: ①절차 안내 → ②심사 모드(신청 직전 필수) → ③신청 이력 기록
   //       → ④상태 자동 추적 → ⑤반려 분석(반려됐을 때만, 맨 아래)
-  const apply=ads.querySelector('.sub-sec[data-k="apply"]');
-  if(apply){
-    ["adsGuide","adsReviewMode","adsLogApply","adsTrackBtn","adsAnalyze"]
-      .forEach(id=>{ const f=fieldOf(id); if(f) apply.appendChild(f); });
-  }
+  // 신청 탭은 '지금 상태'에 따라 주인공이 바뀐다.
+  //   미신청 → 절차·심사모드가 위, 반려분석은 아직 볼 일 없으니 맨 아래
+  //   심사중 → 상태 추적과 결과 기록이 위 ("결과가 오면 여기 누르세요")
+  //   반려됨 → 반려 분석이 맨 위로 ("사유를 붙여넣으세요") → 보완 → 재신청 루프
+  //   승인됨 → 축하 + 다음 단계(램프) 안내
+  applyStateLayout(ads);
   // 번호를 탭 안 순서에 맞게 다시 붙인다(옛 전역 번호 ④⑥⑦⑧의 잔재 정리)
   const relabel=(id, from, to)=>{
     const f=fieldOf(id); if(!f) return;
@@ -2717,12 +2746,12 @@ function moveApprovalControls(){
     if(lb && lb.firstChild && lb.firstChild.nodeType===3)
       lb.firstChild.textContent=lb.firstChild.textContent.replace(from, to);
   };
-  relabel("adsGuide","⑦ 신청 절차 안내","① 신청 절차 안내");
-  relabel("adsLogApply","⑥ 신청 이력","③ 신청 이력");
-  relabel("adsTrackBtn","⑧ 승인 상태 자동 추적","④ 승인 상태 자동 추적");
-  relabel("adsAnalyze","④ 반려 사유 분석 & 보완","⑤ 반려 사유 분석 (반려 메일을 받았을 때만)");
+  relabel("adsGuide","⑦ 신청 절차 안내","📋 신청 절차 안내");
+  relabel("adsLogApply","⑥ 신청 이력","📒 신청 이력");
+  relabel("adsTrackBtn","⑧ 승인 상태 자동 추적","📡 승인 상태 자동 추적");
+  relabel("adsAnalyze","④ 반려 사유 분석 & 보완","🔁 반려 사유 분석 & 보완");
   const rvBtn=document.getElementById("adsReviewMode");
-  if(rvBtn) rvBtn.textContent=rvBtn.textContent.replace(/^[③②]\s*/,"② ").replace("(대량 생성 정지 + 엄격)","(신청 직전 필수 — 대량 생성 정지)");
+  if(rvBtn) rvBtn.textContent=rvBtn.textContent.replace(/^[③②]\s*/,"🛡️ ").replace("(대량 생성 정지 + 엄격)","(신청 직전 필수 — 대량 생성 정지)");
   const mkBtn=document.getElementById("adsMakePages");
   if(mkBtn) mkBtn.textContent=mkBtn.textContent.replace(/^②\s*/,"① ");
   const pg=fieldOf("adsPlugScan");
