@@ -146,7 +146,14 @@ def publish_to_wordpress(article, wp_cfg):
     headers = _auth_header(wp_cfg["username"], wp_cfg["app_password"])
     headers["Content-Type"] = "application/json"
 
-    tag_ids = ensure_tags(base_url, headers, article.get("tags", []))
+    # 태그는 만들지 않는다.
+    # 근거: 글마다 붙는 태그는 '글 1개짜리 태그 아카이브'를 무한히 만들어
+    # 애드센스 반려 1순위 원인(얇은 중복 페이지)이 된다. 실제로 이 코드가
+    # 태그 1,976개를 만들었고, 전량 삭제 후에도 파이프라인이 돌 때마다
+    # 다시 생겨나 승인 점검을 계속 깎았다. 태그가 꼭 필요해지면
+    # config의 safety.allow_tags를 만들어 명시적으로 켤 것.
+    allow_tags = bool((wp_cfg.get("safety") or {}).get("allow_tags"))
+    tag_ids = ensure_tags(base_url, headers, article.get("tags", [])) if allow_tags else []
 
     payload = {
         "title": article["title"],
