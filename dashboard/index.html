@@ -776,7 +776,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v91 · 신청 탭이 상태를 따라감</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v92 · 승인 탭 5단계 재설계</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2106,6 +2106,11 @@ function adsAddEntry(kind){
   if(note===null) return;
   log.push({kind, note:note.trim(), at:new Date().toISOString().slice(0,10)});
   adsLogSave(log);
+  if(kind==="reject"){ CFG.lastRejectReason=note.trim(); saveCfg();
+    // 분석기에도 바로 채워 넣어 '붙여넣기' 수고를 줄인다
+    const ta=document.getElementById("adsReason")||document.querySelector("#adsSheet textarea");
+    if(ta && note.trim()) ta.value=note.trim();
+  }
   if(kind==="approve"){ CFG.adsenseApproved=true; saveCfg(); refreshApprovedUI(); toast("승인 기록됨 🎉"); }
   // 기록 즉시 신청 탭을 새 국면으로 재배치(다음에 열 때가 아니라 지금)
   try{ applyStateLayout(); }catch(e){}
@@ -2632,30 +2637,72 @@ function fillApprovalFields(){
                    :"아직 정하지 않았습니다."; }
 }
 
-// 신청 탭을 '지금 국면'에 맞게 재배치한다. 결과를 기록하는 즉시 호출돼
-// 미신청→심사중→반려→재신청→승인의 루프를 화면이 그대로 따라간다.
+// 결과 탭과 현황 안내를 '지금 국면'에 맞게 갱신한다.
+// 루프: 첫 셋업 → 점검 → 준비 → 신청 → 결과(승인/반려) → (반려면) 점검부터 다시.
 function applyStateLayout(ads){
   ads=ads||document.getElementById("adsSheet"); if(!ads) return;
-  const applySec=ads.querySelector('.sub-sec[data-k="apply"]'); if(!applySec) return;
   const log=(typeof adsLog==="function")?adsLog():[];
   const lastKind=log.length?log[log.length-1].kind:"none";
-  const n=log.filter(e=>e.kind==="apply").length;
-  const ORDER={
-    none:    ["adsGuide","adsReviewMode","adsLogApply","adsTrackBtn","adsAnalyze"],
-    apply:   ["adsTrackBtn","adsLogApply","adsAnalyze","adsGuide","adsReviewMode"],
-    reject:  ["adsAnalyze","adsGuide","adsReviewMode","adsLogApply","adsTrackBtn"],
-    approve: ["adsLogApply","adsTrackBtn","adsGuide","adsReviewMode","adsAnalyze"]
-  };
-  (ORDER[lastKind]||ORDER.none).forEach(id=>{ const f=fieldOf(id); if(f) applySec.appendChild(f); });
-  let head=document.getElementById("applyStateHead");
-  if(!head){ head=document.createElement("div"); head.id="applyStateHead"; head.className="wiz-note"; }
-  applySec.prepend(head);
-  head.innerHTML=({
-    none:   `🚀 <b>첫 신청 준비</b> — 아래 순서대로 진행하세요. 반려 분석은 결과가 나온 뒤에 쓰는 도구라 맨 아래 있습니다.`,
-    apply:  `⏳ <b>${n}회차 심사 중</b> — 보통 며칠~2주 걸립니다. 결과 메일이 오면 아래에서 <b>승인됨/반려됨</b>을 기록하세요.`,
-    reject: `🔁 <b>반려 후 보완 단계</b> — 반려 메일의 사유를 맨 위 분석기에 붙여넣으세요. 보완 → 점검 만점 → 재신청 순서입니다.`,
-    approve:`🎉 <b>승인 완료!</b> — 이제 수익 탭의 램프가 3주에 걸쳐 광고·발행량을 끌어올립니다. 이 기록 자체가 다음 고객에게 최고의 증거입니다.`
-  })[lastKind]||"";
+  const applies=log.filter(e=>e.kind==="apply");
+  const n=applies.length;
+
+  // ── 결과 탭 ──
+  const res=ads.querySelector('.sub-sec[data-k="result"]');
+  if(res){
+    const ORDER={
+      none:    ["adsLogApply","adsTrackBtn","adsAnalyze"],
+      apply:   ["adsLogApply","adsTrackBtn","adsAnalyze"],   // 결과 기록이 주인공
+      reject:  ["adsAnalyze","adsLogApply","adsTrackBtn"],   // 분석이 주인공
+      approve: ["adsLogApply","adsTrackBtn","adsAnalyze"]
+    };
+    (ORDER[lastKind]||ORDER.none).forEach(id=>{ const f=fieldOf(id); if(f) res.appendChild(f); });
+    let head=document.getElementById("applyStateHead");
+    if(!head){ head=document.createElement("div"); head.id="applyStateHead"; head.className="wiz-note"; }
+    res.prepend(head);
+    // 승인 소요일: 마지막 apply → approve 사이
+    let days="";
+    if(lastKind==="approve" && applies.length){
+      const a=new Date(applies[applies.length-1].at), b2=new Date(log[log.length-1].at);
+      const d=Math.max(0,Math.round((b2-a)/86400000));
+      days=` 신청 <b>${d}일 만에</b> 승인됐습니다.`;
+    }
+    head.innerHTML=({
+      none:   `📮 아직 신청 기록이 없습니다. <b>신청 탭</b>에서 신청을 마치면 여기에 기록이 시작됩니다.`,
+      apply:  `⏳ <b>${n}회차 심사 중</b> — 보통 며칠~2주. 결과 메일이 오면 아래에서 <b>승인됨/반려됨</b>을 기록하세요. 상태 추적을 연결해두면 자동으로 확인됩니다.`,
+      reject: `🔁 <b>반려됨 (${n}회차)</b> — 아래 분석기에 반려 메일 사유를 붙여넣으세요. 사유는 <b>점검 탭에도 자동으로 표시</b>되어, 보완 → 점검 만점 → 재신청 루프를 안내합니다.`,
+      approve:`🎉 <b>승인 완료!</b>${days} 이제 <b>수익 탭</b>으로 — 램프가 3주에 걸쳐 광고·발행량을 끌어올립니다. 반려→보완→승인 로그는 다음 사이트와 고객에게 그대로 자산이 됩니다.`
+    })[lastKind]||"";
+  }
+
+  // ── 현황 탭 안내 ──
+  const guide=document.getElementById("adsFlowGuide");
+  if(guide){
+    const wpOk=(typeof wpReady==="function")&&wpReady();
+    const sc=CFG.lastCheck?`${CFG.lastCheck.score}/${CFG.lastCheck.total}`:null;
+    const flow=`<div style="margin-top:6px;color:var(--muted);font-size:12px">진행 순서: <b>현황</b> → 점검 → 준비 → 신청 → 결과</div>`;
+    guide.innerHTML=({
+      none: wpOk
+        ? `🚀 <b>첫 신청입니다.</b> 블로그가 연결됐으니 <b>점검 탭</b>으로 넘어가 상태부터 확인하세요.${sc?` (최근 점검 ${sc})`:""}
+           <button class="btn primary sm" style="width:100%;margin-top:8px" onclick="gotoSub('adsSheet','check');setTimeout(()=>document.getElementById('adsCheck').click(),300)">🔍 점검 시작 →</button>${flow}`
+        : `🚀 <b>첫 신청입니다.</b> 먼저 아래에 블로그 주소·아이디·앱 비밀번호를 넣어 연결하세요.${flow}`,
+      apply:  `⏳ <b>${n}회차 심사 중.</b> 결과가 오면 <b>결과 탭</b>에 기록하세요.
+        <button class="btn sm" style="width:100%;margin-top:8px" onclick="gotoSub('adsSheet','result')">📮 결과 탭으로</button>${flow}`,
+      reject: `🔁 <b>반려 후 보완 중.</b> <b>점검 탭</b>에 반려 사유가 표시됩니다 — 보완하고 만점을 만든 뒤 재신청하세요.
+        <button class="btn primary sm" style="width:100%;margin-top:8px" onclick="gotoSub('adsSheet','check');setTimeout(()=>document.getElementById('adsCheck').click(),300)">🔍 점검부터 다시 →</button>${flow}`,
+      approve:`🎉 <b>승인 완료!</b> 수익 탭에서 램프가 진행됩니다.${flow}`
+    })[lastKind]||"";
+  }
+
+  // ── 점검 탭의 반려 사유 참고 상자 ──
+  const ref=document.getElementById("checkRejectRef");
+  if(ref){
+    const lastRej=[...log].reverse().find(e=>e.kind==="reject");
+    ref.innerHTML = lastRej
+      ? `<div class="wiz-note" style="border-color:var(--danger)">🔁 <b>직전 반려 사유 (${lastRej.at})</b><br>
+         ${escAttr(lastRej.note||"(사유 미입력 — 결과 탭 분석기에 붙여넣으면 여기에도 반영됩니다)")}<br>
+         <span class="hint">아래 점검 결과를 이 사유와 비교하며 보완하세요.</span></div>`
+      : "";   // 첫 신청이면 비워둔다
+  }
 }
 
 function moveApprovalControls(){
@@ -2668,10 +2715,20 @@ function moveApprovalControls(){
   const head=(t,d)=>{ const h=document.createElement("div"); h.className="field";
     h.innerHTML=`<label>${t}</label><div class="hint">${d}</div>`; return h; };
 
-  // ① 점검 = 블로그 연결 + 연결 진단
-  const c=[head("① 블로그 연결","여기 넣은 값은 <b>자동으로 저장</b>됩니다. 설정 탭에 따로 옮겨 적을 필요가 없습니다.")];
-  ["cfgSite","cfgUser","cfgPass","wpDiagBtn"].forEach(id=>{ const f=fieldOf(id); if(f) c.push(f); });
-  c.reverse().forEach(el=>check.prepend(el));
+  // ① 현황 = "지금 어디까지 왔나" + 전체 순서 안내 + 블로그 연결 정보.
+  //    처음 온 사람이 여기서 시작해 화살표 방향(점검→준비→신청→결과)으로 간다.
+  const nowSec=ads.querySelector('.sub-sec[data-k="now"]');
+  if(nowSec){
+    const guide=document.createElement("div");
+    guide.className="wiz-note"; guide.id="adsFlowGuide";
+    nowSec.prepend(guide);
+    const c=[head("🔗 블로그 연결","여기 넣은 값은 <b>자동으로 저장</b>됩니다. 아직 블로그가 없다면 준비 탭의 개설 안내를 보세요.")];
+    ["cfgSite","cfgUser","cfgPass","wpDiagBtn"].forEach(id=>{ const f=fieldOf(id); if(f) c.push(f); });
+    c.forEach(el=>nowSec.appendChild(el));
+  }
+  // 점검 탭 맨 위: 직전 반려 사유 참고 상자(있을 때만 내용 표시)
+  const rejRef=document.createElement("div");
+  rejRef.id="checkRejectRef"; check.prepend(rejRef);
 
   // ② 준비 = 승인 프로그램만 보인다. 옮겨온 설정 필드는 프로그램의 버튼이
   //    호출할 수 있도록 존재해야 하지만, 화면에서는 접힌 상자 안에 숨긴다.
@@ -2738,6 +2795,17 @@ function moveApprovalControls(){
   //   심사중 → 상태 추적과 결과 기록이 위 ("결과가 오면 여기 누르세요")
   //   반려됨 → 반려 분석이 맨 위로 ("사유를 붙여넣으세요") → 보완 → 재신청 루프
   //   승인됨 → 축하 + 다음 단계(램프) 안내
+  // 신청 탭: 절차 안내 → 심사 모드 → '신청을 마쳤습니다' 기록 버튼
+  const applySec=ads.querySelector('.sub-sec[data-k="apply"]');
+  if(applySec && !document.getElementById("applyDoneBtn")){
+    ["adsGuide","adsReviewMode"].forEach(id=>{ const f=fieldOf(id); if(f) applySec.appendChild(f); });
+    const doneF=document.createElement("div");
+    doneF.className="field";
+    doneF.innerHTML=`<button class="btn primary" id="applyDoneBtn" style="width:100%">✅ 애드센스 신청을 마쳤습니다 (기록하고 결과 탭으로)</button>
+      <div class="hint">몇 회차인지, 이번에 무엇을 고치고 신청했는지가 기록됩니다. 이 기록이 쌓일수록 승인이 빨라집니다.</div>`;
+    applySec.appendChild(doneF);
+    doneF.querySelector("#applyDoneBtn").onclick=()=>{ adsAddEntry("apply"); gotoSub("adsSheet","result"); };
+  }
   applyStateLayout(ads);
   // 번호를 탭 안 순서에 맞게 다시 붙인다(옛 전역 번호 ④⑥⑦⑧의 잔재 정리)
   const relabel=(id, from, to)=>{
@@ -2922,7 +2990,7 @@ function renderPrepPlan(){
         sub:s.check?`현재 ${s.check.score}/${s.check.total}`:"아직 점검 전",
         body:B("gotoSub('adsSheet','check');setTimeout(()=>document.getElementById('adsCheck').click(),300)","🔄 점검 실행","primary sm") },
       { t:"애드센스 신청", done:false,
-        sub:"만점이 되면 신청합니다",
+        sub:"만점이 되면 신청 탭에서 진행하고, 결과 탭에 기록합니다",
         body:B("gotoSub('adsSheet','apply')","📮 신청 탭으로","primary sm") }
     ];
     // '지금 할 단계' = 앞에서부터 첫 미완료
@@ -4988,7 +5056,8 @@ const SUBTABS={
       {k:"now",  label:"현황"},
       {k:"check",label:"점검", ids:["adsCheck"]},
       {k:"prep", label:"준비", ids:["adsMakePages","adsPlugScan"]},
-      {k:"apply",label:"신청", ids:["adsGuide","adsReviewMode","adsAnalyze","adsLogApply","adsTrackBtn"]},
+      {k:"apply",label:"신청", ids:["adsGuide","adsReviewMode"]},
+      {k:"result",label:"결과", ids:["adsAnalyze","adsLogApply","adsTrackBtn"]},
     ],
     home:"now", render:()=>renderAdsDash(),
   },
