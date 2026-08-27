@@ -776,7 +776,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v84 · 작업 배너 화면 고정</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v85 · 오류 배너 소음 제거</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -4809,7 +4809,9 @@ if("serviceWorker" in navigator){
   });
   // 앱이 다시 포그라운드로 올 때도 업데이트 확인
   document.addEventListener("visibilitychange",()=>{
-    if(!document.hidden) navigator.serviceWorker.getRegistration().then(r=>r&&r.update());
+    if(!document.hidden) navigator.serviceWorker.getRegistration()
+      .then(r=>r&&r.update().catch(()=>{}))   // 네트워크 순단이면 갱신만 건너뜀 — 앱은 정상
+      .catch(()=>{});
   });
 }
 
@@ -6085,8 +6087,18 @@ setTimeout(maybeOnboard, 800);   // 첫 실행이면 온보딩 위저드
     const b=document.getElementById("errBar"), t=document.getElementById("errMsg");
     if(!b||!t) return; t.textContent=String(m).slice(0,220); b.style.display="block";
   }catch(e){} };
-  window.addEventListener("error",e=>show((e.message||"오류")+" @"+((e.filename||"").split("/").pop())+":"+e.lineno));
-  window.addEventListener("unhandledrejection",e=>show("처리되지 않은 오류: "+(e.reason&&e.reason.message||e.reason)));
+  // 앱이 멀쩡히 도는데도 뜨는 소음(SW 갱신 실패, 네트워크 순단, 확장프로그램)은 거른다.
+  // 배너는 '버튼이 안 먹는 진짜 고장'을 알리는 용도다.
+  const benign=/ServiceWorker|sw\.js|Failed to fetch|Load failed|NetworkError|ResizeObserver|extension/i;
+  window.addEventListener("error",e=>{
+    if(benign.test(e.message||"")) return;
+    show((e.message||"오류")+" @"+((e.filename||"").split("/").pop())+":"+e.lineno);
+  });
+  window.addEventListener("unhandledrejection",e=>{
+    const m=String(e.reason&&e.reason.message||e.reason||"");
+    if(benign.test(m)) { console.warn("무해한 실패(표시 안 함):", m.slice(0,120)); return; }
+    show("처리되지 않은 오류: "+m);
+  });
 })();
 </script>
 </body>
