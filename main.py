@@ -221,6 +221,52 @@ def _category_active_today(cat):
     return doy_is_odd if mode == "odd" else (not doy_is_odd)
 
 
+def _theme_guard(cats, hist, topic_width=None):
+    """주제(카테고리) 전환 완충 장치.
+
+    왜: 카테고리를 바꾸면 다음 실행부터 새 주제가 최대 물량으로 나간다.
+    승인 직후 주제가 갑자기 바뀌는 것은 '검수 없는 대량 발행'과 함께
+    애드센스가 가장 싫어하는 신호다(실제로 인테리어 블로그에 자격증
+    초안이 하루 만에 생성된 사고가 있었다).
+
+    규칙:
+      · 그 주제로 이미 발행된 글 수(n)에 따라 하루 상한을 둔다
+        n 0~4편 → 하루 1편, 5~9 → 2편, 10~14 → 3편, 15편↑ → 제한 없음
+      · 램프의 topic_width(단계별 주제 폭)를 실제로 집행한다 —
+        기존 주제를 우선하고, 폭을 넘는 '새' 주제는 이번 단계에선 보류
+      · 블로그 자체가 새것(총 기록 10편 미만)이면 제한하지 않는다
+        (승인 준비 단계의 첫 주제가 여기 해당)
+    """
+    arts = (hist or {}).get("articles") or []
+    counts = {}
+    for a in arts:
+        c = a.get("category")
+        if c:
+            counts[c] = counts.get(c, 0) + 1
+    total = sum(counts.values())
+    if total < 10:
+        return cats, []
+
+    kept, notes = [], []
+    ranked = sorted(cats, key=lambda c: -counts.get(c.get("name", ""), 0))
+    width = len(ranked) if not topic_width else max(1, int(topic_width))
+    for i, c in enumerate(ranked):
+        n = counts.get(c.get("name", ""), 0)
+        if i >= width and n == 0:
+            notes.append(f"'{c['name']}' 보류 — 현 단계 주제 폭({width})을 넘는 새 주제")
+            continue
+        c = dict(c)
+        if n < 15:
+            cap = 1 + n // 5
+            c["_daily_cap"] = cap
+            notes.append(f"'{c['name']}' 완충 — 누적 {n}편이라 하루 최대 {cap}편(시리즈 금지)")
+        kept.append(c)
+    if not kept and ranked:            # 전부 보류되는 극단은 막는다
+        c = dict(ranked[0]); c["_daily_cap"] = 1; kept = [c]
+        notes.append(f"'{c['name']}' 최소 1편 유지")
+    return kept, notes
+
+
 def _plan_slots(cfg, cat=None):
     """각 갈래의 슬롯을 (series/single)로 계획. 시리즈=1슬롯(여러 편 생성).
     카테고리 dict에 'counts'가 있으면 그 카테고리 전용 발행량으로 우선 사용(없으면 전역 기본값)."""
@@ -240,6 +286,11 @@ def _plan_slots(cfg, cat=None):
         slots.append(("season", "series", parts()))
     for _ in range(c.get("season_single", 1)):
         slots.append(("season", "single", 1))
+
+    # 주제 전환 완충: 새 주제는 슬롯 수를 줄이고 시리즈(한 번에 여러 편)를 금지한다.
+    cap = (cat or {}).get("_daily_cap")
+    if cap:
+        slots = [(lane, "single", 1) for lane, _m, _n in slots][:int(cap)]
     return slots
 
 
@@ -766,6 +817,22 @@ def run():
     # 승인→수익 램프: 단계에 맞춰 광고·발행량·깊이를 config에 덮어쓴다
     ramp.apply_to_config(cfg)
     _bias = cfg.get("_ramp_intent_bias", "auto")
+
+    # 주제 전환 완충 — 새 주제가 하루아침에 물량을 차지하지 못하게 한다
+    cats, _tnotes = _theme_guard(cats, hist, cfg.get("_ramp_topic_width"))
+    for _tn in _tnotes:
+        print(f"[주제 완충] {_tn}")
+    try:  # 전략 탭이 전환 진행률을 보여줄 수 있게 남긴다
+        _shift = {"at": datetime.now().isoformat(timespec="seconds"),
+                  "notes": _tnotes,
+                  "maturity": [{"category": c["name"],
+                                "published": sum(1 for a in hist["articles"] if a.get("category") == c["name"]),
+                                "daily_cap": c.get("_daily_cap")} for c in cats]}
+        os.makedirs(DASH_DATA, exist_ok=True)
+        with open(os.path.join(DASH_DATA, "theme_shift.json"), "w", encoding="utf-8") as f:
+            json.dump(_shift, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"[주제 완충] 상태 기록 건너뜀: {e}")
 
     # 오늘의 의도 배분(strategy.json 기반). 수익형/누적형을 요일별로 다르게 쓴다.
     _plan = strategy.load_plan()

@@ -776,7 +776,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v93 · 수익 탭 재설계</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v94 · 주제 전환 완충</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2722,13 +2722,42 @@ function buildMoneyTab(){
     mkNote(`💰 <b>지금 얼마나 벌고 있나</b> — 실측값을 넣을수록 아래 추정이 정확해집니다.`),
     now.firstChild.nextSibling);
 
-  // ② 전략 안내 강화
+  // ② 전략 안내 + 주제 전환 완충 상태
   const strat=sec("strat");
-  if(strat) strat.prepend(mkNote(
+  if(strat){
+    strat.prepend(mkNote(
     `🎯 <b>전략이 하는 일</b> — 매주 월요일 검색 실적·트렌드를 분석해
      <b>다음 주에 쓸 글의 주제 비율과 형식</b>을 정합니다. 여기서 정해진 테마가
      <b>글 탭의 자동 작성</b>에 그대로 반영됩니다. 정책이 바뀌면 규칙 파일이
      갱신되어 형식도 함께 조정됩니다.`));
+    // 주제 전환 완충 — 갑작스러운 테마 교체는 정책 위험이므로 엔진이 막는다.
+    // 여기서는 그 진행 상황을 보여준다.
+    const shift=document.createElement("div"); shift.className="wiz-note";
+    shift.innerHTML=`🛡️ <b>주제 전환 완충</b> — 주제를 바꿔도 한꺼번에 바뀌지 않습니다.
+      새 주제는 <b>하루 1편·시리즈 금지</b>로 시작해, 그 주제 글이 5편 쌓일 때마다
+      하루 상한이 1편씩 늘어납니다(15편부터 제한 없음). 램프 단계의 주제 폭을
+      넘는 새 주제는 자동 보류됩니다.<div id="themeShiftBox" class="hint" style="margin-top:6px">전환 기록 없음</div>`;
+    strat.appendChild(shift);
+    (async()=>{
+      const box=document.getElementById("themeShiftBox"); if(!box) return;
+      try{
+        const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+        let r=await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/dashboard/data/theme_shift.json`,{cache:"no-store"});
+        if(!r.ok) r=await fetch("./data/theme_shift.json",{cache:"no-store"});
+        if(!r.ok) return;
+        const j=await r.json();
+        box.innerHTML=(j.maturity||[]).map(m=>{
+          const pct=Math.min(100,Math.round((m.published||0)/15*100));
+          return `<div style="margin:5px 0">${escAttr(m.category)} — 누적 ${m.published}편
+            ${m.daily_cap?` · 하루 상한 ${m.daily_cap}편`:" · 제한 없음"}
+            <div style="height:5px;border-radius:99px;background:rgba(255,255,255,.08);margin-top:3px">
+              <div style="height:100%;width:${pct}%;border-radius:99px;background:${pct>=100?"var(--ok)":"var(--accent)"}"></div>
+            </div></div>`;
+        }).join("")||"전환 기록 없음";
+        if(j.at) box.innerHTML+=`<div style="margin-top:4px;opacity:.7">마지막 계산 ${new Date(j.at).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})}</div>`;
+      }catch(e){}
+    })();
+  }
 
   // ③ 애드센스 세팅: 승인 탭 현황에 있던 수익 최적화 블록을 이동
   if(setg){
