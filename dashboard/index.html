@@ -776,7 +776,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v85 · 오류 배너 소음 제거</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v86 · 잘린 제목 자동 탐지</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2974,7 +2974,7 @@ ${olds}`;
     const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key),
       {method:"POST",headers:{"Content-Type":"application/json"},
        body:JSON.stringify({contents:[{parts:[{text:prompt}]}],
-         generationConfig:{temperature:0.9,maxOutputTokens:4096}})});
+         generationConfig:{temperature:0.9,maxOutputTokens:8192}})});
     const j=await r.json();
     out=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"";
     if(!out) throw new Error(j.error?.message||"빈 응답");
@@ -3011,11 +3011,31 @@ ${olds}`;
     return;
   }
 
+  // 잘린 제목 탐지 — 실제 사고 사례: "…옷장 행거 파이"(파이프에서 절단),
+  // "…수평: 숨은 경첩"(서술 없이 명사에서 끝). AI 출력이 토큰 한도나
+  // 스트리밍 중단으로 끊기면 이런 형태가 된다. 세 가지 신호로 잡는다:
+  //  ① 너무 짧다(15자 미만)  ② 조사·연결어로 끝난다  ③ 원제목보다 절반 이하로 줄었다
+  const KOR_PARTICLE=/(의|를|을|이|가|은|는|와|과|로|에|서|고|며|및|중|후|전|시)$/;
+  const looksCut=(neo,old)=>{
+    const t=neo.trim();
+    if(t.length<15) return "너무 짧음";
+    if(KOR_PARTICLE.test(t.replace(/[^가-힣]+$/,""))) return "조사로 끝남";
+    if(old && t.length < old.length*0.45) return "원제목 대비 과도한 축소";
+    // "…도어 수평: 숨은 경첩"처럼 구분자 뒤가 명사 몇 글자로 끝나면
+    // 서술이 잘렸을 가능성이 높다(실제 사고 사례).
+    const seg=t.split(/[,:·—-]/).pop().trim();
+    if(seg && seg.replace(/\s+/g,"").length<6 && t.includes(seg) && /[,:·—-]/.test(t))
+      return "구분자 뒤가 너무 짧음";
+    return null;
+  };
+  const cut=pairs.filter(x=>looksCut(x.neo,x.old));
+  cut.forEach(x=>x._cut=looksCut(x.neo,x.old));
+
   // 새 제목이 다시 규칙을 어기지 않는지 검사(AI가 지시를 어길 때가 있다)
   const bad=pairs.filter(x=>isClicheTitle(x.neo));
   const ends={}; pairs.forEach(x=>{const w=x.neo.split(/\s+/).pop(); ends[w]=(ends[w]||0)+1;});
   const dup=Object.entries(ends).filter(([,n])=>n>=2);
-  log.say(`제안 ${pairs.length}편 생성${missing.length?` · 누락 ${missing.length}편`:""}${bad.length?` · 규칙 위반 ${bad.length}편 제외`:""}${dup.length?` · 어미 중복 ${dup.length}종`:""}${drift.length?` · 확인 필요 ${drift.length}편`:""}`, bad.length===0&&missing.length===0);
+  log.say(`제안 ${pairs.length}편 생성${missing.length?` · 누락 ${missing.length}편`:""}${bad.length?` · 규칙 위반 ${bad.length}편 제외`:""}${cut.length?` · 잘림 의심 ${cut.length}편`:""}${dup.length?` · 어미 중복 ${dup.length}종`:""}${drift.length?` · 확인 필요 ${drift.length}편`:""}`, bad.length===0&&missing.length===0&&cut.length===0);
 
   const good=pairs.filter(x=>!isClicheTitle(x.neo));
   window._titlePairs=good;
@@ -3025,11 +3045,14 @@ ${olds}`;
                 border:1px solid var(--line);border-radius:10px;padding:8px">
       ${good.map((x,i)=>{
         const odd=share(x.old,x.neo)===0;
+        const cutWhy=x._cut||null;
+        const unchecked=odd||cutWhy;
         return `<label style="display:block;margin:8px 0;font-size:12.5px;line-height:1.5">
-        <input type="checkbox" class="tfix" data-i="${i}"${odd?"":" checked"} style="width:auto;margin-right:6px">
+        <input type="checkbox" class="tfix" data-i="${i}"${unchecked?"":" checked"} style="width:auto;margin-right:6px">
         <span style="color:var(--muted);text-decoration:line-through">${escAttr(x.old)}</span><br>
         <span style="margin-left:20px">→ <b>${escAttr(x.neo)}</b>${
-          odd?` <span style="color:var(--danger)">⚠️ 원본과 겹치는 말이 없습니다 — 확인하세요</span>`:""}</span></label>`;
+          odd?` <span style="color:var(--danger)">⚠️ 원본과 겹치는 말이 없습니다</span>`:""}${
+          cutWhy?` <span style="color:var(--warn)">✂️ 잘린 것 같습니다(${escAttr(cutWhy)}) — 직접 고치거나 빼세요</span>`:""}</span></label>`;
       }).join("")}
     </div>
     <button class="btn primary sm" style="width:100%;margin-top:8px" onclick="applyTitles()">체크한 제목 적용</button>
