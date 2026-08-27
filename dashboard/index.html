@@ -712,6 +712,7 @@
   <div class="field">
     <button class="btn primary sm" id="adsCheck" style="width:100%">① 사이트 점검하기</button>
     <div id="adsReport" style="margin-top:10px;font-size:13px"></div>
+    <div id="deepBox" style="margin-top:10px;font-size:13px"></div>
   </div>
 
   <div class="field">
@@ -3768,6 +3769,103 @@ async function createOnePage(slug){
   }catch(e){ toast("생성 실패(네트워크/CORS)",1); }
   adsCheck();
 }
+/* ───────── 본문 정밀 점검 ─────────
+   왜 만들었나: 16/16 만점에서 "낮은 가치의 콘텐츠"로 반려됐다(2026-08-28, 5회차).
+   기존 점검은 형식(제목·태그·페이지)만 보고 본문은 안 봤다. 심사관이 실제로 읽는 건
+   본문이므로, AI 티가 나는 신호(어미 단조, 상투 표현, 구조 복제, 경험 부재)를
+   글마다 채점한다. 반려 기록이 있으면 이 점검을 통과해야 전체 통과가 된다. */
+function _dcText(html){const d=document.createElement("div");d.innerHTML=html||"";
+  d.querySelectorAll("script,style").forEach(x=>x.remove());return (d.textContent||"").replace(/\s+/g," ").trim();}
+function _dcSentences(t){return t.split(/(?<=[.!?…])\s+/).map(s=>s.trim()).filter(s=>s.length>8);}
+const DC_CLICHE=[/알아보겠습니다/,/살펴보(겠|도록 하겠)습니다/,/도움이 되(셨기를|길)/,/마무리하겠습니다/,
+  /오늘은 .{2,20}에 대해/,/지금까지 .{2,20}였습니다/,/참고하(시기 바랍니다|세요)/,/정리해보(겠습니다|았습니다)/,
+  /함께 알아(봐요|보아요|보시죠)/,/이번 (글|포스팅)에서는/,/궁금하신 분들/,/많은 도움이/];
+const DC_EXP=[/제가 직접/,/직접 (해보|써보|설치|시공|측정|비교)/,/저는 /,/우리 집/,/실제로 (해보|써보|받아보)/,
+  /해봤(는데|더니|습니다)/,/겪었|실패했|후회했/,/주문(했|해서)/,/사서 써/];
+async function contentDeepCheck(){
+  const box=document.getElementById("deepBox");
+  if(!wpReady()){ box.innerHTML='<span style="color:#ffb020">블로그 연결 정보를 먼저 넣어주세요.</span>'; return; }
+  box.innerHTML='<div class="hint">발행 글 본문을 전부 읽는 중… (글 수에 따라 수십 초)</div>';
+  const base=wpBase(); let all=[];
+  try{
+    for(let pg=1;pg<=3;pg++){
+      const r=await fetch(base+`/wp-json/wp/v2/posts?per_page=50&page=${pg}&status=publish`,{headers:wpAuth()});
+      if(!r.ok) break; const js=await r.json(); all=all.concat(js);
+      if(js.length<50) break;
+    }
+  }catch(e){ box.innerHTML='<span style="color:#ff6b4a">본문 조회 실패 — 연결 정보/CORS 확인.</span>'; return; }
+  if(!all.length){ box.innerHTML='<span class="hint">공개 글이 없습니다.</span>'; return; }
+
+  // 1차: 글별 지표 수집
+  const metas=all.map(p=>{
+    const html=(p.content&&p.content.rendered)||"";
+    const txt=_dcText(html), sents=_dcSentences(txt);
+    // 어미 단조: 문장 마지막 어절의 최빈값 비율
+    const ends={}; sents.forEach(s=>{const w=s.replace(/[.!?…"']+$/,"").split(" ").pop()||"";
+      const k=w.slice(-4); if(k) ends[k]=(ends[k]||0)+1;});
+    const topEnd=Object.entries(ends).sort((a,b)=>b[1]-a[1])[0]||["",0];
+    const endRatio=sents.length?Math.round(topEnd[1]/sents.length*100):0;
+    // 문단 균일성(기계 리듬): <p> 길이의 변동계수
+    const d=document.createElement("div"); d.innerHTML=html;
+    const plens=[...d.querySelectorAll("p")].map(x=>(x.textContent||"").trim().length).filter(n=>n>30);
+    let cv=1; if(plens.length>=8){const m=plens.reduce((a,b)=>a+b,0)/plens.length;
+      cv=Math.sqrt(plens.reduce((a,b)=>a+(b-m)*(b-m),0)/plens.length)/m;}
+    const skel=`h2:${d.querySelectorAll("h2").length}|h3:${d.querySelectorAll("h3").length}|ul:${d.querySelectorAll("ul,ol").length}|tb:${d.querySelectorAll("table").length}`;
+    return {id:p.id, link:p.link, title:_dcText((p.title&&p.title.rendered)||""),
+      len:txt.length, sents, endRatio, topEnd:topEnd[0],
+      cliche:DC_CLICHE.filter(re=>re.test(txt)).length,
+      exp:DC_EXP.filter(re=>re.test(txt)).length,
+      nums:(txt.match(/\d+(?:\.\d+)?\s*(?:mm|cm|m|만원|원|시간|분|kg|평|%|개|년|일)/g)||[]).length,
+      imgs:d.querySelectorAll("img").length, uniform:cv<0.35, skel};
+  });
+  // 사이트 수준: 구조 복제(같은 뼈대 비율) + 여러 글에 반복되는 문장(보일러플레이트)
+  const skelCount={}; metas.forEach(m=>skelCount[m.skel]=(skelCount[m.skel]||0)+1);
+  const topSkel=Object.entries(skelCount).sort((a,b)=>b[1]-a[1])[0];
+  const skelShare=Math.round(topSkel[1]/metas.length*100);
+  const sentMap={}; metas.forEach(m=>{ new Set(m.sents.map(s=>s.replace(/\s+/g,"").slice(0,60))).forEach(k=>{
+    if(k.length>25) sentMap[k]=(sentMap[k]||0)+1; }); });
+  const boiler=new Set(Object.entries(sentMap).filter(([,n])=>n>=3).map(([k])=>k));
+
+  // 2차: 채점 (100점 시작, '가치' 신호 위주 감점)
+  const scored=metas.map(m=>{
+    let sc=100; const issues=[];
+    const myBoiler=[...new Set(m.sents.map(s=>s.replace(/\s+/g,"").slice(0,60)))].filter(k=>boiler.has(k)).length;
+    if(m.exp===0){sc-=25;issues.push("경험 신호 0 — 직접 해본 흔적(1인칭·실측·실패담)이 없음");}
+    else if(m.exp<=1){sc-=10;issues.push("경험 신호 약함");}
+    if(m.len<800){sc-=25;issues.push(`본문 ${m.len}자 — 너무 짧음`);}
+    else if(m.len<1200){sc-=12;issues.push(`본문 ${m.len}자 — 얇음`);}
+    if(m.nums<3){sc-=10;issues.push("구체 수치 부족(치수·가격·시간)");}
+    if(m.endRatio>=80){sc-=20;issues.push(`어미 단조 ${m.endRatio}% ("${m.topEnd}" 반복)`);}
+    else if(m.endRatio>=65){sc-=10;issues.push(`어미 단조 ${m.endRatio}%`);}
+    if(m.cliche>=5){sc-=20;issues.push(`상투 표현 ${m.cliche}종 (알아보겠습니다류)`);}
+    else if(m.cliche>=3){sc-=12;issues.push(`상투 표현 ${m.cliche}종`);}
+    if(myBoiler>=2){sc-=15;issues.push(`다른 글과 겹치는 문장 ${myBoiler}개`);}
+    if(m.uniform){sc-=8;issues.push("문단 길이가 기계처럼 균일");}
+    if(m.imgs===0){sc-=8;issues.push("본문 이미지 없음");}
+    return Object.assign(m,{score:Math.max(0,sc),issues});
+  }).sort((a,b)=>a.score-b.score);
+  const avg=Math.round(scored.reduce((a,b)=>a+b.score,0)/scored.length);
+  const fails=scored.filter(m=>m.score<60);
+
+  CFG.deepCheck={at:new Date().toISOString(), avg, n:scored.length, fails:fails.length, skelShare}; saveCfg();
+
+  let html=`<div style="padding:10px;border:1px solid var(--line);border-radius:10px">
+    <b>🧪 본문 정밀 점검 — 평균 ${avg}점 / ${scored.length}편</b>
+    <div class="hint" style="margin-top:4px">60점 미만 ${fails.length}편은 보완 필수. 구조 복제(같은 뼈대) ${skelShare}%${skelShare>50?' <span style="color:#ff6b4a">— 절반 이상이 같은 틀, 자동 생성 신호</span>':''}</div>`;
+  html+=`<div style="max-height:260px;overflow-y:auto;margin-top:8px;border-top:1px solid var(--line)">`;
+  for(const m of scored){
+    const c=m.score>=80?"var(--ok)":m.score>=60?"#ffb020":"var(--danger)";
+    html+=`<div style="padding:6px 0;border-bottom:1px solid var(--line)">
+      <span style="color:${c};font-weight:700">${m.score}점</span> <a href="${m.link}" target="_blank" style="color:inherit">${escAttr(m.title)}</a>
+      ${m.issues.length?`<div class="hint" style="margin-left:8px">↳ ${m.issues.map(escAttr).join(" · ")}</div>`:""}</div>`;
+  }
+  html+=`</div>
+    <div class="hint" style="margin-top:8px"><b>고치는 규칙(사람 티 내기)</b> — ① 글마다 직접 한 일 1개를 도입에(실패담이 최고) ② 실측 수치 3개 이상(치수·가격·소요시간) ③ "알아보겠습니다"류 전부 삭제 ④ 어미를 평서·의문·명사형으로 섞기 ⑤ 같은 소제목 뼈대 재사용 금지 ⑥ 현장 사진 1장 이상</div>
+    <button class="btn sm" style="width:100%;margin-top:8px" onclick="contentDeepCheck()">🔄 본문 다시 점검</button></div>`;
+  box.innerHTML=html;
+  try{ adsCheck(); }catch(e){}
+}
+
 async function adsCheck(){
   const box=document.getElementById("adsReport");
   if(!wpReady()){ box.innerHTML='<span style="color:#ffb020">위 <b>① 블로그 연결</b>에 주소·아이디·앱 비밀번호를 먼저 넣어주세요.</span>'; return; }
@@ -3829,6 +3927,22 @@ async function adsCheck(){
       {ok:lonelyTags<=TH.max_lonely_tags, label:`글 1개짜리 태그 ${lonelyTags}개 (태그/글 비율 ${tagRatio}%)`,
        reason:`<b>왜 문제인가</b> — 글마다 전용 태그가 생기면 <u>내용이 하나뿐인 태그 페이지</u>가 글 수만큼 색인됩니다. 실질 글이 30개여도 구글은 알맹이 없는 페이지 30개를 함께 봅니다. 이게 '가치 없는 콘텐츠' 판정의 흔한 숨은 원인입니다.<br><b>어떻게 고치나</b> — Rank Math → 일반 설정 → 태그 아카이브를 <b>noindex</b>로. 앞으로는 태그를 10~15개 사전에서만 골라 쓰세요.`},
     ]},
+    // 반려 이력이 있으면 본문 점검을 통과 조건에 편입한다.
+    // 형식 만점(16/16)에서도 '낮은 가치의 콘텐츠'로 반려된 실사례가 근거 —
+    // 반려 후에 본문 점검 없이 "전체 통과"를 보여주는 것은 거짓 안심이다.
+    ...(function(){
+      const rej=[...adsLog()].reverse().find(e=>e.kind==="reject");
+      if(!rej) return [];
+      const dc=CFG.deepCheck;
+      const fresh=dc && dc.at>new Date(rej.at+"T00:00:00").toISOString();
+      const pass=!!(fresh && dc.avg>=70 && dc.fails===0);
+      return [{h:"🧪 본문 품질 (반려 사유: "+escAttr(rej.note||"기록 없음")+")", items:[
+        {ok:pass,
+         label: !fresh ? "본문 정밀 점검 미실행 (반려 이후 기준)"
+              : `본문 평균 ${dc.avg}점 · 보완 필요 ${dc.fails}편 · 구조 복제 ${dc.skelShare||0}%`,
+         reason:`반려 후에는 <u>본문</u>이 바뀌어야 결과가 바뀝니다. 제목·태그는 이미 정리됐습니다.<br>기준: 평균 70점 이상 + 60점 미만 0편.<br><button class="btn primary sm" style="margin-top:4px" onclick="contentDeepCheck()">🧪 본문 정밀 점검 실행</button>`}
+      ]}];
+    })(),
     {h:"🏷️ 사이트 기본", items:[
       {ok:!!siteTitle, label:`사이트 제목 ${siteTitle?"("+siteTitle+")":""}`, reason:"워드프레스 설정 → 일반 → 사이트 제목을 채우세요."},
       {ok:!!siteDesc, label:"사이트 설명(태그라인)", reason:"워드프레스 설정 → 일반 → 태그라인을 채우세요. 비어 있으면 제목이 '블로그 -'처럼 끊겨 미완성으로 보입니다."},
