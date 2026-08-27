@@ -776,7 +776,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v88 · 카테고리 기준 모순 수정</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v89 · 4단계 완료 판정 수정</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2854,8 +2854,8 @@ function renderPrepPlan(){
            :"승인용 글을 예약 발행합니다",
         body:has?(s.classified?B("openContentFix()","🧭 기존 글 정리 열기","primary sm"):"")
                 :B("startApprovalPosts()","✍️ 승인용 글 생성","primary sm") },
-      { t:"사이트 기본 갖추기", done:false,
-        sub:"필수 페이지·플러그인·디자인",
+      { t:"사이트 기본 갖추기", done:!!CFG.runnerAt,
+        sub:CFG.runnerAt?`정리 실행됨 (${new Date(CFG.runnerAt).toLocaleDateString("ko-KR")})`:"필수 페이지·플러그인·디자인",
         body:B("document.getElementById('runnerBtn').click()","🧹 한 번에 정리","primary sm")
             +B("openDesignPlan()","🎨 디자인 제안","sm") },
       { t:"점검 통과", done:checkDone,
