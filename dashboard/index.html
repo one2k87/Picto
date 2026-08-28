@@ -711,6 +711,7 @@
 
   <div class="field">
     <button class="btn primary sm" id="adsCheck" style="width:100%">① 전체 점검하기</button>
+    <div id="snapBox"></div>
     <div id="jobBox"></div>
     <div id="checkBar" style="margin-top:6px"></div><div id="checkLog"></div>
     <div id="learnBox"></div>
@@ -3991,6 +3992,7 @@ async function contentDeepCheck(){
     </div>`;
   box.innerHTML=html;
   try{ adsCheck(); }catch(e){}
+  try{ snapSave(); }catch(e){}
 }
 
 // 재작성 결과 수락용 간이 채점 — contentDeepCheck의 감점 규칙과 동기 유지할 것
@@ -4033,6 +4035,7 @@ async function aiFixContent(auto){
   const key=(CFG.llmKey||"").trim();
   const log=makeLog(document.getElementById("deepLog"), document.getElementById("deepBar"), "본문 AI 보완 재작성");
   if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return log.finish("중단됨"); }
+  await ensureHtml(st.fails);
   if(!auto && !confirm(`${st.fails.length}편의 본문을 다시 씁니다.\n원본은 워드프레스 '수정본(리비전)'에 남아 언제든 되돌릴 수 있습니다.\n진행할까요?`)) return log.finish("중단됨");
   const base=wpBase(); let done=0, skip=0;
   for(let i=0;i<st.fails.length;i++){
@@ -4166,6 +4169,75 @@ ${drop.html}`;
   log.say("워드프레스에서 옛 주소 → 새 글로 리디렉션을 걸어두면 더 안전합니다(Rank Math → 리디렉션)");
   if(!auto) await fullCheck();
   log.finish("완료");
+}
+
+/* ───────── 점검 결과 보존(계정별) ─────────
+   실사용 문제: 앱을 다시 열 때마다 승인 탭이 빈 화면이라 점검을 처음부터
+   다시 돌려야 했다. 점수(CFG.lastCheck)는 저장돼 있었지만 '무엇이 걸렸는지'와
+   '어떤 글을 고쳐야 하는지'가 메모리에만 있었던 탓이다.
+   → 리포트와 대상 목록을 계정(사이트+아이디)별로 저장해 두고, 탭을 열면
+     마지막 결과를 그대로 되살린다. 본문 HTML은 크므로 저장하지 않고
+     고칠 때 그 글만 다시 불러온다. */
+function acctKey(){
+  const raw=(CFG.site||"")+"|"+(CFG.user||"");
+  let h=0; for(const c of raw) h=(h*31+c.charCodeAt(0))&0xFFFFFFFF;
+  return "scripto_check_"+h.toString(36);
+}
+function snapSave(){
+  try{
+    const st=window._dcState||{};
+    const snap={at:Date.now(),
+      report:(document.getElementById("adsReport")||{}).innerHTML||"",
+      deepBox:(document.getElementById("deepBox")||{}).innerHTML||"",
+      deep:CFG.deepCheck||null, check:CFG.lastCheck||null, titleForm:window._titleForm||null,
+      anon:window._anonCheck||null,
+      // 본문(html)은 빼고 식별 정보만 — 용량을 아끼고, 고칠 때 다시 불러온다
+      fails:(st.fails||[]).map(m=>({id:m.id,title:m.title,link:m.link,score:m.score,len:m.len,issues:m.issues})),
+      noImg:(st.noImg||[]).map(m=>({id:m.id,title:m.title,link:m.link,featured:m.featured})),
+      mergePairs:(st.mergePairs||[]).map(p=>({a:{id:p.a.id,title:p.a.title,len:p.a.len},
+        b:{id:p.b.id,title:p.b.title,len:p.b.len}, ts:p.ts, bs:p.bs})),
+      allTitles:(window._allTitlePosts||[]).map(p=>({id:p.id,title:p.title,link:p.link}))};
+    localStorage.setItem(acctKey(), JSON.stringify(snap));
+  }catch(e){ /* 용량 초과 등은 무시 — 다음 점검 때 다시 만든다 */ }
+}
+function snapLoad(){ try{ return JSON.parse(localStorage.getItem(acctKey())||"null"); }catch(e){ return null; } }
+// 저장된 결과로 화면을 되살린다(점검을 다시 돌리지 않고)
+function snapRestore(){
+  const s=snapLoad(); if(!s) return false;
+  const rep=document.getElementById("adsReport"), deep=document.getElementById("deepBox");
+  if(rep && s.report) rep.innerHTML=s.report;
+  if(deep && s.deepBox) deep.innerHTML=s.deepBox;
+  window._dcState={fails:s.fails||[], noImg:s.noImg||[], mergePairs:s.mergePairs||[]};
+  window._titleForm=s.titleForm||null;
+  window._anonCheck=s.anon||null;
+  window._allTitlePosts=s.allTitles||[];
+  const box=document.getElementById("snapBox");
+  if(box){
+    const min=Math.round((Date.now()-s.at)/60000);
+    const ago=min<60?`${min}분 전`:min<1440?`${Math.round(min/60)}시간 전`:`${Math.round(min/1440)}일 전`;
+    const stale=min>720;   // 반나절 넘으면 새로 보는 편이 낫다
+    box.innerHTML=`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-bottom:8px">
+      <b>📌 마지막 점검 결과를 불러왔습니다</b>
+      <div class="hint" style="margin-top:3px">${new Date(s.at).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})} (${ago})
+      ${s.check?` · 승인 준비 ${s.check.score}/${s.check.total}`:""}${s.deep?` · 본문 평균 ${s.deep.avg}점`:""}
+      <br>아래 결과로 <b>바로 이어서</b> 고칠 수 있습니다. 점검을 다시 돌릴 필요가 없습니다.
+      ${stale?'<br><span style="color:#ffb020">다만 시간이 꽤 지났으니 한 번 새로 점검하시는 편이 정확합니다.</span>':""}</div></div>`;
+  }
+  try{ renderFixAll(); renderLearn(); }catch(e){}
+  return true;
+}
+// 저장된 목록에는 본문이 없다. 고칠 때 그 글만 다시 불러온다.
+async function ensureHtml(items){
+  const need=(items||[]).filter(m=>!m.html && m.id);
+  if(!need.length) return items;
+  const base=wpBase();
+  for(const m of need){
+    try{
+      const r=await fetch(base+"/wp-json/wp/v2/posts/"+m.id+"?_fields=id,content,featured_media",{headers:wpAuth()});
+      if(r.ok){ const j=await r.json(); m.html=(j.content&&j.content.rendered)||""; m.featured=!!j.featured_media; }
+    }catch(e){}
+  }
+  return items;
 }
 
 /* ───────── 작업 상태 보존 ─────────
@@ -4368,7 +4440,7 @@ async function fullCheck(){
     log.say("본문 정밀 점검 완료", true, "s3");
     await adsCheck();          // 본문 결과를 점수에 반영
     fixJobs().forEach(j=>learnAdd({type:"hit", key:j.k, detail:j.label}));
-    renderFixAll(); renderLearn();
+    renderFixAll(); renderLearn(); snapSave();
     log.say("전체 점검 끝 — 아래 결과를 확인하세요", true);
   }catch(e){ log.say("점검 중 오류: "+escAttr(String(e).slice(0,120)), false); }
   finally{
@@ -4581,6 +4653,7 @@ async function genPostImages(auto){
   const log=makeLog(document.getElementById("imgLog"), document.getElementById("imgBar"), "설명 도해 생성");
   if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return log.finish("중단됨"); }
   const n=Math.min(targets.length, 30);
+  await ensureHtml(targets.slice(0, Math.min(targets.length,30)));
   if(!auto && !confirm(`${n}편에 설명 도해를 만들어 넣습니다.\n한 장에 약 15초 → 대략 ${Math.ceil(n*16/60)}분.\n\n※ 실사 사진이 아니라 '구조·순서를 보여주는 도해'입니다. 찍지 않은 장면을 사진처럼 만들지 않습니다.\n진행할까요?`)) return log.finish("중단됨");
   const base=wpBase(); let done=0, skip=0;
   for(let i=0;i<n;i++){
@@ -6224,7 +6297,17 @@ function showSub(pageId,k){
   if(k===cfg.home&&cfg.render){ try{ cfg.render(); }catch(e){ console.warn(e); } }
   if(pageId==="statsSheet"&&k==="strat"){ try{ renderStrategy(); }catch(e){ console.warn(e); } }
   // 오래 걸리는 작업의 진행/완료 상태는 저장돼 있으므로 탭을 열 때마다 되살린다
-  if(pageId==="adsSheet"&&k==="check"){ try{ renderJob(); renderLearn(); }catch(e){} }
+  if(pageId==="adsSheet"&&k==="check"){
+    try{
+      renderJob(); renderLearn();
+      // 화면이 비어 있으면(앱을 다시 연 경우) 마지막 점검 결과를 되살린다.
+      // 매번 점검부터 다시 돌려야 했던 불편의 원인이 이것이었다.
+      const rep=document.getElementById("adsReport");
+      if(rep && !rep.innerHTML.trim()) snapRestore();
+    }catch(e){}
+  }
+  // 마지막으로 보던 보조탭을 기억한다(계정별 진행 위치)
+  try{ CFG.lastSub=Object.assign({}, CFG.lastSub||{}, {[pageId]:k}); saveCfg(); }catch(e){}
   window.scrollTo({top:0,behavior:"instant"});
 }
 function moveSub(pageId,dir){
@@ -6493,7 +6576,7 @@ function gotoTab(k){
   if(k==="set") openSheet();
   else if(k==="stats") openStats();
   else if(k==="ads") openAds();
-  // 보조탭은 페이지를 처음 열 때 만들고, 이후엔 항상 '현황'부터 보여준다
+  // 보조탭은 페이지를 처음 열 때 만들고, 마지막으로 보던 위치로 돌아간다
   if(k==="ads"||k==="stats"){
     const pid=k==="ads"?"adsSheet":"statsSheet";
     setTimeout(()=>{ buildSubtabs(pid);
@@ -6502,7 +6585,10 @@ function gotoTab(k){
       if(pid==="adsSheet"){ try{ moveApprovalControls(); fillApprovalFields(); }
         catch(e){ console.warn("승인 탭 통합:",e); } }
       if(pid==="statsSheet"){ try{ buildMoneyTab(); }catch(e){ console.warn("수익 탭 조립:",e); } }
-      showSub(pid,SUBTABS[pid].home); },60);
+      // 이어서 하기: 마지막으로 보던 보조탭으로 돌아간다(없으면 현황)
+      const last=(CFG.lastSub||{})[pid];
+      const valid=last && SUBTABS[pid].tabs.some(t=>t.k===last);
+      showSub(pid, valid?last:SUBTABS[pid].home); },60);
   }
   syncViews(); syncTabbar();
   window.scrollTo({top:0,behavior:"instant"});   // 탭 바꾸면 항상 맨 위부터
