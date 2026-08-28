@@ -3742,6 +3742,38 @@ function titleTemplateStats(titles){
   return {ratio:best.r, top:best.top,
           clicheRatio: titles.length?Math.round(cliche/titles.length*100):0};
 }
+/* 제목 '골격' 진단 — 단어 겹침이 아니라 문장 구조의 겹침을 본다.
+   실측(2026-08, 29편): 단어는 전부 달랐지만 모두 "[공간] [부품] [문제], [방법]으로 [동작]"
+   한 공식이었고 29편 전부 공간 명사로 시작했다. 어미 중복 10%로 '통과'가 떴지만
+   목록을 훑으면 한눈에 찍어낸 티가 났다. 어미 검사만으로는 절대 못 잡는 구멍. */
+const TITLE_ROOMS=/^(?:거실|주방|욕실|화장실|베란다|발코니|현관|안방|침실|드레스룸|다락방|옥상|지하실|창고|보일러실|탕비실|테라스|복도|계단|서재|아이방|세탁실|팬트리|파우더룸|내부 창고|물품 창고)/;
+function titleSkeleton(t){
+  const s=stripText(t||"").trim();
+  const parts=s.split(/[,·:]/).map(x=>x.trim()).filter(Boolean);
+  const w=s.split(/\s+/);
+  const last=w[w.length-1]||"";
+  const form = /[?？]\s*$/.test(s) ? "질문형"
+    : /^\d|^[0-9]/.test(s) ? "수치선두"
+    : /(?:니다|세요|해요|줍니다|됩니다)$/.test(last) ? "문장종결"
+    : /(?:교체|조정|보강|측정|고정|타공|결선|재고정|제어|복원|점검|시공|보수|설치|정리|해결)$/.test(last) ? "동작명사끝"
+    : /(?:절차|방법|매뉴얼|공식|기준|순서|가이드|팁)$/.test(last) ? "절차어끝"
+    : "명사구";
+  const head = TITLE_ROOMS.test(s) ? "공간선두" : /^\d/.test(s) ? "숫자선두" : "기타선두";
+  // 명사 연쇄 길이(조사·어미 없는 어절이 몇 개나 이어지는가) — 5개 이상이면 나열식
+  let run=0, maxRun=0;
+  w.forEach(x=>{ if(/[가-힣A-Za-z0-9]$/.test(x)&&!/(?:은|는|이|가|을|를|의|에|로|와|과|도|만|부터|까지)$/.test(x)){run++;maxRun=Math.max(maxRun,run);} else run=0; });
+  return {key:`${form}|${head}`, form, head, parts:parts.length, nounRun:maxRun};
+}
+function titleFormStats(titles){
+  const ss=titles.map(titleSkeleton);
+  const c={}; ss.forEach(s=>c[s.key]=(c[s.key]||0)+1);
+  const rank=Object.entries(c).sort((a,b)=>b[1]-a[1]);
+  const topShare=titles.length?Math.round(rank[0][1]/titles.length*100):0;
+  const forms=new Set(ss.map(s=>s.form)).size;
+  const roomLead=titles.length?Math.round(ss.filter(s=>s.head==="공간선두").length/titles.length*100):0;
+  const nounStack=titles.length?Math.round(ss.filter(s=>s.nounRun>=5).length/titles.length*100):0;
+  return {topShare, topKey:rank.length?rank[0][0]:"", forms, roomLead, nounStack, skels:ss};
+}
 // 도입부 상투 구문(경험담 흉내 템플릿). 2개 이상 동시에 걸리면 템플릿으로 본다.
 const OPEN_CLICHE=[/처음\s*(접했|알아봤|이용했|들었|봤|겪었)/,/줄\s*알았/,/생각했(습니다|던|어요)/,
   /실제로\s*(확인|진행|해보|알아)/,/가장\s*(중요|먼저)/,/느끼게\s*되었/,/알게\s*되었/,/헷갈리는/,/궁금해하는/];
@@ -3833,7 +3865,7 @@ async function contentDeepCheck(){
       cliche:DC_CLICHE.filter(re=>re.test(txt)).length,
       exp:DC_EXP.filter(re=>re.test(txt)).length,
       nums:(txt.match(/\d+(?:\.\d+)?\s*(?:mm|cm|m|만원|원|시간|분|kg|평|%|개|년|일)/g)||[]).length,
-      imgs:d.querySelectorAll("img").length, uniform:cv<0.35, skel,
+      imgs:d.querySelectorAll("img").length, featured:!!p.featured_media, uniform:cv<0.35, skel,
       hedgeRatio, triads, lenCV, fixedEnd};
   });
   // 사이트 수준: 구조 복제(같은 뼈대 비율) + 여러 글에 반복되는 문장(보일러플레이트)
@@ -3912,9 +3944,12 @@ async function contentDeepCheck(){
         <button class="btn sm" style="padding:1px 8px;font-size:11px" onclick="aiMergePair(${i})">합치기</button></div>`).join("")}
       <div id="mergeBar" style="margin-top:6px"></div><div id="mergeLog"></div></div>`:""}
     ${noImg.length?`<div style="margin-top:10px;padding:9px 10px;border:1px solid var(--line);border-radius:9px">
-      <b>📷 사진 없는 글 ${noImg.length}편</b>
-      <div class="hint">2026년 3월 코어 업데이트 이후 <b>직접 찍은 사진</b>이 가장 강한 '경험' 신호입니다. AI가 대신 못 하는 유일한 항목이고, 스톡·AI 이미지는 역효과입니다.<br>
-      <b>루틴 제안</b> — 주 1회, 실제 작업·공구·자재 사진 3~5장을 찍어 글에 한 장씩 배분하세요. 흔들려도 됩니다(오히려 진짜처럼 보입니다).</div>
+      <b>🖼️ 본문 이미지 없는 글 ${noImg.length}편</b>
+      <div class="hint"><b>현장 사진을 찍을 수 없다면 '설명 도해'로 채웁니다.</b> 실사 사진을 흉내 내는 건 위험합니다 — 찍지 않은 장면을 사진처럼 만들면 그게 구글이 문제 삼는 가짜 경험 신호입니다.<br>
+      대신 구조·순서·비교를 보여주는 도해는 <u>정직하면서 독자에게 실제로 쓸모가 있어</u> 정보 가치를 올립니다. 캡션에 '설명 도해(실제 촬영 사진 아님)'를 자동으로 붙입니다.<br>
+      <span style="opacity:.75">※ 나중에 실제 작업 사진을 한 장이라도 찍게 되면 그 글부터 교체하세요. 사진이 여전히 가장 강한 신호입니다.</span></div>
+      <button class="btn primary sm" style="width:100%;margin-top:6px" onclick="genPostImages()">🖼️ ${noImg.length}편에 설명 도해 만들어 넣기 (약 ${Math.ceil(Math.min(noImg.length,30)*16/60)}분)</button>
+      <div id="imgBar" style="margin-top:6px"></div><div id="imgLog"></div>
       <div class="hint" style="margin-top:4px">${noImg.slice(0,8).map(m=>`· <a href="${m.link}" target="_blank" style="color:inherit">${escAttr(m.title.slice(0,30))}</a>`).join("<br>")}${noImg.length>8?`<br>… 외 ${noImg.length-8}편`:""}</div></div>`:""}
     <button class="btn sm" style="width:100%;margin-top:8px" onclick="contentDeepCheck()">🔄 본문 다시 점검</button></div>`;
   box.innerHTML=html;
@@ -4088,6 +4123,182 @@ ${drop.html}`;
   await contentDeepCheck();
 }
 
+/* 제목 골격 흩기 — 골격이 겹치는 글만 골라, 서로 다른 형태를 '배정'해 다시 쓴다.
+   기존 rewriteTitles는 상투 표현만 걷어냈다. 그래서 표현은 깨끗한데 골격은
+   그대로인 지금 상태가 나왔다. 여기서는 형태를 먼저 정하고 그 틀로 쓰게 한다. */
+const TITLE_FORM_SPECS=[
+  ["질문형","독자가 검색창에 칠 법한 질문 그대로. 물음표로 끝낸다."],
+  ["수치선두","숫자를 맨 앞에 놓는다. (예: '3만 원으로 끝내는 …')"],
+  ["문장종결","완결된 서술문. '~니다/~습니다'로 끝낸다."],
+  ["대조형","두 가지를 맞세운다. (예: 'A냐 B냐, …')"],
+  ["경고형","하지 말아야 할 것을 앞세운다. (예: '… 먼저 하면 안 되는 이유')"],
+  ["상황선두","문제 상황을 먼저 던진다. 공간 이름으로 시작하지 않는다."],
+  ["명사구","짧은 명사구 하나. 8어절 이내."],
+];
+async function rewriteTitleForms(){
+  const posts=window._allTitlePosts;
+  if(!posts||!posts.length){ toast("먼저 사이트 점검을 실행해 주세요",1); return; }
+  const key=(CFG.llmKey||"").trim();
+  const host=document.getElementById("adsReport");
+  let bar=document.getElementById("tfBar"), lg=document.getElementById("tfLog");
+  if(!bar){ const wrap=document.createElement("div"); wrap.innerHTML='<div id="tfBar" style="margin-top:6px"></div><div id="tfLog"></div>';
+    host.appendChild(wrap); bar=document.getElementById("tfBar"); lg=document.getElementById("tfLog"); }
+  const log=makeLog(lg, bar, "제목 골격 흩기");
+  if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return; }
+
+  const items=posts.map(p=>({id:p.id, t:stripText(p.title.rendered), s:titleSkeleton(p.title.rendered)}));
+  // 형태별 목표 인원(고르게) — 이미 그 형태인 글은 건드리지 않는다
+  const quota={}; TITLE_FORM_SPECS.forEach(([n])=>quota[n]=Math.ceil(items.length/TITLE_FORM_SPECS.length));
+  const keep=[], todo=[];
+  items.forEach(it=>{
+    const f=it.s.form==="동작명사끝"||it.s.form==="절차어끝"?null:it.s.form;
+    if(f && quota[f]>0 && it.s.head!=="공간선두" && it.s.nounRun<5){ quota[f]--; keep.push(it); }
+    else todo.push(it);
+  });
+  if(!todo.length){ log.say("이미 골격이 충분히 흩어져 있습니다", true); return; }
+  // 남은 정원을 순서대로 배정
+  const slots=[]; TITLE_FORM_SPECS.forEach(([n,d])=>{ for(let i=0;i<quota[n];i++) slots.push([n,d]); });
+  const assigned=todo.map((it,i)=>({...it, form:slots[i%slots.length]||TITLE_FORM_SPECS[i%TITLE_FORM_SPECS.length]}));
+  log.say(`${assigned.length}편에 서로 다른 골격을 배정해 다시 쓰는 중… (유지 ${keep.length}편)`);
+
+  const list=assigned.map((a,i)=>`${i+1}. [골격:${a.form[0]}] ${a.t}`).join("\n");
+  const prompt=`아래 한국어 블로그 제목들을 각각 지정된 '골격'으로 다시 쓰세요.
+
+[골격 설명]
+${TITLE_FORM_SPECS.map(([n,d])=>`- ${n}: ${d}`).join("\n")}
+
+[반드시 지킬 것]
+- 각 제목의 [골격:○○]에 지정된 형태를 정확히 따르세요. 이것이 이 작업의 목적입니다.
+- 원래 주제·검색 키워드(공간, 부품, 문제)는 유지하세요. 다루는 대상이 바뀌면 안 됩니다.
+- 명사를 5개 이상 이어 붙이지 마세요. "보일러실 가스 차단기 연동 신호선 결선 절연" 같은 나열 금지.
+- "~로 보강 / ~로 조정 / ~ 절차 / ~ 매뉴얼 / ~ 방법 / ~ 공식"처럼 동작명사·절차어로 끝내지 마세요.
+- 금지 표현: 총정리, 완벽정리, 알아보기, 한눈에, 꼭 알아야, 제대로, 모든 것, A to Z.
+- 25~45자. 과장·낚시 금지, 사실만.
+
+[출력 형식]
+- "번호. 제목" 형식의 줄만 출력. 머리말·맺음말·설명·코드블록 금지.
+- 번호는 아래 목록의 번호와 정확히 같아야 합니다.
+
+[기존 제목]
+${list}`;
+  let out="";
+  try{
+    const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key),
+      {method:"POST",headers:{"Content-Type":"application/json"},
+       body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.95,maxOutputTokens:8192}})});
+    const j=await r.json();
+    out=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"";
+    if(!out) throw new Error(j.error?.message||"빈 응답");
+  }catch(e){ log.say("AI 호출 실패: "+escAttr(String(e).slice(0,120)), false); return; }
+  // 번호로 짝 맞추기(머리말 한 줄에 전부 밀리는 사고를 겪은 뒤의 필수 방어)
+  const byNum={};
+  out.split("\n").forEach(line=>{
+    const m=line.replace(/^[\s\-*>]+/,"").replace(/\*\*/g,"").match(/^(\d{1,3})\s*[.):]\s*(.+)$/);
+    if(!m) return;
+    const t=m[2].replace(/\s*\[골격[^\]]*\]\s*/,"").replace(/\s+/g," ").replace(/^["'“”‘’]|["'“”‘’]$/g,"").trim();
+    if(t.length>=8) byNum[+m[1]]=t;
+  });
+  let ok=0, skip=0;
+  const base=wpBase();
+  for(let i=0;i<assigned.length;i++){
+    const a=assigned[i], neo=byNum[i+1];
+    if(!neo || neo===a.t){ skip++; continue; }
+    const sk=titleSkeleton(neo);
+    // 배정한 골격이 실제로 반영됐는지 확인 — 아니면 적용하지 않는다
+    if(sk.nounRun>=5 || sk.form==="동작명사끝" || sk.form==="절차어끝" || neo.length<12 || neo.length>60){
+      skip++; log.say(`건너뜀 — 골격 미달: ${escAttr(neo.slice(0,26))}`, false); continue;
+    }
+    try{
+      const r=await fetch(base+"/wp-json/wp/v2/posts/"+a.id,
+        {method:"POST",headers:Object.assign({"Content-Type":"application/json"},wpAuth()),
+         body:JSON.stringify({title:neo})});
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      ok++; log.say(`✅ [${a.form[0]}] ${escAttr(neo.slice(0,34))}`, true, "p"+a.id);
+    }catch(e){ skip++; log.say(`실패: ${escAttr(String(e).slice(0,60))}`, false); }
+  }
+  log.say(`완료 — 적용 ${ok}편 · 건너뜀 ${skip}편. 다시 점검합니다`, ok>0);
+  adsCheck();
+}
+
+/* 본문 이미지 자동 생성 — 현장 사진을 찍을 수 없을 때의 대안.
+   ⚠️ 원칙: 실사 사진을 흉내 내지 않는다. 실제로 찍지 않은 장면을 사진처럼 만들면
+   그게 바로 구글이 문제 삼는 '가짜 경험 신호'다. 대신 독자에게 실제로 쓸모 있는
+   '설명 도해'(구조·순서·비교)를 만든다. 이건 정직하면서 정보 가치도 올린다. */
+async function genPostImages(){
+  const st=window._dcState;
+  const targets=(st&&st.noImg)||[];
+  if(!targets.length){ toast("먼저 본문 점검을 실행해 주세요",1); return; }
+  const key=(CFG.llmKey||"").trim();
+  const log=makeLog(document.getElementById("imgLog"), document.getElementById("imgBar"), "설명 도해 생성");
+  if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return; }
+  const n=Math.min(targets.length, 30);
+  if(!confirm(`${n}편에 설명 도해를 만들어 넣습니다.\n한 장에 약 15초 → 대략 ${Math.ceil(n*16/60)}분.\n\n※ 실사 사진이 아니라 '구조·순서를 보여주는 도해'입니다. 찍지 않은 장면을 사진처럼 만들지 않습니다.\n진행할까요?`)) return;
+  const base=wpBase(); let done=0, skip=0;
+  for(let i=0;i<n;i++){
+    const m=targets[i];
+    log.say(`(${i+1}/${n}) ${escAttr(m.title.slice(0,26))}… 도해 만드는 중`, undefined, "cur");
+    // 1) 글 내용에 맞는 도해 지시문을 먼저 뽑는다(제목만 보고 그리면 엉뚱해진다)
+    let desc="";
+    try{
+      const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key="+encodeURIComponent(key),
+        {method:"POST",headers:{"Content-Type":"application/json"},
+         body:JSON.stringify({contents:[{parts:[{text:`다음 한국어 글에 넣을 '설명 도해' 1장의 영어 지시문을 한 문장으로 쓰세요.
+사진이 아니라 도해입니다. 무엇의 구조/순서/비교를 보여줄지 구체적으로.
+글자·문자는 넣지 않습니다(한글이 깨집니다). 출력은 영어 한 문장만.
+
+제목: ${m.title}
+본문 일부: ${_dcText(m.html).slice(0,900)}`}]}],
+           generationConfig:{temperature:0.6,maxOutputTokens:200}})});
+      const j=await r.json();
+      desc=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text?.trim()||"";
+    }catch(e){}
+    if(!desc) desc=`instructional cross-section diagram related to ${m.title}`;
+    // 2) 도해 생성
+    let b64=null, mime="image/jpeg";
+    try{
+      const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key="+encodeURIComponent(key),
+        {method:"POST",headers:{"Content-Type":"application/json"},
+         body:JSON.stringify({contents:[{parts:[{text:`${desc}
+Style: clean instructional diagram for a home-repair guide. Flat vector, muted blue-gray and warm neutral palette, white background, simple arrows and shapes, 16:9.
+Absolutely NO text, NO letters, NO numbers, NO watermark. Not a photograph.`}]}]})});
+      const j=await r.json();
+      const parts=(((j.candidates||[])[0]||{}).content||{}).parts||[];
+      const inl=parts.find(p=>p.inlineData||p.inline_data);
+      const d=inl&&(inl.inlineData||inl.inline_data);
+      if(!d) throw new Error(j.error?.message||"이미지 없음");
+      b64=d.data; mime=d.mimeType||d.mime_type||"image/jpeg";
+    }catch(e){ skip++; log.say(`건너뜀 — 생성 실패: ${escAttr(String(e).slice(0,70))}`, false); continue; }
+    // 3) 미디어 업로드 → 본문 첫 h2 뒤에 삽입 (+대표 이미지 없으면 지정)
+    try{
+      const bin=Uint8Array.from(atob(b64), c=>c.charCodeAt(0));
+      const ext=mime.includes("png")?"png":"jpg";
+      const fname=`diagram-${m.id}.${ext}`;
+      const up=await fetch(base+"/wp-json/wp/v2/media",{method:"POST",
+        headers:Object.assign({"Content-Type":mime,"Content-Disposition":`attachment; filename="${fname}"`},wpAuth()),
+        body:bin});
+      if(!up.ok) throw new Error("업로드 HTTP "+up.status);
+      const med=await up.json();
+      const alt=`${m.title} 설명 도해`;
+      try{ await fetch(base+"/wp-json/wp/v2/media/"+med.id,{method:"POST",
+        headers:Object.assign({"Content-Type":"application/json"},wpAuth()),
+        body:JSON.stringify({alt_text:alt, caption:"이해를 돕기 위한 설명 도해입니다(실제 촬영 사진이 아닙니다)."})}); }catch(e){}
+      const fig=`<figure class="wp-block-image size-large"><img src="${med.source_url}" alt="${escAttr(alt)}" loading="lazy"/>`+
+                `<figcaption>이해를 돕기 위한 설명 도해입니다(실제 촬영 사진이 아닙니다).</figcaption></figure>`;
+      let html=m.html;
+      const idx=html.search(/<\/h2>/i);
+      html = idx>-1 ? html.slice(0, idx+5)+fig+html.slice(idx+5) : fig+html;
+      const body={content:html};
+      if(!m.featured) body.featured_media=med.id;
+      const r2=await fetch(base+"/wp-json/wp/v2/posts/"+m.id,{method:"POST",
+        headers:Object.assign({"Content-Type":"application/json"},wpAuth()), body:JSON.stringify(body)});
+      if(!r2.ok) throw new Error("본문 반영 HTTP "+r2.status);
+      done++; log.say(`✅ ${escAttr(m.title.slice(0,28))}`, true, "p"+m.id);
+    }catch(e){ skip++; log.say(`건너뜀 — ${escAttr(String(e).slice(0,70))}`, false); }
+  }
+  log.say(`완료 — 삽입 ${done}편 · 건너뜀 ${skip}편. 다시 점검합니다`, done>0);
+  await contentDeepCheck();
+}
+
 async function adsCheck(){
   const box=document.getElementById("adsReport");
   if(!wpReady()){ box.innerHTML='<span style="color:#ffb020">위 <b>① 블로그 연결</b>에 주소·아이디·앱 비밀번호를 먼저 넣어주세요.</span>'; return; }
@@ -4114,6 +4325,17 @@ async function adsCheck(){
   // 템플릿성 진단(반려 사유 1위 '가치 없는 콘텐츠'의 실제 원인을 잡는 부분)
   const T=titleTemplateStats(sample.map(p=>(p.title&&p.title.rendered)||""));
   const O=openingStats(sample);
+  // 제목 골격은 표본 20편이 아니라 '전체 목록'으로 봐야 한다(심사관이 보는 것이 목록이므로)
+  let allTitles=sample.map(p=>(p.title&&p.title.rendered)||"");
+  try{
+    let acc=[];
+    for(let pg=1;pg<=3;pg++){
+      const r=await fetch(base+`/wp-json/wp/v2/posts?per_page=100&page=${pg}&status=publish&_fields=id,title,link`,{headers:wpAuth()});
+      if(!r.ok) break; const js=await r.json(); acc=acc.concat(js); if(js.length<100) break;
+    }
+    if(acc.length){ allTitles=acc.map(p=>(p.title&&p.title.rendered)||""); window._allTitlePosts=acc; }
+  }catch(e){}
+  const F=titleFormStats(allTitles);
   const lonelyTags=tags.filter(t=>(t.count||0)<=1).length;   // 글 1개짜리 태그 = 얇은 중복 페이지
   const tagRatio=posts?Math.round(tagTotal/posts*100):0;      // 태그수/글수 (100% 근처면 글마다 전용 태그)
 
@@ -4146,6 +4368,9 @@ async function adsCheck(){
       {ok:O.ratio<TH.max_opening_tail_sim, label:`도입부 서술부 유사쌍 ${O.ratio}% (최대 ${O.max}%)`,
        reason:`<b>왜 문제인가</b> — 한국어는 문장 끝에서 문체가 드러납니다. 첫 문장이 같은 어미로 끝나면 다른 주제라도 같은 사람이 같은 틀로 찍어낸 티가 납니다.`+
               (O.worst?`<br><span style="opacity:.75">실제 예: “…${escAttr(O.worst[0])}” / “…${escAttr(O.worst[1])}”</span>`:"")},
+      {ok:F.topShare<=40 && F.roomLead<=50 && F.nounStack<=40,
+       label:`제목 골격 다양성 — 최다 골격 ${F.topShare}%${F.topKey?` (${escAttr(F.topKey)})`:""} · 형태 ${F.forms}종 · 공간명사 시작 ${F.roomLead}% · 명사나열 ${F.nounStack}%`,
+       reason:`<b>왜 문제인가</b> — 단어를 아무리 다르게 써도 <u>문장 골격이 같으면</u> 목록을 훑는 순간 찍어낸 티가 납니다. 어미 중복 검사로는 안 잡히는 구멍입니다.<br>실제로 이 사이트 29편은 어미 중복 10%로 '통과'였지만, 전부 "[공간] [부품] [문제], [방법]으로 [동작]" 한 공식이었고 29편 모두 공간 이름으로 시작했습니다.<br><b>기준</b> — 최다 골격 40% 이하, 공간명사 시작 50% 이하, 명사 5개 이상 나열 40% 이하.<br><button class="btn primary sm" style="margin-top:4px" onclick="rewriteTitleForms()">🎯 제목 골격 흩기 (AI 재작성)</button>`},
       {ok:lonelyTags<=TH.max_lonely_tags, label:`글 1개짜리 태그 ${lonelyTags}개 (태그/글 비율 ${tagRatio}%)`,
        reason:`<b>왜 문제인가</b> — 글마다 전용 태그가 생기면 <u>내용이 하나뿐인 태그 페이지</u>가 글 수만큼 색인됩니다. 실질 글이 30개여도 구글은 알맹이 없는 페이지 30개를 함께 봅니다. 이게 '가치 없는 콘텐츠' 판정의 흔한 숨은 원인입니다.<br><b>어떻게 고치나</b> — Rank Math → 일반 설정 → 태그 아카이브를 <b>noindex</b>로. 앞으로는 태그를 10~15개 사전에서만 골라 쓰세요.`},
     ]},
