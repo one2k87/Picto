@@ -4031,8 +4031,8 @@ async function aiFixContent(auto){
   if(!st||!st.fails.length){ toast("보완 대상이 없습니다 — 먼저 본문 점검을 실행",1); return; }
   const key=(CFG.llmKey||"").trim();
   const log=makeLog(document.getElementById("deepLog"), document.getElementById("deepBar"), "본문 AI 보완 재작성");
-  if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return; }
-  if(!auto && !confirm(`${st.fails.length}편의 본문을 다시 씁니다.\n원본은 워드프레스 '수정본(리비전)'에 남아 언제든 되돌릴 수 있습니다.\n진행할까요?`)) return;
+  if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return log.finish("중단됨"); }
+  if(!auto && !confirm(`${st.fails.length}편의 본문을 다시 씁니다.\n원본은 워드프레스 '수정본(리비전)'에 남아 언제든 되돌릴 수 있습니다.\n진행할까요?`)) return log.finish("중단됨");
   const base=wpBase(); let done=0, skip=0;
   for(let i=0;i<st.fails.length;i++){
     const m=st.fails[i];
@@ -4091,6 +4091,7 @@ ${m.html}`;
   }
   log.say(`완료 — 적용 ${done}편 · 건너뜀 ${skip}편`, done>0);
   if(!auto) await fullCheck();
+  log.finish("완료");
 }
 
 // 얇고 비슷한 두 글을 한 편으로 합친다 — 남는 글은 비공개(삭제 아님, 되돌릴 수 있게)
@@ -4099,10 +4100,10 @@ async function aiMergePair(idx, auto){
   if(!p){ toast("먼저 본문 점검을 실행해 주세요",1); return; }
   const key=(CFG.llmKey||"").trim();
   const log=makeLog(document.getElementById("mergeLog"), document.getElementById("mergeBar"), "글 병합");
-  if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return; }
+  if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return log.finish("중단됨"); }
   // 긴 글을 살리고 짧은 글을 흡수시킨다(링크·색인이 더 쌓인 쪽을 남기는 게 안전)
   const keep=p.a.len>=p.b.len?p.a:p.b, drop=keep===p.a?p.b:p.a;
-  if(!auto && !confirm(`두 글을 한 편으로 합칩니다.\n\n남길 글: ${keep.title}\n비공개로 돌릴 글: ${drop.title}\n\n삭제가 아니라 비공개이며, 원본은 수정본 이력에 남습니다. 진행할까요?`)) return;
+  if(!auto && !confirm(`두 글을 한 편으로 합칩니다.\n\n남길 글: ${keep.title}\n비공개로 돌릴 글: ${drop.title}\n\n삭제가 아니라 비공개이며, 원본은 수정본 이력에 남습니다. 진행할까요?`)) return log.finish("중단됨");
   log.say("병합 초안 작성 중…", undefined, "cur");
   const prompt=`아래 두 편의 한국어 블로그 글을 한 편으로 합쳐, 더 깊고 완결된 글로 다시 쓰세요.
 
@@ -4133,14 +4134,14 @@ ${drop.html}`;
     const j=await r.json();
     out=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"";
     if(!out) throw new Error(j.error?.message||"빈 응답");
-  }catch(e){ log.say("AI 호출 실패: "+escAttr(String(e).slice(0,100)), false); return; }
+  }catch(e){ log.say("AI 호출 실패: "+escAttr(String(e).slice(0,100)), false); return log.finish("중단됨"); }
   out=out.trim().replace(/^```html?\s*/i,"").replace(/\s*```$/,"").trim();
   const mt=out.match(/^제목\s*:\s*(.+)$/m);
   const newTitle=mt?mt[1].trim():keep.title;
   let body=out.replace(/^제목\s*:\s*.+$/m,"").trim();
   const q=_dcQuickScore(body);
   if(!/<h2/i.test(body) || q.len<Math.max(1500, keep.len) || q.score<70){
-    log.say(`중단 — 병합 결과 검증 미달(${q.score}점·${q.len}자). 두 글 모두 그대로 둡니다`, false); return;
+    log.say(`중단 — 병합 결과 검증 미달(${q.score}점·${q.len}자). 두 글 모두 그대로 둡니다`, false); return log.finish("중단됨");
   }
   const base=wpBase();
   try{
@@ -4154,9 +4155,10 @@ ${drop.html}`;
        body:JSON.stringify({status:"private"})});
     if(!r.ok) throw new Error("비공개 전환 HTTP "+r.status);
     log.say(`✅ 흡수된 글 비공개 — ${escAttr(drop.title.slice(0,32))}`);
-  }catch(e){ log.say("실패: "+escAttr(String(e).slice(0,100)), false); return; }
+  }catch(e){ log.say("실패: "+escAttr(String(e).slice(0,100)), false); return log.finish("중단됨"); }
   log.say("워드프레스에서 옛 주소 → 새 글로 리디렉션을 걸어두면 더 안전합니다(Rank Math → 리디렉션)");
   if(!auto) await fullCheck();
+  log.finish("완료");
 }
 
 /* ───────── 학습 기록 ─────────
@@ -4252,7 +4254,11 @@ async function fullCheck(){
     renderFixAll(); renderLearn();
     log.say("전체 점검 끝 — 아래 결과를 확인하세요", true);
   }catch(e){ log.say("점검 중 오류: "+escAttr(String(e).slice(0,120)), false); }
-  if(b){ b.disabled=false; b.textContent="🔄 전체 다시 점검"; }
+  finally{
+    // 배너를 반드시 닫는다 — 안 닫으면 상단에서 계속 도는 것처럼 보인다(실제 신고).
+    if(b){ b.disabled=false; b.textContent="🔄 전체 다시 점검"; }
+  }
+  log.finish("완료");
 }
 // 점검 결과에서 '고칠 것'을 모아 버튼 하나로 만든다
 function renderFixAll(){
@@ -4312,6 +4318,7 @@ async function fixAll(){
   window._fixAllRunning=false;
   log.say("모두 끝났습니다. 전체 점검을 다시 돌립니다", true);
   await fullCheck();
+  log.finish("완료");
 }
 
 /* 제목 골격 흩기 — 골격이 겹치는 글만 골라, 서로 다른 형태를 '배정'해 다시 쓴다.
@@ -4335,7 +4342,7 @@ async function rewriteTitleForms(auto){
   if(!bar){ const wrap=document.createElement("div"); wrap.innerHTML='<div id="tfBar" style="margin-top:6px"></div><div id="tfLog"></div>';
     host.appendChild(wrap); bar=document.getElementById("tfBar"); lg=document.getElementById("tfLog"); }
   const log=makeLog(lg, bar, "제목 골격 흩기");
-  if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return; }
+  if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return log.finish("중단됨"); }
 
   const items=posts.map(p=>({id:p.id, t:stripText(p.title.rendered), s:titleSkeleton(p.title.rendered)}));
   // 형태별 목표 인원(고르게) — 이미 그 형태인 글은 건드리지 않는다
@@ -4346,7 +4353,7 @@ async function rewriteTitleForms(auto){
     if(f && quota[f]>0 && it.s.head!=="공간선두" && it.s.nounRun<5){ quota[f]--; keep.push(it); }
     else todo.push(it);
   });
-  if(!todo.length){ log.say("이미 골격이 충분히 흩어져 있습니다", true); return; }
+  if(!todo.length){ log.say("이미 골격이 충분히 흩어져 있습니다", true); return log.finish("중단됨"); }
   // 남은 정원을 순서대로 배정
   const slots=[]; TITLE_FORM_SPECS.forEach(([n,d])=>{ for(let i=0;i<quota[n];i++) slots.push([n,d]); });
   const assigned=todo.map((it,i)=>({...it, form:slots[i%slots.length]||TITLE_FORM_SPECS[i%TITLE_FORM_SPECS.length]}));
@@ -4385,12 +4392,12 @@ ${list}`;
     const j=await r.json();
     out=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"";
     if(!out) throw new Error(j.error?.message||"빈 응답");
-  }catch(e){ log.say("AI 호출 실패: "+escAttr(String(e).slice(0,120)), false); return; }
+  }catch(e){ log.say("AI 호출 실패: "+escAttr(String(e).slice(0,120)), false); return log.finish("중단됨"); }
   // 번호로 짝 맞추기(머리말 한 줄에 전부 밀리는 사고를 겪은 뒤의 필수 방어)
   const byNum={};
   out.split("\n").forEach(line=>{
     const m=line.replace(/^[\s\-*>]+/,"").replace(/\*\*/g,"").match(/^(\d{1,3})\s*[.):]\s*(.+)$/);
-    if(!m) return;
+    if(!m) return log.finish("중단됨");
     const t=m[2].replace(/\s*\[골격[^\]]*\]\s*/,"").replace(/\s+/g," ").replace(/^["'“”‘’]|["'“”‘’]$/g,"").trim();
     if(t.length>=8) byNum[+m[1]]=t;
   });
@@ -4415,6 +4422,7 @@ ${list}`;
   }
   log.say(`완료 — 적용 ${ok}편 · 건너뜀 ${skip}편`, ok>0);
   if(!auto) await fullCheck();
+  log.finish("완료");
 }
 
 /* 본문 이미지 자동 생성 — 현장 사진을 찍을 수 없을 때의 대안.
@@ -4427,9 +4435,9 @@ async function genPostImages(auto){
   if(!targets.length){ toast("먼저 본문 점검을 실행해 주세요",1); return; }
   const key=(CFG.llmKey||"").trim();
   const log=makeLog(document.getElementById("imgLog"), document.getElementById("imgBar"), "설명 도해 생성");
-  if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return; }
+  if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return log.finish("중단됨"); }
   const n=Math.min(targets.length, 30);
-  if(!auto && !confirm(`${n}편에 설명 도해를 만들어 넣습니다.\n한 장에 약 15초 → 대략 ${Math.ceil(n*16/60)}분.\n\n※ 실사 사진이 아니라 '구조·순서를 보여주는 도해'입니다. 찍지 않은 장면을 사진처럼 만들지 않습니다.\n진행할까요?`)) return;
+  if(!auto && !confirm(`${n}편에 설명 도해를 만들어 넣습니다.\n한 장에 약 15초 → 대략 ${Math.ceil(n*16/60)}분.\n\n※ 실사 사진이 아니라 '구조·순서를 보여주는 도해'입니다. 찍지 않은 장면을 사진처럼 만들지 않습니다.\n진행할까요?`)) return log.finish("중단됨");
   const base=wpBase(); let done=0, skip=0;
   for(let i=0;i<n;i++){
     const m=targets[i];
@@ -4524,6 +4532,7 @@ Hard constraints: absolutely NO text, NO letters, NO numbers, NO labels, NO wate
   }
   log.say(`완료 — 삽입 ${done}편 · 건너뜀 ${skip}편`, done>0);
   if(!auto) await fullCheck();
+  log.finish("완료");
 }
 
 async function adsCheck(){
