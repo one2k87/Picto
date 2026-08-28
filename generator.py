@@ -97,6 +97,62 @@ def requirements_block():
     return "\n".join(lines)
 
 
+
+# ── 톤 기수(era) ─────────────────────────────────────────────────
+# 사람이 쓰는 블로그는 몇 달 단위로 문체가 조금씩 변한다. 같은 톤으로
+# 수백 편이 쌓이면 그 균일함 자체가 자동 생성 신호가 된다.
+# 그래서 기간(기본 2개월)마다 어조·리듬·선호 제목 골격을 이동시킨다.
+# ⚠️ 급변은 금지 — 요건(무엇을 쓰는가)은 그대로 두고 '어떻게 말하는가'만
+#    옮긴다. 경계에서는 이전 기수 톤을 일부 섞어 칼같이 끊기지 않게 한다.
+_TONE_CACHE = {}
+
+
+def load_tone_eras(path="data/tone_eras.json"):
+    if _TONE_CACHE.get("v") is None:
+        try:
+            with open(path, encoding="utf-8") as f:
+                _TONE_CACHE["v"] = json.load(f)
+        except Exception:
+            _TONE_CACHE["v"] = {"eras": [], "period_months": 2, "epoch": "2026-07", "blend_ratio": 0.25}
+    return _TONE_CACHE["v"]
+
+
+def current_era(today=None, seed=""):
+    """오늘 날짜로 톤 기수를 정한다. (era_dict, 기수번호, 이전기수_섞임여부)"""
+    from datetime import date
+    cfg = load_tone_eras()
+    eras = cfg.get("eras") or []
+    if not eras:
+        return None, 0, False
+    today = today or date.today()
+    try:
+        ey, em = [int(x) for x in str(cfg.get("epoch", "2026-07")).split("-")[:2]]
+    except Exception:
+        ey, em = 2026, 7
+    period = max(1, int(cfg.get("period_months", 2)))
+    months = (today.year * 12 + today.month) - (ey * 12 + em)
+    idx = max(0, months) // period
+    # 경계 겹침: 일부 글은 직전 기수 톤으로 쓴다(사람의 문체는 칼같이 안 바뀐다)
+    blend = float(cfg.get("blend_ratio", 0.25))
+    use_prev = idx > 0 and (_variant(str(seed) + "|blend", 100) < int(blend * 100))
+    use = (idx - 1) if use_prev else idx
+    return eras[use % len(eras)], idx, use_prev
+
+
+def _weighted_pick(weights, seed):
+    """{키: 가중치} 에서 시드로 하나 고른다(같은 글은 항상 같은 결과)."""
+    items = [(k, max(0, int(v))) for k, v in (weights or {}).items() if int(v) > 0]
+    if not items:
+        return None
+    total = sum(w for _, w in items)
+    r = _variant(seed, total)
+    for k, w in items:
+        if r < w:
+            return k
+        r -= w
+    return items[0][0]
+
+
 def _article_prompt(keyword, kind, category, links, related, insert_ads, competitive=False):
     from datetime import date
     today = date.today()
@@ -118,6 +174,16 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
     ])
     _open_mode = OPENING_MODES[_variant(keyword, len(OPENING_MODES))]
 
+    # 톤 기수 — 이 글이 어느 시기의 목소리로 쓰이는지.
+    # 부속물 확률·제목 골격이 모두 이 값을 참조하므로 가장 먼저 정한다.
+    _era, _era_no, _era_prev = current_era(seed=keyword)
+    # 제목 골격: 기수가 선호하는 형태에 가중치를 줘서 고른다.
+    # (균등 랜덤이 아니라 가중 랜덤이라, 시기마다 목록의 '결'이 달라진다)
+    _form_key = _weighted_pick((_era or {}).get("title_weights"), str(keyword) + "|tform") if _era else None
+    _title_form = next((f for f in TITLE_FORMS if _form_key and f.startswith(_form_key)), None) \
+        or TITLE_FORMS[_variant(str(keyword) + "|title", len(TITLE_FORMS))]
+
+
     # ── 부속물 확률 배정 (구조 복제 해소) ────────────────────────────
     # 전에는 모든 글에 tldr+요약표+FAQ3+체크리스트 4종 세트를 강제했다.
     # 소제목 문구를 아무리 바꿔도 모든 글이 같은 뼈대로 나와, 실측에서
@@ -125,10 +191,18 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
     # 다르게 켜고 끄면 목록을 훑는 심사관 눈에 '찍어낸 티'가 사라진다.
     # 시드는 키워드 해시라 같은 글은 항상 같은 구성(재현 가능·디버깅 용이).
     _p = _variant(str(keyword) + "|parts", 100)
-    _use_table = (_p % 5) < 3 or "비교" in _style          # 60% (비교형이면 항상)
-    _use_tldr = ((_p // 5) % 2) == 0                       # 50%
-    _use_check = ((_p // 10) % 5) < 2                      # 40%
-    _n_faq = [0, 3, 0, 4, 5, 3, 0, 4][_p % 8]              # 0~5개 (0개가 3/8)
+    _bias = ((_era or {}).get("parts_bias") or {})
+    def _on(base, key, val):      # 기수 성향만큼 확률을 밀거나 당긴다
+        return val < int(max(0, min(100, (base + _bias.get(key, 0)) * 100)))
+    _use_table = _on(0.6, "table", _p) or "비교" in _style
+    _use_tldr = _on(0.5, "tldr", (_p * 7) % 100)
+    _use_check = _on(0.4, "checklist", (_p * 13) % 100)
+    _faq_pool = [0, 3, 0, 4, 5, 3, 0, 4]
+    if _bias.get("faq", 0) > 0.1:
+        _faq_pool = [3, 3, 4, 4, 5, 3, 0, 4]
+    elif _bias.get("faq", 0) < -0.1:
+        _faq_pool = [0, 0, 3, 0, 4, 0, 0, 3]
+    _n_faq = _faq_pool[_p % 8]
     _parts_rules = []
     _parts_rules.append(
         "7. summary_table: 핵심을 한눈에 보는 요약표(2~4행) 데이터를 rows로 제공."
@@ -154,7 +228,6 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
         ("range", "국내 기준 실측 범위 정리 — 규격·가격대·소요 시간을 범위로 제시하고 무엇에 따라 달라지는지."),
     ]
     _gain_key, _gain_desc = GAIN_MODES[_variant(str(keyword) + "|gain", len(GAIN_MODES))]
-    _title_form = TITLE_FORMS[_variant(str(keyword) + "|title", len(TITLE_FORMS))]
     if not insert_ads:
         ad_rule = "5. 이미지는 '딱 1개'만 [[IMG:이미지설명]]로 본문 상단부에 넣으세요(광고 마커는 넣지 말 것)."
     elif ADS_BOOST:   # 승인 후 수익 최적화: 광고 3개(첫 소제목·중반·결론 직전)
@@ -260,6 +333,14 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
 - 다른 글을 복제한 듯한 문장·구성을 피한다. 겪지 않은 경험을 지어내지 말고,
   '자료를 확인한 결과' 관점에서 실무적으로 주의할 지점을 짚는다.
 - 사실은 단정하지 말고 "공식 기준 확인 필요"처럼 검증 여지를 남긴다(정확성·신뢰성 E-E-A-T).
+
+{("[이번 시기의 목소리 — " + _era["name"] + "]" + chr(10)
+   + "- 어조: " + _era.get("voice","") + chr(10)
+   + "- 문장: " + _era.get("sentence","") + chr(10)
+   + "- 도입 성향: " + _era.get("opening","") + chr(10)
+   + "- 마무리 성향: " + _era.get("closing","") + chr(10)
+   + "  (이 목소리는 시기마다 조금씩 달라집니다. 요건은 그대로 지키되 말투와 리듬을 여기에 맞추세요.)")
+  if _era else ""}
 
 {HUMAN_STYLE}
 [이번 글의 도입 방식] {_open_mode}

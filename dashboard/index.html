@@ -2748,6 +2748,41 @@ function buildMoneyTab(){
       하루 상한이 1편씩 늘어납니다(15편부터 제한 없음). 램프 단계의 주제 폭을
       넘는 새 주제는 자동 보류됩니다.<div id="themeShiftBox" class="hint" style="margin-top:6px">전환 기록 없음</div>`;
     strat.appendChild(shift);
+    // 톤 기수 — 글이 쌓여도 같은 목소리로 굳지 않게, 시기마다 문체를 옮긴다.
+    // ⚠️ 아래 계산식은 generator.py의 current_era()와 같아야 한다(같은 파일을 읽음).
+    const eraCard=document.createElement("div"); eraCard.className="wiz-note";
+    eraCard.innerHTML=`🎚️ <b>시기별 목소리(톤 기수)</b> — 같은 말투로 수백 편이 쌓이면
+      그 균일함 자체가 자동 생성 신호가 됩니다. 그래서 일정 기간마다 어조·리듬·선호 제목 형태가
+      조금씩 이동합니다. <u>요건(무엇을 쓰는가)은 그대로</u>이고 말투만 바뀌며, 기수 경계에서는
+      이전 톤이 일부 섞여 칼같이 끊기지 않습니다.
+      <div id="toneEraBox" class="hint" style="margin-top:6px">불러오는 중…</div>`;
+    strat.appendChild(eraCard);
+    (async()=>{
+      const box=document.getElementById("toneEraBox"); if(!box) return;
+      try{
+        const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+        let r=await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/data/tone_eras.json`,{cache:"no-store"});
+        if(!r.ok) r=await fetch("../data/tone_eras.json",{cache:"no-store"});
+        if(!r.ok){ box.textContent="톤 설정 파일을 찾지 못했습니다."; return; }
+        const j=await r.json(), eras=j.eras||[];
+        if(!eras.length){ box.textContent="설정된 기수가 없습니다."; return; }
+        const [ey,em]=String(j.epoch||"2026-07").split("-").map(Number);
+        const per=Math.max(1, j.period_months||2);
+        const now=new Date();
+        const months=(now.getFullYear()*12+now.getMonth()+1)-(ey*12+em);
+        const idx=Math.max(0,Math.floor(Math.max(0,months)/per));
+        const cur=eras[idx%eras.length], nxt=eras[(idx+1)%eras.length];
+        // 다음 전환까지 남은 개월
+        const left=per-((Math.max(0,months))%per)-0;
+        const top=Object.entries(cur.title_weights||{}).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);
+        box.innerHTML=`<div><b style="color:var(--accent)">지금: ${escAttr(cur.name)}</b> (${idx+1}기 · ${per}개월 주기)</div>
+          <div style="margin-top:3px">· 어조 — ${escAttr(cur.voice||"")}</div>
+          <div>· 문장 — ${escAttr(cur.sentence||"")}</div>
+          <div>· 즐겨 쓰는 제목 형태 — ${top.map(escAttr).join(" · ")}</div>
+          <div style="margin-top:4px;opacity:.75">약 ${left}개월 뒤 <b>${escAttr(nxt.name)}</b>로 이동합니다.
+          전환 무렵 글의 ${Math.round((j.blend_ratio||0.25)*100)}%는 이전 톤으로 쓰여 자연스럽게 겹칩니다.</div>`;
+      }catch(e){ box.textContent="톤 정보를 읽지 못했습니다."; }
+    })();
     (async()=>{
       const box=document.getElementById("themeShiftBox"); if(!box) return;
       try{
