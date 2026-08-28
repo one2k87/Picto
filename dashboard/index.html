@@ -710,7 +710,9 @@
   </div>
 
   <div class="field">
-    <button class="btn primary sm" id="adsCheck" style="width:100%">① 사이트 점검하기</button>
+    <button class="btn primary sm" id="adsCheck" style="width:100%">① 전체 점검하기</button>
+    <div id="checkBar" style="margin-top:6px"></div><div id="checkLog"></div>
+    <div id="fixAllBox" style="margin-top:8px"></div>
     <div id="adsReport" style="margin-top:10px;font-size:13px"></div>
     <div id="deepBox" style="margin-top:10px;font-size:13px"></div>
   </div>
@@ -3933,8 +3935,7 @@ async function contentDeepCheck(){
   }
   html+=`</div>
     <div class="hint" style="margin-top:8px"><b>고치는 규칙(가치 만들기)</b> — ① 실전 신호 2개↑: 자주 나는 실수·조건 분기·주의점 (겪지 않은 1인칭 일화 창작은 금지 — '흔히 겪는 문제' 관점이면 거짓말 없이 같은 효과) ② 실측 수치 3개↑(치수·가격대·소요시간, 모르면 범위로) ③ "알아보겠습니다"류 전부 삭제 ④ 어미를 평서·의문·명사형으로 섞기 ⑤ 같은 소제목 뼈대 재사용 금지 ⑥ 현장 사진 1장 이상(AI 재작성으론 못 넣음 — 직접 추가)</div>
-    ${fails.length?`<button class="btn primary sm" style="width:100%;margin-top:8px" onclick="aiFixContent()">🤖 60점 미만 ${fails.length}편, Scripto가 다시 쓰기</button>
-    <div id="deepBar" style="margin-top:6px"></div><div id="deepLog"></div>`:""}
+    <div id="deepBar" style="margin-top:6px"></div><div id="deepLog"></div>
     ${mergePairs.length?`<div style="margin-top:10px;padding:9px 10px;border:1px solid var(--line);border-radius:9px">
       <b>🔗 병합 후보 ${mergePairs.length}쌍</b>
       <div class="hint">얇고 비슷한 글은 <u>합치는 편이 새로 쓰는 것보다 반려 해소에 효과적</u>입니다. 합친 뒤 한 편은 비공개로 돌립니다.</div>
@@ -3948,10 +3949,9 @@ async function contentDeepCheck(){
       <div class="hint"><b>현장 사진을 찍을 수 없다면 '설명 도해'로 채웁니다.</b> 실사 사진을 흉내 내는 건 위험합니다 — 찍지 않은 장면을 사진처럼 만들면 그게 구글이 문제 삼는 가짜 경험 신호입니다.<br>
       대신 구조·순서·비교를 보여주는 도해는 <u>정직하면서 독자에게 실제로 쓸모가 있어</u> 정보 가치를 올립니다. 캡션에 '설명 도해(실제 촬영 사진 아님)'를 자동으로 붙입니다.<br>
       <span style="opacity:.75">※ 나중에 실제 작업 사진을 한 장이라도 찍게 되면 그 글부터 교체하세요. 사진이 여전히 가장 강한 신호입니다.</span></div>
-      <button class="btn primary sm" style="width:100%;margin-top:6px" onclick="genPostImages()">🖼️ ${noImg.length}편에 설명 도해 만들어 넣기 (약 ${Math.ceil(Math.min(noImg.length,30)*16/60)}분)</button>
       <div id="imgBar" style="margin-top:6px"></div><div id="imgLog"></div>
       <div class="hint" style="margin-top:4px">${noImg.slice(0,8).map(m=>`· <a href="${m.link}" target="_blank" style="color:inherit">${escAttr(m.title.slice(0,30))}</a>`).join("<br>")}${noImg.length>8?`<br>… 외 ${noImg.length-8}편`:""}</div></div>`:""}
-    <button class="btn sm" style="width:100%;margin-top:8px" onclick="contentDeepCheck()">🔄 본문 다시 점검</button></div>`;
+    </div>`;
   box.innerHTML=html;
   try{ adsCheck(); }catch(e){}
 }
@@ -3990,13 +3990,13 @@ function _dcQuickScore(html){
 }
 
 // 60점 미만 글을 Gemini로 다시 쓴다 — 적용 전 기계 검증, 원본은 WP 수정본 이력에 남음
-async function aiFixContent(){
+async function aiFixContent(auto){
   const st=window._dcState;
   if(!st||!st.fails.length){ toast("보완 대상이 없습니다 — 먼저 본문 점검을 실행",1); return; }
   const key=(CFG.llmKey||"").trim();
   const log=makeLog(document.getElementById("deepLog"), document.getElementById("deepBar"), "본문 AI 보완 재작성");
   if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return; }
-  if(!confirm(`${st.fails.length}편의 본문을 다시 씁니다.\n원본은 워드프레스 '수정본(리비전)'에 남아 언제든 되돌릴 수 있습니다.\n진행할까요?`)) return;
+  if(!auto && !confirm(`${st.fails.length}편의 본문을 다시 씁니다.\n원본은 워드프레스 '수정본(리비전)'에 남아 언제든 되돌릴 수 있습니다.\n진행할까요?`)) return;
   const base=wpBase(); let done=0, skip=0;
   for(let i=0;i<st.fails.length;i++){
     const m=st.fails[i];
@@ -4053,12 +4053,12 @@ ${m.html}`;
       done++; log.say(`✅ ${escAttr(m.title.slice(0,28))} — ${m.score}점 → ${q.score}점(단독 기준)`);
     }catch(e){ skip++; log.say(`건너뜀 — 업로드 실패: ${escAttr(String(e).slice(0,60))}`, false); }
   }
-  log.say(`완료 — 적용 ${done}편 · 건너뜀 ${skip}편. 전체 재점검을 시작합니다`, done>0);
-  await contentDeepCheck();
+  log.say(`완료 — 적용 ${done}편 · 건너뜀 ${skip}편`, done>0);
+  if(!auto) await fullCheck();
 }
 
 // 얇고 비슷한 두 글을 한 편으로 합친다 — 남는 글은 비공개(삭제 아님, 되돌릴 수 있게)
-async function aiMergePair(idx){
+async function aiMergePair(idx, auto){
   const st=window._dcState; const p=st&&st.mergePairs&&st.mergePairs[idx];
   if(!p){ toast("먼저 본문 점검을 실행해 주세요",1); return; }
   const key=(CFG.llmKey||"").trim();
@@ -4066,7 +4066,7 @@ async function aiMergePair(idx){
   if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return; }
   // 긴 글을 살리고 짧은 글을 흡수시킨다(링크·색인이 더 쌓인 쪽을 남기는 게 안전)
   const keep=p.a.len>=p.b.len?p.a:p.b, drop=keep===p.a?p.b:p.a;
-  if(!confirm(`두 글을 한 편으로 합칩니다.\n\n남길 글: ${keep.title}\n비공개로 돌릴 글: ${drop.title}\n\n삭제가 아니라 비공개이며, 원본은 수정본 이력에 남습니다. 진행할까요?`)) return;
+  if(!auto && !confirm(`두 글을 한 편으로 합칩니다.\n\n남길 글: ${keep.title}\n비공개로 돌릴 글: ${drop.title}\n\n삭제가 아니라 비공개이며, 원본은 수정본 이력에 남습니다. 진행할까요?`)) return;
   log.say("병합 초안 작성 중…", undefined, "cur");
   const prompt=`아래 두 편의 한국어 블로그 글을 한 편으로 합쳐, 더 깊고 완결된 글로 다시 쓰세요.
 
@@ -4120,7 +4120,88 @@ ${drop.html}`;
     log.say(`✅ 흡수된 글 비공개 — ${escAttr(drop.title.slice(0,32))}`);
   }catch(e){ log.say("실패: "+escAttr(String(e).slice(0,100)), false); return; }
   log.say("워드프레스에서 옛 주소 → 새 글로 리디렉션을 걸어두면 더 안전합니다(Rank Math → 리디렉션)");
-  await contentDeepCheck();
+  if(!auto) await fullCheck();
+}
+
+/* ───────── 통합 점검·통합 수정 ─────────
+   버튼이 늘어날수록 이용자는 무엇을 눌러야 하는지 모른다(실제 피드백).
+   점검은 「① 전체 점검하기」 하나로 전부 돌고, 고치는 것도 「한 번에 고치기」
+   하나로 순서대로 돈다. 개별 실행 버튼은 전부 없앴다. */
+async function anonVisibilityCheck(){
+  // 심사관은 로그아웃 상태로 본다. 관리자 화면의 '비공개:' 라벨을 보고
+  // '그대로 게시된 것 아니냐'고 오해하기 쉬워, 익명 시점을 기계로 확인해 둔다.
+  const base=wpBase(); const out={ok:null, priv:0, leak:0, note:""};
+  try{
+    const pr=await fetch(base+"/wp-json/wp/v2/posts?per_page=100&status=private&_fields=id,link",{headers:wpAuth()});
+    const priv=pr.ok?await pr.json():[]; out.priv=priv.length;
+    if(!priv.length){ out.ok=true; out.note="비공개 글이 없습니다."; return out; }
+    // 인증 없이(=방문자처럼) 목록을 불러 비공개 글이 섞여 있는지 확인
+    const an=await fetch(base+"/wp-json/wp/v2/posts?per_page=100&_fields=id");
+    const ids=new Set(an.ok?(await an.json()).map(p=>p.id):[]);
+    out.leak=priv.filter(p=>ids.has(p.id)).length;
+    out.ok=out.leak===0;
+    out.note=out.ok?`비공개 ${priv.length}편은 방문자에게 보이지 않습니다(목록·사이트맵 모두 제외). 관리자로 로그인한 화면에서만 '비공개:' 라벨과 함께 보입니다.`
+                   :`비공개 처리한 글 ${out.leak}편이 방문자에게 노출되고 있습니다. 즉시 확인이 필요합니다.`;
+  }catch(e){ out.ok=null; out.note="확인 실패 — 연결 정보를 확인하세요."; }
+  return out;
+}
+async function fullCheck(){
+  const b=document.getElementById("adsCheck");
+  const log=makeLog(document.getElementById("checkLog"), document.getElementById("checkBar"), "전체 점검");
+  if(b){ b.disabled=true; b.textContent="점검 중…"; }
+  try{
+    log.say("사이트 구조·제목 골격 확인 중…", undefined, "s1");
+    await adsCheck();
+    log.say("사이트 구조·제목 골격 확인 완료", true, "s1");
+    log.say("방문자 시점(로그아웃) 노출 확인 중…", undefined, "s2");
+    window._anonCheck=await anonVisibilityCheck();
+    log.say("방문자 시점 확인 완료 — "+escAttr(window._anonCheck.note.slice(0,60)), window._anonCheck.ok!==false, "s2");
+    log.say("발행 글 본문 전체 읽는 중… (수십 초)", undefined, "s3");
+    await contentDeepCheck();
+    log.say("본문 정밀 점검 완료", true, "s3");
+    await adsCheck();          // 본문 결과를 점수에 반영
+    renderFixAll();
+    log.say("전체 점검 끝 — 아래 결과를 확인하세요", true);
+  }catch(e){ log.say("점검 중 오류: "+escAttr(String(e).slice(0,120)), false); }
+  if(b){ b.disabled=false; b.textContent="🔄 전체 다시 점검"; }
+}
+// 점검 결과에서 '고칠 것'을 모아 버튼 하나로 만든다
+function renderFixAll(){
+  const box=document.getElementById("fixAllBox"); if(!box) return;
+  const jobs=fixJobs();
+  if(!jobs.length){ box.innerHTML='<div class="hint" style="color:var(--ok)">✅ 자동으로 고칠 항목이 없습니다.</div>'; return; }
+  box.innerHTML=`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px">
+    <b>🛠️ 고칠 것 ${jobs.length}가지</b>
+    <div class="hint" style="margin-top:3px">${jobs.map((j,i)=>`${i+1}. ${j.label}`).join("<br>")}</div>
+    <button class="btn primary sm" style="width:100%;margin-top:7px" onclick="fixAll()">🛠️ 한 번에 고치기 (약 ${jobs.reduce((a,j)=>a+j.min,0)}분)</button>
+    <div id="fixAllBar" style="margin-top:6px"></div><div id="fixAllLog"></div></div>`;
+}
+function fixJobs(){
+  const jobs=[], st=window._dcState||{}, F=window._titleForm||{};
+  if(F.topShare>40||F.roomLead>50||F.nounStack>40)
+    jobs.push({k:"title", label:`제목 골격 흩기 (최다 골격 ${F.topShare}%·공간명사 시작 ${F.roomLead}%)`, min:1, run:rewriteTitleForms});
+  if((st.fails||[]).length)
+    jobs.push({k:"body", label:`본문 ${st.fails.length}편 다시 쓰기 (60점 미만)`, min:Math.ceil(st.fails.length*0.4), run:aiFixContent});
+  if((st.mergePairs||[]).length)
+    jobs.push({k:"merge", label:`비슷한 글 ${st.mergePairs.length}쌍 병합`, min:st.mergePairs.length, run:async()=>{for(let i=0;i<st.mergePairs.length;i++) await aiMergePair(i,true);}});
+  if((st.noImg||[]).length)
+    jobs.push({k:"img", label:`설명 도해 ${Math.min(st.noImg.length,30)}장 만들어 넣기`, min:Math.ceil(Math.min(st.noImg.length,30)*16/60), run:genPostImages});
+  return jobs;
+}
+async function fixAll(){
+  const jobs=fixJobs();
+  if(!jobs.length) return;
+  if(!confirm(`아래를 순서대로 실행합니다.\n\n${jobs.map((j,i)=>`${i+1}. ${j.label}`).join("\n")}\n\n원본은 워드프레스 '수정본(리비전)'에 남아 되돌릴 수 있습니다.\n진행할까요?`)) return;
+  const log=makeLog(document.getElementById("fixAllLog"), document.getElementById("fixAllBar"), "한 번에 고치기");
+  window._fixAllRunning=true;
+  for(let i=0;i<jobs.length;i++){
+    log.say(`(${i+1}/${jobs.length}) ${escAttr(jobs[i].label)}`, undefined, "j"+i);
+    try{ await jobs[i].run(true); log.say(`(${i+1}/${jobs.length}) ${escAttr(jobs[i].label)} — 완료`, true, "j"+i); }
+    catch(e){ log.say(`(${i+1}/${jobs.length}) 실패: ${escAttr(String(e).slice(0,80))}`, false, "j"+i); }
+  }
+  window._fixAllRunning=false;
+  log.say("모두 끝났습니다. 전체 점검을 다시 돌립니다", true);
+  await fullCheck();
 }
 
 /* 제목 골격 흩기 — 골격이 겹치는 글만 골라, 서로 다른 형태를 '배정'해 다시 쓴다.
@@ -4135,7 +4216,7 @@ const TITLE_FORM_SPECS=[
   ["상황선두","문제 상황을 먼저 던진다. 공간 이름으로 시작하지 않는다."],
   ["명사구","짧은 명사구 하나. 8어절 이내."],
 ];
-async function rewriteTitleForms(){
+async function rewriteTitleForms(auto){
   const posts=window._allTitlePosts;
   if(!posts||!posts.length){ toast("먼저 사이트 점검을 실행해 주세요",1); return; }
   const key=(CFG.llmKey||"").trim();
@@ -4216,15 +4297,15 @@ ${list}`;
       ok++; log.say(`✅ [${a.form[0]}] ${escAttr(neo.slice(0,34))}`, true, "p"+a.id);
     }catch(e){ skip++; log.say(`실패: ${escAttr(String(e).slice(0,60))}`, false); }
   }
-  log.say(`완료 — 적용 ${ok}편 · 건너뜀 ${skip}편. 다시 점검합니다`, ok>0);
-  adsCheck();
+  log.say(`완료 — 적용 ${ok}편 · 건너뜀 ${skip}편`, ok>0);
+  if(!auto) await fullCheck();
 }
 
 /* 본문 이미지 자동 생성 — 현장 사진을 찍을 수 없을 때의 대안.
    ⚠️ 원칙: 실사 사진을 흉내 내지 않는다. 실제로 찍지 않은 장면을 사진처럼 만들면
    그게 바로 구글이 문제 삼는 '가짜 경험 신호'다. 대신 독자에게 실제로 쓸모 있는
    '설명 도해'(구조·순서·비교)를 만든다. 이건 정직하면서 정보 가치도 올린다. */
-async function genPostImages(){
+async function genPostImages(auto){
   const st=window._dcState;
   const targets=(st&&st.noImg)||[];
   if(!targets.length){ toast("먼저 본문 점검을 실행해 주세요",1); return; }
@@ -4232,35 +4313,64 @@ async function genPostImages(){
   const log=makeLog(document.getElementById("imgLog"), document.getElementById("imgBar"), "설명 도해 생성");
   if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return; }
   const n=Math.min(targets.length, 30);
-  if(!confirm(`${n}편에 설명 도해를 만들어 넣습니다.\n한 장에 약 15초 → 대략 ${Math.ceil(n*16/60)}분.\n\n※ 실사 사진이 아니라 '구조·순서를 보여주는 도해'입니다. 찍지 않은 장면을 사진처럼 만들지 않습니다.\n진행할까요?`)) return;
+  if(!auto && !confirm(`${n}편에 설명 도해를 만들어 넣습니다.\n한 장에 약 15초 → 대략 ${Math.ceil(n*16/60)}분.\n\n※ 실사 사진이 아니라 '구조·순서를 보여주는 도해'입니다. 찍지 않은 장면을 사진처럼 만들지 않습니다.\n진행할까요?`)) return;
   const base=wpBase(); let done=0, skip=0;
   for(let i=0;i<n;i++){
     const m=targets[i];
     log.say(`(${i+1}/${n}) ${escAttr(m.title.slice(0,26))}… 도해 만드는 중`, undefined, "cur");
-    // 1) 글 내용에 맞는 도해 지시문을 먼저 뽑는다(제목만 보고 그리면 엉뚱해진다)
-    let desc="";
+    // 1) 이미지 기획: 제목이 아니라 '본문에서 실제로 설명하는 것'을 읽고,
+    //    애드센스 심사 기준(정보 가치·독창성)에 맞는 도해를 설계한다.
+    //    - 심사관이 보는 것: 이 이미지가 글을 이해하는 데 실제로 보탬이 되는가
+    //    - 감점 요인: 주제와 무관한 장식 이미지, 스톡 느낌, 글자 깨짐, 사진 흉내
+    let spec=null;
     try{
-      const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key="+encodeURIComponent(key),
+      const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key),
         {method:"POST",headers:{"Content-Type":"application/json"},
-         body:JSON.stringify({contents:[{parts:[{text:`다음 한국어 글에 넣을 '설명 도해' 1장의 영어 지시문을 한 문장으로 쓰세요.
-사진이 아니라 도해입니다. 무엇의 구조/순서/비교를 보여줄지 구체적으로.
-글자·문자는 넣지 않습니다(한글이 깨집니다). 출력은 영어 한 문장만.
+         body:JSON.stringify({contents:[{parts:[{text:`아래 한국어 블로그 글에 넣을 '설명 도해' 1장을 기획하세요.
+이 블로그는 구글 애드센스 승인을 준비 중이며, 심사 기준은 "이 이미지가 글을 이해하는 데 실제로 보탬이 되는가"입니다.
+
+[기획 원칙]
+- 본문에서 **실제로 설명하는 대상·순서·수치**를 그림으로 옮기세요. 제목만 보고 장식용 그림을 만들면 감점입니다.
+- 아래 넷 중 이 글에 가장 쓸모 있는 하나를 고르세요:
+  cutaway(단면 구조 — 무엇이 어떻게 맞물리는지) / steps(작업 순서 3~4단계) /
+  compare(두 방식·부품의 차이) / dimension(치수·간격을 화살표로 표시)
+- 사진을 흉내 내지 마세요. 실제로 촬영하지 않은 장면을 사진처럼 만들면 '가짜 경험 신호'가 됩니다.
+- 이미지 안에 글자를 넣지 마세요(한글이 반드시 깨집니다). 설명은 캡션으로 답니다.
+
+[출력 — JSON만, 다른 말 금지]
+{"kind":"cutaway|steps|compare|dimension",
+ "en":"영어 그림 지시문 1~2문장. 무엇을 어떤 배치로 그릴지 구체적으로. 글자 없이 형태·화살표만.",
+ "caption":"한국어 캡션 한 문장. 이 도해가 무엇을 보여주는지 (예: 문틀과 경첩이 맞물리는 단면과 조정 나사 위치)",
+ "alt":"한국어 대체텍스트 한 문장(시각장애인용, 화면에 보이는 형태 설명)"}
 
 제목: ${m.title}
-본문 일부: ${_dcText(m.html).slice(0,900)}`}]}],
-           generationConfig:{temperature:0.6,maxOutputTokens:200}})});
+본문: ${_dcText(m.html).slice(0,1800)}`}]}],
+           generationConfig:{temperature:0.6,maxOutputTokens:500}})});
       const j=await r.json();
-      desc=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text?.trim()||"";
+      let t=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"";
+      t=t.replace(/^```json?\s*/i,"").replace(/\s*```$/,"").trim();
+      const a=t.indexOf("{"), b=t.lastIndexOf("}");
+      if(a>-1&&b>a) spec=JSON.parse(t.slice(a,b+1));
     }catch(e){}
-    if(!desc) desc=`instructional cross-section diagram related to ${m.title}`;
-    // 2) 도해 생성
+    if(!spec||!spec.en){ skip++; log.say("건너뜀 — 이미지 기획 실패(본문을 읽지 못함)", false); continue; }
+    // 2) 도해 생성 — 종류별로 화풍을 달리해 29장이 똑같아 보이지 않게 한다
+    const PALETTE=["muted slate blue and warm sand","soft teal and warm gray","muted terracotta and stone gray","desaturated olive and cream"];
+    const pal=PALETTE[i%PALETTE.length];
+    const KIND_HINT={
+      cutaway:"technical cross-section cutaway view, layers clearly separated",
+      steps:"sequence of 3-4 numbered-free panels left to right, arrows showing order",
+      compare:"side-by-side comparison of two variants, clear visual contrast between them",
+      dimension:"orthographic view with dimension arrows and gap indicators"};
     let b64=null, mime="image/jpeg";
     try{
       const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key="+encodeURIComponent(key),
         {method:"POST",headers:{"Content-Type":"application/json"},
-         body:JSON.stringify({contents:[{parts:[{text:`${desc}
-Style: clean instructional diagram for a home-repair guide. Flat vector, muted blue-gray and warm neutral palette, white background, simple arrows and shapes, 16:9.
-Absolutely NO text, NO letters, NO numbers, NO watermark. Not a photograph.`}]}]})});
+         body:JSON.stringify({contents:[{parts:[{text:`${spec.en}
+
+Format: ${KIND_HINT[spec.kind]||KIND_HINT.cutaway}.
+Style: clean instructional diagram for a Korean home-repair guide. Flat vector, ${pal} palette, white background, thin confident linework, subtle shadows only.
+Composition: 16:9, single clear subject centered, generous white space.
+Hard constraints: absolutely NO text, NO letters, NO numbers, NO labels, NO watermark, NO logos. Not a photograph, not photorealistic. No people's faces.`}]}]})});
       const j=await r.json();
       const parts=(((j.candidates||[])[0]||{}).content||{}).parts||[];
       const inl=parts.find(p=>p.inlineData||p.inline_data);
@@ -4278,12 +4388,13 @@ Absolutely NO text, NO letters, NO numbers, NO watermark. Not a photograph.`}]}]
         body:bin});
       if(!up.ok) throw new Error("업로드 HTTP "+up.status);
       const med=await up.json();
-      const alt=`${m.title} 설명 도해`;
+      const alt=(spec.alt||`${m.title} 설명 도해`).slice(0,120);
+      const cap=(spec.caption||"글의 구조를 설명하는 도해").slice(0,140);
       try{ await fetch(base+"/wp-json/wp/v2/media/"+med.id,{method:"POST",
         headers:Object.assign({"Content-Type":"application/json"},wpAuth()),
-        body:JSON.stringify({alt_text:alt, caption:"이해를 돕기 위한 설명 도해입니다(실제 촬영 사진이 아닙니다)."})}); }catch(e){}
+        body:JSON.stringify({alt_text:alt, caption:cap+" (설명을 돕는 도해이며 실제 촬영 사진이 아닙니다.)"})}); }catch(e){}
       const fig=`<figure class="wp-block-image size-large"><img src="${med.source_url}" alt="${escAttr(alt)}" loading="lazy"/>`+
-                `<figcaption>이해를 돕기 위한 설명 도해입니다(실제 촬영 사진이 아닙니다).</figcaption></figure>`;
+                `<figcaption>${escAttr(cap)} <span style="opacity:.7">— 설명을 돕는 도해이며 실제 촬영 사진이 아닙니다.</span></figcaption></figure>`;
       let html=m.html;
       const idx=html.search(/<\/h2>/i);
       html = idx>-1 ? html.slice(0, idx+5)+fig+html.slice(idx+5) : fig+html;
@@ -4295,8 +4406,8 @@ Absolutely NO text, NO letters, NO numbers, NO watermark. Not a photograph.`}]}]
       done++; log.say(`✅ ${escAttr(m.title.slice(0,28))}`, true, "p"+m.id);
     }catch(e){ skip++; log.say(`건너뜀 — ${escAttr(String(e).slice(0,70))}`, false); }
   }
-  log.say(`완료 — 삽입 ${done}편 · 건너뜀 ${skip}편. 다시 점검합니다`, done>0);
-  await contentDeepCheck();
+  log.say(`완료 — 삽입 ${done}편 · 건너뜀 ${skip}편`, done>0);
+  if(!auto) await fullCheck();
 }
 
 async function adsCheck(){
@@ -4335,7 +4446,7 @@ async function adsCheck(){
     }
     if(acc.length){ allTitles=acc.map(p=>(p.title&&p.title.rendered)||""); window._allTitlePosts=acc; }
   }catch(e){}
-  const F=titleFormStats(allTitles);
+  const F=titleFormStats(allTitles); window._titleForm=F;
   const lonelyTags=tags.filter(t=>(t.count||0)<=1).length;   // 글 1개짜리 태그 = 얇은 중복 페이지
   const tagRatio=posts?Math.round(tagTotal/posts*100):0;      // 태그수/글수 (100% 근처면 글마다 전용 태그)
 
@@ -4370,7 +4481,7 @@ async function adsCheck(){
               (O.worst?`<br><span style="opacity:.75">실제 예: “…${escAttr(O.worst[0])}” / “…${escAttr(O.worst[1])}”</span>`:"")},
       {ok:F.topShare<=40 && F.roomLead<=50 && F.nounStack<=40,
        label:`제목 골격 다양성 — 최다 골격 ${F.topShare}%${F.topKey?` (${escAttr(F.topKey)})`:""} · 형태 ${F.forms}종 · 공간명사 시작 ${F.roomLead}% · 명사나열 ${F.nounStack}%`,
-       reason:`<b>왜 문제인가</b> — 단어를 아무리 다르게 써도 <u>문장 골격이 같으면</u> 목록을 훑는 순간 찍어낸 티가 납니다. 어미 중복 검사로는 안 잡히는 구멍입니다.<br>실제로 이 사이트 29편은 어미 중복 10%로 '통과'였지만, 전부 "[공간] [부품] [문제], [방법]으로 [동작]" 한 공식이었고 29편 모두 공간 이름으로 시작했습니다.<br><b>기준</b> — 최다 골격 40% 이하, 공간명사 시작 50% 이하, 명사 5개 이상 나열 40% 이하.<br><button class="btn primary sm" style="margin-top:4px" onclick="rewriteTitleForms()">🎯 제목 골격 흩기 (AI 재작성)</button>`},
+       reason:`<b>왜 문제인가</b> — 단어를 아무리 다르게 써도 <u>문장 골격이 같으면</u> 목록을 훑는 순간 찍어낸 티가 납니다. 어미 중복 검사로는 안 잡히는 구멍입니다.<br>실제로 이 사이트 29편은 어미 중복 10%로 '통과'였지만, 전부 "[공간] [부품] [문제], [방법]으로 [동작]" 한 공식이었고 29편 모두 공간 이름으로 시작했습니다.<br><b>기준</b> — 최다 골격 40% 이하, 공간명사 시작 50% 이하, 명사 5개 이상 나열 40% 이하.`},
       {ok:lonelyTags<=TH.max_lonely_tags, label:`글 1개짜리 태그 ${lonelyTags}개 (태그/글 비율 ${tagRatio}%)`,
        reason:`<b>왜 문제인가</b> — 글마다 전용 태그가 생기면 <u>내용이 하나뿐인 태그 페이지</u>가 글 수만큼 색인됩니다. 실질 글이 30개여도 구글은 알맹이 없는 페이지 30개를 함께 봅니다. 이게 '가치 없는 콘텐츠' 판정의 흔한 숨은 원인입니다.<br><b>어떻게 고치나</b> — Rank Math → 일반 설정 → 태그 아카이브를 <b>noindex</b>로. 앞으로는 태그를 10~15개 사전에서만 골라 쓰세요.`},
     ]},
@@ -4387,8 +4498,14 @@ async function adsCheck(){
         {ok:pass,
          label: !fresh ? "본문 정밀 점검 미실행 (반려 이후 기준)"
               : `본문 평균 ${dc.avg}점 · 보완 필요 ${dc.fails}편 · 구조 복제 ${dc.skelShare||0}%`,
-         reason:`반려 후에는 <u>본문</u>이 바뀌어야 결과가 바뀝니다. 제목·태그는 이미 정리됐습니다.<br>기준: 평균 70점 이상 + 60점 미만 0편.<br><button class="btn primary sm" style="margin-top:4px" onclick="contentDeepCheck()">🧪 본문 정밀 점검 실행</button>`}
+         reason:`반려 후에는 <u>본문</u>이 바뀌어야 결과가 바뀝니다. 제목·태그는 이미 정리됐습니다.<br>기준: 평균 70점 이상 + 60점 미만 0편.`}
       ]}];
+    })(),
+    ...(function(){
+      const a=window._anonCheck;
+      if(!a || a.priv===0) return [];
+      return [{h:"👀 방문자 시점(로그아웃)", items:[{ok:a.ok, label:`비공개 처리한 ${a.priv}편 노출 여부`,
+        reason:escAttr(a.note)+"<br>※ 관리자로 로그인한 채 블로그를 보면 제목 앞에 '비공개:'가 붙어 그대로 게시된 것처럼 보이지만, 방문자와 심사관에게는 404입니다."}]}];
     })(),
     {h:"🏷️ 사이트 기본", items:[
       {ok:!!siteTitle, label:`사이트 제목 ${siteTitle?"("+siteTitle+")":""}`, reason:"워드프레스 설정 → 일반 → 사이트 제목을 채우세요."},
@@ -4431,7 +4548,7 @@ async function adsCheck(){
   }
   const ago=prev?new Date(prev.at).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):"";
   html+=`<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)">
-    <button class="btn primary sm" style="width:100%" onclick="adsCheck()">🔄 다시 점검하기</button>
+    <button class="btn primary sm" style="width:100%" onclick="fullCheck()">🔄 전체 다시 점검</button>
     <div class="hint" style="text-align:center;margin-top:6px">
       ${prev?`직전 점검 ${escAttr(ago)} · ${prev.score}/${prev.total} → ${passed}/${scored.length} ${delta}`
              :"고친 뒤 눌러 결과를 확인하세요"}</div></div>`;
@@ -4443,10 +4560,9 @@ async function adsCheck(){
   if(topBtn) topBtn.textContent="🔄 다시 점검하기";
 }
 document.getElementById("adsCheck").onclick=()=>{
-  const b=document.getElementById("adsCheck"), box=document.getElementById("adsReport");
-  if(b){ b.disabled=true; b.textContent="점검 중…"; }
+  const box=document.getElementById("adsReport");
   if(box) box.innerHTML='<div class="hint">사이트를 읽는 중…</div>';
-  Promise.resolve(adsCheck()).finally(()=>{ if(b) b.disabled=false; });
+  fullCheck();
 };
 document.getElementById("adsMakePages").onclick=async()=>{
   if(!wpReady()){ toast("워드프레스 정보를 먼저 입력",1); return; }
