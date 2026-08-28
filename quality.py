@@ -162,4 +162,37 @@ def check(article, other_texts, safety, recent=None):
                         reasons.append("도입부템플릿(최근글과 어미 유사)")
                         break
 
+    # ── 가치 검사 (5회차 반려 '낮은 가치의 콘텐츠' 실측 반영) ──────────
+    # 대시보드 본문 정밀 점검(contentDeepCheck)과 같은 기준. 프롬프트의
+    # [가치 규칙]이 지켜졌는지 기계로 재확인한다 — 프롬프트만 믿으면
+    # 모델이 슬그머니 백과사전체로 후퇴해도 아무도 모른다(실제로 그랬다).
+    if safety.get("check_value", True):
+        # 1) 실측형 수치 3개 이상
+        nums = re.findall(r"\d+(?:\.\d+)?\s*(?:mm|cm|m|만\s*원|원|시간|분|kg|평|%|개|년|일)", t)
+        if len(nums) < int(safety.get("min_value_numbers", 3)):
+            reasons.append(f"수치부족({len(nums)}개<3)")
+        # 2) 실전 신호(실수·조건분기·비교·경고) 최소 1개
+        practical = [r"자주\s*(?:부러|틀어지|새|막히|풀리|끊)", r"흔한\s*실수", r"라면\s", r"인\s*경우(?:에는|엔)?",
+                     r"반대로", r"주의할\s*점", r"순서를\s*바꾸면", r"하다\s*보면", r"장단점", r"비교하(?:면|자면)"]
+        if sum(1 for p in practical if re.search(p, t)) < int(safety.get("min_practical_signals", 1)):
+            reasons.append("실전신호없음(실수·조건분기·비교 부재)")
+        # 3) 본문 상투 표현
+        cliche = ["알아보겠습니다", "살펴보겠습니다", "이번 글에서는", "도움이 되셨기를",
+                  "마무리하겠습니다", "함께 알아봐요", "참고하시기 바랍니다"]
+        hits = [c for c in cliche if c in t]
+        if hits:
+            reasons.append(f"본문상투표현({hits[0]} 외 {len(hits)-1}종)" if len(hits) > 1 else f"본문상투표현({hits[0]})")
+        # 4) 어미 단조: 문장 마지막 어절 최빈값이 80% 이상
+        sents = [s for s in re.split(r"(?<=[.!?…])\s+", t) if len(s) > 8]
+        if len(sents) >= 8:
+            ends = {}
+            for s in sents:
+                w = re.sub(r"[.!?…\"']+$", "", s).split(" ")[-1][-4:]
+                if w:
+                    ends[w] = ends.get(w, 0) + 1
+            top = max(ends.values()) if ends else 0
+            ratio = round(top / len(sents) * 100)
+            if ratio >= int(safety.get("max_ending_monotony", 80)):
+                reasons.append(f"어미단조({ratio}%)")
+
     return (len(reasons) == 0, "; ".join(reasons))

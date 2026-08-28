@@ -3780,8 +3780,13 @@ function _dcSentences(t){return t.split(/(?<=[.!?…])\s+/).map(s=>s.trim()).fil
 const DC_CLICHE=[/알아보겠습니다/,/살펴보(겠|도록 하겠)습니다/,/도움이 되(셨기를|길)/,/마무리하겠습니다/,
   /오늘은 .{2,20}에 대해/,/지금까지 .{2,20}였습니다/,/참고하(시기 바랍니다|세요)/,/정리해보(겠습니다|았습니다)/,
   /함께 알아(봐요|보아요|보시죠)/,/이번 (글|포스팅)에서는/,/궁금하신 분들/,/많은 도움이/];
+// '실전 신호' — 진짜 경험담(1인칭)뿐 아니라, 거짓말 없이 쓸 수 있는
+// 실무 구체성(실수 시나리오·조건 분기·주의점·비교)도 같은 가치 신호로 센다.
+// 가짜 1인칭 창작을 유도하지 않기 위한 설계(필명 원칙 "자격이 아니라 방법"과 동일).
 const DC_EXP=[/제가 직접/,/직접 (해보|써보|설치|시공|측정|비교)/,/저는 /,/우리 집/,/실제로 (해보|써보|받아보)/,
-  /해봤(는데|더니|습니다)/,/겪었|실패했|후회했/,/주문(했|해서)/,/사서 써/];
+  /해봤(는데|더니|습니다)/,/겪었|실패했|후회했/,/주문(했|해서)/,/사서 써/,
+  /흔한 실수/,/자주 (부러|틀어지|새|막히|풀리|끊)/,/주의할 점/,/순서를 바꾸면/,
+  /하다 보면/,/(라면|경우에는) /,/반대로 /,/장단점/];
 async function contentDeepCheck(){
   const box=document.getElementById("deepBox");
   if(!wpReady()){ box.innerHTML='<span style="color:#ffb020">블로그 연결 정보를 먼저 넣어주세요.</span>'; return; }
@@ -3811,7 +3816,7 @@ async function contentDeepCheck(){
     let cv=1; if(plens.length>=8){const m=plens.reduce((a,b)=>a+b,0)/plens.length;
       cv=Math.sqrt(plens.reduce((a,b)=>a+(b-m)*(b-m),0)/plens.length)/m;}
     const skel=`h2:${d.querySelectorAll("h2").length}|h3:${d.querySelectorAll("h3").length}|ul:${d.querySelectorAll("ul,ol").length}|tb:${d.querySelectorAll("table").length}`;
-    return {id:p.id, link:p.link, title:_dcText((p.title&&p.title.rendered)||""),
+    return {id:p.id, link:p.link, html, title:_dcText((p.title&&p.title.rendered)||""),
       len:txt.length, sents, endRatio, topEnd:topEnd[0],
       cliche:DC_CLICHE.filter(re=>re.test(txt)).length,
       exp:DC_EXP.filter(re=>re.test(txt)).length,
@@ -3830,8 +3835,8 @@ async function contentDeepCheck(){
   const scored=metas.map(m=>{
     let sc=100; const issues=[];
     const myBoiler=[...new Set(m.sents.map(s=>s.replace(/\s+/g,"").slice(0,60)))].filter(k=>boiler.has(k)).length;
-    if(m.exp===0){sc-=25;issues.push("경험 신호 0 — 직접 해본 흔적(1인칭·실측·실패담)이 없음");}
-    else if(m.exp<=1){sc-=10;issues.push("경험 신호 약함");}
+    if(m.exp===0){sc-=25;issues.push("실전 신호 0 — 실수 시나리오·조건 분기·주의점·실측이 없음");}
+    else if(m.exp<=1){sc-=10;issues.push("실전 신호 약함");}
     if(m.len<800){sc-=25;issues.push(`본문 ${m.len}자 — 너무 짧음`);}
     else if(m.len<1200){sc-=12;issues.push(`본문 ${m.len}자 — 얇음`);}
     if(m.nums<3){sc-=10;issues.push("구체 수치 부족(치수·가격·시간)");}
@@ -3846,6 +3851,7 @@ async function contentDeepCheck(){
   }).sort((a,b)=>a.score-b.score);
   const avg=Math.round(scored.reduce((a,b)=>a+b.score,0)/scored.length);
   const fails=scored.filter(m=>m.score<60);
+  window._dcState={fails};   // AI 보완 재작성이 쓸 원문·점수
 
   CFG.deepCheck={at:new Date().toISOString(), avg, n:scored.length, fails:fails.length, skelShare}; saveCfg();
 
@@ -3860,10 +3866,91 @@ async function contentDeepCheck(){
       ${m.issues.length?`<div class="hint" style="margin-left:8px">↳ ${m.issues.map(escAttr).join(" · ")}</div>`:""}</div>`;
   }
   html+=`</div>
-    <div class="hint" style="margin-top:8px"><b>고치는 규칙(사람 티 내기)</b> — ① 글마다 직접 한 일 1개를 도입에(실패담이 최고) ② 실측 수치 3개 이상(치수·가격·소요시간) ③ "알아보겠습니다"류 전부 삭제 ④ 어미를 평서·의문·명사형으로 섞기 ⑤ 같은 소제목 뼈대 재사용 금지 ⑥ 현장 사진 1장 이상</div>
+    <div class="hint" style="margin-top:8px"><b>고치는 규칙(가치 만들기)</b> — ① 실전 신호 2개↑: 자주 나는 실수·조건 분기·주의점 (겪지 않은 1인칭 일화 창작은 금지 — '흔히 겪는 문제' 관점이면 거짓말 없이 같은 효과) ② 실측 수치 3개↑(치수·가격대·소요시간, 모르면 범위로) ③ "알아보겠습니다"류 전부 삭제 ④ 어미를 평서·의문·명사형으로 섞기 ⑤ 같은 소제목 뼈대 재사용 금지 ⑥ 현장 사진 1장 이상(AI 재작성으론 못 넣음 — 직접 추가)</div>
+    ${fails.length?`<button class="btn primary sm" style="width:100%;margin-top:8px" onclick="aiFixContent()">🤖 60점 미만 ${fails.length}편, Scripto가 다시 쓰기</button>
+    <div id="deepBar" style="margin-top:6px"></div><div id="deepLog"></div>`:""}
     <button class="btn sm" style="width:100%;margin-top:8px" onclick="contentDeepCheck()">🔄 본문 다시 점검</button></div>`;
   box.innerHTML=html;
   try{ adsCheck(); }catch(e){}
+}
+
+// 재작성 결과 수락용 간이 채점 — contentDeepCheck의 감점 규칙과 동기 유지할 것
+// (글 간 비교 항목(겹치는 문장·구조 복제)은 단일 글이라 제외)
+function _dcQuickScore(html){
+  const txt=_dcText(html), sents=_dcSentences(txt);
+  const ends={}; sents.forEach(s=>{const w=s.replace(/[.!?…"']+$/,"").split(" ").pop()||"";
+    const k=w.slice(-4); if(k) ends[k]=(ends[k]||0)+1;});
+  const top=Object.values(ends).sort((a,b)=>b-a)[0]||0;
+  const endRatio=sents.length?Math.round(top/sents.length*100):0;
+  const exp=DC_EXP.filter(re=>re.test(txt)).length;
+  const cliche=DC_CLICHE.filter(re=>re.test(txt)).length;
+  const nums=(txt.match(/\d+(?:\.\d+)?\s*(?:mm|cm|m|만원|원|시간|분|kg|평|%|개|년|일)/g)||[]).length;
+  let sc=100;
+  if(exp===0)sc-=25; else if(exp<=1)sc-=10;
+  if(txt.length<800)sc-=25; else if(txt.length<1200)sc-=12;
+  if(nums<3)sc-=10;
+  if(endRatio>=80)sc-=20; else if(endRatio>=65)sc-=10;
+  if(cliche>=5)sc-=20; else if(cliche>=3)sc-=12;
+  return {score:Math.max(0,sc), len:txt.length, exp, nums, cliche, endRatio};
+}
+
+// 60점 미만 글을 Gemini로 다시 쓴다 — 적용 전 기계 검증, 원본은 WP 수정본 이력에 남음
+async function aiFixContent(){
+  const st=window._dcState;
+  if(!st||!st.fails.length){ toast("보완 대상이 없습니다 — 먼저 본문 점검을 실행",1); return; }
+  const key=(CFG.llmKey||"").trim();
+  const log=makeLog(document.getElementById("deepLog"), document.getElementById("deepBar"), "본문 AI 보완 재작성");
+  if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return; }
+  if(!confirm(`${st.fails.length}편의 본문을 다시 씁니다.\n원본은 워드프레스 '수정본(리비전)'에 남아 언제든 되돌릴 수 있습니다.\n진행할까요?`)) return;
+  const base=wpBase(); let done=0, skip=0;
+  for(let i=0;i<st.fails.length;i++){
+    const m=st.fails[i];
+    log.say(`(${i+1}/${st.fails.length}) ${escAttr(m.title.slice(0,28))}… 다시 쓰는 중`, undefined, "cur");
+    const prompt=`아래 한국어 블로그 글의 HTML 본문을, 사실과 주제·소제목의 정보는 유지하면서 '가치 있는 실전 글'로 다시 쓰세요.
+이 글은 애드센스에서 '낮은 가치의 콘텐츠'로 반려된 사이트의 글입니다.
+
+[반드시 지킬 것 — 기계로 검사합니다]
+1. 실전 신호 3개 이상: 이 작업에서 자주 나는 실수·실패 시나리오("이때 ○○가 자주 부러집니다"),
+   조건 분기("벽이 석고보드라면 A, 콘크리트라면 B"), 순서를 어기면 생기는 문제 경고, 방법·부품 2가지 장단 비교.
+   ⚠️ 겪지 않은 1인칭 경험담("제가 직접 해보니")을 창작하지 마세요 — '흔히 겪는 문제' 관점으로 쓰면 됩니다.
+2. 실측형 수치 4개 이상: 규격(mm·cm)·가격대(원)·소요 시간·개수. 원문에 없는 수치는 단정하지 말고
+   범위로 쓰세요("3만~5만 원대", "30분~1시간", "제품마다 다르니 표기 확인").
+3. 금지 문구: 알아보겠습니다/살펴보겠습니다/이번 글에서는/도움이 되셨기를/마무리하겠습니다/함께 알아봐요/참고하시기 바랍니다.
+4. 같은 어미 3문장 연속 금지. 평서·의문·명사형을 섞고, 문장 길이도 들쭉날쭉하게.
+5. 분량은 원문 이상(최소 1,300자). 소제목(h2/h3) 구조는 유지하되 문구는 다듬어도 됩니다.
+6. 광고 자리(<div class="ad-slot">…</div>)와 기존 이미지·링크는 그대로 두세요.
+
+[출력 형식] 순수 HTML 본문만. 머리말·설명·코드블록(\`\`\`) 금지. <p>로 시작하세요.
+
+[원문 HTML]
+${m.html}`;
+    let out="";
+    try{
+      const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key),
+        {method:"POST",headers:{"Content-Type":"application/json"},
+         body:JSON.stringify({contents:[{parts:[{text:prompt}]}],
+           generationConfig:{temperature:0.7,maxOutputTokens:8192}})});
+      const j=await r.json();
+      out=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"";
+      if(!out) throw new Error(j.error?.message||"빈 응답");
+    }catch(e){ skip++; log.say(`건너뜀 — AI 호출 실패: ${escAttr(String(e).slice(0,80))}`, false); continue; }
+    let neo=out.trim().replace(/^```html?\s*/i,"").replace(/\s*```$/,"").trim();
+    // 적용 전 기계 검증: 구조·분량·점수 셋 다 통과해야 올린다
+    const q=_dcQuickScore(neo);
+    const okLen=q.len>=Math.max(1100, Math.round(m.len*0.85));
+    if(!/^<p|^<h2/i.test(neo) || !/<h2/i.test(neo) || !okLen || q.score<70){
+      skip++; log.say(`건너뜀 — 검증 미달(${q.score}점·${q.len}자). 원문 유지`, false); continue;
+    }
+    try{
+      const r=await fetch(base+"/wp-json/wp/v2/posts/"+m.id,
+        {method:"POST",headers:Object.assign({"Content-Type":"application/json"},wpAuth()),
+         body:JSON.stringify({content:neo})});
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      done++; log.say(`✅ ${escAttr(m.title.slice(0,28))} — ${m.score}점 → ${q.score}점(단독 기준)`);
+    }catch(e){ skip++; log.say(`건너뜀 — 업로드 실패: ${escAttr(String(e).slice(0,60))}`, false); }
+  }
+  log.say(`완료 — 적용 ${done}편 · 건너뜀 ${skip}편. 전체 재점검을 시작합니다`, done>0);
+  await contentDeepCheck();
 }
 
 async function adsCheck(){
