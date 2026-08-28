@@ -3245,7 +3245,7 @@ ${olds}`;
     const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key),
       {method:"POST",headers:{"Content-Type":"application/json"},
        body:JSON.stringify({contents:[{parts:[{text:prompt}]}],
-         generationConfig:{temperature:0.9,maxOutputTokens:8192}})});
+         generationConfig:{temperature:0.9,maxOutputTokens:8192, thinkingConfig:{thinkingBudget:0}}})});
     const j=await r.json();
     out=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"";
     if(!out) throw new Error(j.error?.message||"빈 응답");
@@ -4038,7 +4038,8 @@ async function aiFixContent(auto){
   if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return log.finish("중단됨"); }
   await ensureHtml(st.fails);
   if(!auto && !confirm(`${st.fails.length}편의 본문을 다시 씁니다.\n원본은 워드프레스 '수정본(리비전)'에 남아 언제든 되돌릴 수 있습니다.\n진행할까요?`)) return log.finish("중단됨");
-  const base=wpBase(); let done=0, skip=0;
+  const base=wpBase(); let done=0, skip=0; const fails={};
+  const note=r=>{ fails[r]=(fails[r]||0)+1; };
   for(let i=0;i<st.fails.length;i++){
     const m=st.fails[i];
     if(jobItemHas("body", m.id)){ skip++; log.say(`(${i+1}/${st.fails.length}) 이미 끝난 글 — 건너뜀`, true, "cur"); continue; }
@@ -4077,17 +4078,18 @@ ${m.html}`;
       const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key),
         {method:"POST",headers:{"Content-Type":"application/json"},
          body:JSON.stringify({contents:[{parts:[{text:prompt}]}],
-           generationConfig:{temperature:0.7,maxOutputTokens:8192}})});
+           generationConfig:{temperature:0.7,maxOutputTokens:8192, thinkingConfig:{thinkingBudget:0}}})});
       const j=await r.json();
       out=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"";
       if(!out) throw new Error(j.error?.message||"빈 응답");
-    }catch(e){ skip++; log.say(`건너뜀 — AI 호출 실패: ${escAttr(String(e).slice(0,80))}`, false); continue; }
+    }catch(e){ skip++; note("AI 호출 실패: "+String(e).slice(0,40)); log.say(`건너뜀 — AI 호출 실패: ${escAttr(String(e).slice(0,80))}`, false); continue; }
     let neo=out.trim().replace(/^```html?\s*/i,"").replace(/\s*```$/,"").trim();
     // 적용 전 기계 검증: 구조·분량·점수 셋 다 통과해야 올린다
     const q=_dcQuickScore(neo);
     const okLen=q.len>=Math.max(1100, Math.round(m.len*0.85));
     if(!/^<p|^<h2/i.test(neo) || !/<h2/i.test(neo) || !okLen || q.score<70){
-      skip++; log.say(`건너뜀 — 검증 미달(${q.score}점·${q.len}자). 원문 유지`, false); continue;
+      skip++; note(`검증 미달(${q.score<70?"점수":"분량"})`);
+      log.say(`건너뜀 — 검증 미달(${q.score}점·${q.len}자, 기준 70점·${Math.max(1100,Math.round(m.len*0.85))}자). 원문 유지`, false); continue;
     }
     try{
       const r=await fetch(base+"/wp-json/wp/v2/posts/"+m.id,
@@ -4096,9 +4098,11 @@ ${m.html}`;
       if(!r.ok) throw new Error("HTTP "+r.status);
       done++; jobItemDone("body", m.id);
       log.say(`✅ ${escAttr(m.title.slice(0,28))} — ${m.score}점 → ${q.score}점(단독 기준)`);
-    }catch(e){ skip++; log.say(`건너뜀 — 업로드 실패: ${escAttr(String(e).slice(0,60))}`, false); }
+    }catch(e){ skip++; note("업로드 실패"); log.say(`건너뜀 — 업로드 실패: ${escAttr(String(e).slice(0,60))}`, false); }
   }
-  window._lastFixNote=`적용 ${done}편 · 건너뜀 ${skip}편`;
+  const why=Object.entries(fails).map(([k,v])=>`${k} ${v}건`).join(" · ");
+  if(skip) log.say(`⚠️ 건너뛴 이유 — ${escAttr(why)}`, false);
+  window._lastFixNote=`적용 ${done}편 · 건너뜀 ${skip}편${why?` (${why.slice(0,50)})`:""}`;
   jobStep("body",{done:st.fails.length, total:st.fails.length, note:window._lastFixNote});
   log.say(`완료 — 적용 ${done}편 · 건너뜀 ${skip}편`, done>0);
   if(!auto) await fullCheck();
@@ -4141,7 +4145,7 @@ ${drop.html}`;
   try{
     const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key),
       {method:"POST",headers:{"Content-Type":"application/json"},
-       body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.7,maxOutputTokens:8192}})});
+       body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.7,maxOutputTokens:8192, thinkingConfig:{thinkingBudget:0}}})});
     const j=await r.json();
     out=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"";
     if(!out) throw new Error(j.error?.message||"빈 응답");
@@ -4585,6 +4589,35 @@ function renderFixAll(){
     <button class="btn primary sm" style="width:100%;margin-top:7px" onclick="fixAll()">🛠️ 한 번에 고치기 (약 ${jobs.reduce((a,j)=>a+j.min,0)}분)</button>
     <div id="fixAllBar" style="margin-top:6px"></div><div id="fixAllLog"></div></div>`;
 }
+// 그 항목이 정말로 고쳐졌는지 사이트에서 직접 다시 읽어 확인한다.
+// {ok, before, after, msg} 반환. 이걸로 '완료'와 '반영 안 됨'을 구분한다.
+async function verifyFix(key){
+  const base=wpBase();
+  try{
+    if(key==="img"){
+      let all=[];
+      for(let pg=1;pg<=2;pg++){
+        const r=await fetch(base+`/wp-json/wp/v2/posts?per_page=100&page=${pg}&status=publish&_fields=id,content`,{headers:wpAuth()});
+        if(!r.ok) break; const j=await r.json(); all=all.concat(j); if(j.length<100) break;
+      }
+      const withImg=all.filter(p=>/<img/i.test((p.content&&p.content.rendered)||"")).length;
+      return {ok:withImg>0, after:withImg, msg:`본문 이미지가 있는 글 ${withImg}/${all.length}편`};
+    }
+    if(key==="body"){
+      await contentDeepCheck();
+      const d=CFG.deepCheck||{};
+      return {ok:(d.fails||0)===0, after:d.avg, msg:`본문 평균 ${d.avg}점 · 60점 미만 ${d.fails}편`};
+    }
+    if(key==="title"){
+      await adsCheck();
+      const F=window._titleForm||{};
+      return {ok:F.topShare<=40&&F.roomLead<=50&&F.nounStack<=40,
+        after:F.topShare, msg:`최다 골격 ${F.topShare}% · 공간명사 시작 ${F.roomLead}%`};
+    }
+  }catch(e){ return {ok:null, msg:"확인 실패: "+String(e).slice(0,50)}; }
+  return {ok:null, msg:""};
+}
+
 function fixJobs(){
   const jobs=[], st=window._dcState||{}, F=window._titleForm||{};
   if(F.topShare>40||F.roomLead>50||F.nounStack>40)
@@ -4609,8 +4642,10 @@ async function fixOne(key){
   if(!j){ toast("고칠 항목을 찾지 못했습니다 — 전체 점검을 먼저 실행",1); return; }
   const before=(CFG.deepCheck&&CFG.deepCheck.avg)||null;
   await j.run(true);
-  learnAdd({type:"fix", key, before, detail:j.label});
-  await fullCheck();
+  const v=await verifyFix(key);      // 실제로 고쳐졌는지 사이트에서 확인
+  learnAdd({type:"fix", key, before, detail:j.label, verified:v.ok});
+  toast(v.ok===false?`반영되지 않았습니다 — ${v.msg}`:`반영 확인 — ${v.msg}`, v.ok===false?1:0);
+  await fullCheck();                 // 그리고 전체 재점검
   const after=(CFG.deepCheck&&CFG.deepCheck.avg)||null;
   const v=learnLog(); if(v.length){ v[v.length-1].after=after; learnSave(v); }
 }
@@ -4641,9 +4676,13 @@ async function fixAll(resume){
     log.say(`(${i+1}/${jobs.length}) ${escAttr(jobs[i].label)}`, undefined, "j"+i);
     const before=(CFG.deepCheck&&CFG.deepCheck.avg)||null;
     try{ await jobs[i].run(true);
-      learnAdd({type:"fix", key:jobs[i].k, before, detail:jobs[i].label});
-      jobStep(jobs[i].k,{status:"done", note:window._lastFixNote||""});
-      log.say(`(${i+1}/${jobs.length}) ${escAttr(jobs[i].label)} — 완료`, true, "j"+i); }
+      // 말로만 '완료'라고 하지 않는다 — 사이트를 다시 읽어 실제 반영을 확인한다
+      log.say(`(${i+1}/${jobs.length}) ${escAttr(jobs[i].label)} — 반영 확인 중…`, undefined, "j"+i);
+      const v=await verifyFix(jobs[i].k);
+      learnAdd({type:"fix", key:jobs[i].k, before, detail:jobs[i].label, verified:v.ok});
+      jobStep(jobs[i].k,{status:"done", note:(window._lastFixNote||"")+(v.msg?` → ${v.msg}`:"")});
+      log.say(`(${i+1}/${jobs.length}) ${escAttr(jobs[i].label)} — ${v.ok===false?"⚠️ 반영 안 됨":"완료"}${v.msg?` (${escAttr(v.msg)})`:""}`,
+        v.ok!==false, "j"+i); }
     catch(e){ const jj=jobLoad(); if(jj){ jj.lastError=String(e).slice(0,90); jobSave(jj); }
       jobStep(jobs[i].k,{status:"done", note:"실패: "+String(e).slice(0,40)});
       log.say(`(${i+1}/${jobs.length}) 실패: ${escAttr(String(e).slice(0,80))}`, false, "j"+i); }
@@ -4724,7 +4763,7 @@ ${list}`;
   try{
     const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key),
       {method:"POST",headers:{"Content-Type":"application/json"},
-       body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.95,maxOutputTokens:8192}})});
+       body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.95,maxOutputTokens:8192, thinkingConfig:{thinkingBudget:0}}})});
     const j=await r.json();
     out=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"";
     if(!out) throw new Error(j.error?.message||"빈 응답");
@@ -4779,7 +4818,8 @@ async function genPostImages(auto){
   const n=Math.min(targets.length, 30);
   await ensureHtml(targets.slice(0, Math.min(targets.length,30)));
   if(!auto && !confirm(`${n}편에 설명 도해를 만들어 넣습니다.\n한 장에 약 15초 → 대략 ${Math.ceil(n*16/60)}분.\n\n※ 실사 사진이 아니라 '구조·순서를 보여주는 도해'입니다. 찍지 않은 장면을 사진처럼 만들지 않습니다.\n진행할까요?`)) return log.finish("중단됨");
-  const base=wpBase(); let done=0, skip=0;
+  const base=wpBase(); let done=0, skip=0; const fails={};
+  const note=r=>{ fails[r]=(fails[r]||0)+1; };
   for(let i=0;i<n;i++){
     const m=targets[i];
     if(jobItemHas("img", m.id)){ skip++; log.say(`(${i+1}/${n}) 이미 넣은 글 — 건너뜀`, true, "cur"); continue; }
@@ -4813,14 +4853,14 @@ async function genPostImages(auto){
 
 제목: ${m.title}
 본문: ${_dcText(m.html).slice(0,1800)}`}]}],
-           generationConfig:{temperature:0.6,maxOutputTokens:500}})});
+           generationConfig:{temperature:0.6,maxOutputTokens:900, thinkingConfig:{thinkingBudget:0}}})});
       const j=await r.json();
       let t=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"";
       t=t.replace(/^```json?\s*/i,"").replace(/\s*```$/,"").trim();
       const a=t.indexOf("{"), b=t.lastIndexOf("}");
       if(a>-1&&b>a) spec=JSON.parse(t.slice(a,b+1));
     }catch(e){}
-    if(!spec||!spec.en){ skip++; log.say("건너뜀 — 이미지 기획 실패(본문을 읽지 못함)", false); continue; }
+    if(!spec||!spec.en){ skip++; note("도해 기획 실패(응답 형식)"); log.say(`건너뜀 — 도해 기획 실패: ${escAttr(m.title.slice(0,20))}`, false); continue; }
     // 2) 도해 생성 — 종류별로 화풍을 달리해 29장이 똑같아 보이지 않게 한다
     const PALETTE=["muted slate blue and warm sand","soft teal and warm gray","muted terracotta and stone gray","desaturated olive and cream"];
     const pal=PALETTE[i%PALETTE.length];
@@ -4845,7 +4885,7 @@ Hard constraints: absolutely NO text, NO letters, NO numbers, NO labels, NO wate
       const d=inl&&(inl.inlineData||inl.inline_data);
       if(!d) throw new Error(j.error?.message||"이미지 없음");
       b64=d.data; mime=d.mimeType||d.mime_type||"image/jpeg";
-    }catch(e){ skip++; log.say(`건너뜀 — 생성 실패: ${escAttr(String(e).slice(0,70))}`, false); continue; }
+    }catch(e){ skip++; note("이미지 생성 실패: "+String(e).slice(0,40)); log.say(`건너뜀 — 생성 실패: ${escAttr(String(e).slice(0,70))}`, false); continue; }
     // 3) 미디어 업로드 → 본문 첫 h2 뒤에 삽입 (+대표 이미지 없으면 지정)
     try{
       const bin=Uint8Array.from(atob(b64), c=>c.charCodeAt(0));
@@ -4873,9 +4913,11 @@ Hard constraints: absolutely NO text, NO letters, NO numbers, NO labels, NO wate
       if(!r2.ok) throw new Error("본문 반영 HTTP "+r2.status);
       done++; jobItemDone("img", m.id);
       log.say(`✅ ${escAttr(m.title.slice(0,28))}`, true, "p"+m.id);
-    }catch(e){ skip++; log.say(`건너뜀 — ${escAttr(String(e).slice(0,70))}`, false); }
+    }catch(e){ skip++; note("업로드/반영 실패: "+String(e).slice(0,40)); log.say(`건너뜀 — ${escAttr(String(e).slice(0,70))}`, false); }
   }
-  window._lastFixNote=`삽입 ${done}편 · 건너뜀 ${skip}편`;
+  const why=Object.entries(fails).map(([k,v])=>`${k} ${v}건`).join(" · ");
+  if(skip) log.say(`⚠️ 건너뛴 이유 — ${escAttr(why)}`, false);
+  window._lastFixNote=`삽입 ${done}편 · 건너뜀 ${skip}편${why?` (${why.slice(0,50)})`:""}`;
   jobStep("img",{done:n, total:n, note:window._lastFixNote});
   log.say(`완료 — 삽입 ${done}편 · 건너뜀 ${skip}편`, done>0);
   if(!auto) await fullCheck();
