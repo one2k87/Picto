@@ -4201,6 +4201,12 @@ function snapSave(){
   }catch(e){ /* 용량 초과 등은 무시 — 다음 점검 때 다시 만든다 */ }
 }
 function snapLoad(){ try{ return JSON.parse(localStorage.getItem(acctKey())||"null"); }catch(e){ return null; } }
+// 화면이 비어 있을 때만 되살린다(이미 점검 중이거나 결과가 있으면 건드리지 않음)
+function maybeRestore(){
+  const rep=document.getElementById("adsReport");
+  if(!rep || rep.innerHTML.trim() || window._checkRunning) return false;
+  try{ return snapRestore(); }catch(e){ return false; }
+}
 // 저장된 결과로 화면을 되살린다(점검을 다시 돌리지 않고)
 function snapRestore(){
   const s=snapLoad(); if(!s) return false;
@@ -4427,6 +4433,7 @@ async function anonVisibilityCheck(){
 async function fullCheck(){
   const b=document.getElementById("adsCheck");
   const log=makeLog(document.getElementById("checkLog"), document.getElementById("checkBar"), "전체 점검");
+  window._checkRunning=true;
   if(b){ b.disabled=true; b.textContent="점검 중…"; }
   try{
     log.say("사이트 구조·제목 골격 확인 중…", undefined, "s1");
@@ -4445,6 +4452,7 @@ async function fullCheck(){
   }catch(e){ log.say("점검 중 오류: "+escAttr(String(e).slice(0,120)), false); }
   finally{
     // 배너를 반드시 닫는다 — 안 닫으면 상단에서 계속 도는 것처럼 보인다(실제 신고).
+    window._checkRunning=false;
     if(b){ b.disabled=false; b.textContent="🔄 전체 다시 점검"; }
   }
   log.finish("완료");
@@ -6302,8 +6310,9 @@ function showSub(pageId,k){
       renderJob(); renderLearn();
       // 화면이 비어 있으면(앱을 다시 연 경우) 마지막 점검 결과를 되살린다.
       // 매번 점검부터 다시 돌려야 했던 불편의 원인이 이것이었다.
-      const rep=document.getElementById("adsReport");
-      if(rep && !rep.innerHTML.trim()) snapRestore();
+      maybeRestore();
+      setTimeout(maybeRestore, 300);
+      setTimeout(maybeRestore, 900);
     }catch(e){}
   }
   // 마지막으로 보던 보조탭을 기억한다(계정별 진행 위치)
