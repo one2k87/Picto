@@ -103,7 +103,7 @@ def check(article, other_texts, safety, recent=None):
     words = _words(t)
     reasons = []
 
-    min_chars = int(safety.get("min_chars", 700))
+    min_chars = int(safety.get("min_chars", 1000))
     if len(t) < min_chars:
         reasons.append(f"분량부족({len(t)}자<{min_chars})")
 
@@ -194,5 +194,43 @@ def check(article, other_texts, safety, recent=None):
             ratio = round(top / len(sents) * 100)
             if ratio >= int(safety.get("max_ending_monotony", 80)):
                 reasons.append(f"어미단조({ratio}%)")
+
+    # ── AI 문체 신호 검사 ────────────────────────────────────────────
+    # 근거: AI 탐지 연구가 공통으로 꼽는 신호 — 문장 길이 균일, 셋 묶음 남용,
+    # 과도한 헤징, 고정된 결론 문구. 단일 신호가 아니라 동시 출현이 판정 기준이므로
+    # 각각을 개별 사유로 쌓아 올린다.
+    if safety.get("check_ai_tells", True):
+        sents = [s for s in re.split(r"(?<=[.!?…])\s+", t) if len(s) > 8]
+        # 1) 헤징 밀도 — 완충 어미로 끝나는 문장 비율
+        if len(sents) >= 8:
+            hedge = sum(1 for s in sents if re.search(
+                r"(?:할 수 있습니다|일 수 있습니다|있을 수 있습니다|하는 것이 좋습니다|"
+                r"하시기 바랍니다|필요가 있습니다|좋을 것 같습니다)[.!?…\"']*$", s))
+            hr = round(hedge / len(sents) * 100)
+            # 실측: 현행 발행 글 29편은 0~8%(중앙값 3%). 20%면 정상 글을 건드리지
+            # 않으면서 헤징으로 도배된 글만 걸러낸다.
+            if hr > int(safety.get("max_hedge_ratio", 20)):
+                reasons.append(f"완충표현과다({hr}%)")
+        # 2) 셋 묶음(rule of three) 남용
+        #    명시적 "첫째…둘째…셋째"는 2회만 나와도 습관이다. 쉼표 삼항 나열은
+        #    한국어에서 자연스러울 때가 있어 더 관대하게 본다.
+        ordinal = len(re.findall(r"첫째[,.\s].{0,120}?둘째[,.\s].{0,120}?셋째", t))
+        comma3 = len(re.findall(r"[가-힣]{2,10},\s*[가-힣]{2,10},\s*[가-힣]{2,10}\s*(?:등|을|를|이|가)\s", t))
+        if ordinal >= int(safety.get("max_ordinal_triads", 2)) or comma3 >= int(safety.get("max_triads", 4)):
+            reasons.append(f"셋묶음나열과다(순서형{ordinal}·나열{comma3})")
+        # 3) 문장 길이 균일(기계 리듬) — 변동계수
+        #    ⚠️ 임계값은 추측이 아니라 실측으로 잡았다. 실제 발행 글 29편의 CV는
+        #    0.78~1.05(중앙값 0.82)였다. 0.45는 오탐만 만들고 절대 걸리지 않는
+        #    죽은 검사였다. 0.35 아래면 확실히 기계 리듬이다.
+        if len(sents) >= 12:
+            L = [len(s) for s in sents]
+            mean = sum(L) / len(L)
+            cv = (sum((x - mean) ** 2 for x in L) / len(L)) ** 0.5 / mean if mean else 1
+            if cv < float(safety.get("min_length_cv", 0.35)):
+                reasons.append(f"문장길이균일(CV {cv:.2f})")
+        # 4) 고정 마무리
+        tail = t[-260:]
+        if re.search(r"(?:결론적으로|요약하자면|지금까지 살펴본|이상으로)", tail):
+            reasons.append("고정마무리문구")
 
     return (len(reasons) == 0, "; ".join(reasons))

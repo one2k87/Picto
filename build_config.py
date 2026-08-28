@@ -57,9 +57,11 @@ def envj(name, default):
 def _safety_block():
     """안전/품질 강도 프리셋 → 개별 env가 있으면 그 값으로 덮어씀."""
     presets = {
-        "느슨":  {"force_draft": False, "min_chars": 500,  "max_similarity": 0.65, "verify_accuracy": "off"},
-        "표준":  {"force_draft": True,  "min_chars": 700,  "max_similarity": 0.50, "verify_accuracy": "flag"},
-        "엄격":  {"force_draft": True,  "min_chars": 1000, "max_similarity": 0.40, "verify_accuracy": "strict"},
+        # 2026-08 상향: 애드센스 '낮은 가치' 판정 경계가 올라갔다. 얇은 글은
+        # 한 편만 있어도 사이트 단위로 감점되므로 하한을 통째로 끌어올린다.
+        "느슨":  {"force_draft": False, "min_chars": 800,  "max_similarity": 0.65, "verify_accuracy": "off"},
+        "표준":  {"force_draft": True,  "min_chars": 1000, "max_similarity": 0.50, "verify_accuracy": "flag"},
+        "엄격":  {"force_draft": True,  "min_chars": 1200, "max_similarity": 0.40, "verify_accuracy": "strict"},
     }
     # 발행량을 하루 5편으로 줄인 만큼(비용 여유 생김) 기본 강도를 '엄격'으로 상향.
     # YMYL(금융/건강) 비중이 있는 만큼 품질 기준을 높게 잡는 게 정책 리스크 대비에 유리.
