@@ -711,6 +711,7 @@
 
   <div class="field">
     <button class="btn primary sm" id="adsCheck" style="width:100%">① 전체 점검하기</button>
+    <div id="jobBox"></div>
     <div id="checkBar" style="margin-top:6px"></div><div id="checkLog"></div>
     <div id="learnBox"></div>
     <div id="fixAllBox" style="margin-top:8px"></div>
@@ -4037,6 +4038,8 @@ async function aiFixContent(auto){
   for(let i=0;i<st.fails.length;i++){
     const m=st.fails[i];
     log.say(`(${i+1}/${st.fails.length}) ${escAttr(m.title.slice(0,28))}… 다시 쓰는 중`, undefined, "cur");
+    jobStep("body",{status:"running", done:i, total:st.fails.length});
+    jobNow(`본문 다시 쓰기 ${i+1}/${st.fails.length} — ${m.title.slice(0,20)}`);
     const prompt=`아래 한국어 블로그 글의 HTML 본문을, 사실과 주제·소제목의 정보는 유지하면서 '가치 있는 실전 글'로 다시 쓰세요.
 이 글은 애드센스에서 '낮은 가치의 콘텐츠'로 반려된 사이트의 글입니다.
 
@@ -4089,6 +4092,8 @@ ${m.html}`;
       done++; log.say(`✅ ${escAttr(m.title.slice(0,28))} — ${m.score}점 → ${q.score}점(단독 기준)`);
     }catch(e){ skip++; log.say(`건너뜀 — 업로드 실패: ${escAttr(String(e).slice(0,60))}`, false); }
   }
+  window._lastFixNote=`적용 ${done}편 · 건너뜀 ${skip}편`;
+  jobStep("body",{done:st.fails.length, total:st.fails.length, note:window._lastFixNote});
   log.say(`완료 — 적용 ${done}편 · 건너뜀 ${skip}편`, done>0);
   if(!auto) await fullCheck();
   log.finish("완료");
@@ -4159,6 +4164,101 @@ ${drop.html}`;
   log.say("워드프레스에서 옛 주소 → 새 글로 리디렉션을 걸어두면 더 안전합니다(Rank Math → 리디렉션)");
   if(!auto) await fullCheck();
   log.finish("완료");
+}
+
+/* ───────── 작업 상태 보존 ─────────
+   실사용 문제: "한 번에 고치기"를 눌러놓고 화면을 벗어났다가 돌아오니
+   끝난 건지 아닌지 알 수가 없었다. 진행 상황이 메모리에만 있어서다.
+   그래서 단계 하나가 끝날 때마다 즉시 저장하고, 앱을 다시 열면
+   ① 끝났으면 완료 표시 + 다음 단계 안내 ② 중간에 끊겼으면 이어서 실행
+   을 보여준다. 모든 오래 걸리는 작업이 이 규칙을 따른다. */
+const JOB_KEY="scripto_job";
+const JOB_STALE_MS=4*60*1000;   // 이 시간 넘게 소식 없으면 '끊김'으로 본다
+function jobLoad(){ try{ return JSON.parse(localStorage.getItem(JOB_KEY)||"null"); }catch(e){ return null; } }
+function jobSave(j){ try{ localStorage.setItem(JOB_KEY, JSON.stringify(j)); }catch(e){} }
+function jobStart(name, steps){
+  const j={name, at:Date.now(), beat:Date.now(), status:"running",
+    steps:steps.map(s=>({k:s.k, label:s.label, status:"pending", done:0, total:s.total||0, note:""}))};
+  jobSave(j); renderJob(); return j;
+}
+function jobStep(k, patch){
+  const j=jobLoad(); if(!j) return;
+  const s=j.steps.find(x=>x.k===k); if(!s) return;
+  Object.assign(s, patch||{});
+  j.beat=Date.now(); jobSave(j); renderJob();
+}
+function jobBeat(){ const j=jobLoad(); if(j&&j.status==="running"){ j.beat=Date.now(); jobSave(j); } }
+function jobEnd(status, note){
+  const j=jobLoad(); if(!j) return;
+  j.status=status||"done"; j.endedAt=Date.now(); j.note=note||""; j.beat=Date.now();
+  jobSave(j); renderJob();
+}
+function jobIsStale(j){ return j&&j.status==="running"&&(Date.now()-(j.beat||j.at))>JOB_STALE_MS; }
+// 지금 무엇을 하고 있는지(항목 이름)까지 남긴다 — 멈췄을 때 어디서 멈췄는지 알려면 필요
+function jobNow(text){ const j=jobLoad(); if(!j||j.status!=="running") return;
+  j.now=text; j.beat=Date.now(); jobSave(j); }
+function jobMark(reason){ const j=jobLoad(); if(!j||j.status!=="running") return;
+  j.leftAt=Date.now(); j.leftReason=reason; jobSave(j); }
+// 화면을 벗어나거나 앱을 닫는 순간을 기록해 두면, 돌아왔을 때 원인을 말해줄 수 있다.
+// (브라우저는 숨겨진 탭의 작업을 늦추거나 멈추므로 이게 실제 중단 원인이 된다)
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden) jobMark("화면을 벗어남"); else jobBeat();
+});
+window.addEventListener("pagehide",()=>jobMark("앱/탭이 닫힘"));
+function jobWhy(j){
+  if(!j) return "";
+  const gapMin=Math.round((Date.now()-(j.beat||j.at))/60000);
+  if(j.lastError) return `마지막 오류: ${j.lastError}`;
+  if(j.leftReason) return `${j.leftReason} 뒤 ${gapMin}분째 진행 없음 — 브라우저가 숨겨진 화면의 작업을 멈춘 것으로 보입니다`;
+  return `${gapMin}분째 진행 없음 — 네트워크 오류나 절전으로 멈췄을 수 있습니다`;
+}
+function renderJob(){
+  const box=document.getElementById("jobBox"); if(!box) return;
+  const j=jobLoad();
+  if(!j){ box.innerHTML=""; return; }
+  const stale=jobIsStale(j);
+  const icon=s=>s.status==="done"?"✅":s.status==="running"?(stale?"⏸️":"⏳"):s.status==="skip"?"⏭️":"⬜";
+  const when=t=>new Date(t).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
+  const doneN=j.steps.filter(s=>s.status==="done").length;
+  const mins=t=>Math.max(0,Math.round((Date.now()-t)/60000));
+  const dur=j.endedAt?Math.round((j.endedAt-j.at)/60000):mins(j.at);
+  const head = j.status==="done"
+    ? `<b style="color:var(--ok)">✅ ${escAttr(j.name)} 완료</b>
+       <div class="hint">${when(j.at)} 시작 → ${when(j.endedAt||j.at)} 종료 (${dur}분 소요)${j.note?` · ${escAttr(j.note)}`:""}</div>`
+    : stale
+    ? `<b style="color:#ffb020">⏸️ ${escAttr(j.name)} — ${doneN}/${j.steps.length}단계에서 멈춤</b>
+       <div class="hint">${when(j.at)} 시작 · 마지막 진행 ${when(j.beat||j.at)}
+       ${j.now?`<br>멈춘 지점: <b>${escAttr(j.now)}</b>`:""}
+       <br>원인 추정: ${escAttr(jobWhy(j))}
+       <br><span style="opacity:.75">여기까지 한 작업은 이미 블로그에 반영돼 있습니다. 이어서 실행하면 <b>끝난 단계는 건너뜁니다.</b></span></div>`
+    : `<b style="color:var(--accent)">⏳ ${escAttr(j.name)} 진행 중</b>
+       <div class="hint">${doneN}/${j.steps.length}단계 · ${dur}분 경과${j.now?` · 지금: ${escAttr(j.now)}`:""}
+       <br><span style="opacity:.75">이 화면을 벗어나도 진행 상황은 저장됩니다. 다만 브라우저가 숨겨진 화면의 작업을 늦출 수 있으니, 급하면 화면을 켜 두세요.</span></div>`;
+  let btns="";
+  if(j.status==="done"){
+    btns=`<button class="btn primary sm" style="width:100%;margin-top:7px" onclick="jobNext()">➡️ 다음 단계로</button>
+      <button class="btn sm" style="width:100%;margin-top:5px" onclick="jobClear()">기록 지우기</button>`;
+  }else if(stale){
+    btns=`<button class="btn primary sm" style="width:100%;margin-top:7px" onclick="fixAll(true)">▶️ 남은 단계 이어서 실행</button>
+      <button class="btn sm" style="width:100%;margin-top:5px" onclick="jobClear()">처음부터 다시</button>`;
+  }
+  box.innerHTML=`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-bottom:8px">
+    ${head}
+    <div class="hint" style="margin-top:4px">${j.steps.map(s=>
+      `${icon(s)} ${escAttr(s.label)}${s.total?` <span style="opacity:.7">(${s.done}/${s.total})</span>`:""}${s.note?` <span style="opacity:.7">— ${escAttr(s.note)}</span>`:""}`
+    ).join("<br>")}</div>${btns}</div>`;
+}
+function jobClear(){ try{ localStorage.removeItem(JOB_KEY); }catch(e){} renderJob(); }
+// 완료 후 '그래서 다음에 뭘 하나'를 대신 판단해준다
+async function jobNext(){
+  jobClear();
+  const rest=fixJobs();
+  if(rest.length){ toast("남은 항목이 있어 다시 점검합니다",0); await fullCheck(); return; }
+  await fullCheck();
+  if(!fixJobs().length){
+    toast("고칠 것이 없습니다 — 신청 단계로 이동합니다",0);
+    try{ gotoSub("adsSheet","apply"); }catch(e){}
+  }
 }
 
 /* ───────── 학습 기록 ─────────
@@ -4301,23 +4401,40 @@ async function fixOne(key){
   const after=(CFG.deepCheck&&CFG.deepCheck.avg)||null;
   const v=learnLog(); if(v.length){ v[v.length-1].after=after; learnSave(v); }
 }
-async function fixAll(){
-  const jobs=fixJobs();
+async function fixAll(resume){
+  let jobs=fixJobs();
+  // 이어서 실행: 이미 끝난 단계는 건너뛴다
+  let prev=resume?jobLoad():null;
+  if(resume && prev){
+    const doneKeys=new Set(prev.steps.filter(s=>s.status==="done").map(s=>s.k));
+    jobs=jobs.filter(j=>!doneKeys.has(j.k));
+    if(!jobs.length){ jobEnd("done","남은 단계 없음"); toast("남은 단계가 없습니다",0); return; }
+  }
   if(!jobs.length) return;
-  if(!confirm(`아래를 순서대로 실행합니다.\n\n${jobs.map((j,i)=>`${i+1}. ${j.label}`).join("\n")}\n\n원본은 워드프레스 '수정본(리비전)'에 남아 되돌릴 수 있습니다.\n진행할까요?`)) return;
+  if(!resume && !confirm(`아래를 순서대로 실행합니다.\n\n${jobs.map((j,i)=>`${i+1}. ${j.label}`).join("\n")}\n\n※ 시간이 걸립니다. 화면을 벗어나도 진행 상황이 저장되어, 다시 열면 어디까지 됐는지 보입니다.\n원본은 워드프레스 '수정본(리비전)'에 남아 되돌릴 수 있습니다.\n진행할까요?`)) return;
+  // 이어서 실행이면 앞서 끝낸 단계를 그대로 유지한 채 기록을 잇는다
+  const keep=(resume&&prev)?prev.steps.filter(s=>s.status==="done"):[];
+  const j0=jobStart("한 번에 고치기", [...keep.map(s=>({k:s.k,label:s.label})), ...jobs.map(x=>({k:x.k,label:x.label}))]);
+  keep.forEach(s=>jobStep(s.k,{status:"done", done:s.done, total:s.total, note:s.note}));
   const log=makeLog(document.getElementById("fixAllLog"), document.getElementById("fixAllBar"), "한 번에 고치기");
   window._fixAllRunning=true;
   for(let i=0;i<jobs.length;i++){
+    jobStep(jobs[i].k,{status:"running"});
     log.say(`(${i+1}/${jobs.length}) ${escAttr(jobs[i].label)}`, undefined, "j"+i);
     const before=(CFG.deepCheck&&CFG.deepCheck.avg)||null;
     try{ await jobs[i].run(true);
       learnAdd({type:"fix", key:jobs[i].k, before, detail:jobs[i].label});
+      jobStep(jobs[i].k,{status:"done", note:window._lastFixNote||""});
       log.say(`(${i+1}/${jobs.length}) ${escAttr(jobs[i].label)} — 완료`, true, "j"+i); }
-    catch(e){ log.say(`(${i+1}/${jobs.length}) 실패: ${escAttr(String(e).slice(0,80))}`, false, "j"+i); }
+    catch(e){ const jj=jobLoad(); if(jj){ jj.lastError=String(e).slice(0,90); jobSave(jj); }
+      jobStep(jobs[i].k,{status:"done", note:"실패: "+String(e).slice(0,40)});
+      log.say(`(${i+1}/${jobs.length}) 실패: ${escAttr(String(e).slice(0,80))}`, false, "j"+i); }
   }
   window._fixAllRunning=false;
+  jobEnd("done");
   log.say("모두 끝났습니다. 전체 점검을 다시 돌립니다", true);
   await fullCheck();
+  jobEnd("done", `남은 항목 ${fixJobs().length}가지`);
   log.finish("완료");
 }
 
@@ -4358,6 +4475,7 @@ async function rewriteTitleForms(auto){
   const slots=[]; TITLE_FORM_SPECS.forEach(([n,d])=>{ for(let i=0;i<quota[n];i++) slots.push([n,d]); });
   const assigned=todo.map((it,i)=>({...it, form:slots[i%slots.length]||TITLE_FORM_SPECS[i%TITLE_FORM_SPECS.length]}));
   log.say(`${assigned.length}편에 서로 다른 골격을 배정해 다시 쓰는 중… (유지 ${keep.length}편)`);
+  jobNow(`제목 골격 ${assigned.length}편 재작성 중`);
 
   const list=assigned.map((a,i)=>`${i+1}. [골격:${a.form[0]}] ${a.t}`).join("\n");
   const prompt=`아래 한국어 블로그 제목들을 각각 지정된 '골격'으로 다시 쓰세요.
@@ -4420,6 +4538,8 @@ ${list}`;
       ok++; log.say(`✅ [${a.form[0]}] ${escAttr(neo.slice(0,34))}`, true, "p"+a.id);
     }catch(e){ skip++; log.say(`실패: ${escAttr(String(e).slice(0,60))}`, false); }
   }
+  window._lastFixNote=`적용 ${ok}편 · 건너뜀 ${skip}편`;
+  jobStep("title",{done:assigned.length, total:assigned.length, note:window._lastFixNote});
   log.say(`완료 — 적용 ${ok}편 · 건너뜀 ${skip}편`, ok>0);
   if(!auto) await fullCheck();
   log.finish("완료");
@@ -4442,6 +4562,8 @@ async function genPostImages(auto){
   for(let i=0;i<n;i++){
     const m=targets[i];
     log.say(`(${i+1}/${n}) ${escAttr(m.title.slice(0,26))}… 도해 만드는 중`, undefined, "cur");
+    jobStep("img",{status:"running", done:i, total:n});
+    jobNow(`도해 ${i+1}/${n} — ${m.title.slice(0,20)}`);
     // 1) 이미지 기획: 제목이 아니라 '본문에서 실제로 설명하는 것'을 읽고,
     //    애드센스 심사 기준(정보 가치·독창성)에 맞는 도해를 설계한다.
     //    - 심사관이 보는 것: 이 이미지가 글을 이해하는 데 실제로 보탬이 되는가
@@ -4530,6 +4652,8 @@ Hard constraints: absolutely NO text, NO letters, NO numbers, NO labels, NO wate
       done++; log.say(`✅ ${escAttr(m.title.slice(0,28))}`, true, "p"+m.id);
     }catch(e){ skip++; log.say(`건너뜀 — ${escAttr(String(e).slice(0,70))}`, false); }
   }
+  window._lastFixNote=`삽입 ${done}편 · 건너뜀 ${skip}편`;
+  jobStep("img",{done:n, total:n, note:window._lastFixNote});
   log.say(`완료 — 삽입 ${done}편 · 건너뜀 ${skip}편`, done>0);
   if(!auto) await fullCheck();
   log.finish("완료");
@@ -6073,6 +6197,8 @@ function showSub(pageId,k){
   page.querySelectorAll(".sub-sec").forEach(d=>d.classList.toggle("on",d.dataset.k===k));
   if(k===cfg.home&&cfg.render){ try{ cfg.render(); }catch(e){ console.warn(e); } }
   if(pageId==="statsSheet"&&k==="strat"){ try{ renderStrategy(); }catch(e){ console.warn(e); } }
+  // 오래 걸리는 작업의 진행/완료 상태는 저장돼 있으므로 탭을 열 때마다 되살린다
+  if(pageId==="adsSheet"&&k==="check"){ try{ renderJob(); renderLearn(); }catch(e){} }
   window.scrollTo({top:0,behavior:"instant"});
 }
 function moveSub(pageId,dir){
