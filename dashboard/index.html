@@ -4037,6 +4037,7 @@ async function aiFixContent(auto){
   const base=wpBase(); let done=0, skip=0;
   for(let i=0;i<st.fails.length;i++){
     const m=st.fails[i];
+    if(jobItemHas("body", m.id)){ skip++; log.say(`(${i+1}/${st.fails.length}) 이미 끝난 글 — 건너뜀`, true, "cur"); continue; }
     log.say(`(${i+1}/${st.fails.length}) ${escAttr(m.title.slice(0,28))}… 다시 쓰는 중`, undefined, "cur");
     jobStep("body",{status:"running", done:i, total:st.fails.length});
     jobNow(`본문 다시 쓰기 ${i+1}/${st.fails.length} — ${m.title.slice(0,20)}`);
@@ -4089,7 +4090,8 @@ ${m.html}`;
         {method:"POST",headers:Object.assign({"Content-Type":"application/json"},wpAuth()),
          body:JSON.stringify({content:neo})});
       if(!r.ok) throw new Error("HTTP "+r.status);
-      done++; log.say(`✅ ${escAttr(m.title.slice(0,28))} — ${m.score}점 → ${q.score}점(단독 기준)`);
+      done++; jobItemDone("body", m.id);
+      log.say(`✅ ${escAttr(m.title.slice(0,28))} — ${m.score}점 → ${q.score}점(단독 기준)`);
     }catch(e){ skip++; log.say(`건너뜀 — 업로드 실패: ${escAttr(String(e).slice(0,60))}`, false); }
   }
   window._lastFixNote=`적용 ${done}편 · 건너뜀 ${skip}편`;
@@ -4188,6 +4190,19 @@ function jobStep(k, patch){
   j.beat=Date.now(); jobSave(j); renderJob();
 }
 function jobBeat(){ const j=jobLoad(); if(j&&j.status==="running"){ j.beat=Date.now(); jobSave(j); } }
+// 항목(글) 하나를 끝낼 때마다 그 id를 남긴다. 중간에 멈춰도 다음에 이 목록을
+// 건너뛰고 이어갈 수 있다. 단계 단위 건너뛰기만으로는 12/29에서 멈췄을 때
+// 1번부터 다시 도는 문제가 남는다(실사용 지적).
+function jobItemDone(key, id, ok){
+  const j=jobLoad(); if(!j) return;
+  j.doneIds=j.doneIds||{}; j.doneIds[key]=j.doneIds[key]||[];
+  if(!j.doneIds[key].includes(id)) j.doneIds[key].push(id);
+  j.beat=Date.now(); jobSave(j);
+}
+function jobItemHas(key, id){
+  const j=jobLoad(); return !!(j&&j.doneIds&&j.doneIds[key]&&j.doneIds[key].includes(id));
+}
+function jobItemCount(key){ const j=jobLoad(); return (j&&j.doneIds&&j.doneIds[key]||[]).length; }
 function jobEnd(status, note){
   const j=jobLoad(); if(!j) return;
   j.status=status||"done"; j.endedAt=Date.now(); j.note=note||""; j.beat=Date.now();
@@ -4239,7 +4254,9 @@ function renderJob(){
     btns=`<button class="btn primary sm" style="width:100%;margin-top:7px" onclick="jobNext()">➡️ 다음 단계로</button>
       <button class="btn sm" style="width:100%;margin-top:5px" onclick="jobClear()">기록 지우기</button>`;
   }else if(stale){
-    btns=`<button class="btn primary sm" style="width:100%;margin-top:7px" onclick="fixAll(true)">▶️ 남은 단계 이어서 실행</button>
+    const cur=j.steps.find(s=>s.status==="running");
+    const from=cur&&cur.total?` (${cur.label} ${(j.doneIds&&j.doneIds[cur.k]||[]).length||cur.done}번째부터)`:"";
+    btns=`<button class="btn primary sm" style="width:100%;margin-top:7px" onclick="fixAll(true)">▶️ 멈춘 곳부터 이어서 실행${from}</button>
       <button class="btn sm" style="width:100%;margin-top:5px" onclick="jobClear()">처음부터 다시</button>`;
   }
   box.innerHTML=`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-bottom:8px">
@@ -4405,10 +4422,14 @@ async function fixAll(resume){
   let jobs=fixJobs();
   // 이어서 실행: 이미 끝난 단계는 건너뛴다
   let prev=resume?jobLoad():null;
+  let carryIds=null;
   if(resume && prev){
     const doneKeys=new Set(prev.steps.filter(s=>s.status==="done").map(s=>s.k));
     jobs=jobs.filter(j=>!doneKeys.has(j.k));
+    carryIds=prev.doneIds||{};   // 멈춘 단계에서 이미 끝낸 글 목록을 그대로 이어받는다
     if(!jobs.length){ jobEnd("done","남은 단계 없음"); toast("남은 단계가 없습니다",0); return; }
+    // 목표 목록이 메모리에 없으면(앱을 껐다 켠 경우) 다시 계산해야 이어갈 수 있다
+    if(!window._dcState){ toast("이어서 실행 준비 중 — 현재 상태를 다시 읽습니다",0); await contentDeepCheck(); }
   }
   if(!jobs.length) return;
   if(!resume && !confirm(`아래를 순서대로 실행합니다.\n\n${jobs.map((j,i)=>`${i+1}. ${j.label}`).join("\n")}\n\n※ 시간이 걸립니다. 화면을 벗어나도 진행 상황이 저장되어, 다시 열면 어디까지 됐는지 보입니다.\n원본은 워드프레스 '수정본(리비전)'에 남아 되돌릴 수 있습니다.\n진행할까요?`)) return;
@@ -4416,6 +4437,7 @@ async function fixAll(resume){
   const keep=(resume&&prev)?prev.steps.filter(s=>s.status==="done"):[];
   const j0=jobStart("한 번에 고치기", [...keep.map(s=>({k:s.k,label:s.label})), ...jobs.map(x=>({k:x.k,label:x.label}))]);
   keep.forEach(s=>jobStep(s.k,{status:"done", done:s.done, total:s.total, note:s.note}));
+  if(carryIds){ const jj=jobLoad(); if(jj){ jj.doneIds=carryIds; jobSave(jj); } }
   const log=makeLog(document.getElementById("fixAllLog"), document.getElementById("fixAllBar"), "한 번에 고치기");
   window._fixAllRunning=true;
   for(let i=0;i<jobs.length;i++){
@@ -4523,6 +4545,7 @@ ${list}`;
   const base=wpBase();
   for(let i=0;i<assigned.length;i++){
     const a=assigned[i], neo=byNum[i+1];
+    if(jobItemHas("title", a.id)){ skip++; continue; }
     if(!neo || neo===a.t){ skip++; continue; }
     const sk=titleSkeleton(neo);
     // 배정한 골격이 실제로 반영됐는지 확인 — 아니면 적용하지 않는다
@@ -4535,7 +4558,8 @@ ${list}`;
         {method:"POST",headers:Object.assign({"Content-Type":"application/json"},wpAuth()),
          body:JSON.stringify({title:neo})});
       if(!r.ok) throw new Error("HTTP "+r.status);
-      ok++; log.say(`✅ [${a.form[0]}] ${escAttr(neo.slice(0,34))}`, true, "p"+a.id);
+      ok++; jobItemDone("title", a.id);
+      log.say(`✅ [${a.form[0]}] ${escAttr(neo.slice(0,34))}`, true, "p"+a.id);
     }catch(e){ skip++; log.say(`실패: ${escAttr(String(e).slice(0,60))}`, false); }
   }
   window._lastFixNote=`적용 ${ok}편 · 건너뜀 ${skip}편`;
@@ -4561,6 +4585,7 @@ async function genPostImages(auto){
   const base=wpBase(); let done=0, skip=0;
   for(let i=0;i<n;i++){
     const m=targets[i];
+    if(jobItemHas("img", m.id)){ skip++; log.say(`(${i+1}/${n}) 이미 넣은 글 — 건너뜀`, true, "cur"); continue; }
     log.say(`(${i+1}/${n}) ${escAttr(m.title.slice(0,26))}… 도해 만드는 중`, undefined, "cur");
     jobStep("img",{status:"running", done:i, total:n});
     jobNow(`도해 ${i+1}/${n} — ${m.title.slice(0,20)}`);
@@ -4649,7 +4674,8 @@ Hard constraints: absolutely NO text, NO letters, NO numbers, NO labels, NO wate
       const r2=await fetch(base+"/wp-json/wp/v2/posts/"+m.id,{method:"POST",
         headers:Object.assign({"Content-Type":"application/json"},wpAuth()), body:JSON.stringify(body)});
       if(!r2.ok) throw new Error("본문 반영 HTTP "+r2.status);
-      done++; log.say(`✅ ${escAttr(m.title.slice(0,28))}`, true, "p"+m.id);
+      done++; jobItemDone("img", m.id);
+      log.say(`✅ ${escAttr(m.title.slice(0,28))}`, true, "p"+m.id);
     }catch(e){ skip++; log.say(`건너뜀 — ${escAttr(String(e).slice(0,70))}`, false); }
   }
   window._lastFixNote=`삽입 ${done}편 · 건너뜀 ${skip}편`;
