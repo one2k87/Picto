@@ -4867,6 +4867,20 @@ async function adsCheck(){
       return [{h:"👀 방문자 시점(로그아웃)", items:[{ok:a.ok, label:`비공개 처리한 ${a.priv}편 노출 여부`,
         reason:escAttr(a.note)+"<br>※ 관리자로 로그인한 채 블로그를 보면 제목 앞에 '비공개:'가 붙어 그대로 게시된 것처럼 보이지만, 방문자와 심사관에게는 404입니다."}]}];
     })(),
+    // 비공개로 돌린 글이 사이트맵에 남으면 구글이 따라가서 404를 대량으로 만난다.
+    // 실측(2026-08, wontheland): 사이트맵 49개 중 표본 8개에 404가 3개 —
+    // 심사 중에 글을 비공개로 돌리고 사이트맵을 갱신하지 않은 것이 원인이었다.
+    // 이건 '가치 없는 콘텐츠' 판정으로 이어지는 흔한 숨은 원인이다.
+    ...(function(){
+      const a=window._anonCheck;
+      if(!a || !a.priv) return [];
+      const done=!!CFG.sitemapFixedAt && (!CFG.lastPrivateAt || CFG.sitemapFixedAt>CFG.lastPrivateAt);
+      return [{h:"🗺️ 사이트맵 정합성", items:[{ok:done,
+        label:`비공개 ${a.priv}편 처리 후 사이트맵 갱신`,
+        reason:`글을 비공개로 돌려도 <u>사이트맵에는 주소가 그대로 남습니다.</u> 구글이 그 주소를 따라가 404를 대량으로 만나면 '관리되지 않는 사이트'로 봅니다.<br>
+        <b>하는 법</b> — 워드프레스 → Rank Math SEO → 일반 설정 → 사이트맵 → <b>캐시 지우기(Delete sitemap cache)</b>. 그다음 <a href="${escAttr(wpBase())}/sitemap_index.xml" target="_blank" style="color:var(--accent)">사이트맵을 직접 열어</a> 개수가 공개 글 수와 맞는지 확인하세요.<br>
+        확인이 끝나면 아래 버튼을 누르세요.<br><button class="btn primary sm" style="margin-top:4px" onclick="CFG.sitemapFixedAt=new Date().toISOString();saveCfg();fullCheck()">✅ 사이트맵 갱신함</button>`}]}];
+    })(),
     {h:"🏷️ 사이트 기본", items:[
       {ok:!!siteTitle, label:`사이트 제목 ${siteTitle?"("+siteTitle+")":""}`, reason:"워드프레스 설정 → 일반 → 사이트 제목을 채우세요."},
       {ok:!!siteDesc, label:"사이트 설명(태그라인)", reason:"워드프레스 설정 → 일반 → 태그라인을 채우세요. 비어 있으면 제목이 '블로그 -'처럼 끊겨 미완성으로 보입니다."},
