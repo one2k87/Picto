@@ -6579,6 +6579,9 @@ function gotoTab(k){
   // 보조탭은 페이지를 처음 열 때 만들고, 마지막으로 보던 위치로 돌아간다
   if(k==="ads"||k==="stats"){
     const pid=k==="ads"?"adsSheet":"statsSheet";
+    // ⚠️ 기억해 둔 위치를 '먼저' 읽어야 한다. buildSubtabs()가 내부에서
+    //    showSub(home)을 호출하면서 CFG.lastSub를 '현황'으로 덮어쓰기 때문.
+    const remembered=(CFG.lastSub||{})[pid];
     setTimeout(()=>{ buildSubtabs(pid);
       // 승인 탭의 보조탭은 여기서 처음 만들어진다. 설정에서 옮겨올 블록은
       // 그 뒤에 붙여야 하므로, 타이머로 기다리지 말고 이 시점에 실행한다.
@@ -6586,9 +6589,8 @@ function gotoTab(k){
         catch(e){ console.warn("승인 탭 통합:",e); } }
       if(pid==="statsSheet"){ try{ buildMoneyTab(); }catch(e){ console.warn("수익 탭 조립:",e); } }
       // 이어서 하기: 마지막으로 보던 보조탭으로 돌아간다(없으면 현황)
-      const last=(CFG.lastSub||{})[pid];
-      const valid=last && SUBTABS[pid].tabs.some(t=>t.k===last);
-      showSub(pid, valid?last:SUBTABS[pid].home); },60);
+      const valid=remembered && SUBTABS[pid].tabs.some(t=>t.k===remembered);
+      showSub(pid, valid?remembered:SUBTABS[pid].home); },60);
   }
   syncViews(); syncTabbar();
   window.scrollTo({top:0,behavior:"instant"});   // 탭 바꾸면 항상 맨 위부터
