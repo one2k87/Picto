@@ -4078,9 +4078,11 @@ ${m.html}`;
       const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key),
         {method:"POST",headers:{"Content-Type":"application/json"},
          body:JSON.stringify({contents:[{parts:[{text:prompt}]}],
-           generationConfig:{temperature:0.7,maxOutputTokens:8192, thinkingConfig:{thinkingBudget:0}}})});
+           generationConfig:{temperature:0.7,maxOutputTokens:32768, thinkingConfig:{thinkingBudget:0}}})});
       const j=await r.json();
-      out=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"";
+      const cand=(j.candidates||[])[0]||{};
+      out=((cand.content||{}).parts||[])[0]?.text||"";
+      if(cand.finishReason==="MAX_TOKENS") throw new Error("응답이 잘림(글이 너무 길어 재작성 실패)");
       if(!out) throw new Error(j.error?.message||"빈 응답");
     }catch(e){ skip++; note("AI 호출 실패: "+String(e).slice(0,40)); log.say(`건너뜀 — AI 호출 실패: ${escAttr(String(e).slice(0,80))}`, false); continue; }
     let neo=out.trim().replace(/^```html?\s*/i,"").replace(/\s*```$/,"").trim();
@@ -4145,9 +4147,11 @@ ${drop.html}`;
   try{
     const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key),
       {method:"POST",headers:{"Content-Type":"application/json"},
-       body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.7,maxOutputTokens:8192, thinkingConfig:{thinkingBudget:0}}})});
+       body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.7,maxOutputTokens:32768, thinkingConfig:{thinkingBudget:0}}})});
     const j=await r.json();
-    out=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"";
+    const cand=(j.candidates||[])[0]||{};
+    out=((cand.content||{}).parts||[])[0]?.text||"";
+    if(cand.finishReason==="MAX_TOKENS") throw new Error("응답이 잘림");
     if(!out) throw new Error(j.error?.message||"빈 응답");
   }catch(e){ log.say("AI 호출 실패: "+escAttr(String(e).slice(0,100)), false); return log.finish("중단됨"); }
   out=out.trim().replace(/^```html?\s*/i,"").replace(/\s*```$/,"").trim();
