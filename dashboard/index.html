@@ -4204,7 +4204,11 @@ function snapLoad(){ try{ return JSON.parse(localStorage.getItem(acctKey())||"nu
 // 화면이 비어 있을 때만 되살린다(이미 점검 중이거나 결과가 있으면 건드리지 않음)
 function maybeRestore(){
   const rep=document.getElementById("adsReport");
-  if(!rep || rep.innerHTML.trim() || window._checkRunning) return false;
+  if(!rep || window._checkRunning) return false;
+  // ⚠️ innerHTML으로 '비었는지'를 판단하면 안 된다. 탭을 조립하면서 빈 태그가
+  //    몇 글자 남아 있어(실측 5자) 매번 '내용 있음'으로 오판했다.
+  //    사람이 읽을 글자가 있는지(textContent)로 본다.
+  if((rep.textContent||"").trim().length > 20) return false;
   try{ return snapRestore(); }catch(e){ return false; }
 }
 // 저장된 결과로 화면을 되살린다(점검을 다시 돌리지 않고)
