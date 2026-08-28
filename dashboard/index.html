@@ -712,6 +712,7 @@
   <div class="field">
     <button class="btn primary sm" id="adsCheck" style="width:100%">① 전체 점검하기</button>
     <div id="checkBar" style="margin-top:6px"></div><div id="checkLog"></div>
+    <div id="learnBox"></div>
     <div id="fixAllBox" style="margin-top:8px"></div>
     <div id="adsReport" style="margin-top:10px;font-size:13px"></div>
     <div id="deepBox" style="margin-top:10px;font-size:13px"></div>
@@ -4123,6 +4124,58 @@ ${drop.html}`;
   if(!auto) await fullCheck();
 }
 
+/* ───────── 학습 기록 ─────────
+   같은 실수를 두 번 겪지 않게 하는 장치. 점검에서 무엇이 걸렸고,
+   어떤 수정으로 몇 점이 됐는지를 남긴다. 기록은 CFG에 들어가므로
+   기기 간 동기화도 그대로 따라간다(폰에서 고쳐도 PC가 안다).
+   쌓이면 ① 자주 걸리는 항목을 먼저 검사·먼저 수정하고
+   ② 반려 사유별로 '그때 무엇이 통했는지'를 다음 사람에게 알려준다. */
+function learnLog(){ try{ return JSON.parse(localStorage.getItem("scripto_learn")||"[]"); }catch(e){ return []; } }
+function learnSave(v){ try{ localStorage.setItem("scripto_learn", JSON.stringify(v.slice(-300))); }catch(e){}
+  CFG.learnCount=(v||[]).length; saveCfg(); }
+function learnAdd(rec){
+  const v=learnLog();
+  v.push(Object.assign({at:new Date().toISOString(), reject:CFG.lastRejectReason||""}, rec));
+  learnSave(v);
+}
+// 어떤 항목이 몇 번 걸렸고, 어떤 조치로 해결됐는가
+function learnSummary(){
+  const v=learnLog(), by={};
+  v.forEach(r=>{
+    const k=r.key||"기타";
+    by[k]=by[k]||{key:k, hit:0, fixed:0, gain:0, last:null};
+    if(r.type==="hit") by[k].hit++;
+    if(r.type==="fix"){ by[k].fixed++; by[k].last=r; if(typeof r.after==="number"&&typeof r.before==="number") by[k].gain+=r.after-r.before; }
+  });
+  return Object.values(by).sort((a,b)=>b.hit-a.hit);
+}
+function renderLearn(){
+  const box=document.getElementById("learnBox"); if(!box) return;
+  const sum=learnSummary(), v=learnLog();
+  if(!v.length){ box.innerHTML=""; return; }
+  const fixes=v.filter(r=>r.type==="fix").slice(-3).reverse();
+  box.innerHTML=`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-top:8px">
+    <b>🧠 이 사이트에서 배운 것</b> <span class="hint">(점검 ${v.filter(r=>r.type==="hit").length}건 · 수정 ${v.filter(r=>r.type==="fix").length}건 누적)</span>
+    ${sum.length?`<div class="hint" style="margin-top:4px">자주 걸린 항목 — ${sum.slice(0,3).map(s=>`${escAttr(FIX_LABEL[s.key]||s.key)} <b>${s.hit}회</b>${s.fixed?`(고침 ${s.fixed})`:""}`).join(" · ")}</div>`:""}
+    ${fixes.length?`<div class="hint" style="margin-top:4px">최근 조치 — ${fixes.map(f=>`${escAttr(FIX_LABEL[f.key]||f.key)}: ${escAttr(f.detail||"")}`).join("<br>")}</div>`:""}
+    ${CFG.lastRejectReason?`<div class="hint" style="margin-top:4px;color:#ffb59e">반려 사유 "${escAttr(CFG.lastRejectReason)}" 기준으로 아래 항목을 먼저 봅니다.</div>`:""}
+  </div>`;
+}
+const FIX_LABEL={title:"제목 골격", body:"본문 깊이", img:"본문 이미지", merge:"얇은 글 병합",
+  pages:"필수 페이지", tags:"태그 정리"};
+// 반려 사유별로 먼저 볼 항목(쌓인 기록이 없을 때의 출발점)
+const REJECT_PRIORITY=[
+  {re:/가치|저품질|low\s*value|thin/i, keys:["body","img","merge"]},
+  {re:/중복|복제|duplicate|스크랩/i,   keys:["merge","body"]},
+  {re:/탐색|navigation|사용성/i,        keys:["pages"]},
+];
+function priorityKeys(){
+  const r=CFG.lastRejectReason||"";
+  const hit=REJECT_PRIORITY.find(p=>p.re.test(r));
+  const learned=learnSummary().map(s=>s.key);
+  return [...(hit?hit.keys:[]), ...learned];
+}
+
 /* ───────── 통합 점검·통합 수정 ─────────
    버튼이 늘어날수록 이용자는 무엇을 눌러야 하는지 모른다(실제 피드백).
    점검은 「① 전체 점검하기」 하나로 전부 돌고, 고치는 것도 「한 번에 고치기」
@@ -4160,7 +4213,8 @@ async function fullCheck(){
     await contentDeepCheck();
     log.say("본문 정밀 점검 완료", true, "s3");
     await adsCheck();          // 본문 결과를 점수에 반영
-    renderFixAll();
+    fixJobs().forEach(j=>learnAdd({type:"hit", key:j.k, detail:j.label}));
+    renderFixAll(); renderLearn();
     log.say("전체 점검 끝 — 아래 결과를 확인하세요", true);
   }catch(e){ log.say("점검 중 오류: "+escAttr(String(e).slice(0,120)), false); }
   if(b){ b.disabled=false; b.textContent="🔄 전체 다시 점검"; }
@@ -4172,7 +4226,8 @@ function renderFixAll(){
   if(!jobs.length){ box.innerHTML='<div class="hint" style="color:var(--ok)">✅ 자동으로 고칠 항목이 없습니다.</div>'; return; }
   box.innerHTML=`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px">
     <b>🛠️ 고칠 것 ${jobs.length}가지</b>
-    <div class="hint" style="margin-top:3px">${jobs.map((j,i)=>`${i+1}. ${j.label}`).join("<br>")}</div>
+    <div class="hint" style="margin-top:3px">${jobs.map((j,i)=>
+      `${i+1}. ${j.label} <button class="btn sm" style="padding:1px 8px;font-size:11px" onclick="fixOne('${j.k}')">이것만</button>`).join("<br>")}</div>
     <button class="btn primary sm" style="width:100%;margin-top:7px" onclick="fixAll()">🛠️ 한 번에 고치기 (약 ${jobs.reduce((a,j)=>a+j.min,0)}분)</button>
     <div id="fixAllBar" style="margin-top:6px"></div><div id="fixAllLog"></div></div>`;
 }
@@ -4186,7 +4241,24 @@ function fixJobs(){
     jobs.push({k:"merge", label:`비슷한 글 ${st.mergePairs.length}쌍 병합`, min:st.mergePairs.length, run:async()=>{for(let i=0;i<st.mergePairs.length;i++) await aiMergePair(i,true);}});
   if((st.noImg||[]).length)
     jobs.push({k:"img", label:`설명 도해 ${Math.min(st.noImg.length,30)}장 만들어 넣기`, min:Math.ceil(Math.min(st.noImg.length,30)*16/60), run:genPostImages});
+  // 학습된 우선순위(반려 사유 + 과거 빈도)를 앞으로 당긴다
+  const pri=priorityKeys();
+  jobs.sort((a,b)=>{
+    const ia=pri.indexOf(a.k), ib=pri.indexOf(b.k);
+    return (ia<0?99:ia)-(ib<0?99:ib);
+  });
   return jobs;
+}
+// 항목 하나만 고치기(점검 결과 옆 버튼) — 끝나면 자동으로 다시 점검한다
+async function fixOne(key){
+  const j=fixJobs().find(x=>x.k===key);
+  if(!j){ toast("고칠 항목을 찾지 못했습니다 — 전체 점검을 먼저 실행",1); return; }
+  const before=(CFG.deepCheck&&CFG.deepCheck.avg)||null;
+  await j.run(true);
+  learnAdd({type:"fix", key, before, detail:j.label});
+  await fullCheck();
+  const after=(CFG.deepCheck&&CFG.deepCheck.avg)||null;
+  const v=learnLog(); if(v.length){ v[v.length-1].after=after; learnSave(v); }
 }
 async function fixAll(){
   const jobs=fixJobs();
@@ -4196,7 +4268,10 @@ async function fixAll(){
   window._fixAllRunning=true;
   for(let i=0;i<jobs.length;i++){
     log.say(`(${i+1}/${jobs.length}) ${escAttr(jobs[i].label)}`, undefined, "j"+i);
-    try{ await jobs[i].run(true); log.say(`(${i+1}/${jobs.length}) ${escAttr(jobs[i].label)} — 완료`, true, "j"+i); }
+    const before=(CFG.deepCheck&&CFG.deepCheck.avg)||null;
+    try{ await jobs[i].run(true);
+      learnAdd({type:"fix", key:jobs[i].k, before, detail:jobs[i].label});
+      log.say(`(${i+1}/${jobs.length}) ${escAttr(jobs[i].label)} — 완료`, true, "j"+i); }
     catch(e){ log.say(`(${i+1}/${jobs.length}) 실패: ${escAttr(String(e).slice(0,80))}`, false, "j"+i); }
   }
   window._fixAllRunning=false;
@@ -4251,7 +4326,12 @@ ${TITLE_FORM_SPECS.map(([n,d])=>`- ${n}: ${d}`).join("\n")}
 [반드시 지킬 것]
 - 각 제목의 [골격:○○]에 지정된 형태를 정확히 따르세요. 이것이 이 작업의 목적입니다.
 - 원래 주제·검색 키워드(공간, 부품, 문제)는 유지하세요. 다루는 대상이 바뀌면 안 됩니다.
-- 명사를 5개 이상 이어 붙이지 마세요. "보일러실 가스 차단기 연동 신호선 결선 절연" 같은 나열 금지.
+- ⚠️ 가장 중요: **소리 내어 읽었을 때 말이 되는 문장**으로 쓰세요.
+  지금 제목들은 명사만 늘어놓아 딱딱하고 끊깁니다("보일러실 가스 차단기 연동 신호선 결선 절연 장갑").
+  조사(을/를/이/가/은/는/에/로)와 서술어를 넣어 사람이 말하듯 이어지게 하세요.
+  나쁨: "탕비실 콘센트 발열, 내화 가스켓과 피스 조임으로 보강"
+  좋음: "탕비실 콘센트가 뜨거워질 때, 가스켓부터 확인하세요"
+- 조사 없는 명사를 4개 이상 이어 붙이지 마세요.
 - "~로 보강 / ~로 조정 / ~ 절차 / ~ 매뉴얼 / ~ 방법 / ~ 공식"처럼 동작명사·절차어로 끝내지 마세요.
 - 금지 표현: 총정리, 완벽정리, 알아보기, 한눈에, 꼭 알아야, 제대로, 모든 것, A to Z.
 - 25~45자. 과장·낚시 금지, 사실만.
@@ -4286,7 +4366,8 @@ ${list}`;
     if(!neo || neo===a.t){ skip++; continue; }
     const sk=titleSkeleton(neo);
     // 배정한 골격이 실제로 반영됐는지 확인 — 아니면 적용하지 않는다
-    if(sk.nounRun>=5 || sk.form==="동작명사끝" || sk.form==="절차어끝" || neo.length<12 || neo.length>60){
+    const hasParticle=/(?:을|를|이|가|은|는|에|로|의|와|과|도|만)\s/.test(neo);
+    if(sk.nounRun>=4 || !hasParticle || sk.form==="동작명사끝" || sk.form==="절차어끝" || neo.length<12 || neo.length>60){
       skip++; log.say(`건너뜀 — 골격 미달: ${escAttr(neo.slice(0,26))}`, false); continue;
     }
     try{
@@ -4481,7 +4562,7 @@ async function adsCheck(){
               (O.worst?`<br><span style="opacity:.75">실제 예: “…${escAttr(O.worst[0])}” / “…${escAttr(O.worst[1])}”</span>`:"")},
       {ok:F.topShare<=40 && F.roomLead<=50 && F.nounStack<=40,
        label:`제목 골격 다양성 — 최다 골격 ${F.topShare}%${F.topKey?` (${escAttr(F.topKey)})`:""} · 형태 ${F.forms}종 · 공간명사 시작 ${F.roomLead}% · 명사나열 ${F.nounStack}%`,
-       reason:`<b>왜 문제인가</b> — 단어를 아무리 다르게 써도 <u>문장 골격이 같으면</u> 목록을 훑는 순간 찍어낸 티가 납니다. 어미 중복 검사로는 안 잡히는 구멍입니다.<br>실제로 이 사이트 29편은 어미 중복 10%로 '통과'였지만, 전부 "[공간] [부품] [문제], [방법]으로 [동작]" 한 공식이었고 29편 모두 공간 이름으로 시작했습니다.<br><b>기준</b> — 최다 골격 40% 이하, 공간명사 시작 50% 이하, 명사 5개 이상 나열 40% 이하.`},
+       reason:`<b>왜 문제인가</b> — 단어를 아무리 다르게 써도 <u>문장 골격이 같으면</u> 목록을 훑는 순간 찍어낸 티가 납니다. 어미 중복 검사로는 안 잡히는 구멍입니다.<br>실제로 이 사이트 29편은 어미 중복 10%로 '통과'였지만, 전부 "[공간] [부품] [문제], [방법]으로 [동작]" 한 공식이었고 29편 모두 공간 이름으로 시작했습니다.<br><b>기준</b> — 최다 골격 40% 이하, 공간명사 시작 50% 이하, 명사 5개 이상 나열 40% 이하.<br><button class="btn primary sm" style="margin-top:4px" onclick="fixOne('title')">🎯 이 항목 자동 수정</button>`},
       {ok:lonelyTags<=TH.max_lonely_tags, label:`글 1개짜리 태그 ${lonelyTags}개 (태그/글 비율 ${tagRatio}%)`,
        reason:`<b>왜 문제인가</b> — 글마다 전용 태그가 생기면 <u>내용이 하나뿐인 태그 페이지</u>가 글 수만큼 색인됩니다. 실질 글이 30개여도 구글은 알맹이 없는 페이지 30개를 함께 봅니다. 이게 '가치 없는 콘텐츠' 판정의 흔한 숨은 원인입니다.<br><b>어떻게 고치나</b> — Rank Math → 일반 설정 → 태그 아카이브를 <b>noindex</b>로. 앞으로는 태그를 10~15개 사전에서만 골라 쓰세요.`},
     ]},
@@ -4498,7 +4579,7 @@ async function adsCheck(){
         {ok:pass,
          label: !fresh ? "본문 정밀 점검 미실행 (반려 이후 기준)"
               : `본문 평균 ${dc.avg}점 · 보완 필요 ${dc.fails}편 · 구조 복제 ${dc.skelShare||0}%`,
-         reason:`반려 후에는 <u>본문</u>이 바뀌어야 결과가 바뀝니다. 제목·태그는 이미 정리됐습니다.<br>기준: 평균 70점 이상 + 60점 미만 0편.`}
+         reason:`반려 후에는 <u>본문</u>이 바뀌어야 결과가 바뀝니다. 제목·태그는 이미 정리됐습니다.<br>기준: 평균 70점 이상 + 60점 미만 0편.<br><button class="btn primary sm" style="margin-top:4px" onclick="fixOne('body')">🤖 이 항목 자동 수정</button>`}
       ]}];
     })(),
     ...(function(){

@@ -92,6 +92,50 @@ def jaccard(a, b):
     return len(a & b) / len(a | b)
 
 
+
+# ── 글의 '요건' 검사 (data/article_requirements.json) ────────────────
+# 형식은 매번 흔들되 요건은 고정한다. 생성 프롬프트와 '같은 파일'을 읽어
+# 검사하므로, 요건을 늘리면 생성과 검수가 함께 움직인다(둘이 어긋나는 사고 방지).
+_REQ = {}
+
+
+def load_requirements(path="data/article_requirements.json"):
+    if _REQ.get("v") is None:
+        try:
+            import json
+            with open(path, encoding="utf-8") as f:
+                _REQ["v"] = json.load(f)
+        except Exception:
+            _REQ["v"] = {"requirements": []}
+    return _REQ["v"]
+
+
+def check_requirements(html, text=None):
+    """(미충족 요건 라벨 목록, 충족 수, 전체 수) 반환. 기계 검사 가능한 항목만."""
+    t = text if text is not None else _text(html)
+    reqs = (load_requirements() or {}).get("requirements") or []
+    missing, checked = [], 0
+    for r in reqs:
+        v = r.get("verify")
+        if not v:
+            continue
+        checked += 1
+        ok = True
+        kind = v.get("type")
+        if kind == "regex_count":
+            n = sum(len(re.findall(p, t)) for p in v.get("patterns", []))
+            ok = n >= int(v.get("min", 1))
+        elif kind == "regex_absent":
+            ok = not any(re.search(p, t[-300:]) for p in v.get("patterns", []))
+        elif kind == "tag_min":
+            ok = (html or "").count("<" + v.get("tag", "h2")) >= int(v.get("min", 1))
+        elif kind == "min_chars":
+            ok = len(t) >= int(v.get("min", 1000))
+        if not ok:
+            missing.append(r.get("label", r.get("id", "?")))
+    return missing, checked - len(missing), checked
+
+
 def check(article, other_texts, safety, recent=None):
     """(ok: bool, reason: str) 반환.
 
@@ -194,6 +238,15 @@ def check(article, other_texts, safety, recent=None):
             ratio = round(top / len(sents) * 100)
             if ratio >= int(safety.get("max_ending_monotony", 80)):
                 reasons.append(f"어미단조({ratio}%)")
+
+    # ── 요건 검사(형식과 무관하게 반드시 들어가야 하는 것) ───────────
+    if safety.get("check_requirements", True):
+        miss, _okn, _tot = check_requirements(html, t)
+        # 이미 위에서 같은 사유로 잡힌 것은 중복 표기하지 않는다
+        dup = ("수치부족", "실전신호없음", "소제목부족", "분량부족", "고정마무리문구")
+        miss = [m for m in miss if not any(d[:4] in "".join(reasons) and d[:2] in m[:6] for d in dup)]
+        if miss:
+            reasons.append("요건미충족(" + ", ".join(miss[:3]) + (f" 외 {len(miss)-3}" if len(miss) > 3 else "") + ")")
 
     # ── AI 문체 신호 검사 ────────────────────────────────────────────
     # 근거: AI 탐지 연구가 공통으로 꼽는 신호 — 문장 길이 균일, 셋 묶음 남용,

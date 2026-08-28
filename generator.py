@@ -68,6 +68,35 @@ def _img_slot(desc):
     )
 
 
+# ── 글의 '요건'(고정) ─────────────────────────────────────────────
+# 형식은 매번 흔들되, 무엇을 쓰든 반드시 들어가야 하는 것은 고정한다.
+# 형식만 랜덤화하면 사람 티는 나는데 알맹이가 빠지고, 요건만 고정하면
+# 대량생산 티가 난다. 둘을 분리해 관리한다(data/article_requirements.json).
+_REQ_CACHE = {}
+
+
+def load_requirements(path="data/article_requirements.json"):
+    if _REQ_CACHE.get("v"):
+        return _REQ_CACHE["v"]
+    try:
+        with open(path, encoding="utf-8") as f:
+            _REQ_CACHE["v"] = json.load(f)
+    except Exception:
+        _REQ_CACHE["v"] = {"requirements": []}
+    return _REQ_CACHE["v"]
+
+
+def requirements_block():
+    reqs = (load_requirements() or {}).get("requirements") or []
+    if not reqs:
+        return ""
+    lines = ["[반드시 들어가야 하는 것 — 형식이 어떻게 바뀌든 이건 고정]"]
+    for i, r in enumerate(reqs, 1):
+        lines.append(f"{i}. {r.get('label','')} — {r.get('how','')}")
+    lines.append("※ 위 요건은 발행 전 기계로 검사합니다. 하나라도 빠지면 글이 폐기됩니다.")
+    return "\n".join(lines)
+
+
 def _article_prompt(keyword, kind, category, links, related, insert_ads, competitive=False):
     from datetime import date
     today = date.today()
@@ -238,6 +267,8 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
 
 [이번 글 구성 스타일] {_style}
   (매번 같은 뼈대를 반복하지 말고, 위 스타일에 맞춰 흐름과 소제목을 자연스럽게 바꾼다.)
+
+{requirements_block()}
 
 [가치 규칙 — 5회차 반려('낮은 가치의 콘텐츠') 실측 반영. 다른 규칙과 충돌하면 이것이 우선]
 반려된 글들의 공통점은 셋이었다: 실전 신호 0, 구체 수치 부족, 백과사전식 매뉴얼체.
