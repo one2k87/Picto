@@ -4642,9 +4642,9 @@ async function fixOne(key){
   if(!j){ toast("고칠 항목을 찾지 못했습니다 — 전체 점검을 먼저 실행",1); return; }
   const before=(CFG.deepCheck&&CFG.deepCheck.avg)||null;
   await j.run(true);
-  const v=await verifyFix(key);      // 실제로 고쳐졌는지 사이트에서 확인
-  learnAdd({type:"fix", key, before, detail:j.label, verified:v.ok});
-  toast(v.ok===false?`반영되지 않았습니다 — ${v.msg}`:`반영 확인 — ${v.msg}`, v.ok===false?1:0);
+  const chk=await verifyFix(key);    // 실제로 고쳐졌는지 사이트에서 확인
+  learnAdd({type:"fix", key, before, detail:j.label, verified:chk.ok});
+  toast(chk.ok===false?`반영되지 않았습니다 — ${chk.msg}`:`반영 확인 — ${chk.msg}`, chk.ok===false?1:0);
   await fullCheck();                 // 그리고 전체 재점검
   const after=(CFG.deepCheck&&CFG.deepCheck.avg)||null;
   const v=learnLog(); if(v.length){ v[v.length-1].after=after; learnSave(v); }
