@@ -534,7 +534,7 @@
 /* ===== 작업 진행 배너 =====
    스크롤을 따라 사라지지 않도록 화면에 고정한다. 위치는 JS가 헤더·서브탭의
    실제 높이를 재서 그 '아래'로 잡으므로 메뉴를 가리지 않는다. */
-#workbar{position:fixed;left:8px;right:8px;z-index:16;display:none;
+#workbar{position:fixed;left:8px;right:8px;z-index:40;display:none;
   background:var(--card);border:1px solid var(--accent);border-radius:14px;
   padding:10px 14px;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 #workbar.on{display:block}
@@ -3007,14 +3007,24 @@ function _workbarEl(){
 }
 function workBanner(){
   const w=_workbarEl();
+  // 닫기 버튼(한 번만 붙임) — 완료 후 배너는 사용자가 닫기 전까지 남는다.
+  // 자동으로 사라지니 "끝난 건지 멈춘 건지 모르겠다"는 실사용 문제가 있었다.
+  if(!w.querySelector(".w-x")){
+    const x=document.createElement("button");
+    x.className="w-x"; x.textContent="✕";
+    x.style.cssText="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:4px";
+    x.onclick=()=>w.classList.remove("on");
+    w.style.position="fixed"; w.appendChild(x);
+  }
   return {
     start(t,d){ w.classList.add("on"); w.querySelector(".w-title").textContent=t;
       w.querySelector(".w-d").textContent=d||""; w.querySelector(".w-sp").style.display="";
       _workbarEl(); },
     update(d){ w.querySelector(".w-d").textContent=d; },
-    done(t){ w.querySelector(".w-sp").style.display="none";
-      w.querySelector(".w-title").textContent=t||"완료";
-      setTimeout(()=>w.classList.remove("on"),2500); }
+    done(t,next){ w.querySelector(".w-sp").style.display="none";
+      w.querySelector(".w-title").textContent="✅ "+(t||"완료");
+      w.querySelector(".w-d").textContent=next||"";
+      /* 자동으로 닫지 않는다 — ✕를 누르거나 다음 작업이 시작될 때까지 유지 */ }
   };
 }
 function makeLog(box, barBox, taskName){
@@ -3042,7 +3052,7 @@ function makeLog(box, barBox, taskName){
       if(wb) wb.update(t.replace(/<[^>]+>/g,""));
       render();
     },
-    finish(t){ if(wb) wb.done(t||"완료"); },
+    finish(t,next){ if(wb) wb.done(t||"완료", next); },
     prog(cur,total){
       if(!fill) return;
       if(!total){ barBox.style.display="none"; return; }
@@ -4105,6 +4115,7 @@ ${m.html}`;
   const why=Object.entries(fails).map(([k,v])=>`${k} ${v}건`).join(" · ");
   if(skip) log.say(`⚠️ 건너뛴 이유 — ${escAttr(why)}`, false);
   window._lastFixNote=`적용 ${done}편 · 건너뜀 ${skip}편${why?` (${why.slice(0,50)})`:""}`;
+  window._lastFixStats={done,skip};
   jobStep("body",{done:st.fails.length, total:st.fails.length, note:window._lastFixNote});
   log.say(`완료 — 적용 ${done}편 · 건너뜀 ${skip}편`, done>0);
   if(!auto) await fullCheck();
@@ -4318,6 +4329,11 @@ function snapSave(){
         b:{id:p.b.id,title:p.b.title,len:p.b.len}, ts:p.ts, bs:p.bs})),
       allTitles:(window._allTitlePosts||[]).map(p=>({id:p.id,title:p.title,link:p.link}))};
     localStorage.setItem(acctKey(), JSON.stringify(snap));
+    // 방금 점검했으면 카드도 '방금'으로 갱신 — 어제 복원 문구가 남아 혼란을 줬다
+    const box=document.getElementById("snapBox");
+    if(box) box.innerHTML=`<div style="padding:7px 10px;border:1px solid var(--line);border-radius:9px;margin-bottom:8px" class="hint">
+      ✅ 방금 점검 완료 — ${new Date().toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})}
+      ${CFG.lastCheck?` · 승인 준비 ${CFG.lastCheck.score}/${CFG.lastCheck.total}`:""}${CFG.deepCheck?` · 본문 평균 ${CFG.deepCheck.avg}점`:""}</div>`;
   }catch(e){ /* 용량 초과 등은 무시 — 다음 점검 때 다시 만든다 */ }
 }
 function snapLoad(){ try{ return JSON.parse(localStorage.getItem(acctKey())||"null"); }catch(e){ return null; } }
@@ -4573,7 +4589,12 @@ async function fullCheck(){
     fixJobs().forEach(j=>learnAdd({type:"hit", key:j.k, detail:j.label}));
     renderFixAll(); renderLearn(); renderPlan(); snapSave();
     log.say("전체 점검 끝 — 아래 결과를 확인하세요", true);
-  }catch(e){ log.say("점검 중 오류: "+escAttr(String(e).slice(0,120)), false); }
+    const _jobs=fixJobs();
+    log.finish(`전체 점검 완료 · 승인 준비 ${CFG.lastCheck?CFG.lastCheck.score+"/"+CFG.lastCheck.total:""}`,
+      _jobs.length?`다음 → 아래 「🛠️ 한 번에 고치기」(${_jobs.length}가지)를 누르세요`
+                  :"고칠 것이 없습니다 → 「🗓️ 발행 계획」으로 진행하세요");
+  }catch(e){ log.say("점검 중 오류: "+escAttr(String(e).slice(0,120)), false);
+    log.finish("점검 중단 — 오류", "「🔄 전체 다시 점검」으로 재시도하세요"); }
   finally{
     // 배너를 반드시 닫는다 — 안 닫으면 상단에서 계속 도는 것처럼 보인다(실제 신고).
     window._checkRunning=false;
@@ -4595,9 +4616,16 @@ function renderFixAll(){
 }
 // 그 항목이 정말로 고쳐졌는지 사이트에서 직접 다시 읽어 확인한다.
 // {ok, before, after, msg} 반환. 이걸로 '완료'와 '반영 안 됨'을 구분한다.
-async function verifyFix(key){
+async function verifyFix(key, base0){
+  // base0: 실행 전 상태. '목표 달성' 여부가 아니라 '실제로 나아졌는가'로 판정한다.
+  // (전에는 60점 미만이 한 편이라도 남으면 무조건 "반영 안 됨"이라고 표시해
+  //  실제로는 적용됐는데도 실패처럼 보였다 — 실사용 지적)
+  const st0=window._lastFixStats||{};
   const base=wpBase();
   try{
+    if(st0.done===0){
+      return {ok:false, msg:`적용 0편 — ${(window._lastFixNote||"").slice(0,60)}`};
+    }
     if(key==="img"){
       let all=[];
       for(let pg=1;pg<=2;pg++){
@@ -4605,18 +4633,25 @@ async function verifyFix(key){
         if(!r.ok) break; const j=await r.json(); all=all.concat(j); if(j.length<100) break;
       }
       const withImg=all.filter(p=>/<img/i.test((p.content&&p.content.rendered)||"")).length;
-      return {ok:withImg>0, after:withImg, msg:`본문 이미지가 있는 글 ${withImg}/${all.length}편`};
+      const b=(base0&&base0.withImg)||0;
+      return {ok:withImg>b, after:withImg,
+        msg:`이미지 있는 글 ${b}편 → ${withImg}편 (도해 ${st0.done||0}장 삽입)`};
     }
     if(key==="body"){
       await contentDeepCheck();
       const d=CFG.deepCheck||{};
-      return {ok:(d.fails||0)===0, after:d.avg, msg:`본문 평균 ${d.avg}점 · 60점 미만 ${d.fails}편`};
+      const b=base0||{};
+      const better=(d.avg>(b.avg||0)) || ((d.fails??99)<(b.fails??99));
+      return {ok:better, after:d.avg,
+        msg:`평균 ${b.avg??"?"}→${d.avg}점 · 미달 ${b.fails??"?"}→${d.fails}편`};
     }
     if(key==="title"){
       await adsCheck();
-      const F=window._titleForm||{};
-      return {ok:F.topShare<=40&&F.roomLead<=50&&F.nounStack<=40,
-        after:F.topShare, msg:`최다 골격 ${F.topShare}% · 공간명사 시작 ${F.roomLead}%`};
+      const F=window._titleForm||{}, b=base0||{};
+      const met=F.topShare<=40&&F.roomLead<=50&&F.nounStack<=40;
+      const better=(F.topShare<(b.topShare??101))||(F.roomLead<(b.roomLead??101));
+      return {ok:met||better, after:F.topShare,
+        msg:`최다 골격 ${b.topShare??"?"}→${F.topShare}% · 공간명사 시작 ${b.roomLead??"?"}→${F.roomLead}%`};
     }
   }catch(e){ return {ok:null, msg:"확인 실패: "+String(e).slice(0,50)}; }
   return {ok:null, msg:""};
@@ -4645,8 +4680,13 @@ async function fixOne(key){
   const j=fixJobs().find(x=>x.k===key);
   if(!j){ toast("고칠 항목을 찾지 못했습니다 — 전체 점검을 먼저 실행",1); return; }
   const before=(CFG.deepCheck&&CFG.deepCheck.avg)||null;
+  const st0=window._dcState||{};
+  const base0=key==="body"?{avg:CFG.deepCheck?.avg,fails:CFG.deepCheck?.fails}
+    :key==="img"?{withImg:(CFG.deepCheck?.n||29)-((st0.noImg||[]).length)}
+    :key==="title"?{topShare:window._titleForm?.topShare,roomLead:window._titleForm?.roomLead}:null;
+  window._lastFixStats=null;
   await j.run(true);
-  const chk=await verifyFix(key);    // 실제로 고쳐졌는지 사이트에서 확인
+  const chk=await verifyFix(key, base0);  // 실제로 나아졌는지 사이트에서 확인
   learnAdd({type:"fix", key, before, detail:j.label, verified:chk.ok});
   toast(chk.ok===false?`반영되지 않았습니다 — ${chk.msg}`:`반영 확인 — ${chk.msg}`, chk.ok===false?1:0);
   await fullCheck();                 // 그리고 전체 재점검
@@ -4679,10 +4719,17 @@ async function fixAll(resume){
     jobStep(jobs[i].k,{status:"running"});
     log.say(`(${i+1}/${jobs.length}) ${escAttr(jobs[i].label)}`, undefined, "j"+i);
     const before=(CFG.deepCheck&&CFG.deepCheck.avg)||null;
+    // 실행 전 상태 저장 — 검증은 '목표 달성'이 아니라 '나아졌는가'로 한다
+    const st=window._dcState||{};
+    const base0=jobs[i].k==="body"?{avg:CFG.deepCheck?.avg,fails:CFG.deepCheck?.fails}
+      :jobs[i].k==="img"?{withImg:(CFG.deepCheck?.n||29)-((st.noImg||[]).length)}
+      :jobs[i].k==="title"?{topShare:window._titleForm?.topShare,roomLead:window._titleForm?.roomLead}
+      :null;
+    window._lastFixStats=null;
     try{ await jobs[i].run(true);
       // 말로만 '완료'라고 하지 않는다 — 사이트를 다시 읽어 실제 반영을 확인한다
       log.say(`(${i+1}/${jobs.length}) ${escAttr(jobs[i].label)} — 반영 확인 중…`, undefined, "j"+i);
-      const v=await verifyFix(jobs[i].k);
+      const v=await verifyFix(jobs[i].k, base0);
       learnAdd({type:"fix", key:jobs[i].k, before, detail:jobs[i].label, verified:v.ok});
       jobStep(jobs[i].k,{status:"done", note:(window._lastFixNote||"")+(v.msg?` → ${v.msg}`:"")});
       log.say(`(${i+1}/${jobs.length}) ${escAttr(jobs[i].label)} — ${v.ok===false?"⚠️ 반영 안 됨":"완료"}${v.msg?` (${escAttr(v.msg)})`:""}`,
@@ -4695,7 +4742,11 @@ async function fixAll(resume){
   jobEnd("done");
   log.say("모두 끝났습니다. 전체 점검을 다시 돌립니다", true);
   await fullCheck();
-  jobEnd("done", `남은 항목 ${fixJobs().length}가지`);
+  const remain=fixJobs().length;
+  jobEnd("done", `남은 항목 ${remain}가지`);
+  log.finish(`한 번에 고치기 완료`,
+    remain?`남은 항목 ${remain}가지 — 아래에서 확인하세요`
+          :"모든 항목 통과 → 「🗓️ 발행 계획」으로 진행하세요");
   log.finish("완료");
 }
 
@@ -4802,6 +4853,7 @@ ${list}`;
     }catch(e){ skip++; log.say(`실패: ${escAttr(String(e).slice(0,60))}`, false); }
   }
   window._lastFixNote=`적용 ${ok}편 · 건너뜀 ${skip}편`;
+  window._lastFixStats={done:ok,skip};
   jobStep("title",{done:assigned.length, total:assigned.length, note:window._lastFixNote});
   log.say(`완료 — 적용 ${ok}편 · 건너뜀 ${skip}편`, ok>0);
   if(!auto) await fullCheck();
@@ -4922,6 +4974,7 @@ Hard constraints: absolutely NO text, NO letters, NO numbers, NO labels, NO wate
   const why=Object.entries(fails).map(([k,v])=>`${k} ${v}건`).join(" · ");
   if(skip) log.say(`⚠️ 건너뛴 이유 — ${escAttr(why)}`, false);
   window._lastFixNote=`삽입 ${done}편 · 건너뜀 ${skip}편${why?` (${why.slice(0,50)})`:""}`;
+  window._lastFixStats={done,skip};
   jobStep("img",{done:n, total:n, note:window._lastFixNote});
   log.say(`완료 — 삽입 ${done}편 · 건너뜀 ${skip}편`, done>0);
   if(!auto) await fullCheck();
