@@ -4600,7 +4600,6 @@ async function fullCheck(){
     window._checkRunning=false;
     if(b){ b.disabled=false; b.textContent="🔄 전체 다시 점검"; }
   }
-  log.finish("완료");
 }
 // 점검 결과에서 '고칠 것'을 모아 버튼 하나로 만든다
 function renderFixAll(){
@@ -4747,7 +4746,6 @@ async function fixAll(resume){
   log.finish(`한 번에 고치기 완료`,
     remain?`남은 항목 ${remain}가지 — 아래에서 확인하세요`
           :"모든 항목 통과 → 「🗓️ 발행 계획」으로 진행하세요");
-  log.finish("완료");
 }
 
 /* 제목 골격 흩기 — 골격이 겹치는 글만 골라, 서로 다른 형태를 '배정'해 다시 쓴다.
