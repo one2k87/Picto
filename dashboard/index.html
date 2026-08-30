@@ -4288,10 +4288,23 @@ async function planReserve(){
     const r=await fetch(base+"/wp-json/wp/v2/posts?per_page=50&status=draft&orderby=date&order=desc&_fields=id,title,categories",{headers:wpAuth()});
     drafts=r.ok?await r.json():[];
   }catch(e){ log.say("초안을 불러오지 못했습니다", false); return log.finish("실패"); }
-  // 니치 밖(지원금 등)은 제외 — 방금 초안으로 돌린 글들이 섞여 있다
-  const off=/지원금|지원 사업|보조금|자격증|장려금|수당|월세|전세|청년|시니어|농어업|창업/;
-  const pool=drafts.filter(d=>!off.test(_dcText(d.title.rendered)));
-  if(!pool.length){ log.say("니치에 맞는 초안이 없습니다 — 글 탭에서 먼저 생성하세요", false); return log.finish("완료"); }
+  // 니치 판정 2단: ①금지어(네거티브) ②발행 글 제목 어휘와의 겹침(포지티브).
+  // 네거티브만 쓰다가 '신용카드/직장인 점심' 초안이 뚫려 예약된 사고(2026-08-30)가 있었다.
+  // 발행 글이 곧 그 사이트의 니치이므로, 발행 제목 어휘를 학습해 사이트마다 자동 적응한다.
+  const off=/지원금|지원 사업|보조금|자격증|장려금|수당|월세|전세|청년|시니어|농어업|창업|신용카드|대출|보험|재테크|연금|세금|주식|다이어트|영양제|건강검진/;
+  let corpus=[];
+  try{
+    const pr=await fetch(base+"/wp-json/wp/v2/posts?per_page=100&status=publish&_fields=title",{headers:wpAuth()});
+    (pr.ok?await pr.json():[]).forEach(p=>_dcText(p.title.rendered).split(/[^가-힣a-zA-Z0-9]+/).forEach(w=>{ if(w.length>=2) corpus.push(w); }));
+  }catch(e){}
+  const nicheOk=t=>{
+    if(!corpus.length) return true; // 발행 글이 없으면(신규 사이트) 판정 불가 → 통과
+    const ws=t.split(/[^가-힣a-zA-Z0-9]+/).filter(w=>w.length>=2);
+    const hit=ws.filter(w=>corpus.some(c=>c.startsWith(w)||w.startsWith(c))).length;
+    return hit>=2; // 제목에서 니치 어휘 2개 이상
+  };
+  const pool=drafts.filter(d=>{ const t=_dcText(d.title.rendered); return !off.test(t)&&nicheOk(t); });
+  if(!pool.length){ log.say("니치에 맞는 초안이 없습니다 — 생성 탭에서 니치 글을 먼저 만드세요 (카테고리가 니치와 다르면 니치 밖 초안만 쌓입니다)", false); return log.finish("완료"); }
   let n=0;
   for(let i=0;i<Math.min(todo.length, pool.length);i++){
     const slot=todo[i], d=pool[i];

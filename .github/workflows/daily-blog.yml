@@ -167,6 +167,12 @@ jobs:
           BLOCKLIST_EXTRA: ${{ secrets.BLOCKLIST_EXTRA }}
         run: python build_config.py
 
+      # 카테고리 단일 소스: 수동실행 입력 > data/site_categories.json > 시크릿
+      # (옛 카테고리 시크릿이 니치 밖 초안을 만들던 문제의 영구 해결 — 2026-08-30)
+      - name: 카테고리 저장소 파일 적용
+        if: github.event.inputs.categories == ''
+        run: python scripts/apply_site_categories.py
+
       - name: 블로그 생성 실행
         run: python -u main.py
 
