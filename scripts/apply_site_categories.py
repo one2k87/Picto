@@ -6,9 +6,14 @@ P = "data/site_categories.json"
 if os.path.exists(P):
     site = json.load(open(P, encoding="utf-8"))
     cfg = json.load(open("config.json", encoding="utf-8"))
+    changed = False
     if site.get("categories"):
-        cfg["categories"] = site["categories"]
-        json.dump(cfg, open("config.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        cfg["categories"] = site["categories"]; changed = True
         print("저장소 카테고리 적용:", [c["name"] for c in site["categories"]])
+    if site.get("images_provider"):
+        cfg.setdefault("images", {})["provider"] = site["images_provider"]; changed = True
+        print("이미지 provider 적용:", site["images_provider"])
+    if changed:
+        json.dump(cfg, open("config.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 else:
     print("data/site_categories.json 없음 — 시크릿/기본값 사용")

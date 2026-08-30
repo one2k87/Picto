@@ -7,8 +7,15 @@
       "wp_category": "셀프 인테리어 정보",
       "wp_slug": "self-interiors-information",
       "desc": "셀프 인테리어·집수리 실무: 실리콘/코킹, 타일·줄눈, 도배·페인트, 방수·결로·곰팡이, 배관·누수, 콘센트·조명 등 전기 소모품, 문·창문·섀시 조정, 단열, 바닥재. 반드시 '직접 하는 수리·시공' 관점. 지원금·정책·금융·건강·생활정보 주제 금지.",
-      "counts": { "long_series": 0, "long_single": 1, "season_series": 0, "season_single": 0 },
+      "counts": {
+        "long_series": 0,
+        "long_single": 1,
+        "season_series": 0,
+        "season_single": 0
+      },
       "active_days": "all"
     }
-  ]
+  ],
+  "images_provider": "free",
+  "_images_설명": "이미지 생성 방식(단일 소스). free=Gemini 무료 도해→스톡→썸네일 순. 옛 IMAGE_PROVIDER 시크릿('none')이 이미지를 조용히 꺼서 모든 글이 '이미지 요건'으로 폐기되던 사고(2026-08-30) 이후, 시크릿보다 이 파일이 우선한다."
 }
