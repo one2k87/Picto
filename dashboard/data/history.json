@@ -14457,6 +14457,19 @@
       "intent": "revenue",
       "date": "2026-08-30",
       "series_id": ""
+    },
+    {
+      "title": "셀프 인테리어 도배 전 풀바른 벽지 제거, 올바른 방법과 준비물이 필요합니다",
+      "slug": "self-interior-wallpaper-removal",
+      "url": "",
+      "post_id": null,
+      "status": "폐기",
+      "kind": "long",
+      "keyword": "셀프 인테리어 도배 풀바른 벽지 제거 방법과 준비물",
+      "category": "셀프 인테리어",
+      "intent": "evergreen",
+      "date": "2026-08-30",
+      "series_id": ""
     }
   ]
 }
