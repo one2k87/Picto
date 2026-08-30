@@ -170,8 +170,8 @@ def make_image_resolver(cfg, auto_publish, category="", budget=None):
     """[[IMG:설명]] → 실제 이미지 자동 생성 후 <figure> 반환하는 콜백(카테고리별).
     budget={"used":n,"max":N} 로 실행 1회당 이미지 개수를 제한(비용 상한)."""
     imgcfg = dict(cfg.get("images", {}) or {})
-    if imgcfg.get("provider") in ("gemini", "imagen", "google") and not imgcfg.get("api_key"):
-        imgcfg["api_key"] = cfg["llm"].get("api_key", "")   # Gemini 키 재사용
+    if imgcfg.get("provider") in ("gemini", "imagen", "google", "free") and not imgcfg.get("api_key"):
+        imgcfg["api_key"] = cfg["llm"].get("api_key", "")   # Gemini 키 재사용(free도 도해 1순위)
     wp_cfg = cfg.get("wordpress", {})
     out = os.path.join(OUT_DIR, "images")
 
@@ -191,7 +191,9 @@ def make_image_resolver(cfg, auto_publish, category="", budget=None):
             src = upload_media(path, wp_cfg, alt=desc)
         if not src:
             src = images.to_data_uri(path)     # 미게시/업로드 실패 시 인라인
-        return images.figure_html(src, desc)
+        note = ("설명을 돕는 도해이며 실제 촬영 사진이 아닙니다"
+                if getattr(images, "LAST_KIND", "") == "ai" else None)
+        return images.figure_html(src, desc, note)
 
     return resolver
 
