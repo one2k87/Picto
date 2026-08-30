@@ -14496,6 +14496,19 @@
       "intent": "revenue",
       "date": "2026-08-30",
       "series_id": ""
+    },
+    {
+      "title": "오래된 집 콘센트 교체, 누전 차단기 확인 없이 진행하면 안 됩니다 (2026년 8월)",
+      "slug": "old-house-outlet-breaker-replacement-cost-procedure",
+      "url": "",
+      "post_id": null,
+      "status": "폐기",
+      "kind": "long",
+      "keyword": "오래된 집 콘센트 교체, 누전 차단기 설치 비용과 절차 확인 방법",
+      "category": "셀프 인테리어",
+      "intent": "revenue",
+      "date": "2026-08-30",
+      "series_id": ""
     }
   ]
 }
