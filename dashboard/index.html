@@ -4268,6 +4268,7 @@ function renderPlan(){
       ${p.slots.map(s=>`${s.status==="done"?"✅":"⬜"} ${fmt(s.at)}`).join("<br>")}</div>
     <div style="display:flex;gap:6px;margin-top:7px">
       <button class="btn sm" style="flex:1" onclick="planReserve()">📅 초안을 이 날짜로 예약</button>
+      <button class="btn sm" style="flex:1" onclick="sprintCompose()">✍️ 빈 슬롯 글 즉시 생성</button>
       <button class="btn sm" style="flex:1" onclick="localStorage.removeItem(PLAN_KEY);renderPlan()">계획 다시 짜기</button>
     </div>
     <div id="planLog"></div></div>`;
@@ -4320,6 +4321,113 @@ async function planReserve(){
   planSave(p); renderPlan();
   log.say(`${n}편을 계획 날짜로 예약했습니다`, n>0);
   log.finish("완료");
+}
+
+/* ───────── 빈 슬롯 즉시 생성 ─────────
+   파이프라인 초안이 없거나 품질 게이트에서 전부 폐기돼 발행 슬롯이 비었을 때,
+   브라우저에서 직접(사용자의 Gemini 키) 니치 글을 써서 슬롯을 채운다.
+   배경(2026-08-30): 옛 카테고리 설정 + 이미지 요건 폐기가 겹쳐 니치 초안이 0이 됐고,
+   스프린트 중 발행 공백은 그대로 심사 감점이 된다. 같은 벽에 부딪힐 다른 이용자를 위한 기능. */
+async function sprintCompose(auto){
+  const p=planLoad(); if(!p){ toast("먼저 발행 계획을 만드세요",1); return; }
+  const key=(CFG.llmKey||"").trim();
+  const log=makeLog(document.getElementById("planLog"), null, "빈 슬롯 글 즉시 생성");
+  if(!key){ log.say("AI 키가 없습니다 — 상단 🔑 버튼에서 Gemini 키를 연결해 주세요", false); return log.finish("중단됨"); }
+  const base=wpBase();
+  // 예약이 취소·초안 전환된 슬롯을 실제 상태와 대조해 되살린다 (기록만 믿으면 빈 슬롯을 놓친다)
+  for(const s of p.slots.filter(s=>s.postId && new Date(s.at)>new Date())){
+    try{
+      const r=await fetch(base+"/wp-json/wp/v2/posts/"+s.postId+"?_fields=status&context=edit",{headers:wpAuth()});
+      const st2=r.ok?(await r.json()).status:"missing";
+      if(st2!=="future"){ s.status="todo"; delete s.postId; }
+    }catch(e){}
+  }
+  const empty=p.slots.filter(s=>new Date(s.at)>new Date() && !s.postId);
+  if(!empty.length){ log.say("빈 슬롯이 없습니다 — 예약이 전부 차 있습니다", true); planSave(p); renderPlan(); return log.finish("완료"); }
+  // 발행 글 제목 = 이 사이트의 니치. 주제 중복을 피하고 같은 어휘권에서 쓰게 한다
+  let titles=[], catId=null, catName="";
+  try{
+    const r=await fetch(base+"/wp-json/wp/v2/posts?per_page=100&status=publish&_fields=title",{headers:wpAuth()});
+    titles=(r.ok?await r.json():[]).map(x=>_dcText(x.title.rendered));
+    const c=await fetch(base+"/wp-json/wp/v2/categories?per_page=5&orderby=count&order=desc&_fields=id,name",{headers:wpAuth()});
+    const top=(c.ok?await c.json():[])[0]; if(top){ catId=top.id; catName=top.name; }
+  }catch(e){}
+  if(!auto && !confirm(`빈 슬롯 ${empty.length}개에 넣을 새 글을 AI가 씁니다.\n글마다 기계 검증(70점·1,300자·h2 3개)을 통과해야 예약됩니다.\n진행할까요?`)) return log.finish("중단됨");
+  let made=0; const newPosts=[];
+  for(let i=0;i<empty.length;i++){
+    const slot=empty[i];
+    const when=new Date(slot.at).toLocaleDateString("ko-KR",{month:"numeric",day:"numeric"});
+    let okPost=null;
+    for(let attempt=1;attempt<=2 && !okPost;attempt++){
+      log.say(`(${i+1}/${empty.length}) ${when} 슬롯 글 작성 중${attempt>1?" (재시도)":""}…`, undefined, "cur");
+      const avoid=titles.concat(newPosts.map(n=>n.title)).slice(-60).join(" / ");
+      const prompt=`당신은 '${catName||"셀프 인테리어"}' 블로그의 필자입니다. 새 글 한 편을 쓰세요.
+
+[주제 선정]
+- 니치: 직접 하는 집수리·시공 — 실리콘/코킹, 타일·줄눈, 도배·페인트, 방수·결로·곰팡이, 배관·누수, 콘센트·조명 같은 전기 소모품, 문·창문·섀시 조정, 단열, 바닥재.
+- 금지 주제: 지원금·보조금·정책·사업 공고·금융·건강. 제목과 본문 어디에도 넣지 마세요.
+- 아래 기존 글과 겹치지 않는 주제 1개를 고르세요.
+  기존 글: ${avoid}
+
+[제목 규칙] 소리 내어 읽어 말이 되는 자연스러운 문장 1개(25~45자). 명사를 3개 이상 연달아 나열하지 말고 조사(을/를/이/가/은/는/에/로)를 넣으세요. "완벽 정리/총정리/꿀팁/모든 것" 같은 상투 표현 금지.
+
+[본문 규칙 — 기계로 검사합니다]
+1. 실전 신호 3개 이상: 자주 나는 실수·실패 시나리오, 조건 분기("벽이 석고보드라면 A, 콘크리트라면 B"), 순서를 어기면 생기는 문제, 방법·부품 2가지 장단 비교.
+   ⚠️ 겪지 않은 1인칭 경험담("제가 직접 해보니")을 창작하지 마세요 — '흔히 겪는 문제' 관점으로.
+2. 실측형 수치 4개 이상: 규격(mm·cm)·가격대(원)·소요 시간·개수. 단정할 수 없는 값은 범위로("3만~5만 원대", "제품마다 다르니 표기 확인").
+3. 금지 문구: 알아보겠습니다/살펴보겠습니다/이번 글에서는/도움이 되셨기를/마무리하겠습니다/함께 알아봐요/참고하시기 바랍니다.
+4. 같은 어미 3문장 연속 금지. 10자 이하 짧은 문장을 3개 이상.
+5. 완충 표현("~할 수 있습니다/~하는 것이 좋습니다")으로 끝나는 문장은 전체의 1/4 이하.
+6. 셋 묶음 금지 — "첫째…둘째…셋째", 한 문장 안 "A, B, C" 삼항 나열은 2개나 4개로.
+7. 마지막 문단을 "결론적으로/요약하자면/지금까지"로 시작하지 말고, '다음에 할 행동 하나' 또는 '가장 조심할 것 하나'로 끝내세요.
+8. 이 글만의 정보 이득 1가지: 방식·부품 2~3가지 비교표 / 실패 시나리오 2가지와 복구 절차 / 자재·구조·예산별 분기표 / 국내 기준 실측 범위 중 택1.
+9. 분량 1,300~2,000자(태그 제외), 소제목 h2 3개 이상. 두 번째 h2 뒤에 광고 자리 <div class="ad-slot"></div> 1개.
+
+[출력 형식] JSON 하나만: {"title":"...","html":"<p>…"} — 코드블록·설명 금지.`;
+      let title="", html="";
+      try{
+        const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key),
+          {method:"POST",headers:{"Content-Type":"application/json"},
+           body:JSON.stringify({contents:[{parts:[{text:prompt}]}],
+             generationConfig:{temperature:0.85,maxOutputTokens:32768, thinkingConfig:{thinkingBudget:0}, responseMimeType:"application/json"}})});
+        const j=await r.json();
+        const cand=(j.candidates||[])[0]||{};
+        if(cand.finishReason==="MAX_TOKENS") throw new Error("응답 잘림");
+        const raw=(((cand.content||{}).parts||[])[0]?.text||"").trim().replace(/^```json?\s*/i,"").replace(/\s*```$/,"");
+        const o=JSON.parse(raw); title=(o.title||"").trim(); html=(o.html||"").trim();
+      }catch(e){ log.say(`시도 ${attempt} 실패 — ${escAttr(String(e).slice(0,60))}`, false); continue; }
+      // 기계 검증: 본문 점수·분량·구조 + 제목(니치·조사·상투)
+      const q=_dcQuickScore(html);
+      const h2s=(html.match(/<h2/gi)||[]).length;
+      const badTopic=/지원금|보조금|사업|금융|대출|보험|건강|다이어트/.test(title);
+      const hasParticle=/(?:을|를|이|가|은|는|에|로|의|와|과|도|만)\s/.test(title+" ");
+      if(q.score<70 || q.len<1300 || h2s<3 || badTopic || !hasParticle || title.length<15){
+        log.say(`시도 ${attempt} 검증 미달(${q.score}점·${q.len}자·h2 ${h2s}${badTopic?"·니치밖":""}) — ${attempt<2?"다시 씁니다":"건너뜀"}`, false); continue;
+      }
+      okPost={title, html, score:q.score, len:q.len};
+    }
+    if(!okPost){ log.say(`${when} 슬롯 — 2회 모두 미달, 비워둠`, false); continue; }
+    try{
+      const body={title:okPost.title, content:okPost.html, status:"future", date:slot.at.slice(0,19)};
+      if(catId) body.categories=[catId];
+      const r=await fetch(base+"/wp-json/wp/v2/posts",{method:"POST",
+        headers:Object.assign({"Content-Type":"application/json"},wpAuth()), body:JSON.stringify(body)});
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      const np=await r.json();
+      slot.status="done"; slot.postId=np.id; made++;
+      newPosts.push({id:np.id, title:okPost.title, html:okPost.html, len:okPost.len});
+      log.say(`✅ ${when} — ${escAttr(okPost.title.slice(0,30))} (${okPost.score}점·${okPost.len}자)`);
+    }catch(e){ log.say(`업로드 실패 — ${escAttr(String(e).slice(0,60))}`, false); }
+  }
+  planSave(p); renderPlan();
+  if(newPosts.length){
+    // 새 글에도 설명 도해 — 기존 도해 생성기를 그대로 태운다
+    log.say(`도해 ${newPosts.length}장 생성 중…`, undefined, "cur");
+    window._dcState=Object.assign(window._dcState||{fails:[],mergePairs:[]},{noImg:newPosts});
+    try{ await genPostImages(true); }catch(e){ log.say("도해 생성 실패 — 글은 예약됨, 나중에 '도해 생성'으로 보완 가능", false); }
+  }
+  log.say(`완료 — ${made}편 작성·예약${made<empty.length?` (${empty.length-made}편은 미달로 비움)`:""}`, made>0);
+  log.finish("완료", made>0?"📋 색인 요청 도우미에서 오늘 10개를 처리하세요":"다시 실행하거나 초안 예약을 이용하세요");
 }
 
 /* ───────── 색인 요청 도우미 ─────────
