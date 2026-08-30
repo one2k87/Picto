@@ -454,7 +454,7 @@ def _parse_output(raw):
     return {}
 
 
-def _convert_markers(html_body, insert_ads, resolver=None):
+def _convert_markers(html_body, insert_ads, resolver=None, fallback_desc=""):
     """[[IMG:..]] / [[AD]] 마커를 실제 이미지/광고 자리로 치환. 부족하면 자동 보충."""
     counter = [0]
 
@@ -470,6 +470,15 @@ def _convert_markers(html_body, insert_ads, resolver=None):
         return _img_slot(desc)            # 실패/미설정 시 자리 표시
 
     html_body = re.sub(r"\[\[IMG:([^\]]*)\]\]", img_repl, html_body)
+    # LLM이 [[IMG:]] 마커를 빼먹는 일이 잦다 — 검수 요건(이미지 1장 이상)이 있으므로
+    # 마커가 없으면 제목 기반으로 1장을 보장 삽입한다(2026-08-30: 마커 누락→전량 폐기 원인).
+    if counter[0] == 0 and resolver and fallback_desc:
+        _html = resolver(f"{fallback_desc} — 작업 과정을 설명하는 도해", 1)
+        if _html:
+            if "</h2>" in html_body:
+                html_body = html_body.replace("</h2>", "</h2>" + _html, 1)
+            else:
+                html_body = _html + html_body
     if insert_ads:
         if "[[AD]]" in html_body:
             html_body = html_body.replace("[[AD]]", _ad_slot())
@@ -748,7 +757,8 @@ def _build_jsonld(title, meta, faqs, author="편집부", lang="ko", author_type=
 
 def _assemble(data, related, blog_url, insert_ads, resolver=None, series_nav="",
               category="", author="편집부", author_bio="", author_type="Organization"):
-    body = _convert_markers(data.get("html_body", ""), insert_ads, resolver)
+    body = _convert_markers(data.get("html_body", ""), insert_ads, resolver,
+                            fallback_desc=(data.get("title") or "")[:60])
     body, headings = _slugify_headings(body)
     toc = _build_toc(headings)
     summary = _summary_table_html(data.get("summary_table"))
