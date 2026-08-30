@@ -14483,6 +14483,19 @@
       "intent": "evergreen",
       "date": "2026-08-30",
       "series_id": ""
+    },
+    {
+      "title": "셀프 인테리어 공사 후 하자 보수, 2026년 8월 기준 업체 선정 기준과 비용을 비교합니다.",
+      "slug": "self-interior-after-repair-cost-comparison-2026-08",
+      "url": "",
+      "post_id": null,
+      "status": "폐기",
+      "kind": "long",
+      "keyword": "셀프 인테리어 공사 후 하자 보수 업체 선정 기준과 비용 비교",
+      "category": "셀프 인테리어",
+      "intent": "revenue",
+      "date": "2026-08-30",
+      "series_id": ""
     }
   ]
 }
