@@ -166,6 +166,8 @@ def collect_lane(cfg, cat, lane, n_slots, exclude):
     return sel
 
 
+IMG_ERRS = []   # 이미지 생성 실패 사유 수집(관측용)
+
 def make_image_resolver(cfg, auto_publish, category="", budget=None):
     """[[IMG:설명]] → 실제 이미지 자동 생성 후 <figure> 반환하는 콜백(카테고리별).
     budget={"used":n,"max":N} 로 실행 1회당 이미지 개수를 제한(비용 상한)."""
@@ -183,6 +185,9 @@ def make_image_resolver(cfg, auto_publish, category="", budget=None):
             return None                      # 비용 상한 초과 → 자리표시로 대체
         path = images.generate_image(desc, imgcfg, out, idx, category=category)
         if not path:
+            err = getattr(images, "LAST_ERR", "")
+            if err:
+                IMG_ERRS.append(err[:180])
             return None
         if budget is not None:
             budget["used"] = budget.get("used", 0) + 1
@@ -691,6 +696,7 @@ def _save_status_and_notify(cfg, all_articles, start_t, ok=True, error=""):
         "duration_s": int(time.time() - start_t),
         "cost": {"month_krw": cost_krw, "llm_calls": usage["llm_calls"]},
         "health_bad": health_bad,
+        "image_errors": IMG_ERRS[-5:],   # 이미지 실패가 조용히 사라지지 않게(2026-08-30)
     }
 
     status = {

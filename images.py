@@ -59,6 +59,7 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category=""):
         data = _gemini(build_prompt(desc, category, cfg_images.get("style")), cfg_images)
         if data: LAST_KIND = "ai"
     if not data:
+        globals()["LAST_ERR"] = globals().get("LAST_ERR") or f"provider '{provider}' 결과 없음(스톡 키·Pillow 확인)"
         return None
 
     # 사용량/비용 집계(유료 provider만 비용 발생)
@@ -242,6 +243,7 @@ def to_data_uri(path):
 
 
 LAST_KIND = "photo"   # generate_image가 갱신: "ai"(생성 도해) / "photo"(스톡·썸네일)
+LAST_ERR = ""         # 마지막 실패 사유(관측용) — status.json에 실린다
 
 def figure_html(src, alt, note=None):
     a = (alt or "").replace('"', "'")
@@ -279,8 +281,9 @@ def _gemini(prompt, cfg):
         r = _rq.post(url, json={"contents": [{"parts": [{"text": prompt}]}]}, timeout=90)
         j = r.json()
         if r.status_code != 200:
-            print(f"[images] gemini 실패 HTTP {r.status_code}: "
-                  f"{str(j.get('error',{}).get('message',''))[:120]}")
+            global LAST_ERR
+            LAST_ERR = f"gemini HTTP {r.status_code}: {str(j.get('error',{}).get('message',''))[:150]}"
+            print(f"[images] {LAST_ERR}")
             return None
         for part in (j.get("candidates") or [{}])[0].get("content", {}).get("parts", []):
             blob = part.get("inlineData") or part.get("inline_data") or {}
@@ -288,6 +291,7 @@ def _gemini(prompt, cfg):
                 return base64.b64decode(blob["data"])
         print("[images] gemini 응답에 이미지 없음")
     except Exception as e:
+        globals()["LAST_ERR"] = f"gemini 예외: {str(e)[:150]}"
         print(f"[images] gemini 생성 실패: {e}")
     return None
 """
@@ -534,6 +538,7 @@ def to_data_uri(path):
 
 
 LAST_KIND = "photo"   # generate_image가 갱신: "ai"(생성 도해) / "photo"(스톡·썸네일)
+LAST_ERR = ""         # 마지막 실패 사유(관측용) — status.json에 실린다
 
 def figure_html(src, alt, note=None):
     a = (alt or "").replace('"', "'")
