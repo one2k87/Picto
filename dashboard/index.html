@@ -538,9 +538,13 @@
 /* ===== 작업 진행 배너 =====
    스크롤을 따라 사라지지 않도록 화면에 고정한다. 위치는 JS가 헤더·서브탭의
    실제 높이를 재서 그 '아래'로 잡으므로 메뉴를 가리지 않는다. */
-#workbar{position:fixed;left:8px;right:8px;z-index:40;display:none;
-  background:var(--card);border:1px solid var(--accent);border-radius:14px;
-  padding:10px 14px;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+/* 상태바 v129: 우상단 플로팅 카드가 본문을 가리던 문제 →
+   헤더 바로 아래 전폭 스트립으로 도킹. 흐름에 포함되어 본문을 '밀어내고',
+   sticky로 스크롤 중에도 헤더 밑에 붙어 있는다. */
+#workbar{position:sticky;top:0;left:0;right:0;z-index:19;display:none;
+  background:color-mix(in srgb,var(--accent) 10%,var(--bg));
+  border-bottom:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));
+  border-radius:0;padding:9px 44px 9px 14px;margin:0}
 #workbar.on{display:block}
 #workbar .w-t{font-weight:800;font-size:14px;display:flex;align-items:center;gap:8px}
 #workbar .w-sp{width:14px;height:14px;border:2px solid var(--accent);border-top-color:transparent;
@@ -3165,13 +3169,11 @@ function _workbarEl(){
     w.innerHTML='<div class="w-t"><span class="w-sp"></span><span class="w-title"></span></div><div class="w-d"></div>';
     document.body.appendChild(w);
   }
-  // 헤더 + (보이는) 서브탭의 실제 높이를 재서 바로 아래에 붙인다
-  let top=8;
+  // 헤더 '바로 다음' 위치에 도킹(문서 흐름 안 → 본문을 가리지 않고 밀어낸다)
   const hd=document.querySelector("header");
-  if(hd) top=hd.getBoundingClientRect().bottom;
-  const st=[...document.querySelectorAll(".subtabs")].find(e=>e.offsetParent!==null);
-  if(st){ const r=st.getBoundingClientRect(); if(r.bottom>top) top=r.bottom; }
-  w.style.top=(top+6)+"px";
+  if(hd && w.previousElementSibling!==hd) hd.after(w);
+  // sticky 고정 지점 = 헤더의 실제 높이
+  if(hd) w.style.top=hd.getBoundingClientRect().height+"px";
   return w;
 }
 function workBanner(){
@@ -3183,7 +3185,7 @@ function workBanner(){
     x.className="w-x"; x.textContent="✕";
     x.style.cssText="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:4px";
     x.onclick=()=>w.classList.remove("on");
-    w.style.position="fixed"; w.appendChild(x);
+    w.appendChild(x);
   }
   return {
     start(t,d){ w.classList.add("on"); w.querySelector(".w-title").textContent=t;
@@ -4702,13 +4704,13 @@ async function renderIdxQueue(){
       ${CFG.indexnowOn?`✅ <b>IndexNow</b> 켜짐 — 발행되면 네이버·빙·얀덱스에 즉시 자동 등록됩니다`
         :`⬜ IndexNow 미설정 — 네이버·빙 즉시 등록. 아래 버튼 한 번이면 끝 <button class="btn sm" style="padding:1px 8px;font-size:11px" onclick="enableAutoIndex()">켜기</button>`}<br>
       ✅ <b>WebSub</b> — 발행되면 구글에 RSS 갱신을 자동 푸시(매일 실행에 포함)<br>
-      ${CFG.rssSubmitted?`✅ RSS 피드 Search Console 제출됨`
-        :`⬜ <b>1회만</b>: RSS 피드를 SC → 사이트맵에 제출하면 구글 발견이 빨라집니다
-         <button class="btn sm" style="padding:1px 8px;font-size:11px" onclick="navigator.clipboard.writeText('${feed}');toast('피드 주소 복사됨 — SC 사이트맵에 붙여넣기',0)">피드 복사</button>
-         <button class="btn sm" style="padding:1px 8px;font-size:11px" onclick="CFG.rssSubmitted=true;saveCfg();renderIdxQueue()">✓제출함</button>`}
+      ✅ <b>사이트맵·RSS</b> — 매일 Search Console에 자동 재제출(수동 작업 없음)
       ${idxStat}
     </div>
-    <div class="hint" style="margin-top:4px;opacity:.8">※ 구글은 IndexNow에 참여하지 않아(2026), 구글 쪽 '요청 버튼'만은 자동화 API가 없습니다. 아래 수동 요청은 <b>신청 직전 스프린트 전용</b>입니다.</div>
+    <div class="hint" style="margin-top:5px;padding-top:5px;border-top:1px dashed var(--line)">
+      <b>아래 '수동 색인 요청'과의 차이</b> — 위는 구글·네이버에 "새 글 있어요"라고 <u>알리는</u> 자동 채널이고,
+      아래는 구글에 "지금 당장 가져가"라고 <u>강제하는</u> 버튼입니다. 구글이 이 버튼만은 자동화를 막아두어,
+      평소엔 필요 없고 <b>애드센스 신청 직전(스프린트)에만</b> 사람이 누릅니다.</div>
   </div>`;
   if(!today.length){
     box.innerHTML=autoLayer+`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-top:8px" class="hint">
@@ -6909,12 +6911,13 @@ function syncViews(){
 // 탭 줄은 sticky로 고정돼 아래로 스크롤해도 늘 손에 닿는다.
 const SUBTABS={
   adsSheet:{
+    /* v129 메뉴 단순화: 5탭 → 3탭. 원칙 = 탭은 여정 단계와 1:1.
+       '오늘'(인박스+현황) → '점검'(문제 발견·수리) → '신청·결과'(세팅·신청·기록).
+       준비(필수 페이지·플러그인)는 1회성이라 신청 흐름에 흡수했다. */
     tabs:[
-      {k:"now",  label:"현황"},
+      {k:"now",  label:"오늘"},
       {k:"check",label:"점검", ids:["adsCheck"]},
-      {k:"prep", label:"준비", ids:["adsMakePages","adsPlugScan"]},
-      {k:"apply",label:"신청", ids:["adsGuide","adsReviewMode"]},
-      {k:"result",label:"결과", ids:["adsAnalyze","adsLogApply","adsTrackBtn"]},
+      {k:"apply",label:"신청·결과", ids:["adsMakePages","adsPlugScan","adsGuide","adsReviewMode","adsAnalyze","adsLogApply","adsTrackBtn"]},
     ],
     home:"now", render:()=>renderAdsDash(),
   },
@@ -7022,6 +7025,7 @@ function settingsToSubtabs(){
 }
 function showSub(pageId,k){
   const page=document.getElementById(pageId), cfg=SUBTABS[pageId]; if(!page||!cfg) return;
+  if(!cfg.tabs.some(t=>t.k===k)) k=cfg.home;   // 병합으로 사라진 탭 키 폴백(v129)
   page.dataset.sub=k;
   page.querySelectorAll(".subtabs .st").forEach(b=>b.classList.toggle("active",b.dataset.k===k));
   page.querySelectorAll(".sub-sec").forEach(d=>d.classList.toggle("on",d.dataset.k===k));
@@ -7264,10 +7268,10 @@ function renderAdsDash(){
   else stage="apply";
   const NEXT={
     site:"⚙️ 설정에서 블로그 주소·앱 비밀번호 연결 (도메인이 없으면 준비 탭의 안내부터)",
-    setup:"준비 탭 '원클릭 정리'로 필수 페이지·소개(팀 명의)·사이트 구성 자동 세팅",
+    setup:"'신청·결과' 탭의 원클릭 정리로 필수 페이지·소개(팀 명의)·사이트 구성 자동 세팅",
     content:"점검 탭에서 발행 계획(⚡ 스프린트)을 만들어 예약 발행 시작",
     check:CFG.lastRejectReason?"반려 사유 기반으로 '한 번에 고치기' → 재점검 통과시키기":"점검에서 걸린 항목을 '한 번에 고치기'로 해결",
-    apply:"신청 탭 가이드 따라 애드센스 검토 요청 (색인 요청 병행)",
+    apply:"'신청·결과' 탭 가이드 따라 애드센스 검토 요청 (색인 요청 병행)",
     review:"심사 결과 대기 중 — 결과가 오면 결과 탭에 기록 (반려면 사유 붙여넣기)",
     done:"수익 최적화 켜고 발행 재개"};
   const next=NEXT[stage];
