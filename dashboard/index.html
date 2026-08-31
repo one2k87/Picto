@@ -5305,6 +5305,17 @@ async function adsCheck(){
   const withImg=sample.filter(p=>(p._embedded&&p._embedded["wp:featuredmedia"])||/<img/i.test((p.content&&p.content.rendered)||"")).length;
   const imgRatio=sample.length?Math.round(withImg/sample.length*100):0;
   const hasPage=(p)=>pages.some(x=>((x.slug||"").includes(p.slug))||p.keys.some(k=>((x.title&&x.title.rendered)||"").includes(k)));
+  // 🌐 www 변형 도메인 생존 검사 — 죽은 www는 색인 분산·죽은 링크를 만든다.
+  // 실측(2026-08-31): 구글에 www 주소가 색인돼 있는데 서버가 www에 무응답이었다
+  // (호스팅에서 도메인 연결 시 www 별칭이 자동으로 안 붙는 게 보통 — 모든 이용자가 겪는 함정).
+  // no-cors fetch는 내용은 못 읽지만 '연결 자체가 되는가'는 정확히 알려준다(오탐 없음 실측).
+  let wwwOk=null, wwwVariant="";
+  try{
+    const host=new URL(wpBase()).host;
+    wwwVariant=host.startsWith("www.")?host.replace(/^www\./,""):"www."+host;
+    await fetch("https://"+wwwVariant+"/",{mode:"no-cors",cache:"no-store"});
+    wwwOk=true;
+  }catch(e){ wwwOk=false; }
   // 소개 페이지 충실도 — 존재만으로는 부족하다. 739자짜리 소개가 반려 요인이 됐던 실측 사례(2026-08).
   const aboutPg=pages.find(x=>(x.slug||"").includes("about")||((x.title&&x.title.rendered)||"").includes("소개"));
   const aboutLen=aboutPg?stripLen(aboutPg.content&&aboutPg.content.rendered):0;
@@ -5406,6 +5417,13 @@ async function adsCheck(){
     {h:"🏷️ 사이트 기본", items:[
       {ok:!!siteTitle, label:`사이트 제목 ${siteTitle?"("+siteTitle+")":""}`, reason:"워드프레스 설정 → 일반 → 사이트 제목을 채우세요."},
       {ok:!!siteDesc, label:"사이트 설명(태그라인)", reason:"워드프레스 설정 → 일반 → 태그라인을 채우세요. 비어 있으면 제목이 '블로그 -'처럼 끊겨 미완성으로 보입니다."},
+      {ok:wwwOk!==false, label:`도메인 변형 응답 (${wwwVariant||"www"})`,
+       reason:`<b>왜 문제인가</b> — 방문자와 구글이 <b>${escAttr(wwwVariant)}</b>로 들어오면 접속 자체가 안 됩니다. 구글이 이 주소를 색인해 두면 '죽은 링크가 있는 사이트'가 되고 색인도 둘로 갈립니다. 호스팅에서 도메인을 연결할 때 www 별칭이 자동으로 안 붙는 게 보통이라, 거의 모든 새 블로그가 겪는 함정입니다.<br>
+       <b>고치는 법 (1회 · 약 2분 · 3번 클릭)</b><br>
+       ① <a href="https://unified.cloudways.com" target="_blank" style="color:var(--accent)">Cloudways 콘솔</a> → 애플리케이션 → <b>Domain Management</b> → Add Domain에 <b>${escAttr(wwwVariant)}</b> 추가<br>
+       ② 같은 화면 왼쪽 <b>SSL Certificate</b> → Domain에 ${escAttr(wwwVariant)} 추가 → Save(인증서 재발급, 1~2분)<br>
+       ③ 이 점검을 다시 실행하면 자동으로 초록불이 됩니다.<br>
+       <span style="opacity:.75">다른 호스팅이면: 도메인/별칭 메뉴에 ${escAttr(wwwVariant)} 추가 + SSL 재발급 — 메뉴 이름만 다르고 원리는 같습니다.</span>`},
     ]},
     {h:"🔧 수동 확인 (안내)", items:[
       {ok:null, label:"메뉴에 소개·문의·개인정보 연결", reason:"워드프레스 → 외모 → 메뉴에서 상단 메뉴에 추가."},
