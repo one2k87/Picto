@@ -2121,7 +2121,7 @@ async function todoItems(){
     const plan=typeof planLoad==="function"?planLoad():null;
     if(plan&&plan.mode==="sprint"){
       const doneN=Object.keys(CFG.idxReq||{}).length;
-      if(doneN<30) t.push({i:"📋", x:`오늘의 색인 요청 10개 처리 (누적 ${doneN}/30)`, b:"열기", a:"gotoTab('ads');showSub('adsSheet','check')"});
+      if(doneN<30) t.push({i:"🚀", x:`빠른 등록 부스터 — 오늘 10개 (누적 ${doneN}/30)`, b:"열기", a:"gotoTab('ads');showSub('adsSheet','check')"});
     }
   }catch(e){}
   try{
@@ -4695,38 +4695,46 @@ async function renderIdxQueue(){
     idxStat=`<div class="hint" style="margin-top:4px;padding-top:4px;border-top:1px dashed var(--line)">
       🚦 <b>구글 색인 현황</b> — 글 ${p}/${n}편 색인됨 <span style="opacity:.7">(${s.updated_at.slice(5,10)} 검사, 매일 자동 갱신)</span><br>
       ${ready?`<span style="color:var(--ok)">신청 가능 수준입니다.</span>`
-        :`<span style="color:#ffb59e">아직 부족 — 색인이 이 정도로 낮으면 심사관에게 '콘텐츠 없는 사이트'로 보입니다. 수동 색인 요청을 먼저 채우고, 신호등이 충분해진 뒤 신청하세요.</span>`}
+        :`<span style="color:#ffb59e">아직 부족 — 색인이 이 정도로 낮으면 심사관에게 '콘텐츠 없는 사이트'로 보입니다. 아래 부스터를 먼저 채우고, 이 수치가 충분해진 뒤 신청하세요.</span>`}
     </div>`;
   }catch(e){}
-  const autoLayer=`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-top:8px">
-    <b>🔔 자동 색인 (등록해두면 알아서)</b>
-    <div class="hint" style="margin-top:3px">
-      ${CFG.indexnowOn?`✅ <b>IndexNow</b> 켜짐 — 발행되면 네이버·빙·얀덱스에 즉시 자동 등록됩니다`
-        :`⬜ IndexNow 미설정 — 네이버·빙 즉시 등록. 아래 버튼 한 번이면 끝 <button class="btn sm" style="padding:1px 8px;font-size:11px" onclick="enableAutoIndex()">켜기</button>`}<br>
-      ✅ <b>WebSub</b> — 발행되면 구글에 RSS 갱신을 자동 푸시(매일 실행에 포함)<br>
-      ✅ <b>사이트맵·RSS</b> — 매일 Search Console에 자동 재제출(수동 작업 없음)
-      ${idxStat}
-    </div>
-    <div class="hint" style="margin-top:5px;padding-top:5px;border-top:1px dashed var(--line)">
-      <b>아래 '수동 색인 요청'과의 차이</b> — 위는 구글·네이버에 "새 글 있어요"라고 <u>알리는</u> 자동 채널이고,
-      아래는 구글에 "지금 당장 가져가"라고 <u>강제하는</u> 버튼입니다. 구글이 이 버튼만은 자동화를 막아두어,
-      평소엔 필요 없고 <b>애드센스 신청 직전(스프린트)에만</b> 사람이 누릅니다.</div>
-  </div>`;
-  if(!today.length){
-    box.innerHTML=autoLayer+`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-top:8px" class="hint">
-      ✅ 수동 색인 요청 전부 완료 (${doneN}개). 1~2일 뒤 Search Console에서 크롤 날짜 갱신을 확인하세요.</div>`;
-    return;
+  // ═ 단일 카드(v130) — "색인이 왜 두 개?"라는 혼란 제거 ═
+  // 원칙: 이름은 메커니즘(IndexNow/WebSub)이 아니라 결과로 붙인다.
+  //   "자동 알림"(항상, 무노력) + "빠른 등록 부스터"(신청 전 며칠만, 예외 작업).
+  // 상세 채널은 접어두고 궁금한 사람만 연다. 부스터는 스프린트일 때만 나타난다.
+  const autoDetail=`<details style="margin-top:3px"><summary class="hint" style="cursor:pointer">자동으로 어떻게 되나요? (채널 상세)</summary>
+    <div class="hint" style="margin:5px 0 0 10px">
+      ${CFG.indexnowOn?`✅ IndexNow — 발행 즉시 네이버·빙·얀덱스에 등록`
+        :`⬜ IndexNow — 네이버·빙 즉시 등록 <button class="btn sm" style="padding:1px 8px;font-size:11px" onclick="enableAutoIndex()">켜기</button>`}<br>
+      ✅ WebSub — 발행 즉시 구글에 RSS 푸시<br>
+      ✅ 사이트맵·RSS — 매일 Search Console 자동 재제출<br>
+      ✅ 재크롤 넛지 — 매일 최근 글 30개 자동 검사(Inspection API)
+    </div></details>`;
+  let booster="";
+  if(today.length){
+    booster=`<div style="margin-top:10px;padding-top:9px;border-top:1px solid var(--line)">
+      <b>🚀 빠른 등록 부스터 — 오늘 ${today.length}개</b> <span class="hint">(완료 ${doneN} / 전체 ${urls.length})</span>
+      <div class="hint" style="margin-top:3px"><b>신청 전 며칠만</b> 쓰는 예외 작업입니다. 위의 자동 알림은 "새 글 있어요"까지만 전할 수 있고,
+        "지금 당장 가져가"라고 <u>강제하는 버튼</u>만은 구글이 자동화를 막아뒀습니다. 그래서 이 부분만 하루 5분, 사람이 누릅니다.
+        방법: 복사 → Search Console 검색창에 붙여넣기 → <b>색인 생성 요청</b> → ✓완료.</div>
+      <div class="hint" style="margin-top:5px;max-height:170px;overflow-y:auto">
+        ${today.map(u=>`<div style="margin:3px 0;display:flex;gap:6px;align-items:center">
+          <button class="btn sm" style="padding:1px 7px;font-size:11px" onclick="navigator.clipboard.writeText('${u}');toast('복사됨',0)">복사</button>
+          <button class="btn sm" style="padding:1px 7px;font-size:11px" onclick="idxMark('${u}')">✓완료</button>
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escAttr(decodeURIComponent(u).replace(/^https?:\/\//,''))}</span></div>`).join("")}
+      </div>
+      <a href="https://search.google.com/search-console" target="_blank" class="btn primary sm" style="display:block;text-align:center;margin-top:7px">Search Console 열기</a>
+    </div>`;
+  }else if(doneN){
+    booster=`<div class="hint" style="margin-top:9px;padding-top:8px;border-top:1px solid var(--line)">
+      ✅ 부스터 완료(${doneN}개) — 1~2일 뒤 위 색인 현황이 올라가는지 자동으로 확인됩니다.</div>`;
   }
-  box.innerHTML=autoLayer+`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-top:8px">
-    <b>📋 오늘의 색인 요청 ${today.length}개</b> <span class="hint">— 신청 직전 스프린트 전용(구글만 해당)</span> <span class="hint">(완료 ${doneN} / 전체 ${urls.length} · 최근 수정 글 우선)</span>
-    <div class="hint" style="margin-top:3px">Search Console 상단 검색창에 URL을 붙여넣고 → <b>색인 생성 요청</b>. 하루 한도가 약 10개라 매일 나눠 합니다.</div>
-    <div class="hint" style="margin-top:5px;max-height:170px;overflow-y:auto">
-      ${today.map(u=>`<div style="margin:3px 0;display:flex;gap:6px;align-items:center">
-        <button class="btn sm" style="padding:1px 7px;font-size:11px" onclick="navigator.clipboard.writeText('${u}');toast('복사됨',0)">복사</button>
-        <button class="btn sm" style="padding:1px 7px;font-size:11px" onclick="idxMark('${u}')">✓완료</button>
-        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escAttr(decodeURIComponent(u).replace(/^https?:\/\//,''))}</span></div>`).join("")}
-    </div>
-    <a href="https://search.google.com/search-console" target="_blank" class="btn primary sm" style="display:block;text-align:center;margin-top:7px">Search Console 열기</a>
+  box.innerHTML=`<div class="card" style="margin-top:8px;padding:11px 13px">
+    <b>🔎 검색 등록(색인)</b> <span class="hint">— 구글·네이버가 내 글을 검색 목록에 올리는 것</span>
+    <div class="hint" style="margin-top:5px">✅ <b>자동 알림</b> — 글이 발행되면 스크립토가 구글·네이버·빙에 알아서 알립니다. 하실 일이 없습니다.</div>
+    ${autoDetail}
+    ${idxStat}
+    ${booster}
   </div>`;
 }
 
