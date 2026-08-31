@@ -1,0 +1,14 @@
+{
+ "updated_at": "2026-08-31T03:36:56",
+ "site": "https://wontheland.com",
+ "checked": 1,
+ "indexed": 1,
+ "results": [
+  {
+   "url": "https://wontheland.com/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-08-29"
+  }
+ ]
+}
