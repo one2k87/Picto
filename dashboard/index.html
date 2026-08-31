@@ -3940,7 +3940,7 @@ async function contentDeepCheck(){
     // 가짜 1인칭 경험담 — 옛 생성기의 '경험담 도입 틀'이 만든 창작 경험 주장.
     // 실측(2026-08-31): 32편 중 22편에서 발견. 가짜 Experience는 2025-09 가이드라인의
     // YMYL 확대와 정면 충돌 — 걸리면 사이트 단위 신뢰 하락이라 반드시 걷어낸다.
-    const fakeExp=(txt.match(/제가 (?:직접|경험|현장에서|작업할|시공|준비한)|겪었습니다|겪으면서였|경험 때문이었|현장을 경험|체감하게 된 건/g)||[]).length;
+    const fakeExp=(txt.match(/제가 (?:직접|경험|현장에서|작업할|시공|준비한)|겪었(?:습니다|기 때문|던)|겪으면서|경험 때문이었|현장을 경험|체감하게 된|느끼게 됐|(?:이해|정리)하게 된 건/g)||[]).length;
     return {id:p.id, link:p.link, html, title:_dcText((p.title&&p.title.rendered)||""), fakeExp,
       len:txt.length, sents, endRatio, topEnd:topEnd[0],
       cliche:DC_CLICHE.filter(re=>re.test(txt)).length,
