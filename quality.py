@@ -58,9 +58,19 @@ def is_discard(reason_str):
     return bool((reason_str or "").strip())
 
 
+_END_STRIP = re.compile(r"(?:입니다|합니다|됩니다|줍니다|집니다|합니까|입니까|하세요|보세요|마세요|세요|해요|어요|네요|을까요|일까요|까요|나요|는가|은가|죠)$")
+
 def title_ending(title):
-    """제목의 마지막 어절(한국어는 여기서 템플릿성이 드러난다)."""
+    """제목 마무리의 '동사 어간'을 돌려준다.
+    종결어미(합니다/하세요/까요…)는 한국어의 닫힌 어휘라 문장형 제목끼리 겹치는 게
+    정상이다. 어미를 그대로 비교하던 옛 방식은 문장형 제목(우리가 권장한 방향)을
+    전부 템플릿으로 오판해 재생성을 반복시켰다(2026-08-31 실측 후 개편).
+    어미를 벗긴 어간끼리 비교하면 같은 동사 남발(진짜 반복)만 잡힌다."""
     w = re.findall(r"[가-힣A-Za-z0-9]+", title or "")
+    for i in range(len(w) - 1, max(len(w) - 4, -1), -1):
+        stem = _END_STRIP.sub("", w[i])
+        if len(stem) >= 2:
+            return stem
     return w[-1] if w else ""
 
 
@@ -183,7 +193,7 @@ def check(article, other_texts, safety, recent=None):
         end = title_ending(title)
         if end and len(end) > 1:
             dup = sum(1 for r in recent if title_ending(r.get("title", "")) == end)
-            if dup >= int(safety.get("max_same_title_ending", 2)):
+            if dup >= int(safety.get("max_same_title_ending", 3)):  # 어간 기준이라 2는 과민(실측)
                 reasons.append(f"제목템플릿(어미'{end}' 최근 {dup}건)")
 
         # 3) 도입부 상투 구문
