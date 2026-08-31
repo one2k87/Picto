@@ -4509,6 +4509,20 @@ async function renderIdxQueue(){
   const today=todo.slice(0,10);
   const doneN=Object.keys(done).length;
   const feed="https://"+new URL(wpBase()).host+"/feed/";
+  // 구글 색인 신호등 — 매일 실행의 Inspection API 결과(index_status.json).
+  // 2026-08-31 실측: 글 29편 전부 "unknown to Google" — 색인 0이 반려의 숨은 원인이었다.
+  let idxStat="";
+  try{
+    const s=await (await fetch("data/index_status.json?nc="+Date.now(),{cache:"no-store"})).json();
+    const n=s.results.filter(r=>r.url!==s.site+"/").length;
+    const p=s.results.filter(r=>r.verdict==="PASS"&&r.url!==s.site+"/").length;
+    const ready=p>=Math.min(20,Math.max(5,Math.round(n*0.6)));
+    idxStat=`<div class="hint" style="margin-top:4px;padding-top:4px;border-top:1px dashed var(--line)">
+      🚦 <b>구글 색인 현황</b> — 글 ${p}/${n}편 색인됨 <span style="opacity:.7">(${s.updated_at.slice(5,10)} 검사, 매일 자동 갱신)</span><br>
+      ${ready?`<span style="color:var(--ok)">신청 가능 수준입니다.</span>`
+        :`<span style="color:#ffb59e">아직 부족 — 색인이 이 정도로 낮으면 심사관에게 '콘텐츠 없는 사이트'로 보입니다. 수동 색인 요청을 먼저 채우고, 신호등이 충분해진 뒤 신청하세요.</span>`}
+    </div>`;
+  }catch(e){}
   const autoLayer=`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-top:8px">
     <b>🔔 자동 색인 (등록해두면 알아서)</b>
     <div class="hint" style="margin-top:3px">
@@ -4519,6 +4533,7 @@ async function renderIdxQueue(){
         :`⬜ <b>1회만</b>: RSS 피드를 SC → 사이트맵에 제출하면 구글 발견이 빨라집니다
          <button class="btn sm" style="padding:1px 8px;font-size:11px" onclick="navigator.clipboard.writeText('${feed}');toast('피드 주소 복사됨 — SC 사이트맵에 붙여넣기',0)">피드 복사</button>
          <button class="btn sm" style="padding:1px 8px;font-size:11px" onclick="CFG.rssSubmitted=true;saveCfg();renderIdxQueue()">✓제출함</button>`}
+      ${idxStat}
     </div>
     <div class="hint" style="margin-top:4px;opacity:.8">※ 구글은 IndexNow에 참여하지 않아(2026), 구글 쪽 '요청 버튼'만은 자동화 API가 없습니다. 아래 수동 요청은 <b>신청 직전 스프린트 전용</b>입니다.</div>
   </div>`;
