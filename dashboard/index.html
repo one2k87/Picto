@@ -14,20 +14,24 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
 <style>
-  /* 파스텔 라벤더 · 다크(기본) — 보라를 기조로 표면까지 은은하게 물들인 톤 */
+  /* shadcn 디자인 토큰 (zinc + violet 프리셋) · 다크 기본 — v128 비주얼 개편.
+     React shadcn 컴포넌트는 싱글파일 PWA라 못 얹지만, 토큰·radius·보더·상태 등
+     디자인 시스템은 그대로 이식했다. P3 React 재작성 때 1:1로 옮겨 붙는다. */
   :root{
-    --bg:#141020; --card:#1d1830; --card2:#26203c; --line:#332b4d;
-    --txt:#efeaf9; --muted:#a79dc4; --hot:#f2a08c; --niche:#9fc4f0;
-    --ok:#9fd8b4; --warn:#f5cf94; --accent:#b9a3f0; --accent-2:#8f74e0;
-    --danger:#f0a0ad; --glow:rgba(185,163,240,.30);
+    --bg:#09090b; --card:#121215; --card2:#1c1c21; --line:#27272a;
+    --txt:#fafafa; --muted:#a1a1aa; --hot:#fb923c; --niche:#60a5fa;
+    --ok:#34d399; --warn:#fbbf24; --accent:#8b5cf6; --accent-2:#7c3aed;
+    --danger:#fb7185; --glow:rgba(139,92,246,.25);
+    --radius:10px; --ring:rgba(139,92,246,.45);
     --safe-t:env(safe-area-inset-top); --safe-b:env(safe-area-inset-bottom);
   }
-  /* 파스텔 라벤더 · 라이트 */
+  /* shadcn · 라이트 */
   html[data-theme="light"]{
-    --bg:#f8f5fd; --card:#ffffff; --card2:#f2ecfb; --line:#e4daf6;
-    --txt:#2d2542; --muted:#7a6f96; --hot:#e08571; --niche:#6d9fd8;
-    --ok:#5cae7d; --warn:#d69b3f; --accent:#8b6ee0; --accent-2:#a98ef0;
-    --danger:#d97186; --glow:rgba(139,110,224,.22);
+    --bg:#fafafa; --card:#ffffff; --card2:#f4f4f5; --line:#e4e4e7;
+    --txt:#18181b; --muted:#71717a; --hot:#ea580c; --niche:#2563eb;
+    --ok:#059669; --warn:#d97706; --accent:#7c3aed; --accent-2:#8b5cf6;
+    --danger:#e11d48; --glow:rgba(124,58,237,.18);
+    --ring:rgba(124,58,237,.35);
   }
   html[data-theme="light"] header{background:rgba(248,245,253,.9) !important}
   html[data-theme="light"] .tabbar{background:rgba(255,255,255,.94)}
@@ -544,6 +548,62 @@
 @keyframes wspin{to{transform:rotate(360deg)}}
 #workbar .w-d{font-size:12px;color:var(--muted);margin-top:3px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ═══ shadcn 컴포넌트 레이어 (v128) — 기존 클래스에 후순위 오버라이드 ═══ */
+  body{font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,
+    "Apple SD Gothic Neo","Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  h1,h2,b{letter-spacing:-.015em}
+
+  /* Button — shadcn variants: 기본=secondary, .primary=default, .ok=success */
+  .btn{border-radius:calc(var(--radius) - 2px);font-weight:500;
+    border:1px solid var(--line);background:var(--card2);
+    transition:background .15s,border-color .15s,opacity .15s,transform .1s;
+    box-shadow:0 1px 2px rgba(0,0,0,.18)}
+  .btn:hover{background:color-mix(in srgb,var(--card2) 80%,var(--txt) 6%)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover{background:var(--accent-2)}
+  .btn.ok{background:var(--ok);border-color:var(--ok);color:#052e1c}
+  .btn:active{transform:scale(.98)}
+  .btn:focus-visible,.icon-btn:focus-visible,.tb:focus-visible{
+    outline:2px solid var(--ring);outline-offset:2px}
+
+  /* Input — shadcn: 투명 배경 + input 보더 + 포커스 링 */
+  input,textarea,select{background:var(--card);border:1px solid var(--line);
+    color:var(--txt);border-radius:calc(var(--radius) - 2px);
+    transition:border-color .15s,box-shadow .15s}
+  input:focus,textarea:focus,select:focus{outline:none;
+    border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+
+  /* Card */
+  .card,.dcard{border-radius:var(--radius);box-shadow:0 1px 3px rgba(0,0,0,.22)}
+  html[data-theme="light"] .card,html[data-theme="light"] .dcard{
+    box-shadow:0 1px 2px rgba(0,0,0,.06)}
+
+  /* Tabs — shadcn: active=muted 배경+전경색 (보라 하드코드 제거) */
+  .chip.active,.ptab.active,.st.active{
+    background:var(--card2);color:var(--txt);border-color:var(--line);
+    box-shadow:inset 0 0 0 1px var(--line),0 1px 2px rgba(0,0,0,.2);font-weight:600}
+  .st.active{border-bottom:2px solid var(--accent)}
+  html[data-theme="light"] .ptab.active,html[data-theme="light"] .chip.active,
+  html[data-theme="light"] .st.active{background:var(--card2);color:var(--txt)}
+
+  /* 하드코딩 보라(#241f3d) 잔재 정리 */
+  .icon-btn:active{background:var(--card2)}
+  .dnext{background:color-mix(in srgb,var(--accent) 12%,var(--bg));
+    border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+  .dnext .dl{color:var(--accent)}
+
+  /* Surface — 헤더/탭바를 배경 토큰에 연동 */
+  header{background:color-mix(in srgb,var(--bg) 88%,transparent)}
+  .tabbar{background:color-mix(in srgb,var(--bg) 94%,transparent)}
+  .tb.active{color:var(--txt)}
+  .tb.active .tbi{filter:drop-shadow(0 0 6px var(--glow))}
+
+  /* Scrollbar (데스크톱) */
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}
+  ::-webkit-scrollbar-track{background:transparent}
 </style>
 <!-- 구글 로그인(애드센스 상태 조회 전용, 읽기 권한만). 없어도 나머지 기능은 정상 동작 -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
