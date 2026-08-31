@@ -13,6 +13,14 @@ if os.path.exists(P):
     if site.get("images_provider"):
         cfg.setdefault("images", {})["provider"] = site["images_provider"]; changed = True
         print("이미지 provider 적용:", site["images_provider"])
+    # 자동 색인(IndexNow) — 키를 저장소 파일에서 읽는다(키는 원래 공개 값)
+    if site.get("indexnow"):
+        wpc = cfg.setdefault("wordpress", {})
+        wpc["indexnow_key"] = site["indexnow"].get("key", "")
+        wpc["indexnow_key_location"] = site["indexnow"].get("key_location", "")
+        changed = True
+        print("IndexNow 키 적용(네이버·빙 자동 등록)")
+
     # 주제 금지어 — desc의 서술식 금지는 LLM이 흘려듣는다. 키워드 차단이 확실하다.
     if site.get("ban_keywords"):
         sf = cfg.setdefault("safety", {})

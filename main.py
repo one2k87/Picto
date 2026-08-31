@@ -911,7 +911,8 @@ def run():
         pub_urls = [a.get("post_url") for a in all_articles
                     if a.get("post_url") and a.get("status") == "게시됨"]
         if pub_urls:
-            submit_indexnow(pub_urls, inkey, wp_cfg.get("site_url", ""))
+            submit_indexnow(pub_urls, inkey, wp_cfg.get("site_url", ""),
+                            key_location=wp_cfg.get("indexnow_key_location"))
         else:
             print("  · IndexNow: 공개 게시된 글이 없어 건너뜀(초안은 색인 대상 아님)")
 

@@ -24,7 +24,7 @@ _INDEXNOW_ENDPOINTS = [
 ]
 
 
-def submit_indexnow(urls, key, site_url):
+def submit_indexnow(urls, key, site_url, key_location=None):
     """
     새 글 URL을 네이버·빙 등에 '즉시 등록 요청'(IndexNow).
     사전 준비(1회): 사이트 루트에 '<key>.txt' 파일을 만들고 내용에 key를 넣어야 함
@@ -35,7 +35,9 @@ def submit_indexnow(urls, key, site_url):
     if not key or not urls:
         return False
     host = urlparse(site_url).netloc
-    key_loc = f"{site_url.rstrip('/')}/{key}.txt"
+    # keyLocation은 같은 호스트면 어디든 허용(IndexNow 스펙) — 루트에 파일을 못 놓는
+    # 환경(호스팅 파일관리자 없음)을 위해 미디어 업로드 URL을 쓸 수 있게 했다(2026-08-31)
+    key_loc = key_location or f"{site_url.rstrip('/')}/{key}.txt"
     payload = {"host": host, "key": key, "keyLocation": key_loc, "urlList": urls}
     ok = False
     for ep in _INDEXNOW_ENDPOINTS:
@@ -297,4 +299,21 @@ def trash_post(wp_cfg, post_id):
         return False
     except Exception as e:
         print(f"[wp] 휴지통 이동 오류: {e}")
+        return False
+
+
+def websub_ping(feed_url):
+    """구글이 참여하는 유일한 푸시 채널 — WebSub 허브에 RSS 갱신을 알린다.
+    (구글은 IndexNow 불참. 사이트맵 ping 엔드포인트는 2023년 폐지.
+     RSS+WebSub는 공식 지원이 유지되는 즉시 알림 경로다)"""
+    if not feed_url:
+        return False
+    try:
+        r = requests.post("https://pubsubhubbub.appspot.com/",
+                          data={"hub.mode": "publish", "hub.url": feed_url}, timeout=15)
+        ok = r.status_code in (200, 202, 204)
+        print(f"[websub] 허브 통지 {'성공' if ok else '실패 '+str(r.status_code)} → {feed_url}")
+        return ok
+    except Exception as e:
+        print(f"[websub] 실패: {e}")
         return False

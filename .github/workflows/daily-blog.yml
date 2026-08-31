@@ -176,6 +176,12 @@ jobs:
       - name: 블로그 생성 실행
         run: python -u main.py
 
+      # 예약 발행(WP 크론)으로 공개된 글 포함, 최근 36시간 새 글을
+      # IndexNow(네이버·빙)+WebSub(구글 RSS 푸시)로 자동 통지 — '등록해두면 알아서'
+      - name: 새 글 자동 색인 통지
+        if: always()
+        run: python scripts/ping_new_posts.py || true
+
       - name: 결과 커밋 (대시보드가 읽음)
         if: always()   # 생성 일부 실패해도 만들어진 결과는 커밋
         run: |
