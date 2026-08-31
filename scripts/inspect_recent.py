@@ -42,14 +42,16 @@ except Exception as e:
     raise SystemExit(0)
 
 # 최근 14일 내 수정된 공개 글 (검사 우선순위 = 최근 손본 순, 최대 30개/일)
+diag = {}
 try:
     r = requests.get(f"{site}/wp-json/wp/v2/posts",
-                     params={"per_page": 30, "status": "publish",
-                             "orderby": "modified", "_fields": "link,modified"},
-                     timeout=20)
+                     params={"per_page": 30, "orderby": "modified", "_fields": "link,modified"},
+                     headers={"User-Agent": "Mozilla/5.0 (ScriptoBot)"}, timeout=20)
+    diag = {"http": r.status_code, "body_head": r.text[:120]}
     posts = r.json() if r.ok else []
 except Exception as e:
     print(f"[inspect] 글 목록 실패: {e}")
+    diag = {"err": str(e)[:150]}
     posts = []
 
 cutoff = (datetime.datetime.utcnow() - datetime.timedelta(days=14)).strftime("%Y-%m-%dT%H:%M:%S")
@@ -71,7 +73,8 @@ for u in urls[:30]:
 
 passed = sum(1 for x in results if x["verdict"] == "PASS")
 out = {"updated_at": datetime.datetime.now().isoformat()[:19],
-       "site": site, "checked": ok_n, "indexed": passed, "results": results}
+       "site": site, "checked": ok_n, "indexed": passed,
+       "posts_diag": diag, "posts_n": len(posts), "results": results}
 json.dump(out, open("dashboard/data/index_status.json", "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)
 print(f"[inspect] {ok_n}개 검사 — 색인됨 {passed} / 미색인 {ok_n - passed}")
