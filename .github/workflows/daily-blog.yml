@@ -189,6 +189,12 @@ jobs:
         if: always()
         run: python scripts/inspect_recent.py || true
 
+      # 점검·수리의 서버 이전(v1): 대시보드 채점을 매일 서버에서 수행,
+      # auto_repair 켜진 사이트는 미달 글을 자동 재작성(캡 5편) — 앱을 안 열어도 관리되는 상태
+      - name: 사이트 점검·자동 수리
+        if: always()
+        run: python scripts/daily_check_fix.py || true
+
       - name: 결과 커밋 (대시보드가 읽음)
         if: always()   # 생성 일부 실패해도 만들어진 결과는 커밋
         run: |

@@ -784,7 +784,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v94 · 주제 전환 완충</span></h2>
+  <h2>⚙️ 설정 <span style="font-size:11px;color:var(--muted);font-weight:400">버전 v128 · 자동 운영</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -967,7 +967,8 @@
   <div class="field">
     <label>응용 프로그램 비밀번호</label>
     <input id="cfgPass" placeholder="abcd efgh ijkl mnop" autocapitalize="off">
-    <div class="hint">워드프레스 관리자 → 사용자 → 프로필 → 응용 프로그램 비밀번호에서 발급.</div>
+    <div class="hint">아래 버튼을 누르면 발급 화면이 바로 열립니다 — 이름 아무거나 입력 → [새 응용 프로그램 비밀번호 추가] → 나온 값을 복사해 붙여넣으세요.
+      <button class="btn sm" style="margin-top:5px" onclick="openAppPassPage()">🔑 발급 화면 바로 열기</button></div>
   </div>
   <div class="field">
     <label>게시 방식</label>
@@ -2017,6 +2018,110 @@ document.getElementById("pauseBtn").onclick=togglePause;
 // ===== 애드센스 규칙 파일(정책 변화 대응) =====
 // 심사 기준은 수시로 바뀌므로 코드에 박지 않고 별도 JSON에서 읽는다.
 // 원격(GitHub)에서 최신본을 먼저 시도하고, 실패하면 로컬 사본을 쓴다.
+/* ═══ 자동 운영 루프 (v128) — 셀프서브 원칙 적용 ═══
+   원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
+        ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
+   여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
+const APP_BUILD=128;
+
+function openAppPassPage(){
+  const site=(document.getElementById("cfgSite")?.value||CFG.site||"").trim().replace(/\/+$/,"");
+  if(!site){ toast("사이트 주소를 먼저 입력하세요",1); return; }
+  window.open(site+"/wp-admin/profile.php#application-passwords-section","_blank");
+}
+
+async function autoCheckNow(){ window._checkRunning=false; await fullCheck(); renderTodoInbox(); }
+
+// 할 일 인박스 — 흩어진 모든 '발견'을 현황 맨 위 한 카드로 모은다
+async function todoItems(){
+  const t=[];
+  if(!wpReady()){
+    t.push({i:"🔌", x:"블로그 연결이 필요합니다 — 여기서부터 시작하세요", b:"설정 열기", a:"gotoTab('set')"});
+    return t;
+  }
+  const lastAt=CFG.lastCheck?new Date(CFG.lastCheck.at).getTime():0;
+  const hrs=(Date.now()-lastAt)/36e5;
+  if(hrs>24) t.push({i:"🔍", x:lastAt?`전체 점검이 ${Math.round(hrs)}시간 전입니다`:"첫 전체 점검을 실행하세요", b:"지금 점검", a:"autoCheckNow()"});
+  try{
+    const jobs=(window._dcState&&typeof fixJobs==="function")?fixJobs():[];
+    if(jobs.length) t.push({i:"🛠️", x:`고칠 항목 ${jobs.length}건 — ${jobs.map(j=>FIX_LABEL[j.k]||j.k).join(" · ")}`, b:"한 번에 고치기", a:"fixAll()"});
+  }catch(e){}
+  try{
+    const st=await (await fetch("data/index_status.json?nc="+Date.now(),{cache:"no-store"})).json();
+    const n=st.results.filter(r=>r.url!==st.site+"/").length;
+    const p=st.results.filter(r=>r.verdict==="PASS"&&r.url!==st.site+"/").length;
+    if(n && p<Math.min(20,Math.max(5,Math.round(n*0.6))))
+      t.push({i:"🚦", x:`구글 색인 ${p}/${n}편 — 아직 부족합니다 (매일 자동 넛지 중)`, b:"색인 도우미", a:"gotoTab('ads');showSub('adsSheet','check')"});
+  }catch(e){}
+  try{
+    const plan=typeof planLoad==="function"?planLoad():null;
+    if(plan&&plan.mode==="sprint"){
+      const doneN=Object.keys(CFG.idxReq||{}).length;
+      if(doneN<30) t.push({i:"📋", x:`오늘의 색인 요청 10개 처리 (누적 ${doneN}/30)`, b:"열기", a:"gotoTab('ads');showSub('adsSheet','check')"});
+    }
+  }catch(e){}
+  try{
+    const sj=await (await fetch("data/status.json?nc="+Date.now(),{cache:"no-store"})).json();
+    const lr=sj.last_run||{};
+    if((lr.image_errors||[]).length) t.push({i:"🖼️", x:`어젯밤 이미지 생성 실패: ${lr.image_errors[0].slice(0,50)}`, b:null, a:null});
+  }catch(e){}
+  return t;
+}
+async function renderTodoInbox(){
+  const page=document.getElementById("adsSheet"); if(!page) return;
+  let box=page.querySelector("#todoBox");
+  if(!box){
+    box=document.createElement("div"); box.id="todoBox";
+    const sec=page.querySelector('.sub-sec[data-k="now"]'); if(!sec) return;
+    sec.prepend(box);
+  }
+  const items=await todoItems();
+  const toggle=`<label class="hint" style="display:flex;align-items:center;gap:6px;margin-top:7px;cursor:pointer">
+    <input type="checkbox" ${CFG.autoRepair?"checked":""} onchange="CFG.autoRepair=this.checked;saveCfg();toast(this.checked?'🔧 자동 수리 켜짐 — 점검에서 걸리면 묻지 않고 고칩니다':'자동 수리 꺼짐')">
+    걸리면 자동으로 고치기 (자동 수리)</label>`;
+  box.innerHTML=`<div class="card" style="margin-bottom:10px">
+    <b>📥 오늘 할 일</b> <span class="hint">${items.length?items.length+"건":""}</span>
+    ${items.length?items.map(it=>`<div style="display:flex;align-items:center;gap:8px;margin:7px 0">
+        <span>${it.i}</span><span style="flex:1;font-size:13px">${it.x}</span>
+        ${it.b?`<button class="btn primary sm" style="padding:2px 10px;font-size:12px" onclick="${it.a}">${it.b}</button>`:""}
+      </div>`).join("")
+    :`<div class="hint" style="margin-top:5px">✅ 오늘 할 일이 없습니다 — 발행·점검·색인 전부 자동으로 돌아가는 중입니다.</div>`}
+    ${toggle}</div>`;
+}
+
+(function autoOps(){
+  const start=async()=>{
+    // ① 새 버전 감지 — 구버전 캐시로 계속 쓰는 문제 방지
+    try{
+      const t=await (await fetch("index.html?nc="+Date.now(),{cache:"no-store"})).text();
+      const m=t.match(/APP_BUILD\s*=\s*(\d+)/);
+      if(m && +m[1]>APP_BUILD){
+        const b=document.createElement("div");
+        b.style.cssText="position:fixed;left:12px;right:12px;bottom:70px;z-index:60;background:var(--accent);color:#fff;padding:10px 14px;border-radius:12px;font-size:13px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.35)";
+        b.innerHTML=`✨ 스크립토 새 버전이 나왔습니다 <button class="btn sm" style="background:#fff;color:#111" onclick="location.reload()">새로고침</button>`;
+        document.body.appendChild(b);
+      }
+    }catch(e){}
+    try{ renderTodoInbox(); }catch(e){}
+    // ② 스테일 자동 점검 + ③ 옵트인 자동 수리
+    try{
+      if(!wpReady()) return;
+      const last=CFG.lastCheck?new Date(CFG.lastCheck.at).getTime():0;
+      if(Date.now()-last>24*36e5 && !window._checkRunning){
+        toast("마지막 점검이 24시간을 넘어 자동으로 점검합니다",0);
+        await fullCheck();
+        if(CFG.autoRepair){
+          const jobs=(typeof fixJobs==="function")?fixJobs():[];
+          if(jobs.length){ toast("🔧 자동 수리 시작 ("+jobs.length+"건)",0); await fixAll(); }
+        }
+        renderTodoInbox();
+      }
+    }catch(e){ console.warn("autoOps",e); }
+  };
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",()=>setTimeout(start,2500));
+  else setTimeout(start,2500);
+})();
+
 let ADS_RULES=null;
 async function loadAdsRules(force){
   if(ADS_RULES && !force) return ADS_RULES;
@@ -7118,6 +7223,7 @@ function renderAdsDash(){
     </div>
     <div class="dnext"><div class="dl">다음 할 일</div><div class="dv">${escAttr(next)}</div></div>`;
   animateRings(box);
+  try{ renderTodoInbox(); }catch(e){}
   countUp(box.querySelector('[data-num="'+applies+'"]'),applies,"회");
   const pEl=[...box.querySelectorAll("[data-num]")][1]; countUp(pEl,posts,"편");
 }
