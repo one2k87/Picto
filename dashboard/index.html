@@ -7050,6 +7050,129 @@ function renderMoneyDash(){
       <div class="dv">승인 후 발행을 시작하면 실제 수치가 쌓입니다</div></div>`:""}`;
   animateBars(box);
   countUp(box.querySelector("[data-cnt]"),pub,"편");
+  try{ renderDigest(); }catch(e){ console.warn("digest",e); }
+}
+
+/* ───────── 📆 주·월 결산 + 🎯 글 비율 자동 조절 ─────────
+   설계 원칙:
+   1) 글을 트렌드(시점 의존)/스테디(계절 반복)/에버그린(시점 무관) 3종으로 분류
+   2) 발행 수·구성·검색 방문을 주/월 단위로 자동 집계하고, SC/GA 수치는
+      하루 1회 스냅샷으로 저장 → 시간이 지날수록 '변화'를 말할 수 있는 시계열이 쌓인다
+   3) 권장 비율은 근거와 함께 표시(신뢰). 표본이 적으면 규칙 기반, 쌓이면
+      실측(종류별 글당 평균 클릭)을 절반 가중으로 섞는다(급변 방지)
+   4) '적용'은 저장소 data/site_categories.json의 mix 필드에 기록 →
+      매일 자동 생성이 그 비율로 오늘의 주제 유형을 뽑는다(진짜 반영) */
+function postType(t,kind){
+  const s=_dcText(t||"");
+  if(kind==="season"||/20\d\d년|[1-9]월|1[0-2]월|최신|올해|이번 달/.test(s)) return "trend";
+  if(/장마|결로|곰팡이|여름|겨울|한파|폭염|환절기|장마철|습기|난방|냉방/.test(s)) return "steady";
+  return "evergreen";
+}
+function digestSnap(){
+  const pages=(((INS||{}).search_console)||{}).pages||[];
+  const clicks=pages.reduce((a,p)=>a+(p.clicks||0),0), imps=pages.reduce((a,p)=>a+(p.impressions||0),0);
+  const views=(((INS||{}).ga4)||{}).top_pages?.reduce((a,p)=>a+(p.views||0),0)||0;
+  const today=new Date().toISOString().slice(0,10);
+  const snaps=CFG.digestSnaps||[];
+  if(!snaps.some(s=>s.at===today)){ snaps.push({at:today,clicks,imps,views}); CFG.digestSnaps=snaps.slice(-180); saveCfg(); }
+  return snaps;
+}
+function digestRoll(arts,days,offset){
+  const end=Date.now()-offset*days*864e5, start=end-days*864e5;
+  const inP=arts.filter(a=>{const t=new Date(a.date||0).getTime();return t>start&&t<=end&&a.status==="게시됨";});
+  const by={trend:0,steady:0,evergreen:0};
+  inP.forEach(a=>by[postType(a.title,a.kind)]++);
+  return {n:inP.length,by};
+}
+function typePerf(){
+  const arts=(DATA&&DATA.articles)||[];
+  const map={}; arts.forEach(a=>{ if(a.url){ try{map[decodeURIComponent(a.url).replace(/\/+$/,"")]=postType(a.title,a.kind);}catch(e){} } });
+  const agg={trend:{c:0,n:0},steady:{c:0,n:0},evergreen:{c:0,n:0}};
+  ((((INS||{}).search_console)||{}).pages||[]).forEach(p=>{
+    try{
+      const u=decodeURIComponent(p.page||"").replace(/\/+$/,"");
+      const ty=map[u]; if(ty){ agg[ty].c+=(p.clicks||0); agg[ty].n++; }
+    }catch(e){}
+  });
+  return agg;
+}
+function mixRecommend(){
+  const perf=typePerf();
+  const total=perf.trend.c+perf.steady.c+perf.evergreen.c;
+  const approved=!!CFG.adsenseApproved;
+  let mix, why=[];
+  if(!approved){
+    mix={trend:10,steady:25,evergreen:65};
+    why.push("<b>승인 전</b> — 시점 의존(트렌드) 글은 심사 시점엔 낡아 '방치된 사이트'로 보입니다. 시점 무관 글 위주가 안전합니다.");
+  }else if(total<50){
+    mix={trend:20,steady:30,evergreen:50};
+    why.push(`검색 클릭 표본이 아직 <b>${total}회</b>라 규칙 기반 기본 비율입니다. 표본 50회부터 실측 자동 보정이 켜집니다.`);
+  }else{
+    const avg=k=>perf[k].n?perf[k].c/perf[k].n:0;
+    const a={trend:avg("trend"),steady:avg("steady"),evergreen:avg("evergreen")};
+    const s=(a.trend+a.steady+a.evergreen)||1;
+    const base={trend:30,steady:30,evergreen:40};
+    mix={}; ["trend","steady","evergreen"].forEach(k=>{ mix[k]=base[k]*0.5+(a[k]/s*100)*0.5; });
+    const norm=mix.trend+mix.steady+mix.evergreen;
+    ["trend","steady","evergreen"].forEach(k=>mix[k]=Math.max(5,Math.round(mix[k]/norm*100)));
+    why.push(`실측 반영 — 종류별 글당 평균 클릭: 트렌드 ${a.trend.toFixed(1)} · 스테디 ${a.steady.toFixed(1)} · 에버그린 ${a.evergreen.toFixed(1)}. 성과를 <b>절반 가중</b>으로만 섞어 급변을 막습니다.`);
+  }
+  why.push("결산 때마다 다시 계산되며, 데이터가 쌓일수록 기본값 비중은 줄고 실측 비중이 늘어납니다.");
+  return {mix, why};
+}
+function renderDigest(){
+  const page=document.getElementById("statsSheet"); if(!page) return;
+  let box=page.querySelector("#digestBox");
+  if(!box){
+    box=document.createElement("div"); box.id="digestBox";
+    const md=page.querySelector("#moneyDash");
+    if(md&&md.parentNode) md.parentNode.insertBefore(box, md.nextSibling);
+    else { const sec=page.querySelector('.sub-sec[data-k="now"]'); if(!sec) return; sec.appendChild(box); }
+  }
+  const arts=(DATA&&DATA.articles)||[];
+  const snaps=digestSnap();
+  const W=digestRoll(arts,7,0), Wp=digestRoll(arts,7,1);
+  const M=digestRoll(arts,30,0), Mp=digestRoll(arts,30,1);
+  const d=(a,b)=>{const x=a-b;return x>0?`<span style="color:var(--ok)">▲${x}</span>`:x<0?`<span style="color:#ff8a5c">▼${-x}</span>`:"—";};
+  const last=snaps[snaps.length-1]||{};
+  const weekAgoStr=new Date(Date.now()-7*864e5).toISOString().slice(0,10);
+  const ago=snaps.filter(s=>s.at<=weekAgoStr).pop();
+  const vDelta=ago?`${(last.clicks-ago.clicks)>=0?"▲":"▼"}${Math.abs((last.clicks||0)-(ago.clicks||0))} 클릭/7일 (노출 ${(last.imps||0)-(ago.imps||0)>=0?"+":""}${(last.imps||0)-(ago.imps||0)})`:"스냅샷 축적 중 — 7일치가 쌓이면 변화가 표시됩니다";
+  const R=mixRecommend();
+  const bar=m=>`<div style="display:flex;height:10px;border-radius:99px;overflow:hidden;margin:6px 0">
+    <span style="width:${m.trend}%;background:#ff8a5c"></span><span style="width:${m.steady}%;background:#f0b429"></span><span style="width:${m.evergreen}%;background:#33c27f"></span></div>
+    <div class="hint" style="display:flex;gap:10px"><span>🟠 트렌드 ${m.trend}%</span><span>🟡 스테디 ${m.steady}%</span><span>🟢 에버그린 ${m.evergreen}%</span></div>`;
+  const row=(t,c,p)=>`<tr><td style="padding:2px 0">${t}</td><td style="text-align:right">${c.n}편 ${d(c.n,p.n)}</td><td style="text-align:right;color:var(--muted)">${c.by.trend} / ${c.by.steady} / ${c.by.evergreen}</td></tr>`;
+  box.innerHTML=`<div class="card" style="margin-top:10px">
+    <b>📆 결산</b> <span class="hint">주·월 자동 집계 · 스냅샷 ${snaps.length}일치</span>
+    <table style="width:100%;font-size:12.5px;margin-top:6px;border-collapse:collapse">
+      <tr style="color:var(--muted);font-size:11px"><td></td><td style="text-align:right">발행(직전 대비)</td><td style="text-align:right">트 / 스 / 에</td></tr>
+      ${row("이번 주(7일)",W,Wp)}${row("이번 달(30일)",M,Mp)}</table>
+    <div class="hint" style="margin-top:5px">🔎 검색 방문 변화 — ${vDelta}</div>
+    <div style="margin-top:12px"><b>🎯 권장 글 비율</b>${bar(R.mix)}
+      <div class="hint" style="margin-top:5px">${R.why.map(w=>"· "+w).join("<br>")}</div>
+      ${CFG.mixApplied?`<div class="hint" style="color:var(--ok);margin-top:3px">✅ 적용 중 — 트 ${CFG.mixApplied.trend} / 스 ${CFG.mixApplied.steady} / 에 ${CFG.mixApplied.evergreen} (${(CFG.mixApplied.at||"").slice(0,10)}부터)</div>`:""}
+      <button class="btn primary sm" style="margin-top:7px;width:100%" onclick="applyMix(${R.mix.trend},${R.mix.steady},${R.mix.evergreen})">🎯 이 비율을 매일 자동 생성에 적용</button>
+    </div></div>`;
+}
+async function applyMix(t,s,e){
+  if(!(CFG.ghToken&&CFG.ghOwner&&CFG.ghRepo)){ toast("⚙️ 설정에서 GitHub 연동이 필요합니다",1); return; }
+  if(!confirm(`매일 자동 생성의 주제 유형 비율을 바꿉니다.\n트렌드 ${t}% · 스테디 ${s}% · 에버그린 ${e}%\n(저장소에 기록되어 다음 실행부터 날짜 기반으로 유형을 뽑습니다)`)) return;
+  try{
+    const api=`https://api.github.com/repos/${CFG.ghOwner}/${CFG.ghRepo}/contents/data/site_categories.json`;
+    const H={Authorization:"Bearer "+CFG.ghToken,Accept:"application/vnd.github+json"};
+    const g=await fetch(api,{headers:H}); if(!g.ok) throw new Error("읽기 HTTP "+g.status);
+    const cur=await g.json();
+    const j=JSON.parse(decodeURIComponent(escape(atob((cur.content||"").replace(/\n/g,"")))));
+    j.mix={trend:t,steady:s,evergreen:e,at:new Date().toISOString(),basis:"수익탭 결산 권장(근거는 결산 카드 참조)"};
+    const body=btoa(unescape(encodeURIComponent(JSON.stringify(j,null,2))));
+    const r=await fetch(api,{method:"PUT",headers:Object.assign({"Content-Type":"application/json"},H),
+      body:JSON.stringify({message:`글 비율 적용: 트${t}/스${s}/에${e} (수익탭 결산)`,content:body,sha:cur.sha})});
+    if(!r.ok) throw new Error("쓰기 HTTP "+r.status);
+    CFG.mixApplied={trend:t,steady:s,evergreen:e,at:new Date().toISOString()}; saveCfg();
+    toast("적용됨 — 다음 자동 생성부터 이 비율로 주제 유형을 뽑습니다",0);
+    renderDigest();
+  }catch(err){ toast("적용 실패: "+String(err).slice(0,60),1); }
 }
 
 // ===== 하단 탭은 클릭 전용 / 스와이프는 상단 보조탭에만 =====
