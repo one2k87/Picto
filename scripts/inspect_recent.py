@@ -79,9 +79,18 @@ json.dump(out, open("dashboard/data/index_status.json", "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)
 print(f"[inspect] {ok_n}개 검사 — 색인됨 {passed} / 미색인 {ok_n - passed}")
 
-# 사이트맵 재제출(크롤 넛지) — 권한 없으면 건너뜀
-try:
-    svc.sitemaps().submit(siteUrl=sc_site, feedpath=f"{site}/wp-sitemap.xml").execute()
-    print("[inspect] 사이트맵 재제출 완료")
-except Exception as e:
-    print(f"[inspect] 사이트맵 재제출 건너뜀({str(e)[:60]})")
+# 사이트맵+RSS 피드 제출(크롤 넛지) — 권한 없으면 건너뜀.
+# RSS를 사이트맵으로 제출하면 구글 발견이 빨라진다(WebSub와 짝).
+# 종전엔 'SC에서 피드 수동 제출(1회)'이 이용자 할 일이었는데 API로 지워버렸다(2026-08-31).
+submitted = []
+for feed in (f"{site}/wp-sitemap.xml", f"{site}/feed/"):
+    try:
+        svc.sitemaps().submit(siteUrl=sc_site, feedpath=feed).execute()
+        submitted.append(feed.rsplit("/", 2)[-2] or "sitemap")
+    except Exception as e:
+        print(f"[inspect] 제출 건너뜀 {feed} ({str(e)[:60]})")
+if submitted:
+    print(f"[inspect] SC 제출 완료: {submitted}")
+    out["sitemaps_submitted"] = submitted
+    json.dump(out, open("dashboard/data/index_status.json", "w", encoding="utf-8"),
+              ensure_ascii=False, indent=1)
