@@ -1,6 +1,6 @@
 {
-  "updated": "2026-08-23 22:19",
-  "next_review": "2026-08-30",
+  "updated": "2026-08-31 00:11",
+  "next_review": "2026-09-07",
   "data_status": "no_data",
   "verdict": "아직 성과 데이터가 없어 기본 계획으로 운영합니다. 발행·색인이 쌓이면 자동으로 실측 기반으로 바뀝니다.",
   "matched_posts": 0,
@@ -48,7 +48,19 @@
   },
   "winners": [],
   "weak_queries": [],
-  "buckets": [],
+  "buckets": [
+    {
+      "category": "자격증·시험 준비",
+      "intent": "revenue",
+      "posts": 1,
+      "clicks": 0,
+      "impressions": 0,
+      "scored": 0,
+      "est_value": 0.0,
+      "value_per_post": 0.0,
+      "ctr": 0.0
+    }
+  ],
   "actions": [
     "애드센스 승인 후 발행을 시작하면 다음 주부터 실측 학습이 시작됩니다."
   ],
