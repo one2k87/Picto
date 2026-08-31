@@ -182,6 +182,13 @@ jobs:
         if: always()
         run: python scripts/ping_new_posts.py || true
 
+      # URL Inspection API(하루 2,000회, insights 서비스 계정 재사용):
+      # 최근 수정 글을 검사해 ①구글 fetch 유발(재크롤 넛지) ②색인 신호등 기록
+      # → 수동 '색인 생성 요청'의 API판. 결과는 dashboard/data/index_status.json
+      - name: 색인 검사·넛지 (Inspection API)
+        if: always()
+        run: python scripts/inspect_recent.py || true
+
       - name: 결과 커밋 (대시보드가 읽음)
         if: always()   # 생성 일부 실패해도 만들어진 결과는 커밋
         run: |
