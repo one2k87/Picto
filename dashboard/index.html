@@ -4462,6 +4462,38 @@ async function sprintCompose(auto){
    ③완료 체크를 저장해 내일은 다음 10개를 보여준다. */
 function idxDone(){ return CFG.idxReq||{}; }
 function idxMark(url){ const m=idxDone(); m[url]=new Date().toISOString().slice(0,10); CFG.idxReq=m; saveCfg(); renderIdxQueue(); }
+/* 🔔 자동 색인 켜기(원탭) — IndexNow.
+   키를 만들고 → 키 파일을 WP 미디어에 올리고(루트 접근 불필요, keyLocation 스펙 활용)
+   → 저장소 site 파일에 기록하면 매일 실행이 새 공개 글을 네이버·빙·얀덱스에 자동 통지한다.
+   구글은 IndexNow 불참(2026)이라 구글 쪽은 WebSub+사이트맵이 담당. */
+async function enableAutoIndex(){
+  if(!wpReady()){ toast("① 블로그 연결부터 해주세요",1); return; }
+  const key=[...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,"0")).join("");
+  try{
+    const up=await fetch(wpBase()+"/wp-json/wp/v2/media",{method:"POST",
+      headers:Object.assign({"Content-Type":"text/plain","Content-Disposition":`attachment; filename="${key}.txt"`},wpAuth()),
+      body:key});
+    if(!up.ok) throw new Error("키 파일 업로드 HTTP "+up.status);
+    const loc=(await up.json()).source_url;
+    if(CFG.ghToken&&CFG.ghOwner&&CFG.ghRepo){
+      const api=`https://api.github.com/repos/${CFG.ghOwner}/${CFG.ghRepo}/contents/data/site_categories.json`;
+      const H={Authorization:"Bearer "+CFG.ghToken,Accept:"application/vnd.github+json"};
+      const g=await fetch(api,{headers:H});
+      if(g.ok){
+        const cur=await g.json();
+        const j=JSON.parse(decodeURIComponent(escape(atob((cur.content||"").replace(/\n/g,"")))));
+        j.indexnow={key, key_location:loc};
+        const r=await fetch(api,{method:"PUT",headers:Object.assign({"Content-Type":"application/json"},H),
+          body:JSON.stringify({message:"🔔 IndexNow 자동 색인 켜기",sha:cur.sha,
+            content:btoa(unescape(encodeURIComponent(JSON.stringify(j,null,2))))})});
+        if(!r.ok) throw new Error("저장소 기록 HTTP "+r.status);
+      }
+    }
+    CFG.indexnowOn={key, loc, at:new Date().toISOString()}; saveCfg();
+    toast("🔔 자동 색인 켜짐 — 발행되면 네이버·빙·얀덱스에 즉시 등록됩니다",0);
+    renderIdxQueue();
+  }catch(e){ toast("실패: "+String(e).slice(0,60),1); }
+}
 async function renderIdxQueue(){
   const box=document.getElementById("idxBox"); if(!box) return;
   const plan=planLoad();
@@ -4476,13 +4508,27 @@ async function renderIdxQueue(){
   const todo=urls.filter(u=>!done[u]);
   const today=todo.slice(0,10);
   const doneN=Object.keys(done).length;
+  const feed="https://"+new URL(wpBase()).host+"/feed/";
+  const autoLayer=`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-top:8px">
+    <b>🔔 자동 색인 (등록해두면 알아서)</b>
+    <div class="hint" style="margin-top:3px">
+      ${CFG.indexnowOn?`✅ <b>IndexNow</b> 켜짐 — 발행되면 네이버·빙·얀덱스에 즉시 자동 등록됩니다`
+        :`⬜ IndexNow 미설정 — 네이버·빙 즉시 등록. 아래 버튼 한 번이면 끝 <button class="btn sm" style="padding:1px 8px;font-size:11px" onclick="enableAutoIndex()">켜기</button>`}<br>
+      ✅ <b>WebSub</b> — 발행되면 구글에 RSS 갱신을 자동 푸시(매일 실행에 포함)<br>
+      ${CFG.rssSubmitted?`✅ RSS 피드 Search Console 제출됨`
+        :`⬜ <b>1회만</b>: RSS 피드를 SC → 사이트맵에 제출하면 구글 발견이 빨라집니다
+         <button class="btn sm" style="padding:1px 8px;font-size:11px" onclick="navigator.clipboard.writeText('${feed}');toast('피드 주소 복사됨 — SC 사이트맵에 붙여넣기',0)">피드 복사</button>
+         <button class="btn sm" style="padding:1px 8px;font-size:11px" onclick="CFG.rssSubmitted=true;saveCfg();renderIdxQueue()">✓제출함</button>`}
+    </div>
+    <div class="hint" style="margin-top:4px;opacity:.8">※ 구글은 IndexNow에 참여하지 않아(2026), 구글 쪽 '요청 버튼'만은 자동화 API가 없습니다. 아래 수동 요청은 <b>신청 직전 스프린트 전용</b>입니다.</div>
+  </div>`;
   if(!today.length){
-    box.innerHTML=`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-top:8px" class="hint">
-      ✅ 색인 요청 전부 완료 (${doneN}개). Search Console에서 크롤 날짜가 갱신되는지 1~2일 뒤 확인하세요.</div>`;
+    box.innerHTML=autoLayer+`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-top:8px" class="hint">
+      ✅ 수동 색인 요청 전부 완료 (${doneN}개). 1~2일 뒤 Search Console에서 크롤 날짜 갱신을 확인하세요.</div>`;
     return;
   }
-  box.innerHTML=`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-top:8px">
-    <b>📋 오늘의 색인 요청 ${today.length}개</b> <span class="hint">(완료 ${doneN} / 전체 ${urls.length} · 최근 수정 글 우선)</span>
+  box.innerHTML=autoLayer+`<div style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-top:8px">
+    <b>📋 오늘의 색인 요청 ${today.length}개</b> <span class="hint">— 신청 직전 스프린트 전용(구글만 해당)</span> <span class="hint">(완료 ${doneN} / 전체 ${urls.length} · 최근 수정 글 우선)</span>
     <div class="hint" style="margin-top:3px">Search Console 상단 검색창에 URL을 붙여넣고 → <b>색인 생성 요청</b>. 하루 한도가 약 10개라 매일 나눠 합니다.</div>
     <div class="hint" style="margin-top:5px;max-height:170px;overflow-y:auto">
       ${today.map(u=>`<div style="margin:3px 0;display:flex;gap:6px;align-items:center">
