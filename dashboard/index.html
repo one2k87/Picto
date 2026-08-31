@@ -3937,7 +3937,11 @@ async function contentDeepCheck(){
     if(sents.length>=12){const L=sents.map(s=>s.length), mn=L.reduce((a,b)=>a+b,0)/L.length;
       lenCV=Math.sqrt(L.reduce((a,b)=>a+(b-mn)*(b-mn),0)/L.length)/mn;}
     const fixedEnd=/(?:결론적으로|요약하자면|지금까지 살펴본|이상으로)/.test(txt.slice(-260));
-    return {id:p.id, link:p.link, html, title:_dcText((p.title&&p.title.rendered)||""),
+    // 가짜 1인칭 경험담 — 옛 생성기의 '경험담 도입 틀'이 만든 창작 경험 주장.
+    // 실측(2026-08-31): 32편 중 22편에서 발견. 가짜 Experience는 2025-09 가이드라인의
+    // YMYL 확대와 정면 충돌 — 걸리면 사이트 단위 신뢰 하락이라 반드시 걷어낸다.
+    const fakeExp=(txt.match(/제가 (?:직접|경험|현장에서|작업할|시공|준비한)|겪었습니다|겪으면서였|경험 때문이었|현장을 경험|체감하게 된 건/g)||[]).length;
+    return {id:p.id, link:p.link, html, title:_dcText((p.title&&p.title.rendered)||""), fakeExp,
       len:txt.length, sents, endRatio, topEnd:topEnd[0],
       cliche:DC_CLICHE.filter(re=>re.test(txt)).length,
       exp:DC_EXP.filter(re=>re.test(txt)).length,
@@ -3973,6 +3977,8 @@ async function contentDeepCheck(){
     if(m.triads>0){sc-=8;issues.push(`셋 묶음 나열 ${m.triads}회 (AI 특유 패턴)`);}
     if(m.lenCV<0.35){sc-=10;issues.push(`문장 길이 균일 (CV ${m.lenCV.toFixed(2)} — 정상 글은 0.8 안팎)`);}
     if(m.fixedEnd){sc-=6;issues.push('"결론적으로"류 고정 마무리');}
+    if(m.fakeExp>=3){sc-=18;issues.push(`1인칭 경험담 창작 의심 ${m.fakeExp}건 ("제가 직접/경험했던"류 — 가짜 Experience는 정책 위험)`);}
+    else if(m.fakeExp>=1){sc-=9;issues.push(`1인칭 경험담 표현 ${m.fakeExp}건 — 관찰형("흔히 겪는 문제")으로 바꿀 것`);}
     return Object.assign(m,{score:Math.max(0,sc),issues});
   }).sort((a,b)=>a.score-b.score);
   const avg=Math.round(scored.reduce((a,b)=>a+b.score,0)/scored.length);
@@ -4089,6 +4095,8 @@ async function aiFixContent(auto){
 1. 실전 신호 3개 이상: 이 작업에서 자주 나는 실수·실패 시나리오("이때 ○○가 자주 부러집니다"),
    조건 분기("벽이 석고보드라면 A, 콘크리트라면 B"), 순서를 어기면 생기는 문제 경고, 방법·부품 2가지 장단 비교.
    ⚠️ 겪지 않은 1인칭 경험담("제가 직접 해보니")을 창작하지 마세요 — '흔히 겪는 문제' 관점으로 쓰면 됩니다.
+   ⚠️ 원문에 이미 있는 1인칭 경험 주장("제가 경험했던 현장에서 / 겪으면서였습니다"류)은
+   전부 관찰형으로 바꾸세요("이런 현장에서 자주 나타나는 문제는 / 흔히 겪는 상황은").
 2. 실측형 수치 4개 이상: 규격(mm·cm)·가격대(원)·소요 시간·개수. 원문에 없는 수치는 단정하지 말고
    범위로 쓰세요("3만~5만 원대", "30분~1시간", "제품마다 다르니 표기 확인").
 3. 금지 문구: 알아보겠습니다/살펴보겠습니다/이번 글에서는/도움이 되셨기를/마무리하겠습니다/함께 알아봐요/참고하시기 바랍니다.
