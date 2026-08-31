@@ -13,6 +13,14 @@ if os.path.exists(P):
     if site.get("images_provider"):
         cfg.setdefault("images", {})["provider"] = site["images_provider"]; changed = True
         print("이미지 provider 적용:", site["images_provider"])
+    # 주제 금지어 — desc의 서술식 금지는 LLM이 흘려듣는다. 키워드 차단이 확실하다.
+    if site.get("ban_keywords"):
+        sf = cfg.setdefault("safety", {})
+        cur = sf.get("blocklist_extra") or []
+        sf["blocklist_extra"] = sorted(set(list(cur) + list(site["ban_keywords"])))
+        changed = True
+        print("주제 금지어 적용:", site["ban_keywords"])
+
     # 글 비율(mix) — 수익탭 결산이 기록한 트렌드/스테디/에버그린 비율로
     # '오늘의 주제 유형'을 날짜 시드로 뽑는다(하루 단위라 비율은 주 단위로 수렴).
     mix = site.get("mix")
