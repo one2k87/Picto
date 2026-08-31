@@ -2120,7 +2120,10 @@ function adsAddEntry(kind){
   }
   log.push({kind, note:note.trim(), at:today});
   adsLogSave(log);
-  if(kind==="reject"){ CFG.lastRejectReason=note.trim(); saveCfg();
+  if(kind==="reject"){ CFG.lastRejectReason=note.trim();
+    // 반려는 승인 상태를 해제한다 — 승인 플래그가 남으면 여정 스테퍼와
+    // 수익 최적화가 '승인됨'으로 잘못 갈린다(실데이터에서 발견, 2026-08-30)
+    CFG.adsenseApproved=false; saveCfg();
     // 분석기에도 바로 채워 넣어 '붙여넣기' 수고를 줄인다
     const ta=document.getElementById("adsReason")||document.querySelector("#adsSheet textarea");
     if(ta && note.trim()) ta.value=note.trim();
