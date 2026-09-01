@@ -15,6 +15,7 @@
 """
 import json
 import datetime
+from urllib.parse import unquote
 
 import requests
 
@@ -55,7 +56,10 @@ except Exception as e:
     posts = []
 
 cutoff = (datetime.datetime.utcnow() - datetime.timedelta(days=14)).strftime("%Y-%m-%dT%H:%M:%S")
-urls = [site + "/"] + [p["link"] for p in posts if p.get("modified", "") >= cutoff]
+# ⚠️ WP API는 한글 슬러그를 %인코딩해 주는데, Inspection API에 그대로 보내면
+# 색인된 글도 'URL is unknown to Google'로 나온다(2026-09-01 실측 — SC UI·site: 검색
+# 교차 확인으로 12편+ 색인 확인, API만 0/29 오답). 디코딩해 보내야 정답이 나온다.
+urls = [site + "/"] + [unquote(p["link"]) for p in posts if p.get("modified", "") >= cutoff]
 
 results, ok_n = [], 0
 for u in urls[:30]:
