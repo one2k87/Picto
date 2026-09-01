@@ -165,20 +165,25 @@ json.dump(out, open("dashboard/data/site_check.json", "w", encoding="utf-8"),
 
 try:
     import notify
-    idx_line = ""
+    idx_line, ghost_line = "", ""
     try:
         idx = json.load(open("dashboard/data/index_status.json", encoding="utf-8"))
         pn = len([r for r in idx["results"] if r["url"] != idx["site"] + "/"])
         pp = len([r for r in idx["results"] if r["verdict"] == "PASS" and r["url"] != idx["site"] + "/"])
         idx_line = f"\n🚦 구글 색인 {pp}/{pn}편"
+        ghosts = idx.get("ghosts") or []
+        if ghosts:
+            ghost_line = (f"\n👻 삭제 글 검색 잔재 {len(ghosts)}건 — SC 삭제 도구에서 제거하세요\n"
+                          "https://search.google.com/search-console/removals")
     except Exception:
         pass
-    if fails or repaired or repair_fail:
-        msg = (f"📋 <b>스크립토 아침 점검</b>\n"
-               f"글 {len(scored)}편 · 평균 {avg}점 · 미달 {len(fails)}편{idx_line}")
-        if repaired: msg += "\n🔧 자동 수리: " + " / ".join(repaired[:3])
-        if repair_fail: msg += "\n⚠️ 수리 실패: " + " / ".join(repair_fail[:3])
-        if fails and not AUTO_REPAIR: msg += "\n앱에서 '한 번에 고치기'를 실행하세요 (또는 자동 수리를 켜세요)"
-        notify.send(cfg, msg)
+    # 2026-09-01부터 '무소식 = 정상'도 매일 한 줄로 알린다 — 앱을 안 열어도 아는 상태가 제품의 약속.
+    msg = (f"📋 <b>스크립토 아침 점검</b>\n"
+           f"글 {len(scored)}편 · 평균 {avg}점 · 미달 {len(fails)}편{idx_line}{ghost_line}")
+    if repaired: msg += "\n🔧 자동 수리: " + " / ".join(repaired[:3])
+    if repair_fail: msg += "\n⚠️ 수리 실패: " + " / ".join(repair_fail[:3])
+    if fails and not AUTO_REPAIR: msg += "\n앱에서 '한 번에 고치기'를 실행하세요 (또는 자동 수리를 켜세요)"
+    if not (fails or repaired or repair_fail): msg += "\n✅ 이상 없음"
+    notify.send(cfg, msg)
 except Exception as e:
     print(f"[notify] 건너뜀: {e}")

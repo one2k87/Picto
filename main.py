@@ -469,6 +469,37 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
         except Exception as e:
             print(f"  · 정확도 검증/재작성 건너뜀: {e}")
 
+    # 폐기 직전 구제(2026-09-01): '보류' 글을 버리기 전에 감점 사유를 명시한 보강 재작성 1회.
+    # 실측 계기: 9/1 아침 글이 '실전신호없음' 하나로 폐기돼 그날 새 글이 0편이 됐다.
+    # 서버 점검·수리(daily_check_fix)의 재작성 루틴이 평균 96점을 검증했으므로 같은 패턴을
+    # 생성 단계에도 적용한다. 주제 중복(discard)은 고쳐도 또 겹치므로 구제하지 않는다.
+    for a in generated:
+        if a.get("quality") != "보류" or quality.is_discard(a.get("quality_reason", "")):
+            continue
+        try:
+            import re as _re
+            fix_prompt = (
+                "아래 한국어 블로그 글 HTML을 같은 주제로 다시 쓰세요. 반드시 고칠 것:\n"
+                f"- 현재 감점 사유: {a.get('quality_reason','')}\n"
+                "- 자주 나는 실수·실패 시나리오·조건 분기(예: '벽이 석고보드라면 A, 콘크리트라면 B')·"
+                "방법 2가지 장단 비교 중 3개 이상 포함 (겪지 않은 1인칭 경험담은 창작 금지)\n"
+                "- 실측형 수치 4개 이상(규격·가격대·시간·개수). 원문에 없는 수치는 범위로\n"
+                "- 분량은 원문 이상. 소제목(h2/h3)·이미지·광고 자리(<div class=\"ad-slot\">)는 그대로 유지\n"
+                "[출력] 순수 HTML 본문만. 코드블록 금지. <p>로 시작.\n\n[원문]\n" + a.get("html", ""))
+            neo = chat(fix_prompt, cfg["llm"], max_tokens=16000, temperature=0.7)
+            neo = _re.sub(r"^```html?\s*|\s*```$", "", (neo or "").strip())
+            if neo and neo.lstrip().startswith("<"):
+                trial = dict(a); trial["html"] = neo
+                ok3, reason3 = quality.check(trial, [b["html"] for b in generated if b is not a], safety)
+                if ok3:
+                    a["html"] = neo
+                    a["quality"], a["quality_reason"] = "통과", ""
+                    print(f"  · 폐기 구제(보강 재작성 1회): {a['keyword']}")
+                else:
+                    print(f"  · 구제 실패(여전히 보류: {reason3}): {a['keyword']}")
+        except Exception as e:
+            print(f"  · 구제 재작성 건너뜀: {e}")
+
     # 드립(분산) 발행: 한 번에 다 올리지 않고 '랜덤 간격'으로 시간차 예약
     drip_min = float(safety.get("drip_min_hours", 0) or 0)
     drip_max = float(safety.get("drip_max_hours", 0) or 0)

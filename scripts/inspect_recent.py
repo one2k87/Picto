@@ -76,8 +76,30 @@ for u in urls[:30]:
         results.append({"url": u, "verdict": "ERROR", "state": str(e)[:100], "lastCrawl": ""})
 
 passed = sum(1 for x in results if x["verdict"] == "PASS")
+
+# 고스트 감지(2026-09-01 신설): 사이트에서 삭제한 글이 구글 검색에 잔재로 남는 문제.
+# wontheland 실측 — 404+noindex 처리한 니치 밖 옛 글 6편이 site: 검색에 그대로 노출돼
+# 심사관에게 니치 오염으로 보일 뻔했다. data/removed_urls.json의 URL을 매일 검사해
+# 아직 색인에 남아 있으면(ghosts) 기록한다 → 대시보드/텔레그램이 'SC 삭제 도구' 카드를 띄운다.
+ghosts = []
+try:
+    removed = (json.load(open("data/removed_urls.json", encoding="utf-8")) or {}).get("urls", [])
+except Exception:
+    removed = []
+for u in removed[:20]:
+    try:
+        res = svc.urlInspection().index().inspect(
+            body={"inspectionUrl": unquote(u), "siteUrl": sc_site}).execute()
+        idx = (res.get("inspectionResult", {}) or {}).get("indexStatusResult", {}) or {}
+        if idx.get("verdict") == "PASS":
+            ghosts.append(unquote(u))
+    except Exception:
+        pass
+if ghosts:
+    print(f"[inspect] ⚠️ 삭제 글 검색 잔재(고스트) {len(ghosts)}건 — SC 삭제 도구로 제거 필요")
+
 out = {"updated_at": datetime.datetime.now().isoformat()[:19],
-       "site": site, "checked": ok_n, "indexed": passed,
+       "site": site, "checked": ok_n, "indexed": passed, "ghosts": ghosts,
        "posts_diag": diag, "posts_n": len(posts), "results": results}
 json.dump(out, open("dashboard/data/index_status.json", "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)
@@ -96,5 +118,34 @@ for feed in (f"{site}/wp-sitemap.xml", f"{site}/feed/"):
 if submitted:
     print(f"[inspect] SC 제출 완료: {submitted}")
     out["sitemaps_submitted"] = submitted
-    json.dump(out, open("dashboard/data/index_status.json", "w", encoding="utf-8"),
-              ensure_ascii=False, indent=1)
+
+# 죽은 레거시 사이트맵 정리(2026-09-01 신설): 옛 SEO 플러그인이 제출해 둔 사이트맵이
+# 404가 된 채 SC에 '가져올 수 없음'으로 남아 신호를 오염시킨다(wontheland 실측:
+# /post-sitemap.xml). 사이트에서 404인 제출 항목만 골라 SC에서 제거한다.
+try:
+    ours = {f"{site}/wp-sitemap.xml", f"{site}/feed/", f"{site}/feed"}
+    listed = (svc.sitemaps().list(siteUrl=sc_site).execute() or {}).get("sitemap", [])
+    cleaned = []
+    for sm in listed:
+        path = (sm.get("path") or "").rstrip()
+        if not path or path.rstrip("/") in {p.rstrip("/") for p in ours}:
+            continue
+        try:
+            code = requests.head(path, timeout=15, allow_redirects=True,
+                                 headers={"User-Agent": "Mozilla/5.0 (ScriptoBot)"}).status_code
+        except Exception:
+            continue                      # 네트워크 오류는 판단 보류(삭제하지 않음)
+        if code == 404:
+            try:
+                svc.sitemaps().delete(siteUrl=sc_site, feedpath=path).execute()
+                cleaned.append(path)
+            except Exception as e:
+                print(f"[inspect] 사이트맵 정리 실패 {path} ({str(e)[:60]})")
+    if cleaned:
+        print(f"[inspect] 죽은 사이트맵 정리: {cleaned}")
+        out["sitemaps_cleaned"] = cleaned
+except Exception as e:
+    print(f"[inspect] 사이트맵 목록 확인 건너뜀: {str(e)[:80]}")
+
+json.dump(out, open("dashboard/data/index_status.json", "w", encoding="utf-8"),
+          ensure_ascii=False, indent=1)

@@ -1,9 +1,12 @@
 name: 매일 블로그 자동 생성
 
 # 매일 아침 7시(한국시간, KST=UTC+9) = UTC 22:00
+# 백업 크론(8:30 KST): GitHub이 정기 크론을 조용히 건너뛰는 일이 실제로 있어(2026-09-01 실측)
+# 90분 뒤 한 번 더 깨운다. 아래 '중복 실행 가드'가 이미 생성된 날은 생성을 건너뛰므로 이중 발행은 없다.
 on:
   schedule:
     - cron: "0 22 * * *"
+    - cron: "30 23 * * *"
   workflow_dispatch:      # 폰/깃허브에서 수동 실행
     inputs:
       images:
@@ -173,7 +176,20 @@ jobs:
         if: github.event.inputs.categories == ''
         run: python scripts/apply_site_categories.py
 
+      # 크론 스킵 자가 복구: 정기 실행이 같은 날 두 번 깨어나도 생성은 하루 1회만.
+      - name: 중복 실행 가드
+        id: dup
+        if: github.event_name == 'schedule'
+        run: |
+          today=$(date -u +%F)
+          gen=$(python3 -c "import json;print(json.load(open('dashboard/data/latest.json')).get('generated_at','')[:10])" 2>/dev/null || echo "")
+          if [ "$gen" = "$today" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "오늘($today) 이미 생성 완료 — 생성 단계 건너뜀(백업 크론). 점검·색인은 계속 진행"
+          fi
+
       - name: 블로그 생성 실행
+        if: steps.dup.outputs.skip != 'true'
         run: python -u main.py
 
       # 예약 발행(WP 크론)으로 공개된 글 포함, 최근 36시간 새 글을
