@@ -220,8 +220,10 @@ jobs:
           git commit -m "자동 생성: $(date -u '+%Y-%m-%d %H:%M')" || { echo "변경 없음"; exit 0; }
           # push 경쟁 재시도 루프(2026-09-01): '1회 rebase 후 push || echo'는 rebase나 push가
           # 실패하면 결과가 조용히 사라졌다(#100에서 재현 — 사용자 push와 경쟁해 점검 결과 유실).
+          # --autostash: 실행 중 파이프라인이 건드린 다른 파일(예: 카테고리 적용의 재기록)이
+          # 작업트리에 남아 rebase가 "unstaged changes"로 거부되던 진짜 원인 해결(2026-09-01 #101 실측)
           for i in 1 2 3; do
-            git pull --rebase origin main && git push && { echo "push 성공(${i}차)"; exit 0; }
+            git pull --rebase --autostash origin main && git push && { echo "push 성공(${i}차)"; exit 0; }
             echo "push 경쟁 — ${i}차 재시도"; sleep $((i*7))
           done
           echo "::warning::결과 push 3회 실패 — 이번 데이터는 다음 실행에서 재생성됩니다"
