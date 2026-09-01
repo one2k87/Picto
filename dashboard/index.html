@@ -693,7 +693,7 @@
 <div class="sec-div"></div>
 
 <div class="toolbar" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 16px 0">
-  <input id="fSearch" placeholder="🔎 제목·키워드 검색" style="flex:1;min-width:140px;padding:8px 10px;
+  <input id="fSearch" placeholder="🔎 제목·키워드·주소·카테고리 검색" style="flex:1;min-width:140px;padding:8px 10px;
     border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--txt);font-size:13px">
   <select id="fStatus" style="padding:8px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--txt);font-size:13px">
     <option value="all">상태: 전체</option>
@@ -880,7 +880,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span id="verLabel" style="font-size:11px;color:var(--muted);font-weight:400">Scripto v1.2</span></h2>
+  <h2>⚙️ 설정 <span id="verLabel" style="font-size:11px;color:var(--muted);font-weight:400">Scripto v1.3</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1683,7 +1683,8 @@ function visible(){
     (fKind==="archive" ? isArchived(a) : !isArchived(a))&&
     (fKind==="all"||fKind==="archive"||a.kind===fKind)&&(fCat==="all"||a.category===fCat)&&
     (fStatus==="all"||a.status===fStatus)&&
-    (!q || ((a.title||"")+" "+(a.keyword||"")+" "+(a.focus_keyword||"")+" "+(a.tags||[]).join(" ")).toLowerCase().includes(q)));
+    (!q || ((a.title||"")+" "+(a.keyword||"")+" "+(a.focus_keyword||"")+" "+(a.slug||"")+" "
+            +(a.category||"")+" "+(a.meta||"")+" "+(a.tags||[]).join(" ")).toLowerCase().includes(q)));  // v1.3 검색 범위 확장
   if(sortMode==="volume") list=[...list].sort((x,y)=>(y.volume||0)-(x.volume||0));
   else if(sortMode==="title") list=[...list].sort((x,y)=>(x.title||"").localeCompare(y.title||"","ko"));
   else if(sortMode==="category") list=[...list].sort((x,y)=>(x.category||"").localeCompare(y.category||"","ko"));
@@ -2174,9 +2175,9 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=131;
+const APP_BUILD=133;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
-const SCRIPTO_VER="1.2";
+const SCRIPTO_VER="1.3";
 
 function openAppPassPage(){
   const site=(document.getElementById("cfgSite")?.value||CFG.site||"").trim().replace(/\/+$/,"");
@@ -3449,7 +3450,8 @@ async function openContentFix(){
     <div class="wiz-note"><b>① 주제 밖 글 ${s.offNiche}편</b><br>
       승인 심사에서 주제가 흩어지면 그 자체가 감점입니다. 삭제가 아니라 <b>비공개</b>로 돌립니다.
       승인 후 램프 단계에서 되살릴 수 있습니다.
-      ${s.offNiche?`<button class="btn sm" style="width:100%;margin-top:8px" onclick="hideOffNiche()">주제 밖 ${s.offNiche}편 비공개로</button>`:"<br>정리할 글이 없습니다."}</div>
+      ${s.offNiche?`<button class="btn sm" style="width:100%;margin-top:8px" onclick="hideOffNiche()">주제 밖 ${s.offNiche}편 비공개로</button>`:"<br>정리할 글이 없습니다."}
+      <button class="btn sm" style="width:100%;margin-top:6px" onclick="openRestore()">🔓 비공개 글 복구 (실행 취소)</button></div>
     <div class="wiz-note"><b>② 상투적 제목 ${s.cliche}편</b><br>
       '총정리·알아보기·제대로' 같은 표현과 반복되는 어미를 걷어내고, 그 글에만 해당하는
       구체적인 제목으로 바꿉니다. <b>적용 전에 목록으로 보여드립니다.</b>
@@ -6562,8 +6564,76 @@ function applyPanels(){
 function showTab(t){ if(!PANEL_HAS[t])return; activeTab=t; CFG.panelTab=t; saveCfg(); applyPanels(); }
 document.querySelectorAll('#panelTabs .ptab').forEach(b=>b.onclick=()=>showTab(b.dataset.t));
 
+// ===== v1.3 🔓 비공개 글 복구 센터 (실행 취소) =====
+// '주제 밖 비공개'·'병합 흡수'로 숨긴 글을 골라서 다시 공개한다. 삭제가 아닌 이유가 여기서 완성된다.
+async function openRestore(){
+  const bg=document.getElementById("obBg"), card=document.getElementById("obCard"), body=document.getElementById("obBody");
+  bg.style.display="block"; card.style.display="block";
+  body.innerHTML=`<h2 style="margin:0 0 8px">🔓 비공개 글 복구</h2><div class="skel" style="height:60px"></div>`;
+  const base=wpBase(), H=wpAuth();
+  let posts=[];
+  try{ const r=await fetch(`${base}/wp-json/wp/v2/posts?status=private&per_page=100&_fields=id,title,date`,{headers:H});
+       if(r.ok) posts=await r.json(); }catch(e){}
+  if(!Array.isArray(posts)) posts=[];
+  body.innerHTML=`<h2 style="margin:0 0 6px">🔓 비공개 글 복구</h2>
+    <div class="hint" style="color:var(--warn)">⚠️ 심사 대기·심사 중에는 주제 밖 글을 복구하지 마세요 — 니치가 다시 흐려집니다. 승인 후에 복구하는 것이 안전합니다.</div>
+    ${posts.length?`
+      <div style="max-height:46vh;overflow:auto;margin:10px 0">
+        ${posts.map(p=>`<label style="display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:11px;padding:9px 11px;margin:6px 0;cursor:pointer">
+          <input type="checkbox" class="rstChk" value="${p.id}" style="width:auto;margin-top:3px">
+          <span style="flex:1;min-width:0"><span style="font-size:13px">${escAttr((p.title&&p.title.rendered)||"(제목 없음)")}</span>
+          <div class="hint">${String(p.date).slice(0,10)}</div></span></label>`).join("")}
+      </div>
+      <div class="actions" style="justify-content:space-between">
+        <button class="btn sm" onclick="closeTrackWiz()">닫기</button>
+        <button class="btn primary sm" onclick="restoreSelected()">선택한 글 공개로 복구</button></div>`
+    :`<div class="hint" style="margin:12px 0">비공개 글이 없습니다.</div>
+      <div class="actions" style="justify-content:flex-end"><button class="btn sm" onclick="closeTrackWiz()">닫기</button></div>`}`;
+}
+async function restoreSelected(){
+  const ids=[...document.querySelectorAll(".rstChk:checked")].map(c=>+c.value);
+  if(!ids.length) return toast("복구할 글을 선택하세요");
+  if(!confirm(`${ids.length}편을 다시 공개합니다. 계속할까요?`)) return;
+  const base=wpBase(), HJ=Object.assign({"Content-Type":"application/json"},wpAuth());
+  let done=0, fail=0;
+  for(const id of ids){
+    try{ const r=await fetch(`${base}/wp-json/wp/v2/posts/${id}`,{method:"POST",headers:HJ,
+          body:JSON.stringify({status:"publish"})}); r.ok?done++:fail++; }catch(e){ fail++; }
+  }
+  toast(`🔓 ${done}편 복구 완료${fail?` · 실패 ${fail}`:""}`);
+  openRestore();          // 목록 새로고침
+}
+// ===== v1.3 🔥 발행 스트릭 카드 =====
+// 발행 '리듬'은 심사관에게 살아있는 사이트라는 신호다. 습관을 눈에 보이게 만든다.
+async function renderStreak(){
+  const box=document.getElementById("statusPanel"); if(!box) return;
+  let el=document.getElementById("streakCard");
+  if(!el){ el=document.createElement("div"); el.id="streakCard";
+    box.parentNode.insertBefore(el, box); }
+  const base=(CFG.site||"").replace(/\/$/,""); if(!base){ el.innerHTML=""; return; }
+  let posts=[];
+  try{ const r=await fetch(`${base}/wp-json/wp/v2/posts?per_page=100&_fields=date`,{cache:"no-store"});
+       if(r.ok) posts=await r.json(); }catch(e){}
+  if(!Array.isArray(posts)||!posts.length){ el.innerHTML=""; return; }
+  const D=86400000, key=t=>new Date(t).toISOString().slice(0,10);
+  const days=new Set(posts.map(p=>String(p.date).slice(0,10)));
+  const now=Date.now();
+  let streak=0, t=now;
+  if(!days.has(key(t))) t-=D;                     // 오늘 글이 아직이면 어제부터 센다
+  while(days.has(key(t))){ streak++; t-=D; }
+  const week=posts.filter(p=>now-new Date(p.date).getTime()<7*D).length;
+  const fire=streak>=7?"🔥🔥":streak>=3?"🔥":streak>=1?"✨":"🌱";
+  el.innerHTML=`<div class="card" style="display:flex;gap:13px;align-items:center;padding:11px 14px;margin-bottom:8px">
+    <span style="font-size:24px">${fire}</span>
+    <div style="flex:1;min-width:0"><b>연속 발행 ${streak}일</b>
+      <div class="hint" style="margin-top:2px">이번 주 ${week}편 — 꾸준한 발행 리듬이 곧 승인 신호입니다</div></div>
+    <div style="display:flex;gap:3px">${[6,5,4,3,2,1,0].map(i=>
+      `<span style="width:9px;height:22px;border-radius:4px;background:${days.has(key(now-i*D))?"var(--accent)":"var(--line)"}"></span>`).join("")}</div>
+  </div>`;
+}
 // 운영 안전망 패널: 연동 헬스체크 + 최근 실행 + 이번 달 예상비용
 async function loadStatus(dataUrl,force){
+  try{ renderStreak(); }catch(e){}
   const url=(dataUrl||"./data/latest.json").replace(/latest\.json.*$/,"status.json");
   const box=document.getElementById("statusPanel"); if(!box) return;
   let s=null;
