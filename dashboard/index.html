@@ -68,6 +68,12 @@
   html[data-theme="light"] .skel{background:linear-gradient(90deg,#f2ecfb 25%,#e8dff8 50%,#f2ecfb 75%)}
   html[data-theme="light"] input,html[data-theme="light"] textarea,html[data-theme="light"] select{
     background:rgba(255,255,255,.72);border-color:rgba(139,92,246,.18);color:var(--txt)}
+  /* 실행 버튼 도형이 흰색 하드코딩이라 유리 배경에서 안 보임 → 보라로 */
+  html[data-theme="light"] .ic-play{border-left-color:var(--accent-2)}
+  html[data-theme="light"] .ic-pause i{background:var(--accent-2)}
+  html[data-theme="light"] .ring-bg{stroke:rgba(139,92,246,.2)}
+  html[data-theme="light"] .ring-fg{stroke:var(--accent-2)}
+  html[data-theme="light"] .run-wrap.running .ic-pause i{background:#fff}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{margin:0;background:var(--bg);color:var(--txt);
     font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",sans-serif;
@@ -7383,6 +7389,9 @@ function pickStepsHtml(cur){
 }
 function renderPickDash(){
   const page=document.getElementById("adsSheet");
+  const h=page.querySelector("h2");
+  if(h&&!/픽 라인/.test(h.textContent))
+    h.innerHTML=`🛒 픽 라인 — 쿠팡 수익화 <span style="font-size:11px;color:var(--muted);font-weight:400">심사 없음 · 목표: 오픈 API</span>`;
   let box=page.querySelector("#adsDash");
   if(!box){ box=document.createElement("div"); box.id="adsDash";
     page.querySelector('.sub-sec[data-k="now"]').prepend(box); }
