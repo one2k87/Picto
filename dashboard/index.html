@@ -880,7 +880,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span id="verLabel" style="font-size:11px;color:var(--muted);font-weight:400">Scripto v1.0</span></h2>
+  <h2>⚙️ 설정 <span id="verLabel" style="font-size:11px;color:var(--muted);font-weight:400">Scripto v1.1</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1236,6 +1236,14 @@
     </div>
     <input type="file" id="cfgImportFile" accept=".json" style="display:none">
     <div class="hint">이 기기의 설정 전체를 파일로 저장/복원합니다. ⚠️ 키·비밀번호가 포함되니 파일을 안전하게 보관하세요.</div>
+  </div>
+  <div class="field">
+    <label>🙋 도움</label>
+    <div style="display:flex;gap:6px">
+      <button class="btn sm" id="glossaryBtn" style="flex:1">📖 용어 사전</button>
+      <button class="btn sm" id="feedbackBtn" style="flex:1">💬 의견 보내기</button>
+    </div>
+    <div class="hint">색인이 뭐예요? 앱 비밀번호가 뭐예요? — 처음 보는 말은 용어 사전에서.</div>
   </div>
   <div class="field">
     <label>🔓 자동 로그인</label>
@@ -2129,7 +2137,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
 const APP_BUILD=131;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
-const SCRIPTO_VER="1.0";
+const SCRIPTO_VER="1.1";
 
 function openAppPassPage(){
   const site=(document.getElementById("cfgSite")?.value||CFG.site||"").trim().replace(/\/+$/,"");
@@ -6983,6 +6991,52 @@ function applyTheme(){
   const b=document.getElementById("themeBtn");
   if(b) b.textContent=light?"✨ 글래스 라이트":"🌙 라벤더 다크";
 }
+// ===== v1.1 용어 사전 · CHANGELOG 뷰어 · 의견 보내기 =====
+// 컴퓨터가 낯선 사용자(와이프 베타 기준)가 앱 안에서 막히지 않게, 처음 보는 말을 그 자리에서 푼다.
+const GLOSSARY=[
+ ["도메인","블로그의 인터넷 주소예요 (예: 내이름.com). 1년 단위로 돈 내고 빌립니다."],
+ ["호스팅","블로그가 실제로 저장되는 컴퓨터(서버)를 빌리는 것. 카페24 같은 회사가 대신 관리해줘요."],
+ ["워드프레스","블로그를 만드는 무료 프로그램. 스크립토는 워드프레스 블로그에 글을 자동으로 올립니다."],
+ ["앱 비밀번호","로그인 비밀번호와 달라요. 스크립토 같은 도구가 글을 올릴 수 있게 워드프레스가 발급해주는 전용 열쇠입니다. 설정의 딥링크 버튼으로 발급 화면에 바로 갈 수 있어요."],
+ ["색인(검색 등록)","구글·네이버가 내 글을 검색 목록에 올리는 것. 색인이 안 되면 아무리 좋은 글도 검색에 안 나와요. 스크립토가 매일 자동으로 알리고 확인합니다."],
+ ["니치","블로그가 다루는 한 가지 전문 분야(예: 셀프 인테리어). 여러 주제를 섞으면 애드센스 승인에 불리해요."],
+ ["애드센스","구글 광고를 내 블로그에 붙여 수익을 얻는 프로그램. 심사(승인)를 통과해야 시작됩니다."],
+ ["쿠팡파트너스","내 글에서 소개한 상품이 팔리면 수수료를 받는 프로그램. 심사가 없어 바로 시작할 수 있어요(픽 라인)."],
+ ["오픈 API","쿠팡파트너스에서 일정 수익(최근 30일 15만원, 변동 가능)을 내면 열리는 자동화 열쇠. 이게 있어야 픽토·캐스토와 연동됩니다."],
+ ["초안/예약 발행","초안=아직 비공개 저장 상태, 예약 발행=정해둔 시각에 자동 공개. 스크립토는 하루 발행량을 지키려고 예약을 씁니다."],
+ ["Gemini 키","글을 써주는 구글 AI를 쓰기 위한 무료 열쇠. 처음 한 번만 발급하면 됩니다(AI 키 연결 마법사)."],
+ ["트랙(라인)","이 사이트의 목적: 🅐 애드 라인=애드센스 승인·광고 수익 / 🛒 픽 라인=쿠팡 커머스 수익."]];
+function showGlossary(){
+  const bg=document.getElementById("obBg"), card=document.getElementById("obCard"), body=document.getElementById("obBody");
+  bg.style.display="block"; card.style.display="block";
+  body.innerHTML=`<h2 style="margin:0 0 8px">📖 용어 사전</h2>
+    ${GLOSSARY.map(([t,d])=>`<div style="border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin:7px 0">
+      <b style="font-size:13px">${t}</b><div class="hint" style="margin-top:3px">${d}</div></div>`).join("")}
+    <div class="actions" style="justify-content:flex-end;margin-top:8px">
+      <button class="btn sm" onclick="closeTrackWiz()">닫기</button></div>`;
+}
+async function showChangelog(){
+  const bg=document.getElementById("obBg"), card=document.getElementById("obCard"), body=document.getElementById("obBody");
+  bg.style.display="block"; card.style.display="block";
+  body.innerHTML=`<h2 style="margin:0 0 8px">🗒️ 무엇이 바뀌었나요</h2><div class="skel" style="height:60px"></div>`;
+  let txt="";
+  const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+  try{ const r=await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/CHANGELOG.md`,{cache:"no-store"});
+       if(r.ok) txt=await r.text(); }catch(e){}
+  body.innerHTML=`<h2 style="margin:0 0 8px">🗒️ 무엇이 바뀌었나요 <span style="font-size:11px;color:var(--muted)">Scripto v${SCRIPTO_VER}</span></h2>
+    <pre style="white-space:pre-wrap;font-size:12px;line-height:1.65;max-height:56vh;overflow:auto;
+      background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:12px">${
+      (txt||"불러오지 못했습니다").replace(/[&<]/g,c=>({"&":"&amp;","<":"&lt;"}[c]))}</pre>
+    <div class="actions" style="justify-content:flex-end;margin-top:8px">
+      <button class="btn sm" onclick="closeTrackWiz()">닫기</button></div>`;
+}
+(function helpInit(){
+  const g=document.getElementById("glossaryBtn"); if(g) g.onclick=()=>{ closeSheet(); setTimeout(showGlossary,150); };
+  const f=document.getElementById("feedbackBtn");
+  if(f) f.onclick=()=>{ location.href="mailto:one2k87@gmail.com?subject="+encodeURIComponent("[스크립토 의견] ")+"&body="+encodeURIComponent("앱 버전: v"+SCRIPTO_VER+"\n\n의견: "); };
+  const v=document.getElementById("verLabel");
+  if(v){ v.style.cursor="pointer"; v.title="버전 기록 보기"; v.onclick=()=>{ closeSheet(); setTimeout(showChangelog,150); }; }
+})();
 // ===== v1.0 설정 백업/복원 =====
 (function cfgBackup(){
   const ex=document.getElementById("cfgExportBtn"), im=document.getElementById("cfgImportBtn"),

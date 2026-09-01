@@ -802,6 +802,10 @@ def run():
     _rev = cfg.get("revenue", {}) or {}
     import generator as _gen
     _gen.ADS_BOOST = _approved and bool(_rev.get("ads_boost", True))
+    # v1.1 픽 라인: 이 사이트가 쿠팡 트랙이면 생성 프롬프트를 구매의도형으로 전환
+    _gen.COMMERCE_MODE = (cfg.get("track") == "coupang")
+    if _gen.COMMERCE_MODE:
+        print("[트랙] 🛒 픽 라인(쿠팡) — 커머스 모드로 생성합니다")
 
     # 일시정지: 매일 자동 생성을 꺼둔 상태면 아무것도 하지 않고 종료(초안 안 쌓임, API 호출 0)
     if cfg.get("paused"):

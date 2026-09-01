@@ -22,6 +22,20 @@ from links import find_reference_links
 # 승인 후 수익 최적화: True면 광고 3개 배치(기본 2개). main.run()에서 설정.
 ADS_BOOST = False
 
+# v1.1 픽 라인(쿠팡파트너스) 커머스 모드 — site_categories.json의 track:"coupang"일 때만.
+# 애드 라인과의 차이는 '최적화 대상'뿐: 심사관 관점 → 구매의도. 경험담 창작 금지는 동일.
+COMMERCE_MODE = False
+def _commerce_block():
+    if not COMMERCE_MODE:
+        return ""
+    return """
+[커머스 모드 — 구매 결정을 돕는 글]
+- 이 글의 목적은 검색량이 아니라 **구매의도**다: 가격대·규격·비교·추천·"어떤 걸 사야" 유형의 검색에 답한다.
+- 제품 '유형' 2~3가지를 표나 분기로 비교한다(스펙·가격 범위·어떤 사람에게 맞는지). 특정 쇼핑몰·링크·"구매하세요"는 쓰지 않는다(링크는 시스템이 삽입).
+- 선택 기준을 조건 분기로: "원룸이라면 A, 신축 아파트라면 B"처럼 상황별 결론을 내준다.
+- 가격은 확인 시점 기준 범위로 쓰고 본문에 시점을 명시한다. 겪지 않은 사용 후기는 창작 금지 — 스펙·공식 정보 비교 관점으로.
+"""
+
 SYSTEM = (
     "당신은 구글 애드센스로 실제 수익을 내는 한국어 블로그 전문 작가입니다. "
     "고단가 키워드를 자연스러운 회화체로 녹이고, 방문자가 끝까지 읽고 광고에 시선이 가도록 "
@@ -343,6 +357,7 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
   if _era else ""}
 
 {HUMAN_STYLE}
+{_commerce_block()}
 [이번 글의 도입 방식] {_open_mode}
   (이 방식으로만 시작한다. 다른 글과 같은 틀로 시작하면 안 된다.)
 

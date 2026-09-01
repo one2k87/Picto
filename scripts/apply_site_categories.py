@@ -10,6 +10,10 @@ if os.path.exists(P):
     if site.get("categories"):
         cfg["categories"] = site["categories"]; changed = True
         print("저장소 카테고리 적용:", [c["name"] for c in site["categories"]])
+    # v1.1 트랙(라인) — "adsense"(애드 라인, 기본) / "coupang"(픽 라인: 커머스 모드 프롬프트)
+    if site.get("track"):
+        cfg["track"] = site["track"]; changed = True
+        print("트랙 적용:", site["track"])
     if site.get("images_provider"):
         cfg.setdefault("images", {})["provider"] = site["images_provider"]; changed = True
         print("이미지 provider 적용:", site["images_provider"])
