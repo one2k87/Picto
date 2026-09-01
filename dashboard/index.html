@@ -880,7 +880,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span id="verLabel" style="font-size:11px;color:var(--muted);font-weight:400">Scripto v1.3</span></h2>
+  <h2>⚙️ 설정 <span id="verLabel" style="font-size:11px;color:var(--muted);font-weight:400">Scripto v1.4</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -2175,9 +2175,9 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=133;
+const APP_BUILD=134;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
-const SCRIPTO_VER="1.3";
+const SCRIPTO_VER="1.4";
 
 function openAppPassPage(){
   const site=(document.getElementById("cfgSite")?.value||CFG.site||"").trim().replace(/\/+$/,"");
@@ -6767,12 +6767,30 @@ function showTrackWiz(step){
       <div><b style="font-size:14px">${title}</b><div class="hint" style="margin-top:3px">${desc}</div></div>
     </div>`;
   if(step===0){
-    body.innerHTML=`<h2 style="margin:0 0 4px">어떤 블로그를 만들까요?</h2>
-      <p class="hint">나중에 사이트를 추가해 두 가지를 모두 운영할 수도 있습니다. 지금은 이 사이트의 목적 하나만 고르세요.</p>
-      <div data-v="adsense">${opt("🅐","애드센스 블로그 <span style='font-size:10px;color:var(--accent-2)'>애드 라인</span>",
-        "구글 광고로 수익. 심사 승인이 필요해요 — 승인까지 스크립토가 끌고 갑니다.",CFG.trackPurpose==="adsense")}</div>
-      <div data-v="coupang">${opt("🛒","쿠팡파트너스 블로그 <span style='font-size:10px;color:var(--accent-2)'>픽 라인</span>",
-        "상품 추천으로 수익. 심사가 없어 바로 시작 — 목표는 첫 수익과 오픈 API 발급.",CFG.trackPurpose==="coupang")}</div>`;
+    body.innerHTML=`<h2 style="margin:0 0 4px">무엇으로 수익화할까요?</h2>
+      <p class="hint">선택에 따라 필요한 도메인·호스팅 개수와 비용이 달라집니다. 뒤에서 전부 계산해 보여드려요.</p>
+      <div data-v="adsense">${opt("🅐","애드센스만 <span style='font-size:10px;color:var(--accent-2)'>애드 라인</span>",
+        "구글 광고 수익. 심사 승인이 필요 — 승인까지 스크립토가 끌고 갑니다.",CFG.trackPlan==="adsense")}</div>
+      <div data-v="coupang">${opt("🛒","쿠팡파트너스만 <span style='font-size:10px;color:var(--accent-2)'>픽 라인</span>",
+        "상품 추천 수수료. 심사가 없어 오늘 바로 시작 — 목표는 첫 수익과 오픈 API.",CFG.trackPlan==="coupang")}</div>
+      <div data-v="both">${opt("🅐🛒","둘 다 지금 시작",
+        "사이트 2개를 따로 만듭니다(정책 안전을 위해 도메인 분리). 비용은 2배지만 수익원도 2개.",CFG.trackPlan==="both")}</div>
+      <div data-v="later">${opt("➕","지금은 하나만, 나중에 추가",
+        "가볍게 시작하고 자리 잡으면 확장. 추가할 시점도 스크립토가 알려줍니다.",CFG.trackPlan==="later")}</div>`;
+    body.querySelectorAll("[data-v]").forEach(el=>el.onclick=()=>{
+      const v=el.dataset.v; CFG.trackPlan=v;
+      if(v==="adsense"||v==="coupang"){ CFG.trackPurpose=v; saveCfg(); showTrackWiz(1); }
+      else if(v==="both"){ CFG.trackPurpose="adsense"; saveCfg(); showTrackWiz(1); }  // 첫 사이트는 애드부터(심사가 오래 걸리니 먼저 굴린다)
+      else showTrackWiz(0.5);
+    });
+  } else if(step===0.5){   // '나중에 추가' — 무엇부터?
+    body.innerHTML=`<h2 style="margin:0 0 4px">그럼 무엇부터 시작할까요?</h2>
+      <p class="hint">정답은 없지만 참고: 애드센스는 심사(수 주)가 걸리니 <b>먼저 심어두면</b> 기다리는 동안 쿠팡을 준비하기 좋고,
+      쿠팡은 심사가 없어 <b>수익을 먼저 경험</b>하기 좋습니다.</p>
+      <div data-v="adsense">${opt("🅐","애드센스부터","심사 기간을 벌어두는 전략. 쿠팡은 나중에 사이트 추가.")}</div>
+      <div data-v="coupang">${opt("🛒","쿠팡부터","오늘 시작해 첫 수익부터. 애드센스는 글이 쌓인 뒤 새 사이트로.")}</div>
+      <div class="actions" style="justify-content:flex-start;margin-top:6px">
+        <button class="btn sm" onclick="showTrackWiz(0)">← 뒤로</button></div>`;
     body.querySelectorAll("[data-v]").forEach(el=>el.onclick=()=>{
       CFG.trackPurpose=el.dataset.v; saveCfg(); showTrackWiz(1); });
   } else if(step===1){
@@ -6786,26 +6804,59 @@ function showTrackWiz(step){
       else showTrackWiz(2);
     });
   } else if(step===2){
-    body.innerHTML=`<div class="skel" style="height:60px"></div>`;
-    loadGuide().then(g=>{
-      const rec=(g&&g.hosting_options||[]).find(h=>h.recommend)||{};
-      const ads24=(g&&g.hosting_options||[]).find(h=>h.key==="cafe24_adsense");
-      const pick=CFG.trackPurpose==="coupang";
-      body.innerHTML=`<h2 style="margin:0 0 4px">개설, 어렵지 않아요</h2>
-        <p class="hint">${escAttr((g&&g.warning)||"도메인·호스팅 결제는 본인 카드로 직접 해야 합니다. 나머지는 스크립토가 합니다.")}</p>
-        ${(pick||!ads24)?"":`<div style="border:1.5px solid var(--accent);border-radius:12px;padding:11px 13px;margin:8px 0">
-          <b>⭐ ${escAttr(ads24.name)}</b> <span class="hint">${escAttr(ads24.price_note||"")}</span>
-          <div class="hint" style="margin-top:4px">${(ads24.pros||[]).slice(0,3).map(x=>"· "+escAttr(x)).join("<br>")}</div></div>`}
-        <div style="border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin:8px 0">
-          <b>${escAttr(rec.name||"카페24 매니지드 워드프레스")}</b> <span class="hint">${escAttr(rec.price_note||"")}</span>
-        </div>
-        <div class="hint">전체 ${(g&&g.steps||[]).length||10}단계 안내(사진 찍을 화면까지)는 개설 안내에 있습니다. 준비가 끝나면 다시 이 앱을 열어 이어서 진행하세요.</div>
-        <div class="actions" style="justify-content:space-between;margin-top:10px">
-          <button class="btn sm" onclick="showTrackWiz(1)">← 뒤로</button>
-          <button class="btn primary sm" onclick="closeTrackWiz();finishOnboard(true);setTimeout(()=>{const b=document.getElementById('setupGuideBtn');if(b)b.click();},400)">🧭 개설 안내 열기</button>
-        </div>`;
-    });
+    renderPlanGuide(body);
   }
+}
+// ===== v1.4 선택별 개설 가이드: 비용 전부 계산 + 도메인·카페24 절차를 클릭 경로까지 =====
+// 금액은 2026-09-01 실측(변동 가능) — 결제 화면 금액이 항상 우선.
+function renderPlanGuide(body){
+  const plan=CFG.trackPlan||CFG.trackPurpose||"adsense";
+  const first=CFG.trackPurpose||"adsense";
+  const DOM=23500;                       // .com 1년 (가비아/카페24 통상가)
+  const HO_ADS=1980, HO_PICK=1100;       // 카페24 월: 애드센스WP / 뉴매니지드WP 최저
+  const yr=(dom,ho)=>dom+ho*12;
+  const won=n=>"약 "+n.toLocaleString()+"원";
+  const row=(k,v,b)=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line)">
+    <span class="hint" style="color:var(--txt)">${k}</span><span style="font-weight:${b?800:600};color:${b?"var(--accent-2)":"var(--txt)"}">${v}</span></div>`;
+  const sets={ adsense:[["🅐 애드센스 사이트",DOM,HO_ADS,"애드센스 워드프레스"]],
+               coupang:[["🛒 쿠팡 사이트",DOM,HO_PICK,"뉴매니지드 워드프레스"]],
+               both:[["🅐 애드센스 사이트",DOM,HO_ADS,"애드센스 워드프레스"],["🛒 쿠팡 사이트",DOM,HO_PICK,"뉴매니지드 워드프레스"]],
+               later:[[first==="coupang"?"🛒 쿠팡 사이트":"🅐 애드센스 사이트",DOM,first==="coupang"?HO_PICK:HO_ADS,first==="coupang"?"뉴매니지드 워드프레스":"애드센스 워드프레스"]] }[plan];
+  const total=sets.reduce((s,x)=>s+yr(x[1],x[2]),0);
+  const costHtml=`<div style="border:1px solid var(--line);border-radius:12px;padding:6px 13px;margin:8px 0">
+    ${sets.map(x=>row(`${x[0]} — 도메인(1년)`,won(x[1]))+row(`&nbsp;&nbsp;└ 카페24 ${x[3]}(월 ${x[2].toLocaleString()}원×12)`,won(x[2]*12))).join("")}
+    ${row("첫해 총비용",won(total),true)}
+    ${plan==="later"?row("➕ 나중에 추가할 사이트(그때 결제)",won(yr(DOM,first==="coupang"?HO_ADS:HO_PICK))):""}
+  </div>
+  <div class="hint">월 결제 기준·부가세 별도일 수 있음. 1년 선결제가 더 쌉니다. ⚠️ .shop/.store 550원 특가는 이듬해 갱신이 7~9만원이라 비추천 — .com이 정석.</div>`;
+  const steps=[
+    ["도메인 사기 · 10분","카페24(hosting.cafe24.com) 상단 [도메인] 또는 가비아 → 검색창에 원하는 이름 입력 → <b>.com</b> 선택 → 결제. 짧고 기억하기 쉬운 영문으로, 오래 쓸 이름을 고르세요."],
+    ["카페24 호스팅 신청 · 10분","hosting.cafe24.com → [워드프레스] 메뉴 → "+(plan==="coupang"?"<b>뉴매니지드 워드프레스</b>(월 1,100원대~)":plan==="both"?"애드센스 사이트는 <b>애드센스 워드프레스</b>(월 1,980원~), 쿠팡 사이트는 <b>뉴매니지드 워드프레스</b>(월 1,100원대~)":"<b>애드센스 워드프레스</b>(월 1,980원~, 애드센스 연결 기능 내장)")+" → 신청 과정에서 1번에서 산 도메인 연결 → 무료 SSL(https 자물쇠) 켜져 있는지 확인. 워드프레스는 설치된 상태로 나옵니다."],
+    ["워드프레스 접속 · 5분","내도메인.com<b>/wp-admin</b> 으로 들어가 카페24가 알려준 아이디·비밀번호로 로그인. 이 정보는 꼭 메모해두세요."],
+    ["앱 비밀번호 발급 · 3분","워드프레스 관리자 → 사용자 → 프로필 → 맨 아래 <b>응용 프로그램 비밀번호</b>에 이름 'Scripto' 입력 후 추가 → 나온 문자열 복사(로그인 비번과 다른 전용 열쇠예요)."],
+    ["스크립토 연결 · 2분","이 앱 설정 → 연결에 블로그 주소·아이디·앱 비밀번호 입력 → 니치(주제) 마법사 진행. 여기서부터는 스크립토가 알아서 합니다."]];
+  if(plan==="coupang"||first==="coupang") steps.push(["쿠팡 파트너스 가입 · 5분","partners.coupang.com → 쿠팡 계정으로 가입(심사 없음, 무료) → 승인 탭의 [가입 완료] 버튼으로 기록. 오픈 API는 최근 30일 수익 15만원(변동 가능) 달성 후 열립니다."]);
+  const planNote={ both:"👉 순서 추천: <b>애드센스 사이트를 먼저</b> 세팅해 심사 시계를 돌려두고, 기다리는 동안 쿠팡 사이트를 세팅하세요. 두 사이트는 도메인을 꼭 분리합니다(정책 리스크 격리).",
+    later:first==="coupang"?"👉 지금은 쿠팡만. 글과 색인이 쌓이면 스크립토가 '애드센스 사이트를 추가할 때'라고 알려드립니다.":"👉 지금은 애드센스만. 승인이 나면 '쿠팡 사이트 추가' 안내가 열립니다.",
+    adsense:"",coupang:""}[plan];
+  body.innerHTML=`<h2 style="margin:0 0 4px">비용과 순서, 이게 전부예요</h2>
+    <div class="hint">직접 하실 일은 결제 ${sets.length*2}건과 아래 ${steps.length}단계(총 30~40분/사이트)뿐. 나머지는 전부 스크립토가 합니다.</div>
+    ${costHtml}
+    ${planNote?`<div class="dnext" style="margin:8px 0"><div class="dv" style="font-size:12.5px">${planNote}</div></div>`:""}
+    <div style="margin:10px 0">${steps.map((s,i)=>`
+      <div style="display:flex;gap:11px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:7px 0">
+        <div style="width:24px;height:24px;flex:0 0 auto;border-radius:50%;background:var(--accent);color:#fff;
+          display:grid;place-items:center;font-size:12px;font-weight:800">${i+1}</div>
+        <div style="min-width:0"><b style="font-size:13px">${s[0]}</b>
+          <div class="hint" style="margin-top:3px;line-height:1.6">${s[1]}</div></div>
+      </div>`).join("")}</div>
+    <div class="actions" style="justify-content:space-between;margin-top:6px">
+      <button class="btn sm" onclick="showTrackWiz(1)">← 뒤로</button>
+      <div style="display:flex;gap:6px">
+        <button class="btn sm" onclick="closeTrackWiz();finishOnboard(true);setTimeout(()=>{const b=document.getElementById('setupGuideBtn');if(b)b.click();},400)">🧭 상세 안내</button>
+        <button class="btn primary sm" onclick="closeTrackWiz();showOnboard(0)">준비됐어요 →</button>
+      </div>
+    </div>`;
 }
 function closeTrackWiz(){ const bg=document.getElementById("obBg"), card=document.getElementById("obCard");
   bg.style.display="none"; card.style.display="none"; }
