@@ -880,7 +880,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span id="verLabel" style="font-size:11px;color:var(--muted);font-weight:400">Scripto v1.1</span></h2>
+  <h2>⚙️ 설정 <span id="verLabel" style="font-size:11px;color:var(--muted);font-weight:400">Scripto v1.2</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1397,7 +1397,7 @@
       <input type="checkbox" id="loginRemember" style="width:auto"> 로그인 정보 기억(자동 로그인)
     </label>
     <button class="btn primary" id="loginBtn">로그인</button>
-    <button class="btn" id="guestBtn">게스트(Basic)로 둘러보기</button>
+    <button class="btn" id="guestBtn">🎬 데모로 둘러보기 — 실제 운영 화면 그대로</button>
     <button class="btn" id="signupBtn" disabled style="opacity:.45">회원가입 (준비 중)</button>
   </div>
   <div id="loginMsg" style="color:var(--danger);font-size:13px;min-height:16px;text-align:center"></div>
@@ -1419,6 +1419,7 @@ function loadCfg(){try{return JSON.parse(localStorage.getItem(LS))||{}}catch(e){
 var _syncApplying=false;
 
 function saveCfg(){
+  if(window.__DEMO) return;   // 🎬 데모: 방문자 기기에 아무것도 남기지 않는다
   try{
     // 어느 기기가 더 최신인지 판단하는 기준. 받아서 적용하는 중에는 갱신하지 않는다.
     if(!_syncApplying) CFG.cfgTouchedAt=new Date().toISOString();
@@ -1428,6 +1429,44 @@ function saveCfg(){
   // 설정이 바뀔 때마다 서버에도 올린다(연속 입력은 한 번으로 묶임)
   try{ if(typeof syncAuto==="function") syncAuto(); }catch(e){}
 }
+
+/* ===== v1.2 🎬 데모 모드 =====
+   로그인 화면의 '데모로 둘러보기' → 실제 운영 사이트의 실황 데이터(공개 저장소)를
+   읽기 전용으로 체험한다. 판매 퍼널의 핵심: 설명 대신 실물을 보여준다.
+   안전장치 3중: ①saveCfg가 localStorage에 저장 안 함(방문자 기기 오염 방지)
+   ②모든 비-GET fetch를 관문에서 차단(발행·시크릿 등록·텔레그램 전부 이 길을 지난다)
+   ③나가기 시 새로고침으로 원래 상태 복원 */
+function startDemo(){ sessionStorage.setItem("scriptoDemo","1"); location.reload(); }
+function exitDemo(){ sessionStorage.removeItem("scriptoDemo"); location.reload(); }
+function applyDemo(){
+  window.__DEMO=true;
+  CFG={ auth:{user:"demo",role:"guest"}, plan:"basic", onboarded:true, trackPurpose:"adsense",
+        site:"https://wontheland.com", user:"demo", pass:"demo-mode", autoLogin:true,
+        ghOwner:"one2k87", ghRepo:"Scripto", runnerAt:new Date().toISOString(),
+        adsenseApproved:false, theme:CFG.theme, demo:true };
+  const of=window.fetch.bind(window);
+  window.fetch=function(u,o){
+    const m=((o&&o.method)||"GET").toUpperCase();
+    if(m!=="GET"&&m!=="HEAD"){
+      try{ toast("🎬 데모 모드 — 저장·발행은 실제 계정에서만 돼요"); }catch(e){}
+      return Promise.reject(new Error("demo-blocked"));
+    }
+    return of(u,o);
+  };
+  document.addEventListener("DOMContentLoaded",()=>{
+    const b=document.createElement("div");
+    b.id="demoBar";
+    b.style.cssText="position:fixed;left:12px;right:12px;bottom:calc(74px + env(safe-area-inset-bottom));"+
+      "z-index:60;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;"+
+      "background:linear-gradient(135deg,rgba(167,139,250,.92),rgba(139,92,246,.92));color:#fff;"+
+      "font-size:12.5px;box-shadow:0 10px 26px rgba(124,58,237,.35);backdrop-filter:blur(10px)";
+    b.innerHTML=`<span style="font-size:16px">🎬</span>
+      <span style="flex:1;line-height:1.4"><b>데모 모드</b> — 실제 운영 중인 블로그의 실황을 구경하고 있어요. 저장·발행은 되지 않습니다.</span>
+      <button onclick="exitDemo()" style="border:0;border-radius:9px;padding:7px 12px;background:rgba(255,255,255,.22);color:#fff;font-weight:700;cursor:pointer">나가기</button>`;
+    document.body.appendChild(b);
+  });
+}
+if(sessionStorage.getItem("scriptoDemo")==="1") applyDemo();
 
 /* ===================== 구독 플랜(Basic/Pro/Max) =====================
    ▶ 판매자(=당신)만 아래 SELLER 설정을 채웁니다. 고객은 라이선스 키만 입력합니다.
@@ -2137,7 +2176,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
 const APP_BUILD=131;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
-const SCRIPTO_VER="1.1";
+const SCRIPTO_VER="1.2";
 
 function openAppPassPage(){
   const site=(document.getElementById("cfgSite")?.value||CFG.site||"").trim().replace(/\/+$/,"");
@@ -6973,7 +7012,7 @@ async function forceUpdate(){
 // 로그인 버튼 연결 + 진입 시 게이트
 document.getElementById("loginBtn").onclick=()=>doLogin();
 document.getElementById("loginPass").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
-document.getElementById("guestBtn").onclick=loginGuest;
+document.getElementById("guestBtn").onclick=startDemo;   // v1.2: 빈 게스트 → 실황 데모
 document.getElementById("signupBtn").onclick=()=>toast("회원가입은 준비 중입니다");
 document.getElementById("faceUnlockBtn").onclick=faceUnlock;
 document.getElementById("usePwBtn").onclick=()=>{
