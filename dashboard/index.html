@@ -7428,6 +7428,10 @@ function renderPickDash(){
 function renderAdsDash(){
   if(CFG.trackPurpose==="coupang"){ try{renderPickDash();}catch(e){} return; }
   const page=document.getElementById("adsSheet");
+  // 픽 라인에서 돌아왔을 때 제목 복원 (픽↔애드 전환 시 잔상 방지)
+  const h0=page.querySelector("h2");
+  if(h0&&/픽 라인/.test(h0.textContent))
+    h0.innerHTML=`🛡️ 애드센스 승인 준비 <span style="font-size:11px;color:var(--muted);font-weight:400">사이트 자동 점검·조치</span>`;
   let box=page.querySelector("#adsDash");
   if(!box){ box=document.createElement("div"); box.id="adsDash";
     page.querySelector('.sub-sec[data-k="now"]').prepend(box); }
