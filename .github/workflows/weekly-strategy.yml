@@ -3,8 +3,9 @@ name: 주간 수익 전략 분석
 # 매주 월요일 아침 7시(KST) = 일요일 22:00 UTC — 그날 생성(07:00)보다 먼저 돌아야
 # 새 계획이 그 주 첫날부터 적용된다.
 on:
-  schedule:
-    - cron: "0 22 * * 0"
+# [Picto 연결 전 비활성] schedule:
+# [Picto 연결 전 비활성]     - cron: "0 22 * * 0"
+
   workflow_dispatch: {}          # 앱에서 '지금 분석' 버튼으로도 실행
 
 permissions:

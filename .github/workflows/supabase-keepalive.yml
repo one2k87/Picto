@@ -11,8 +11,9 @@ name: Supabase 정지 방지 핑
 #   비밀값이 필요 없어 시크릿을 쓰지 않는다.
 
 on:
-  schedule:
-    - cron: "0 3 * * *"        # 매일 12:00 KST
+# [Picto 연결 전 비활성] schedule:
+# [Picto 연결 전 비활성]     - cron: "0 3 * * *"        # 매일 12:00 KST
+
   workflow_dispatch: {}
 
 concurrency:

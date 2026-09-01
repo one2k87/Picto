@@ -1,32 +1,32 @@
 {
-  "name": "Scripto",
-  "short_name": "Scripto",
-  "description": "카테고리 집중 AI 블로그 자동화 — 매일 저경쟁·시즌·시리즈 글 생성과 게시 관리",
-  "start_url": "./index.html",
-  "scope": "./",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#141020",
-  "theme_color": "#b9a3f0",
-  "lang": "ko",
-  "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ]
+ "name": "Picto — 쿠팡 커머스 블로그",
+ "short_name": "Picto",
+ "description": "카테고리 집중 AI 블로그 자동화 — 매일 저경쟁·시즌·시리즈 글 생성과 게시 관리",
+ "start_url": "./index.html",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#141020",
+ "theme_color": "#b9a3f0",
+ "lang": "ko",
+ "icons": [
+  {
+   "src": "icons/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icons/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icons/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
 }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Scripto</title>
+<title>Picto</title>
 
 <!-- PWA / 아이폰 홈화면 설치 -->
 <link rel="manifest" href="manifest.json">
@@ -649,7 +649,7 @@
   <img src="icons/icon-192.png" alt="Scripto" width="30" height="30"
     style="border-radius:8px;flex:0 0 auto">
   <div>
-    <h1>Scripto</h1>
+    <h1>Picto 🛒</h1>
     <div class="sub" id="genat">로드 중…</div>
   </div>
   <div class="spacer"></div>
@@ -880,7 +880,7 @@
 <!-- 설정 시트 -->
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
-  <h2>⚙️ 설정 <span id="verLabel" style="font-size:11px;color:var(--muted);font-weight:400">Scripto v1.4</span></h2>
+  <h2>⚙️ 설정 <span id="verLabel" style="font-size:11px;color:var(--muted);font-weight:400">Picto v0.1</span></h2>
 
   <div class="field">
     <label>현재 플랜</label>
@@ -1379,7 +1379,7 @@
   flex-direction:column;justify-content:center;align-items:center;padding:24px;gap:12px">
   <img src="icons/icon-192.png" alt="Scripto" width="84" height="84"
     style="border-radius:20px;box-shadow:0 8px 24px rgba(124,92,255,.35)">
-  <div style="font-size:22px;font-weight:800;letter-spacing:.5px">Scripto</div>
+  <div style="font-size:22px;font-weight:800;letter-spacing:.5px">Picto</div>
 
   <!-- 잠금 모드: Face ID -->
   <button class="btn primary" id="faceUnlockBtn" style="display:none;width:100%;max-width:320px;font-size:16px;padding:14px">
@@ -1406,7 +1406,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const LS="adsense_blog_cfg";
+const LS="picto_cfg";
 let DATA=null, fKind="all", fLang="all", fCat="all", fSearch="", fStatus="all", sortMode="default";
 let CFG=loadCfg();
 
@@ -2177,7 +2177,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
 const APP_BUILD=134;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
-const SCRIPTO_VER="1.4";
+const SCRIPTO_VER="0.1";
 
 function openAppPassPage(){
   const site=(document.getElementById("cfgSite")?.value||CFG.site||"").trim().replace(/\/+$/,"");
@@ -2280,7 +2280,7 @@ async function renderTodoInbox(){
 let ADS_RULES=null;
 async function loadAdsRules(force){
   if(ADS_RULES && !force) return ADS_RULES;
-  const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+  const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Picto";
   const urls=[
     `https://raw.githubusercontent.com/${owner}/${repo}/main/dashboard/data/adsense_rules.json`,
     "./data/adsense_rules.json"
@@ -2683,7 +2683,7 @@ function supaProjectRef(){
 }
 document.getElementById("supaCopySql").onclick=async()=>{
   try{
-    const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+    const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Picto";
     const r=await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/saas/supabase_schema.sql`,{cache:"no-store"});
     if(!r.ok) throw new Error(r.status);
     const sql=await r.text();
@@ -3027,7 +3027,7 @@ function buildMoneyTab(){
     (async()=>{
       const box=document.getElementById("toneEraBox"); if(!box) return;
       try{
-        const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+        const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Picto";
         let r=await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/data/tone_eras.json`,{cache:"no-store"});
         if(!r.ok) r=await fetch("../data/tone_eras.json",{cache:"no-store"});
         if(!r.ok){ box.textContent="톤 설정 파일을 찾지 못했습니다."; return; }
@@ -3053,7 +3053,7 @@ function buildMoneyTab(){
     (async()=>{
       const box=document.getElementById("themeShiftBox"); if(!box) return;
       try{
-        const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+        const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Picto";
         let r=await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/dashboard/data/theme_shift.json`,{cache:"no-store"});
         if(!r.ok) r=await fetch("./data/theme_shift.json",{cache:"no-store"});
         if(!r.ok) return;
@@ -6210,7 +6210,7 @@ async function wpRunner(){
 let GUIDE=null;
 async function loadGuide(){
   if(GUIDE) return GUIDE;
-  const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+  const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Picto";
   for(const u of [`https://raw.githubusercontent.com/${owner}/${repo}/main/dashboard/data/setup_guide.json`,
                   "./data/setup_guide.json"]){
     try{ const r=await fetch(u,{cache:"no-store"}); if(r.ok){ GUIDE=await r.json(); return GUIDE; } }catch(e){}
@@ -6869,7 +6869,7 @@ function maybeOnboard(){ if(!CFG.onboarded && isLoggedIn()){ if(!CFG.trackPurpos
 let NICHES=null, _ans={mode:"",exp:[],region:""}, _nichePick=null;
 async function loadNiches(){
   if(NICHES) return NICHES;
-  const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+  const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Picto";
   for(const u of [`https://raw.githubusercontent.com/${owner}/${repo}/main/dashboard/data/niches.json`,
                   "./data/niches.json"]){
     try{ const r=await fetch(u,{cache:"no-store"}); if(r.ok){ NICHES=await r.json(); return NICHES; } }catch(e){}
@@ -7180,7 +7180,7 @@ async function showChangelog(){
   bg.style.display="block"; card.style.display="block";
   body.innerHTML=`<h2 style="margin:0 0 8px">🗒️ 무엇이 바뀌었나요</h2><div class="skel" style="height:60px"></div>`;
   let txt="";
-  const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+  const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Picto";
   try{ const r=await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/CHANGELOG.md`,{cache:"no-store"});
        if(r.ok) txt=await r.text(); }catch(e){}
   body.innerHTML=`<h2 style="margin:0 0 8px">🗒️ 무엇이 바뀌었나요 <span style="font-size:11px;color:var(--muted)">Scripto v${SCRIPTO_VER}</span></h2>
@@ -7537,7 +7537,7 @@ function animateBars(root){
 let STRAT=null;
 async function loadStrategy(force){
   if(STRAT&&!force) return STRAT;
-  const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Scripto";
+  const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Picto";
   for(const u of [`https://raw.githubusercontent.com/${owner}/${repo}/main/dashboard/data/strategy.json`,
                   "./data/strategy.json"]){
     try{ const r=await fetch(u,{cache:"no-store"}); if(r.ok){ STRAT=await r.json(); return STRAT; } }catch(e){}
