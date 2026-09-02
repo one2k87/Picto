@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-02T01:26:18",
+  "generated_at": "2026-09-02T01:33:48",
   "categories": [
     "생활·주방"
   ],
@@ -7,51 +7,51 @@
   "per_category": {
     "생활·주방": 1
   },
-  "total_all": 1287,
+  "total_all": 1288,
   "articles": [
     {
-      "keyword": "세탁기 건조기 직렬 설치 비용 절약 방법과 필요한 추가 부품 확인하기",
+      "keyword": "비데 자가 설치 비용 절약 방법과 필요한 공구, 주의사항 확인하기",
       "kind": "long",
       "lang": "ko",
       "category": "생활·주방",
-      "title": "세탁기와 건조기 직렬 설치, 예상치 못한 추가 비용 없이 성공하는 방법은?",
-      "meta": "2026년 9월, 좁은 세탁실 공간 때문에 세탁기 건조기 직렬 설치를 고민 중이신가요? 불필요한 비용을 절약하고 안전하게 설치하는 방법과 필요한 부품, 주의할 점까지 자세히 알려드립니다.",
-      "slug": "washing-dryer-stack-installation-cost-saving",
-      "focus_keyword": "세탁기 건조기 직렬 설치 비용 절약 방법과 필요한 추가 부품 확인하기",
+      "title": "비데 자가 설치 비용을 절약하는 데 필요한 공구와 주의사항을 확인합니다",
+      "meta": "2026년 9월 기준, 비데 자가 설치로 비용을 절약하는 방법을 알아봅니다. 필요한 공구와 흔한 실수, 그리고 모델별 설치 난이도를 비교하여 성공적인 자가 설치를 돕는 정보를 제공합니다.",
+      "slug": "bidet-self-installation-cost-saving-tips",
+      "focus_keyword": "비데 자가 설치 비용 절약 방법과 필요한 공구, 주의사항 확인하기",
       "tags": [
-        "세탁기 건조기 직렬 설치",
-        "가전제품 설치",
-        "생활 팁",
-        "주방 리모델링",
-        "비용 절약"
+        "비데 자가 설치",
+        "비데설치비용",
+        "생활비 절약",
+        "DIY팁",
+        "주방용품"
       ],
       "faqs": [
         {
-          "question": "직렬 설치 시 세탁기와 건조기는 같은 브랜드여야 하나요?",
-          "answer": "필수는 아니지만, 같은 브랜드 제품이 키트 호환성 및 디자인 일체감 면에서 유리합니다. 다른 브랜드 제품을 조합할 경우, 범용 스태킹 키트나 자체 선반을 활용해야 합니다."
+          "question": "비데 자가 설치 시 가장 중요한 준비물은 무엇인가요?",
+          "answer": "비데 설치 시 가장 중요한 것은 정확한 사이즈 측정과 필요한 공구 준비입니다. 특히 너트와 렌치 사이즈를 미리 확인해야 합니다. 물이 새지 않도록 고무패킹 상태도 중요합니다."
         },
         {
-          "question": "직렬 설치 시 건조기 문 방향을 바꿀 수 있나요?",
-          "answer": "대부분의 건조기는 문 방향 전환이 가능합니다. 설치 전에 세탁실 동선을 고려하여 원하는 방향으로 미리 설정하는 것이 좋습니다."
+          "question": "자가 설치가 어려운 비데 유형도 있나요?",
+          "answer": "네, 양변기와 비데가 일체형인 모델은 배관 및 전기 작업이 복잡하여 전문가 설치가 필수적입니다. 일반적인 시트형 비데 중에서도 온수 직결 방식은 난이도가 높을 수 있습니다."
         },
         {
-          "question": "건조기가 너무 높이 설치되면 사용이 불편하지 않을까요?",
-          "answer": "키가 작은 사용자에게는 불편할 수 있습니다. 건조기 높이가 눈높이보다 높아지면 세탁물 넣고 빼기가 어려워지므로, 자신의 키와 동선을 고려하여 결정하는 것이 중요합니다."
+          "question": "설치 후 누수가 발생하면 어떻게 해야 하나요?",
+          "answer": "누수가 발생하면 즉시 수도 밸브를 잠그고, 연결 부위의 나사 조임 상태와 고무패킹 위치를 다시 확인해야 합니다. 문제가 지속되면 제조사 고객센터에 문의하거나 전문가의 도움을 받는 것이 좋습니다."
         },
         {
-          "question": "직렬 설치 후 진동이나 소음이 심해졌는데 어떻게 해야 하나요?",
-          "answer": "세탁기와 건조기의 수평이 맞지 않거나 키트가 제대로 고정되지 않았을 때 진동이 심해질 수 있습니다. 먼저 두 가전제품의 수평을 다시 확인하고, 키트 체결 부위를 점검해보세요."
+          "question": "비데 자가 설치로 얼마나 비용을 절약할 수 있나요?",
+          "answer": "2026년 9월 기준, 비데 설치 전문 기사 출장비는 평균 3만 원에서 5만 원대입니다. 자가 설치 시 이 비용을 절약할 수 있으며, 추가 공구 구매 비용은 보통 1만 원 내외입니다."
         }
       ],
-      "html": "<p class=\"hook\" style=\"font-size:17px;font-weight:600\">좁은 세탁실 공간 때문에 세탁기와 건조기 직렬 설치를 고민하고 계신가요?</p><p class=\"byline\" style=\"font-size:12px;color:#98a2b3;margin:2px 0 12px\">✍️ 편집부 · 최종 업데이트 2026년 9월 2일</p><p class=\"ai-notice\" style=\"margin:2px 0 12px;padding:8px 12px;border-left:3px solid #98a2b3;background:#f6f7f9;color:#667085;font-size:12px;line-height:1.6\">⚠️ 본 콘텐츠(텍스트·이미지)는 생성형 AI를 통해 작성되었습니다. 정확성을 위해 검증 과정을 거치지만, 실제 적용 전 공식 출처로 최종 확인하시길 권합니다.</p><p>세탁실 문을 열자마자 좁은 공간에 한숨이 나왔던 경험, 다들 있으실 겁니다. 좁은 세탁실 공간 때문에 세탁기와 건조기 직렬 설치를 고민하고 계신가요? 2026년 9월 현재, 직렬 설치는 공간 효율성을 극대화하는 좋은 방법이지만, 예상치 못한 추가 비용 발생이나 잘못된 부품 선택으로 낭패를 볼 수도 있습니다. 하지만 걱정 마세요. 몇 가지 핵심 사항만 미리 알아두면 세탁기 건조기 직렬 설치 비용을 절약하고 안전하게 설치할 수 있습니다.</p>\n\n<h2 id=\"sec-1\">직렬 설치, 왜 필요하고 어떤 장단점이 있을까요?</h2>\n<p>세탁실이 좁거나, 건조기를 둘 마땅한 공간이 없을 때 세탁기 위에 건조기를 쌓아 올리는 직렬 설치는 공간 활용의 '신의 한 수'처럼 느껴집니다. 특히 1인 가구나 신혼부부에게는 필수적인 선택이 되기도 하죠. 가장 큰 장점은 단연 공간 절약입니다. 세탁 동선을 최소화하여 세탁물을 바로 건조기로 옮길 수 있다는 편리함도 무시할 수 없습니다. 하지만 장점만 있는 건 아닙니다.</p>\n<p>단점으로는 건조기 높이가 너무 높아져 키가 작은 가족 구성원은 사용이 불편할 수 있다는 점, 그리고 세탁 시 발생하는 진동이 건조기에 영향을 줄 수도 있다는 점을 들 수 있습니다. 또한, 설치 환경에 따라 추가적인 부품이나 공사가 필요할 수 있다는 점도 염두에 두어야 합니다. 더 자세한 직렬 설치의 장단점 비교는 <a href=\"https://bandain.tistory.com/entry/세탁기와-건조기-직렬-설치-장단점-비교\" target=\"_blank\" rel=\"noopener\">Barro PaPadoo 블로그</a>에서 확인해볼 수 있습니다.</p>\n<figure style=\"margin:22px 0;text-align:center\"><img src=\"https://one2k.mycafe24.com/wp-content/uploads/2026/09/img_1788312333534_1.jpg\" alt=\"세탁기와 건조기가 직렬로 설치된 깔끔한 세탁실 모습\" loading=\"lazy\" style=\"max-width:100%;height:auto;border-radius:10px\"><figcaption style=\"font-size:13px;color:#98a2b3;margin-top:6px\">세탁기와 건조기가 직렬로 설치된 깔끔한 세탁실 모습 — 설명을 돕는 도해이며 실제 촬영 사진이 아닙니다</figcaption></figure>\n<div class=\"ad-slot\" style=\"margin:26px 0;padding:14px;border:1px dashed #d8dbe0;border-radius:10px;text-align:center;background:#fafbfc\"><p style=\"margin:0 0 8px;color:#666;font-size:14px\">자세히 정리된 내용을 이어서 읽어보세요.</p><!-- 애드센스 광고 코드를 이 자리에 붙여넣으세요 --><div style=\"color:#b6bcc6;font-size:13px\">[ 광고 자리 ]</div></div>\n\n<h2 id=\"sec-2\">추가 비용 없이 직렬 설치하는 핵심 노하우 (부품 비교)</h2>\n<p>직렬 설치 시 가장 많이 발생하는 추가 비용은 바로 '부품' 때문입니다. 어떤 부품을 선택하느냐에 따라 비용이 천차만별인데, 무조건 저렴한 것만 찾다 보면 안전이나 내구성에 문제가 생길 수도 있습니다. 2026년 9월 기준, 대표적인 설치 부품들을 비교하고 어떤 선택이 우리 집에 맞을지 알아보겠습니다.</p>\n<ul>\n    <li><b>정품 스태킹 키트 (제조사 정품)</b><br>\n    가장 안전하고 안정적인 방법입니다. 세탁기와 건조기 제조사에서 직접 만든 키트로, 모델별로 완벽하게 호환되도록 설계되었습니다. 진동 흡수력이 좋고, 설치 후에도 A/S를 받기 용이합니다. 하지만 가격이 가장 비싸다는 단점이 있습니다. 2026년 기준, 10만 원에서 20만 원대까지 형성되어 있습니다. 정품 키트는 제조사별로 규격이 다르니, 반드시 보유한 세탁기 및 건조기 모델명을 확인<h2>자주 묻는 질문</h2><h3></h3><p></p><h3></h3><p></p><h3></h3><p></p><h3></h3><p></p><p class=\"verified\" style=\"margin-top:14px;padding:9px 12px;border-left:3px solid #cfc6e8;background:#faf9fe;color:#6b6386;font-size:12px;line-height:1.6\">🔎 2026년 9월 2일 기준으로 내용을 확인했습니다.</p><p class=\"freshness\" style=\"margin-top:16px;padding:10px 14px;border-left:3px solid #7c5cff;background:#f6f4ff;color:#5b53a8;font-size:13px;line-height:1.6\">🗓️ <b>기준: 2026년 9월</b> · 숫자·조건은 바뀔 수 있으니, 실제 이용 전 공식 페이지에서 한 번 더 확인하시길 권합니다.</p><p class=\"disclaimer\" style=\"margin-top:22px;padding:12px 14px;border-left:3px solid #d8dbe0;background:#fafbfc;color:#6b7280;font-size:13px;line-height:1.6\">ℹ️ 정보 제공을 목적으로 작성했습니다. 실제 적용 시 최신 내용을 한 번 더 확인하세요.</p><h2>함께 보면 좋은 글</h2><ul class=\"related\"><li><a href=\"https://one2k.mycafe24.com/home-appliance-interest-free-installment-2026-september\">새 가전제품 구매할 때 무이자 할부 혜택, 2026년 9월 카드사별 최대 할인 받는 법</a></li><li><a href=\"https://one2k.mycafe24.com/food-waste-disposer-types-comparison\">음식물처리기, 싱크대 일체형과 분쇄 건조형 중 2026년 9월 우리 집엔 뭐가 맞을까?</a></li><li><a href=\"https://one2k.mycafe24.com/post\">주방 인덕션 설치 시 전기료 누진세 차이와 절감 방법 확인하기, 신청 전에 확인해야 할 조건</a></li></ul><script type=\"application/ld+json\">{\"@context\": \"https://schema.org\", \"@type\": \"BlogPosting\", \"headline\": \"세탁기와 건조기 직렬 설치, 예상치 못한 추가 비용 없이 성공하는 방법은?\", \"description\": \"2026년 9월, 좁은 세탁실 공간 때문에 세탁기 건조기 직렬 설치를 고민 중이신가요? 불필요한 비용을 절약하고 안전하게 설치하는 방법과 필요한 부품, 주의할 점까지 자세히 알려드립니다.\", \"inLanguage\": \"ko\", \"datePublished\": \"2026-09-02\", \"dateModified\": \"2026-09-02\", \"author\": {\"@type\": \"Organization\", \"name\": \"편집부\"}, \"mainEntityOfPage\": {\"@type\": \"WebPage\"}}</script><script type=\"application/ld+json\">{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"\"}}, {\"@type\": \"Question\", \"name\": \"\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"\"}}, {\"@type\": \"Question\", \"name\": \"\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"\"}}, {\"@type\": \"Question\", \"name\": \"\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"\"}}]}</script>",
+      "html": "<p class=\"hook\" style=\"font-size:17px;font-weight:600\">비데 설치, 전문가에게 맡겨야만 한다고 생각하는 분들이 많습니다.</p><p class=\"byline\" style=\"font-size:12px;color:#98a2b3;margin:2px 0 12px\">✍️ 편집부 · 최종 업데이트 2026년 9월 2일</p><p class=\"ai-notice\" style=\"margin:2px 0 12px;padding:8px 12px;border-left:3px solid #98a2b3;background:#f6f7f9;color:#667085;font-size:12px;line-height:1.6\">⚠️ 본 콘텐츠(텍스트·이미지)는 생성형 AI를 통해 작성되었습니다. 정확성을 위해 검증 과정을 거치지만, 실제 적용 전 공식 출처로 최종 확인하시길 권합니다.</p><nav class=\"toc\" aria-label=\"목차\"><strong>목차</strong><ul><li style=\"margin-left:0px\"><a href=\"#sec-1\">비데 자가 설치, 어떤 모델이 적합할까요?</a></li><li style=\"margin-left:0px\"><a href=\"#sec-2\">비데 자가 설치에 필요한 공구와 흔한 실수</a></li><li style=\"margin-left:0px\"><a href=\"#sec-3\">설치 과정에서 주의해야 할 핵심 포인트</a></li><li style=\"margin-left:0px\"><a href=\"#sec-4\">자가 설치 후 확인해야 할 최종 점검 사항</a></li></ul></nav><p>비데 설치, 전문가에게 맡겨야만 한다고 생각하는 분들이 많습니다. 하지만 간단한 비데 모델은 굳이 전문가를 부르지 않고도 충분히 자가 설치가 가능하며, 이를 통해 설치 비용을 크게 절약할 수 있습니다. 2026년 9월 기준, 비데 자가 설치에 필요한 공구와 흔히 놓치기 쉬운 주의사항을 자세히 확인해 보겠습니다.</p>\n\n<h2 id=\"sec-1\">비데 자가 설치, 어떤 모델이 적합할까요?</h2>\n<p>비데는 크게 세 가지 유형으로 나눌 수 있습니다. 자가 설치를 고려한다면 비데의 유형별 특징과 난이도를 비교하는 것이 중요합니다. 특히 노즐 일체형 간편 비데나 전자식 시트형 비데는 DIY 설치가 충분히 가능합니다. 반대로 양변기 일체형 비데는 전문적인 배관 및 전기 작업이 필요해 자가 설치는 거의 불가능합니다.</p>\n<p>2026년 9월 기준, 주요 비데 유형별 특징과 설치 난이도는 다음과 같습니다.</p>\n<table border=\"1\" cellpadding=\"5\" cellspacing=\"0\">\n<thead>\n<tr>\n<th>비데 유형</th>\n<th>설치 난이도</th>\n<th>주요 특징</th>\n<th>2026년 기준 가격대</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>노즐 일체형 (수동/간편)</td>\n<td>하 (초보자 가능)</td>\n<td>양변기 시트에 노즐 통합, 전기 불필요, 냉수 연결</td>\n<td>3만~8만 원대</td>\n</tr>\n<tr>\n<td>전자식 시트형 (DIY 가능)</td>\n<td>중 (기본 공구 필요)</td>\n<td>온수/건조/세정 기능, 전기/급수 연결, 시트 분리형</td>\n<td>10만~30만 원대</td>\n</tr>\n<tr>\n<td>일체형 양변기 (전문가 권장)</td>\n<td>상 (배관, 전기 작업)</td>\n<td>비데와 양변기 일체형, 복잡한 배관/전기 작업</td>\n<td>50만 원 이상</td>\n</tr>\n</tbody>\n</table>\n<p>원룸이나 간편한 사용을 원한다면 노즐 일체형이 낫습니다. 반대로 온수, 건조 등 다양한 기능을 원한다면 전자식 시트형 비데가 적합합니다. 자가 설치 비용을 절약하려면 이 두 가지 유형을 우선적으로 검토하는 것이 좋습니다.</p>\n<figure style=\"margin:22px 0;text-align:center\"><img src=\"https://one2k.mycafe24.com/wp-content/uploads/2026/09/img_1788312820044_1.jpg\" alt=\"비데 자가 설치에 필요한 공구들이 바닥에 펼쳐져 있는 모습. 몽키스패너, 드라이버, 테프론 테이프, 고무장갑 등이 보인다.\" loading=\"lazy\" style=\"max-width:100%;height:auto;border-radius:10px\"><figcaption style=\"font-size:13px;color:#98a2b3;margin-top:6px\">비데 자가 설치에 필요한 공구들이 바닥에 펼쳐져 있는 모습. 몽키스패너, 드라이버, 테프론 테이프, 고무장갑 등이 보인다. — 설명을 돕는 도해이며 실제 촬영 사진이 아닙니다</figcaption></figure>\n<div class=\"ad-slot\" style=\"margin:26px 0;padding:14px;border:1px dashed #d8dbe0;border-radius:10px;text-align:center;background:#fafbfc\"><p style=\"margin:0 0 8px;color:#666;font-size:14px\">자세히 정리된 내용을 이어서 읽어보세요.</p><!-- 애드센스 광고 코드를 이 자리에 붙여넣으세요 --><div style=\"color:#b6bcc6;font-size:13px\">[ 광고 자리 ]</div></div>\n\n<h2 id=\"sec-2\">비데 자가 설치에 필요한 공구와 흔한 실수</h2>\n<p>비데 자가 설치를 위해 반드시 필요한 공구는 몇 가지 없습니다. 주로 몽키스패너(혹은 첼라), 드라이버(십자/일자), 그리고 테프론 테이프 정도입니다. 경우에 따라 칼이나 가위가 필요할 수도 있습니다. 이 공구들은 대부분 가정에 비치되어 있거나, 철물점에서 1만 원 내외로 구매할 수 있습니다.</p>\n<p>설치 과정에서 흔한 실수는 다음과 같습니다.</p>\n<ul>\n    <li><b>사이즈 미확인:</b> 양변기 시트와 비데 본체의 사이즈가 맞지 않는 경우가 많습니다. 구매 전 반드시 양변기 가로, 세로, 구멍 간격을 측정해야 합니다.</li>\n    <li><b>누수 발생:</b> 급수 연결 부위에 테프론 테이프를 충분히 감지 않거나, 너트를 너무 세게 조여 고무패킹이 손상되는 경우 누수가 발생합니다. 적절한 조임 강도가 중요합니다.</li>\n    <li><b>전원 연결 문제:</b> 전자식 비데는 전원이 필요합니다. 전원 콘센트 위치를 확인하고, 방수 등급이 낮은 비데는 물이 튀지 않는 곳에 설치해야 합니다.</li>\n</ul>\n<p>설치 설명서를 꼼꼼히 읽고, 각 단계별로 점검하는 습관이 중요합니다. 더 자세한 셀프 비데 설치 방법은 네이버 블로그 <a href=\"https://m.blog.naver.com/pjongsik1005/222268017450\" target=\"_blank\" rel=\"noopener\">셀프 비데설치 방법 및 필요한 공구</a>를 참고할 수 있습니다.</p>\n\n<h2 id=\"sec-3\">설치 과정에서 주의해야 할 핵심 포인트</h2>\n<p>비데 자가 설치는 몇 가지 핵심 주의사항만 지키면 어렵지 않습니다. 첫째, 수도 밸브를 잠그는 것을 잊지 마세요. 물이 새는 것을 방지하는 가장 기본적인 단계입니다. 둘째, 급수 필터가 있는 모델이라면 필터 방향을 정확히 맞춰야 합니다. 필터가 거꾸로 설치되면 물이 제대로 공급되지 않거나 수압이 약해질 수 있습니다.</p>\n<p>셋째, 비데 고정 너트를 조일 때는 너무 과도하게 힘을 주지 않는 것이 좋습니다. 과도한 힘은 비데 본체나 양변기에 손상을 줄 수 있습니다. 적당히 단단하게 고정되었는지 확인하는 것이 중요합니다. 블루밍 비데 설치방법 자가설치 가이드 주의사항 정리 (<a href=\"https://exsling.tistory.com/3317\" target=\"_blank\" rel=\"noopener\">https://exsling.tistory.com/3317</a>)와 같은 자료를 참고하면 더욱 상세한 정보를 얻을 수 있습니다.</p>\n<div class=\"ad-slot\" style=\"margin:26px 0;padding:14px;border:1px dashed #d8dbe0;border-radius:10px;text-align:center;background:#fafbfc\"><p style=\"margin:0 0 8px;color:#666;font-size:14px\">자세히 정리된 내용을 이어서 읽어보세요.</p><!-- 애드센스 광고 코드를 이 자리에 붙여넣으세요 --><div style=\"color:#b6bcc6;font-size:13px\">[ 광고 자리 ]</div></div>\n\n<h2 id=\"sec-4\">자가 설치 후 확인해야 할 최종 점검 사항</h2>\n<p>비데 설치를 마쳤다면 반드시 최종 점검 과정을 거쳐야 합니다. 가장 먼저 모든 연결 부위에서 물이 새는지 육안으로 확인합니다. 수도 밸브를 서서히 열면서 누수 여부를 주의 깊게 관찰해야 합니다. 미세한 누수도 시간이 지나면 큰 문제로 이어질 수 있습니다.</p>\n<p>다음으로, 전자식 비데의 경우 전원을 연결하고 모든 기능(세정, 건조, 온수 등)이 정상적으로 작동하는지 테스트합니다. 특히 비데 노즐이 제대로 나오고 들어가는지, 수압은 적절한지 확인합니다. 이 과정에서 문제가 발생하면 연결 상태나 비데 전원 공급을 다시 점검해야 합니다. 문제가 해결되지 않는다면 제조사의 공식 고객센터에 문의하는 것이 좋습니다.</p><h2>자주 묻는 질문</h2><h3></h3><p></p><h3></h3><p></p><h3></h3><p></p><h3></h3><p></p><p class=\"verified\" style=\"margin-top:14px;padding:9px 12px;border-left:3px solid #cfc6e8;background:#faf9fe;color:#6b6386;font-size:12px;line-height:1.6\">🔎 2026년 9월 2일 기준으로 내용을 확인했습니다.</p><p class=\"freshness\" style=\"margin-top:16px;padding:10px 14px;border-left:3px solid #7c5cff;background:#f6f4ff;color:#5b53a8;font-size:13px;line-height:1.6\">🗓️ <b>기준: 2026년 9월</b> · 제도·금액·한도·순위는 시점에 따라 바뀔 수 있어요. 신청 전 공식 사이트에서 최신 내용을 확인하세요.</p><p class=\"disclaimer\" style=\"margin-top:22px;padding:12px 14px;border-left:3px solid #d8dbe0;background:#fafbfc;color:#6b7280;font-size:13px;line-height:1.6\">ℹ️ 참고용 글입니다. 상황에 따라 다를 수 있으니 공식 자료도 함께 확인하시길 권합니다.</p><h2>함께 보면 좋은 글</h2><ul class=\"related\"><li><a href=\"https://one2k.mycafe24.com/washing-dryer-stack-installation-cost-saving\">세탁기와 건조기 직렬 설치, 예상치 못한 추가 비용 없이 성공하는 방법은?</a></li><li><a href=\"https://one2k.mycafe24.com/home-appliance-interest-free-installment-2026-september\">새 가전제품 구매할 때 무이자 할부 혜택, 2026년 9월 카드사별 최대 할인 받는 법</a></li><li><a href=\"https://one2k.mycafe24.com/food-waste-disposer-types-comparison\">음식물처리기, 싱크대 일체형과 분쇄 건조형 중 2026년 9월 우리 집엔 뭐가 맞을까?</a></li></ul><script type=\"application/ld+json\">{\"@context\": \"https://schema.org\", \"@type\": \"BlogPosting\", \"headline\": \"비데 자가 설치 비용을 절약하는 데 필요한 공구와 주의사항을 확인합니다\", \"description\": \"2026년 9월 기준, 비데 자가 설치로 비용을 절약하는 방법을 알아봅니다. 필요한 공구와 흔한 실수, 그리고 모델별 설치 난이도를 비교하여 성공적인 자가 설치를 돕는 정보를 제공합니다.\", \"inLanguage\": \"ko\", \"datePublished\": \"2026-09-02\", \"dateModified\": \"2026-09-02\", \"author\": {\"@type\": \"Organization\", \"name\": \"편집부\"}, \"mainEntityOfPage\": {\"@type\": \"WebPage\"}}</script><script type=\"application/ld+json\">{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"\"}}, {\"@type\": \"Question\", \"name\": \"\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"\"}}, {\"@type\": \"Question\", \"name\": \"\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"\"}}, {\"@type\": \"Question\", \"name\": \"\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"\"}}]}</script>",
       "links": [
         {
-          "title": "세탁기와 건조기 직렬 설치 장단점 비교 - Barro PaPadoo",
-          "url": "https://bandain.tistory.com/entry/세탁기와-건조기-직렬-설치-장단점-비교"
+          "title": "블루밍 비데 설치방법 자가설치 가이드 주의사항 정리",
+          "url": "https://exsling.tistory.com/3317"
         },
         {
-          "title": "세탁기 위에 건조기 직렬설치 방법 및 비용 후기 : 네이버 블로그",
-          "url": "https://m.blog.naver.com/dbsdud27/222693203580"
+          "title": "셀프 비데설치 방법 및 필요한 공구 : 네이버 블로그",
+          "url": "https://m.blog.naver.com/pjongsik1005/222268017450"
         }
       ],
       "wp_category": "생활·주방",
@@ -61,25 +61,18 @@
       "steadiness": null,
       "interest": null,
       "lane_reason": "",
-      "quality": "보류",
-      "quality_reason": "제목템플릿(상투표현); 본문상투표현(알아보겠습니다)",
+      "quality": "통과",
+      "quality_reason": "",
       "accuracy": "ok",
-      "ongoing": "불명",
+      "ongoing": "진행중",
       "accuracy_issues": [],
-      "accuracy_fix": "블로그 글의 모든 정보는 2026년 9월 시점을 기준으로 작성되었으므로, 실제 적용 시점의 최신 정보와 비교하여 검증해야 합니다.",
-      "accuracy_summary": "ok·불명",
-      "hold_detail": [
-        {
-          "code": "제목템플릿",
-          "kind": "retry",
-          "why": "최근 쓴 글과 제목이 같은 말로 끝납니다. 양산형 사이트 신호입니다.",
-          "fix": "최근 사용한 제목 어미를 금지 목록으로 넘겨 재생성"
-        }
-      ],
-      "status": "폐기",
-      "discarded": true,
-      "post_url": "",
-      "copy_file": "/home/runner/work/Picto/Picto/output/20260902_생활주방_long_세탁기 건조기 직렬 설치 비용 절약 방법과 필요한 추가 부품 확인하기.html"
+      "accuracy_fix": "글의 최신성을 유지하기 위해 '2026년 9월 기준'이라는 표현을 삭제하고, 현재 시점에 맞춰 비데 유형별 특징 및 가격대 정보를 업데이트하는 것이 좋습니다.",
+      "accuracy_summary": "ok·진행중",
+      "_schedule_date": "2026-09-02T01:33:44.201662",
+      "post_id": 21,
+      "status": "게시됨",
+      "post_url": "https://one2k.mycafe24.com/bidet-self-installation-cost-saving-tips/",
+      "copy_file": "/home/runner/work/Picto/Picto/output/20260902_생활주방_long_비데 자가 설치 비용 절약 방법과 필요한 공구 주의사항 확인하기.html"
     }
   ]
 }
