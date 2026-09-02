@@ -7,7 +7,7 @@
 
 <!-- PWA / 아이폰 홈화면 설치 -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#7c5cff">
+<meta name="theme-color" content="#2e9e6b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Scripto">
@@ -20,30 +20,30 @@
   :root{
     --bg:#09090b; --card:#121215; --card2:#1c1c21; --line:#27272a;
     --txt:#fafafa; --muted:#a1a1aa; --hot:#fb923c; --niche:#60a5fa;
-    --ok:#34d399; --warn:#fbbf24; --accent:#8b5cf6; --accent-2:#7c3aed;
-    --danger:#fb7185; --glow:rgba(139,92,246,.25);
-    --radius:10px; --ring:rgba(139,92,246,.45);
+    --ok:#34d399; --warn:#fbbf24; --accent:#2e9e6b; --accent-2:#1f7a52;
+    --danger:#fb7185; --glow:rgba(46,158,107,.25);
+    --radius:10px; --ring:rgba(46,158,107,.45);
     --safe-t:env(safe-area-inset-top); --safe-b:env(safe-area-inset-bottom);
   }
   /* ═══ v1.0 글래스모피즘 · 파스텔 퍼플 (기본 테마) ═══
      원칙: 반투명 유리 카드 + 은은한 라벤더 그라데이션 배경 + 보라 포인트를 '적재적소'에만.
      성능: backdrop-filter는 카드·헤더·탭바 등 큰 면에만 건다(작은 칩엔 반투명 배경만). */
   html[data-theme="light"]{
-    --bg:#f3effe; --card:rgba(255,255,255,.58); --card2:rgba(255,255,255,.78);
-    --line:rgba(139,92,246,.14);
-    --txt:#39335a; --muted:#8b84a8; --hot:#f0925c; --niche:#7c9bf5;
-    --ok:#4cbf98; --warn:#e8b04b; --accent:#a78bfa; --accent-2:#8b5cf6;
-    --danger:#f298ab; --glow:rgba(167,139,250,.28);
-    --ring:rgba(167,139,250,.45);
+    --bg:#edf8f1; --card:rgba(255,255,255,.58); --card2:rgba(255,255,255,.78);
+    --line:rgba(46,158,107,.14);
+    --txt:#27473a; --muted:#7d9c8b; --hot:#f0925c; --niche:#7c9bf5;
+    --ok:#4cbf98; --warn:#e8b04b; --accent:#6cc79a; --accent-2:#2e9e6b;
+    --danger:#f298ab; --glow:rgba(108,199,154,.28);
+    --ring:rgba(108,199,154,.45);
   }
   html[data-theme="light"] body{
-    background:linear-gradient(160deg,#f4efff 0%,#ece4fd 32%,#fbeffa 66%,#eef0ff 100%) fixed}
+    background:linear-gradient(160deg,#eef9f2 0%,#dff3e7 32%,#f2faee 66%,#e8f6ee 100%) fixed}
   html[data-theme="light"] .card,html[data-theme="light"] .grp,
   html[data-theme="light"] .sheet,html[data-theme="light"] .dcard,
   html[data-theme="light"] .dnext,html[data-theme="light"] .install-bar{
     background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.75);
     backdrop-filter:blur(14px) saturate(1.5);-webkit-backdrop-filter:blur(14px) saturate(1.5);
-    box-shadow:0 10px 28px rgba(124,58,237,.09)}
+    box-shadow:0 10px 28px rgba(31,122,82,.09)}
   html[data-theme="light"] header{
     background:rgba(255,255,255,.5) !important;
     backdrop-filter:blur(16px) saturate(1.6);-webkit-backdrop-filter:blur(16px) saturate(1.6);
@@ -51,27 +51,27 @@
   html[data-theme="light"] .tabbar{
     background:rgba(255,255,255,.55);border-top:1px solid rgba(255,255,255,.75);
     backdrop-filter:blur(18px) saturate(1.6);-webkit-backdrop-filter:blur(18px) saturate(1.6)}
-  html[data-theme="light"] .subtabs{background:transparent;border-bottom-color:rgba(139,92,246,.12)}
-  html[data-theme="light"] .btn{background:rgba(255,255,255,.62);border-color:rgba(139,92,246,.18)}
+  html[data-theme="light"] .subtabs{background:transparent;border-bottom-color:rgba(46,158,107,.12)}
+  html[data-theme="light"] .btn{background:rgba(255,255,255,.62);border-color:rgba(46,158,107,.18)}
   html[data-theme="light"] .btn.primary{
-    background:linear-gradient(135deg,#b49bfc,#8b5cf6);border-color:transparent;color:#fff;
-    box-shadow:0 6px 18px rgba(139,92,246,.35)}
-  html[data-theme="light"] .icon-btn{background:rgba(255,255,255,.6);border-color:rgba(139,92,246,.16)}
-  html[data-theme="light"] .icon-btn:active{background:#e9defc}
+    background:linear-gradient(135deg,#8fd7b2,#2e9e6b);border-color:transparent;color:#fff;
+    box-shadow:0 6px 18px rgba(46,158,107,.35)}
+  html[data-theme="light"] .icon-btn{background:rgba(255,255,255,.6);border-color:rgba(46,158,107,.16)}
+  html[data-theme="light"] .icon-btn:active{background:#d9f0e3}
   html[data-theme="light"] .tb.active{color:var(--accent-2)}
   html[data-theme="light"] .ptab,html[data-theme="light"] .st,html[data-theme="light"] .chip{
     background:rgba(255,255,255,.5)}
   html[data-theme="light"] .ptab.active,html[data-theme="light"] .chip.active,
   html[data-theme="light"] .st.active,html[data-theme="light"] .dnext{
-    background:rgba(196,175,251,.32);color:var(--accent-2);border-color:rgba(139,92,246,.35)}
+    background:rgba(143,215,178,.32);color:var(--accent-2);border-color:rgba(46,158,107,.35)}
   html[data-theme="light"] .install-bar b{color:var(--accent-2)}
-  html[data-theme="light"] .skel{background:linear-gradient(90deg,#f2ecfb 25%,#e8dff8 50%,#f2ecfb 75%)}
+  html[data-theme="light"] .skel{background:linear-gradient(90deg,#eaf6ef 25%,#def0e6 50%,#eaf6ef 75%)}
   html[data-theme="light"] input,html[data-theme="light"] textarea,html[data-theme="light"] select{
-    background:rgba(255,255,255,.72);border-color:rgba(139,92,246,.18);color:var(--txt)}
+    background:rgba(255,255,255,.72);border-color:rgba(46,158,107,.18);color:var(--txt)}
   /* 실행 버튼 도형이 흰색 하드코딩이라 유리 배경에서 안 보임 → 보라로 */
   html[data-theme="light"] .ic-play{border-left-color:var(--accent-2)}
   html[data-theme="light"] .ic-pause i{background:var(--accent-2)}
-  html[data-theme="light"] .ring-bg{stroke:rgba(139,92,246,.2)}
+  html[data-theme="light"] .ring-bg{stroke:rgba(46,158,107,.2)}
   html[data-theme="light"] .ring-fg{stroke:var(--accent-2)}
   html[data-theme="light"] .run-wrap.running .ic-pause i{background:#fff}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -93,7 +93,7 @@
     background:var(--card2);color:var(--txt);font-size:16px;line-height:1;
     display:grid;place-items:center;cursor:pointer;
     -webkit-tap-highlight-color:transparent;transition:transform .12s,border-color .12s,background .12s}
-  .icon-btn:active{transform:scale(.92);border-color:var(--accent);background:#241f3d}
+  .icon-btn:active{transform:scale(.92);border-color:var(--accent);background:#16281f}
   .run-wrap{position:relative;width:34px;height:34px;flex:0 0 auto}
   .run-ring{position:absolute;inset:-3px;width:44px;height:44px;transform:rotate(-90deg);
     pointer-events:none;opacity:0;transition:opacity .2s}
@@ -126,14 +126,14 @@
     background:var(--card);cursor:pointer;font-size:11px;color:var(--muted);flex:0 1 auto;
     max-width:100%;overflow:hidden;text-overflow:ellipsis}
   .chip b{font-weight:700}
-  .chip.active{color:#fff;border-color:var(--accent);background:#241f3d}
+  .chip.active{color:#fff;border-color:var(--accent);background:#16281f}
   /* 섹션 구분선 */
   .sec-div{height:1px;background:var(--line);margin:8px 16px;opacity:.7}
   /* 패널 탭 */
   .ptab{flex:1 1 0;min-width:0;padding:7px 4px;font-size:12px;border:1px solid var(--line);background:var(--card);
     color:var(--muted);border-radius:9px;cursor:pointer;white-space:nowrap;
     overflow:hidden;text-overflow:ellipsis}
-  .ptab.active{color:#fff;border-color:var(--accent);background:#241f3d}
+  .ptab.active{color:#fff;border-color:var(--accent);background:#16281f}
 
   /* ── 페이지 전환(3-1): 모달 시트를 전체 화면 페이지로 ──
      기존 open 클래스 토글을 그대로 쓰므로 열고닫는 함수는 수정하지 않는다 */
@@ -151,7 +151,7 @@
   .st{flex:1 1 0;min-width:0;padding:7px 4px;font-size:12px;border:1px solid var(--line);
     background:var(--card);color:var(--muted);border-radius:9px;cursor:pointer;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
-  .st.active{color:#fff;border-color:var(--accent);background:#241f3d}
+  .st.active{color:#fff;border-color:var(--accent);background:#16281f}
   .sub-sec{display:none}
   .sub-sec.on{display:block}
   .swipehint{font-size:10.5px;color:var(--muted);text-align:center;padding:2px 0 6px}
@@ -161,7 +161,7 @@
   .dcard .dl{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .dcard .dv{font-size:21px;font-weight:700;margin-top:2px;line-height:1.15;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .dnext{border:1px solid var(--accent);background:#241f3d;border-radius:11px;padding:10px 12px;margin:10px 0}
+  .dnext{border:1px solid var(--accent);background:#16281f;border-radius:11px;padding:10px 12px;margin:10px 0}
   .dnext .dl{font-size:11px;color:#b3a4ff}
   .dnext .dv{font-size:14px;font-weight:700;margin-top:3px}
 
@@ -419,7 +419,7 @@
   .b-wait{background:rgba(240,180,41,.14);color:var(--warn)}
   .b-err{background:rgba(255,90,110,.15);color:var(--danger)}
   .b-cat{background:rgba(120,130,150,.18);color:#c7cede}
-  .chip.cat.active{border-color:#7c5cff;background:#241f3d;color:#fff}
+  .chip.cat.active{border-color:#2e9e6b;background:#16281f;color:#fff}
   .kw{font-size:12px;color:var(--muted)}
   .metrics{display:flex;gap:6px;flex-wrap:wrap}
   .mchip{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;
@@ -480,7 +480,7 @@
   .hint{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5}
   .divider{height:1px;background:var(--line);margin:16px 0}
 
-  .install-bar{margin:12px 16px 0;padding:12px 14px;background:#241f3d;
+  .install-bar{margin:12px 16px 0;padding:12px 14px;background:#16281f;
     border:1px solid var(--accent);border-radius:12px;font-size:13px;line-height:1.55;display:none}
   .install-bar b{color:#b3a4ff}
 
@@ -624,7 +624,7 @@
   html[data-theme="light"] .ptab.active,html[data-theme="light"] .chip.active,
   html[data-theme="light"] .st.active{background:var(--card2);color:var(--txt)}
 
-  /* 하드코딩 보라(#241f3d) 잔재 정리 */
+  /* 하드코딩 보라(#16281f) 잔재 정리 */
   .icon-btn:active{background:var(--card2)}
   .dnext{background:color-mix(in srgb,var(--accent) 12%,var(--bg));
     border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
@@ -646,7 +646,7 @@
 </head>
 <body>
 <header>
-  <img src="icons/icon-192.png" alt="Scripto" width="30" height="30"
+  <img src="icons/icon-192.png" alt="Picto" width="30" height="30"
     style="border-radius:8px;flex:0 0 auto">
   <div>
     <h1>Picto 🛒</h1>
@@ -657,7 +657,9 @@
     style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.25);
     cursor:pointer;flex:0 0 auto;margin-right:6px;padding:0;background:#7a8291"></button>
   <button class="icon-btn" id="keyBtn" title="AI 키 연결 마법사">🔑</button>
-  <button class="icon-btn" id="adsBtn" title="애드센스 승인 준비">🛡️</button>
+  <button class="icon-btn" id="adsBtn" title="쿠팡 파트너스 허브">🤝</button>
+  <a class="icon-btn" id="appSwitch" href="https://one2k87.github.io/Scripto/dashboard/"
+     title="Scripto(애드센스 라인)로 전환" style="text-decoration:none;font-weight:800;font-size:14px;color:#8b5cf6">S</a>
   <button class="icon-btn" id="statsBtn" title="조회·수익">📊</button>
   <div class="run-wrap" id="runWrap" title="지금 생성 실행">
     <svg class="run-ring" viewBox="0 0 44 44" aria-hidden="true">
@@ -1377,7 +1379,7 @@
 <!-- 로그인 오버레이 -->
 <div id="loginOverlay" style="position:fixed;inset:0;z-index:100;background:var(--bg);display:none;
   flex-direction:column;justify-content:center;align-items:center;padding:24px;gap:12px">
-  <img src="icons/icon-192.png" alt="Scripto" width="84" height="84"
+  <img src="icons/icon-192.png" alt="Picto" width="84" height="84"
     style="border-radius:20px;box-shadow:0 8px 24px rgba(124,92,255,.35)">
   <div style="font-size:22px;font-weight:800;letter-spacing:.5px">Picto</div>
 
@@ -1409,6 +1411,7 @@
 const LS="picto_cfg";
 let DATA=null, fKind="all", fLang="all", fCat="all", fSearch="", fStatus="all", sortMode="default";
 let CFG=loadCfg();
+CFG.trackPurpose="coupang";   // Picto는 쿠팡파트너스(픽 라인) 전용 앱 — 항상 픽 여정이 메인
 
 function loadCfg(){try{return JSON.parse(localStorage.getItem(LS))||{}}catch(e){return {}}}
 // 동기화가 값을 적용하는 중인지 표시하는 플래그.
@@ -1440,7 +1443,7 @@ function startDemo(){ sessionStorage.setItem("scriptoDemo","1"); location.reload
 function exitDemo(){ sessionStorage.removeItem("scriptoDemo"); location.reload(); }
 function applyDemo(){
   window.__DEMO=true;
-  CFG={ auth:{user:"demo",role:"guest"}, plan:"basic", onboarded:true, trackPurpose:"adsense",
+  CFG={ auth:{user:"demo",role:"guest"}, plan:"basic", onboarded:true, trackPurpose:"coupang",
         site:"https://wontheland.com", user:"demo", pass:"demo-mode", autoLogin:true,
         ghOwner:"one2k87", ghRepo:"Scripto", runnerAt:new Date().toISOString(),
         adsenseApproved:false, theme:CFG.theme, demo:true };
@@ -1458,8 +1461,8 @@ function applyDemo(){
     b.id="demoBar";
     b.style.cssText="position:fixed;left:12px;right:12px;bottom:calc(74px + env(safe-area-inset-bottom));"+
       "z-index:60;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;"+
-      "background:linear-gradient(135deg,rgba(167,139,250,.92),rgba(139,92,246,.92));color:#fff;"+
-      "font-size:12.5px;box-shadow:0 10px 26px rgba(124,58,237,.35);backdrop-filter:blur(10px)";
+      "background:linear-gradient(135deg,rgba(108,199,154,.92),rgba(46,158,107,.92));color:#fff;"+
+      "font-size:12.5px;box-shadow:0 10px 26px rgba(31,122,82,.35);backdrop-filter:blur(10px)";
     b.innerHTML=`<span style="font-size:16px">🎬</span>
       <span style="flex:1;line-height:1.4"><b>데모 모드</b> — 실제 운영 중인 블로그의 실황을 구경하고 있어요. 저장·발행은 되지 않습니다.</span>
       <button onclick="exitDemo()" style="border:0;border-radius:9px;padding:7px 12px;background:rgba(255,255,255,.22);color:#fff;font-weight:700;cursor:pointer">나가기</button>`;
@@ -1653,7 +1656,7 @@ const SAMPLE={generated_at:"2026-07-03T07:00:00",categories:["금융/재테크",
    meta:"환절기 알레르기 비염이 심해지기 전에 미리 준비하는 생활 습관과 예방법을 정리했습니다.",
    tags:["비염","환절기","알레르기","예방법","건강습관"],
    links:[{title:"질병관리청",url:"https://www.kdca.go.kr"}],
-   html:"<p class='hook' style='font-size:17px;font-weight:600'>환절기만 되면 코가 막히고 재채기가 멈추지 않나요?</p><nav class='series-nav' style='background:#f6f4ff;padding:8px'>📚 시리즈: <strong>1편(현재)</strong> · <a href='#'>2편</a></nav><h2>비염이 심해지는 시기</h2><p>일교차가 커지는 환절기입니다.</p>"},
+   html:"<p class='hook' style='font-size:17px;font-weight:600'>환절기만 되면 코가 막히고 재채기가 멈추지 않나요?</p><nav class='series-nav' style='background:#f0f9f3;padding:8px'>📚 시리즈: <strong>1편(현재)</strong> · <a href='#'>2편</a></nav><h2>비염이 심해지는 시기</h2><p>일교차가 커지는 환절기입니다.</p>"},
   {kind:"long",category:"경제/IT",keyword:"챗GPT 엑셀 함수 자동 작성법",status:"복붙대기",post_url:"",
    volume:1800,competition:"낮음",steadiness:0.8,slug:"chatgpt-excel-formula",
    title:"챗GPT로 엑셀 함수 자동 작성하는 법 (실무 예시 5가지)",
@@ -2175,9 +2178,9 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=134;
+const APP_BUILD=136;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
-const SCRIPTO_VER="0.1";
+const SCRIPTO_VER="0.3";
 
 function openAppPassPage(){
   const site=(document.getElementById("cfgSite")?.value||CFG.site||"").trim().replace(/\/+$/,"");
@@ -6718,7 +6721,7 @@ async function loadTrend(dataUrl,force){
   const recent=arts.filter(a=>String(a.date||"")>=cutoff);
   const byCat={}; recent.forEach(a=>{const c=a.category||"기타";byCat[c]=(byCat[c]||0)+1;});
   const max=Math.max(1,...Object.values(byCat));
-  const colors={"금융":"#7c5cff","재테크":"#7c5cff","건강":"#2eb37f","생활":"#2eb37f","경제":"#ff8a4c","IT":"#4aa3ff"};
+  const colors={"금융":"#2e9e6b","재테크":"#2e9e6b","건강":"#2eb37f","생활":"#2eb37f","경제":"#ff8a4c","IT":"#4aa3ff"};
   const col=c=>{for(const k in colors)if(c.includes(k))return colors[k];return "#8a7cff";};
   const bars=Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`
     <div style="display:flex;align-items:center;gap:8px;margin:3px 0">
@@ -6941,7 +6944,7 @@ async function showNicheWiz(step){
       <div style="display:flex;flex-wrap:wrap;gap:7px;margin:12px 0">
         ${q.options.map(o=>`<span class="expchip" data-v="${o.v}" title="${escAttr(o.desc)}"
           style="cursor:pointer;border:1px solid ${_ans.exp.includes(o.v)?"var(--accent)":"var(--line)"};
-          background:${_ans.exp.includes(o.v)?"#241f3d":"transparent"};border-radius:18px;padding:7px 13px;font-size:12.5px">${escAttr(o.label)}</span>`).join("")}
+          background:${_ans.exp.includes(o.v)?"#16281f":"transparent"};border-radius:18px;padding:7px 13px;font-size:12.5px">${escAttr(o.label)}</span>`).join("")}
       </div>
       <div class="actions" style="justify-content:space-between">
         <button class="btn sm" onclick="showNicheWiz(0)">← 뒤로</button>
@@ -7147,7 +7150,7 @@ function applyTheme(){
   const light=CFG.theme!=="dark";
   document.documentElement.setAttribute("data-theme",light?"light":"dark");
   const meta=document.querySelector('meta[name="theme-color"]');
-  if(meta) meta.setAttribute("content",light?"#f3effe":"#141020");
+  if(meta) meta.setAttribute("content",light?"#edf8f1":"#141020");
   const b=document.getElementById("themeBtn");
   if(b) b.textContent=light?"✨ 글래스 라이트":"🌙 라벤더 다크";
 }
@@ -7183,7 +7186,7 @@ async function showChangelog(){
   const owner=CFG.ghOwner||"one2k87", repo=CFG.ghRepo||"Picto";
   try{ const r=await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/CHANGELOG.md`,{cache:"no-store"});
        if(r.ok) txt=await r.text(); }catch(e){}
-  body.innerHTML=`<h2 style="margin:0 0 8px">🗒️ 무엇이 바뀌었나요 <span style="font-size:11px;color:var(--muted)">Scripto v${SCRIPTO_VER}</span></h2>
+  body.innerHTML=`<h2 style="margin:0 0 8px">🗒️ 무엇이 바뀌었나요 <span style="font-size:11px;color:var(--muted)">Picto v${SCRIPTO_VER}</span></h2>
     <pre style="white-space:pre-wrap;font-size:12px;line-height:1.65;max-height:56vh;overflow:auto;
       background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:12px">${
       (txt||"불러오지 못했습니다").replace(/[&<]/g,c=>({"&":"&amp;","<":"&lt;"}[c]))}</pre>
@@ -7926,7 +7929,7 @@ const ICONS={
 const svgIcon=(k,cls)=>`<svg class="i ${cls||""}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]||""}</svg>`;
 const TABS=[
   {k:"list",  ic:"list",  label:"글"},
-  {k:"ads",   ic:"ads",   label:"승인"},
+  {k:"ads",   ic:"ads",   label:"파트너스"},
   {k:"stats", ic:"stats", label:"수익"},
   {k:"set",   ic:"set",   label:"설정"},
 ];
@@ -7952,7 +7955,7 @@ function syncTabbar(){
   bar.querySelectorAll(".tb").forEach(b=>b.classList.toggle("active", b.dataset.k===cur));
   // 승인 탭: 아직 승인 전이면 점으로 표시해 다음 할 일을 알린다
   const adsBtn=bar.querySelector('.tb[data-k="ads"]');
-  if(adsBtn) adsBtn.classList.toggle("badge", !CFG.adsenseApproved);
+  if(adsBtn) adsBtn.classList.toggle("badge", !CFG.pickJoined);   // 파트너스 가입 전이면 점 표시
 }
 (function buildTabbar(){
   const bar=document.createElement("nav");
@@ -7968,6 +7971,39 @@ function syncTabbar(){
   setInterval(()=>{syncTabbar();syncViews();}, 600);
   syncTabbar(); syncViews();
 })();
+
+/* ═══ Picto 전용: '승인' 자리(adsSheet)를 쿠팡 파트너스 허브로 교체 ═══
+   Scripto의 애드센스 준비 시트는 픽 라인에 안 맞는다. 모든 진입 경로(헤더 버튼·탭)가
+   openAds()로 수렴하므로 함수만 바꿔치면 라우팅·탭 하이라이트가 그대로 동작한다. */
+const _openAdsOrig=openAds;
+openAds=function(){
+  const sheet=document.getElementById("adsSheet");
+  document.getElementById("adsBg").classList.add("open"); sheet.classList.add("open");
+  if(!sheet.dataset.pick){
+    sheet.dataset.pick="1";
+    sheet.innerHTML=`
+      <h2>🤝 쿠팡 파트너스 <span style="font-size:11px;color:var(--muted);font-weight:400">가입 → 발행 → 수익 → API</span></h2>
+      <div class="hint" style="margin-bottom:10px">픽담(pickdam.com)은 <b>심사 없이 바로 발행</b>합니다.
+        수익은 쿠팡 파트너스 가입 후 링크·위젯을 연결하면 시작돼요.</div>
+      <div class="grp"><div class="gt">1 · 가입·로그인</div>
+        <button class="btn" style="width:100%" onclick="window.open('https://partners.coupang.com','_blank')">🛒 쿠팡 파트너스 열기 (가입/로그인)</button>
+        <div class="hint">쿠팡 계정으로 가입 → 사이트 등록에 <b>https://pickdam.com</b> 입력 → 최종 승인은 <b>월 실적 심사</b>(첫 수익 발생 후) 방식입니다.</div>
+        <button class="btn sm" style="width:100%;margin-top:6px" onclick="CFG.pickJoined=!CFG.pickJoined;saveCfg();openAds();toast(CFG.pickJoined?'가입 완료로 표시 ✓':'가입 전으로 표시')">
+          ${CFG.pickJoined?"✅ 가입 완료로 표시됨 (누르면 해제)":"가입을 마쳤어요 → 완료로 표시"}</button></div>
+      <div class="grp"><div class="gt">2 · 링크·위젯 넣기</div>
+        <button class="btn sm" style="width:100%" onclick="window.open('https://partners.coupang.com/#affiliate/ws/link-coupang','_blank')">🔗 링크 만들기 바로가기</button>
+        <div class="hint">파트너스에서 배너/위젯 HTML을 복사해 설정 📝 → <b>쿠팡 위젯</b>에 붙여넣으면
+          매일 글 본문에 자동 삽입됩니다(생성 파이프라인의 커머스 모드가 처리).</div></div>
+      <div class="grp"><div class="gt">3 · 실적 확인</div>
+        <button class="btn sm" style="width:100%" onclick="window.open('https://partners.coupang.com/#affiliate/ws/report','_blank')">📈 실적 리포트 바로가기</button>
+        <div class="hint">첫 수익이 잡히면 다음 단계로 <b>오픈 API 키</b>를 발급받아 상품 자동 추천(픽토 v1)으로 확장합니다.</div></div>
+      <div class="grp"><div class="gt">여정 전체 보기</div>
+        <button class="btn sm" style="width:100%" onclick="closeAds();try{renderPickDash()}catch(e){}">🧭 픽 라인 여정(8단계) 열기</button></div>
+      <button class="btn" id="adsClose2" style="width:100%;margin-top:8px" onclick="closeAds()">닫기</button>`;
+  }
+};
+document.getElementById("adsBtn").onclick=openAds;
+
 // 헤더에서 하단 탭과 겹치는 아이콘 제거(🛡️ 📊 ⚙️) — 실행·새로고침·자동생성만 남긴다
 ["adsBtn","statsBtn","gear"].forEach(id=>{
   const el=document.getElementById(id); if(el) el.style.display="none";
