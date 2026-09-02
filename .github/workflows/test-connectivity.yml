@@ -1,0 +1,21 @@
+name: test-connectivity
+# 카페24 뉴매니지드WP가 해외 IP(GitHub Actions)의 REST 호출을 차단하는지 실측하는 일회성 테스트.
+# 결과 해석: 200=통과 / 403·차단페이지=국가별 웹접근 설정 해제 필요 / 000=연결 불가
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: probe cafe24 from overseas IP
+        run: |
+          for u in \
+            "http://one2k.mycafe24.com/wp-json/" \
+            "https://one2k.mycafe24.com/wp-json/" \
+            "http://pickdam.com/wp-json/" \
+            "https://pickdam.com/wp-json/" ; do
+            code=$(curl -s -o /tmp/body -w "%{http_code}" --max-time 20 "$u" || echo 000)
+            echo "== $u -> $code"
+            head -c 300 /tmp/body; echo; echo "---"
+          done
