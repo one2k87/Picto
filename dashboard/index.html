@@ -2178,9 +2178,9 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=136;
+const APP_BUILD=137;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
-const SCRIPTO_VER="0.3";
+const SCRIPTO_VER="0.4";
 
 function openAppPassPage(){
   const site=(document.getElementById("cfgSite")?.value||CFG.site||"").trim().replace(/\/+$/,"");
@@ -8003,6 +8003,97 @@ openAds=function(){
   }
 };
 document.getElementById("adsBtn").onclick=openAds;
+
+
+/* ═══ Picto 설정 분리 — Scripto 공유 항목 연동 + 픽담 전용 그룹 ═══
+   원칙: AI 키·GitHub·작성자처럼 두 앱이 같은 값을 쓰는 항목은 '가져오기' 한 번으로 연동(같은
+   오리진의 Scripto localStorage에서 복사). WP 연결·쿠팡 정보는 픽담 전용이라 절대 안 섞는다. */
+(function pictoSettings(){
+  const badge=(id,txt)=>{ const el=document.getElementById(id); if(!el) return;
+    const lbl=el.closest(".field")?.querySelector("label");
+    if(lbl&&!lbl.dataset.badged){ lbl.dataset.badged="1";
+      lbl.insertAdjacentHTML("beforeend",` <span style="font-size:10px;font-weight:700;color:var(--accent-2);background:rgba(46,158,107,.12);padding:1px 6px;border-radius:8px">${txt}</span>`);} };
+  ["cfgSite","cfgUser","cfgPass","cfgCoupangWidget"].forEach(id=>badge(id,"🛒 픽담 전용"));
+  ["cfgGhToken","cfgContactEmail"].forEach(id=>badge(id,"🔗 Scripto와 공유"));
+
+  // 쿠팡 파트너스 ID 필드 추가
+  const wid=document.getElementById("cfgCoupangWidget");
+  if(wid&&!document.getElementById("cfgCoupangId")){
+    const f=document.createElement("div"); f.className="field";
+    f.innerHTML=`<label>쿠팡 파트너스 ID <span style="font-size:10px;font-weight:700;color:var(--accent-2);background:rgba(46,158,107,.12);padding:1px 6px;border-radius:8px">🛒 픽담 전용</span></label>
+      <input id="cfgCoupangId" placeholder="AF1234567 — 파트너스 우측 상단 내 계정에서 확인" autocapitalize="off">
+      <div class="hint">링크·위젯 수익이 내 계정으로 잡히게 하는 식별 코드입니다. 오픈 API 연동(픽토 v1)에도 쓰여요.</div>`;
+    wid.closest(".field").after(f);
+  }
+
+  // 'Scripto에서 가져오기' — WP 연결 필드 위에
+  const siteEl=document.getElementById("cfgSite");
+  if(siteEl&&!document.getElementById("importScripto")){
+    const box=document.createElement("div"); box.className="field";
+    box.innerHTML=`<label>🔗 Scripto와 공유하는 설정</label>
+      <button type="button" class="btn sm" id="importScripto" style="width:100%">Scripto에서 한 번에 가져오기 (AI 키 · GitHub · 작성자 · 이메일)</button>
+      <div class="hint">두 앱이 같은 값을 쓰는 항목만 복사합니다. <b>워드프레스 연결·쿠팡 정보는 픽담 전용</b>이라 가져오지 않아요 — 아래에 직접 넣으세요.</div>`;
+    siteEl.closest(".field").before(box);
+    document.getElementById("importScripto").onclick=()=>{
+      let sc={}; try{ sc=JSON.parse(localStorage.getItem("adsense_blog_cfg")||"{}"); }catch(e){}
+      if(!sc.llmKey&&!sc.ghToken){ toast("이 브라우저에 Scripto 설정이 없어요 — Scripto에 먼저 로그인해 두세요",1); return; }
+      const shared=["llmKey","ghToken","ghOwner","author","authorBio","authorType","contactEmail","genImages"];
+      let n=0; shared.forEach(k=>{ if(sc[k]!=null&&sc[k]!==""){ CFG[k]=sc[k]; n++; } });
+      CFG.ghRepo="Picto";                                  // 저장소는 픽토 고정
+      saveCfg(); openSheet(); toast(`공유 설정 ${n}개 가져옴 ✓ (WP·쿠팡은 픽담 전용)`);
+    };
+  }
+
+  // 설정 열릴 때: 픽담 기본값 자동 채움 + 파트너스 ID 로드
+  const _openSheetOrig=openSheet;
+  openSheet=function(){
+    _openSheetOrig();
+    if(!CFG.site) _sv("cfgSite","https://pickdam.com");
+    if(!CFG.user) _sv("cfgUser","one2k");
+    _sv("cfgCoupangId",(CFG.coupang&&CFG.coupang.partner_id)||"");
+  };
+  // 저장 시 파트너스 ID도 저장
+  const saveBtn=document.getElementById("cfgSave");
+  const _saveOrig=saveBtn.onclick;
+  saveBtn.onclick=function(){
+    const r=_saveOrig&&_saveOrig.apply(this,arguments);
+    const el=document.getElementById("cfgCoupangId");
+    if(el){ CFG.coupang=Object.assign({},CFG.coupang,{partner_id:el.value.trim()}); saveCfg(); }
+    return r;
+  };
+})();
+
+/* ═══ 픽담 유입 체계 — 글만 써서는 유입이 없다: 색인·등록 체크리스트 ═══
+   IndexNow(네이버·빙)는 파이프라인이 발행 때마다 자동 핑(키 등록 완료 2026-09-02).
+   구글·네이버 소유 확인은 로그인이 필요해 버튼으로 안내한다. 완료 여부는 CFG.pick에 기록. */
+const _renderPickDashOrig=renderPickDash;
+renderPickDash=function(){
+  _renderPickDashOrig();
+  const box=document.getElementById("adsDash"); if(!box||box.querySelector("#inflowCard")) return;
+  const P=CFG.pick||(CFG.pick={});
+  const it=(k,label,btnTxt,url,hint)=>`
+    <div style="display:flex;gap:6px;align-items:center;margin:6px 0">
+      <button class="btn sm ${P[k]?"ok":""}" style="flex:0 0 auto;min-width:86px"
+        onclick="(CFG.pick=CFG.pick||{})['${k}']=${P[k]?"false":"true"};saveCfg();renderPickDash()">${P[k]?"✓ 완료":"미완료"}</button>
+      <div style="flex:1;min-width:0"><b style="font-size:12.5px">${label}</b>
+        <div class="hint" style="margin:1px 0 0">${hint}</div></div>
+      ${url?`<a class="btn sm" style="flex:0 0 auto" target="_blank" rel="noopener" href="${url}">${btnTxt}</a>`:""}
+    </div>`;
+  const card=document.createElement("div"); card.id="inflowCard";
+  card.style.cssText="margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card2)";
+  card.innerHTML=`<div class="dl" style="font-size:11px;color:var(--muted)">📥 유입 만들기 (한 번만 등록하면 이후 자동)</div>
+    ${it("inNaverBing","네이버·빙 자동 색인 (IndexNow)","","",
+        "✅ 설정 완료 — 발행할 때마다 파이프라인이 자동으로 색인을 요청합니다(9/2 키 등록).")}
+    ${it("inGsc","구글 서치콘솔 등록 + 사이트맵 제출","열기","https://search.google.com/search-console",
+        "속성 추가 → <b>URL 접두어</b>에 https://pickdam.com → 소유 확인 → Sitemaps에 <b>wp-sitemap.xml</b> 제출. 구글 유입의 시작점입니다.")}
+    ${it("inNsa","네이버 서치어드바이저 등록","열기","https://searchadvisor.naver.com",
+        "웹마스터 도구 → 사이트 등록(https://pickdam.com) → 소유 확인 → 사이트맵 제출. 커머스 검색은 네이버 비중이 큽니다.")}
+    <div class="hint" style="margin-top:6px">🗓️ 유입 관측: 등록 후 1~2주부터 서치콘솔 '실적'에서 노출·클릭이 보이기 시작합니다.
+      초기엔 검색보다 <b>글 수 쌓기(매일 1편)</b>가 최우선 — 색인은 자동으로 따라옵니다.</div>`;
+  box.appendChild(card);
+  // IndexNow는 이미 완료 상태로 표시
+  if(!P.inNaverBing){ P.inNaverBing=true; saveCfg(); }
+};
 
 // 헤더에서 하단 탭과 겹치는 아이콘 제거(🛡️ 📊 ⚙️) — 실행·새로고침·자동생성만 남긴다
 ["adsBtn","statsBtn","gear"].forEach(id=>{
