@@ -485,6 +485,11 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
             fix_prompt = (
                 "아래 한국어 블로그 글 HTML을 같은 주제로 다시 쓰세요. 반드시 고칠 것:\n"
                 f"- 현재 감점 사유: {a.get('quality_reason','')}\n"
+                "- 출력 맨 첫 줄에 <!--TITLE: 새 제목--> 주석으로 제목도 새로 지을 것. 제목에 다음 표현 금지: "
+                "'알아야 할', '알아보기', '총정리', '완벽 정리', '하는 방법', '확인하기', '핵심 정보', '한 번에', '활용법'. "
+                "구체 조건이나 수치가 든 문장형 제목으로(예: '원룸 세탁기 15kg vs 21kg, 배수구 위치부터 재야 하는 이유')\n"
+                "- 본문에 다음 상투 표현 절대 금지: '알아보겠습니다', '살펴보겠습니다', '이번 글에서는', "
+                "'도움이 되셨기를', '마무리하겠습니다', '함께 알아봐요', '참고하시기 바랍니다'\n"
                 "- 자주 나는 실수·실패 시나리오·조건 분기(예: '벽이 석고보드라면 A, 콘크리트라면 B')·"
                 "방법 2가지 장단 비교 중 3개 이상 포함 (겪지 않은 1인칭 경험담은 창작 금지)\n"
                 "- 실측형 수치 4개 이상(규격·가격대·시간·개수). 원문에 없는 수치는 범위로\n"
@@ -493,11 +498,21 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
                 "[출력] 순수 HTML 본문만. 코드블록 금지. <p>로 시작.\n\n[원문]\n" + a.get("html", ""))
             neo = chat(fix_prompt, cfg["llm"], max_tokens=16000, temperature=0.7)
             neo = _re.sub(r"^```html?\s*|\s*```$", "", (neo or "").strip())
+            # 새 제목 파싱(<!--TITLE: ...-->) — 제목 감점(제목템플릿·어미중복)은 본문만 고쳐선 못 벗어난다
+            new_title = ""
+            mt = _re.match(r"\s*<!--\s*TITLE:\s*(.+?)\s*-->\s*", neo or "")
+            if mt:
+                new_title = mt.group(1).strip()
+                neo = neo[mt.end():]
             if neo and neo.lstrip().startswith("<"):
                 trial = dict(a); trial["html"] = neo
+                if new_title:
+                    trial["title"] = new_title
                 ok3, reason3 = quality.check(trial, [b["html"] for b in generated if b is not a], safety)
                 if ok3:
                     a["html"] = neo
+                    if new_title:
+                        a["title"] = new_title
                     a["quality"], a["quality_reason"] = "통과", ""
                     print(f"  · 폐기 구제(보강 재작성 1회): {a['keyword']}")
                 else:
