@@ -14561,6 +14561,19 @@
       "intent": "revenue",
       "date": "2026-09-02",
       "series_id": ""
+    },
+    {
+      "title": "주방 인덕션 설치 시 전기료 누진세 차이와 절감 방법 확인하기, 신청 전에 확인해야 할 조건",
+      "slug": "post",
+      "url": "",
+      "post_id": null,
+      "status": "폐기",
+      "kind": "long",
+      "keyword": "주방 인덕션 설치 시 전기료 누진세 차이와 절감 방법 확인하기",
+      "category": "생활·주방",
+      "intent": "evergreen",
+      "date": "2026-09-02",
+      "series_id": ""
     }
   ]
 }
