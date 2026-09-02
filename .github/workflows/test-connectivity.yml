@@ -8,6 +8,23 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
+      - name: probe REST POST from overseas IP
+        env:
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: |
+          # 해외 IP에서 인증 POST(초안 생성→즉시 삭제)가 되는지 실측 — 게시실패 원인 규명용
+          code=$(curl -s -o /tmp/post -w "%{http_code}" -u "$WP_USER:$WP_APP_PASSWORD" \
+            -H "Content-Type: application/json" \
+            -d '{"title":"overseas-post-test","content":"<p>overseas test</p>","status":"draft"}' \
+            https://one2k.mycafe24.com/wp-json/wp/v2/posts || echo 000)
+          echo "== POST /posts -> $code"; head -c 300 /tmp/post; echo
+          pid=$(python3 -c "import json;print(json.load(open('/tmp/post')).get('id',''))" 2>/dev/null || true)
+          if [ -n "$pid" ]; then
+            dcode=$(curl -s -o /tmp/del -w "%{http_code}" -u "$WP_USER:$WP_APP_PASSWORD" -X DELETE \
+              "https://one2k.mycafe24.com/wp-json/wp/v2/posts/$pid?force=true" || echo 000)
+            echo "== DELETE test post $pid -> $dcode"
+          fi
       - name: probe cafe24 from overseas IP
         run: |
           for u in \
