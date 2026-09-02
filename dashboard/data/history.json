@@ -14548,6 +14548,19 @@
       "intent": "evergreen",
       "date": "2026-09-02",
       "series_id": ""
+    },
+    {
+      "title": "새 아파트 입주 박람회에서 가전 가구, 카드 할부 혜택과 절세 팁으로 싸게 살 수 있을까요?",
+      "slug": "new-apartment-appliance-furniture-deals",
+      "url": "",
+      "post_id": null,
+      "status": "폐기",
+      "kind": "long",
+      "keyword": "새 아파트 입주 박람회 가전 가구 싸게 사는 법: 카드 할부 혜택과 절세 팁",
+      "category": "생활·주방",
+      "intent": "revenue",
+      "date": "2026-09-02",
+      "series_id": ""
     }
   ]
 }

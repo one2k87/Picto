@@ -1,24 +1,9 @@
 {
- "at": "2026-09-02T00:43:45",
+ "at": "2026-09-02T00:49:39",
  "n": 1,
- "avg": 12,
- "fails": [
-  {
-   "id": 1,
-   "title": "Hello world!",
-   "score": 12,
-   "issues": [
-    "실전 신호 0",
-    "본문 85자 — 너무 짧음",
-    "구체 수치 부족",
-    "어미 단조 100%",
-    "본문 이미지 없음"
-   ]
-  }
- ],
+ "avg": 92,
+ "fails": [],
  "auto_repair": true,
- "repaired": [
-  "Hello world! 12→92점"
- ],
+ "repaired": [],
  "repair_fail": []
 }
