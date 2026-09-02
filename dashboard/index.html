@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#2e9e6b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Scripto">
+<meta name="apple-mobile-web-app-title" content="Picto">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
 <style>
@@ -1445,7 +1445,7 @@ function applyDemo(){
   window.__DEMO=true;
   CFG={ auth:{user:"demo",role:"guest"}, plan:"basic", onboarded:true, trackPurpose:"coupang",
         site:"https://wontheland.com", user:"demo", pass:"demo-mode", autoLogin:true,
-        ghOwner:"one2k87", ghRepo:"Scripto", runnerAt:new Date().toISOString(),
+        ghOwner:"one2k87", ghRepo:"Picto", runnerAt:new Date().toISOString(),
         adsenseApproved:false, theme:CFG.theme, demo:true };
   const of=window.fetch.bind(window);
   window.fetch=function(u,o){
@@ -1565,7 +1565,7 @@ async function registerFaceId(){
   try{
     const cred=await navigator.credentials.create({publicKey:{
       challenge:crypto.getRandomValues(new Uint8Array(32)),
-      rp:{name:"Scripto", id:location.hostname},
+      rp:{name:"Picto", id:location.hostname},
       user:{id:crypto.getRandomValues(new Uint8Array(16)), name:CFG.auth.user||"user", displayName:CFG.auth.user||"user"},
       pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],
       authenticatorSelection:{authenticatorAttachment:"platform", userVerification:"required", residentKey:"preferred"},
@@ -6836,7 +6836,7 @@ function renderPlanGuide(body){
     ["도메인 사기 · 10분","카페24(hosting.cafe24.com) 상단 [도메인] 또는 가비아 → 검색창에 원하는 이름 입력 → <b>.com</b> 선택 → 결제. 짧고 기억하기 쉬운 영문으로, 오래 쓸 이름을 고르세요."],
     ["카페24 호스팅 신청 · 10분","hosting.cafe24.com → [워드프레스] 메뉴 → "+(plan==="coupang"?"<b>뉴매니지드 워드프레스</b>(월 1,100원대~)":plan==="both"?"애드센스 사이트는 <b>애드센스 워드프레스</b>(월 1,980원~), 쿠팡 사이트는 <b>뉴매니지드 워드프레스</b>(월 1,100원대~)":"<b>애드센스 워드프레스</b>(월 1,980원~, 애드센스 연결 기능 내장)")+" → 신청 과정에서 1번에서 산 도메인 연결 → 무료 SSL(https 자물쇠) 켜져 있는지 확인. 워드프레스는 설치된 상태로 나옵니다."],
     ["워드프레스 접속 · 5분","내도메인.com<b>/wp-admin</b> 으로 들어가 카페24가 알려준 아이디·비밀번호로 로그인. 이 정보는 꼭 메모해두세요."],
-    ["앱 비밀번호 발급 · 3분","워드프레스 관리자 → 사용자 → 프로필 → 맨 아래 <b>응용 프로그램 비밀번호</b>에 이름 'Scripto' 입력 후 추가 → 나온 문자열 복사(로그인 비번과 다른 전용 열쇠예요)."],
+    ["앱 비밀번호 발급 · 3분","워드프레스 관리자 → 사용자 → 프로필 → 맨 아래 <b>응용 프로그램 비밀번호</b>에 이름 'Picto' 입력 후 추가 → 나온 문자열 복사(로그인 비번과 다른 전용 열쇠예요)."],
     ["스크립토 연결 · 2분","이 앱 설정 → 연결에 블로그 주소·아이디·앱 비밀번호 입력 → 니치(주제) 마법사 진행. 여기서부터는 스크립토가 알아서 합니다."]];
   if(plan==="coupang"||first==="coupang") steps.push(["쿠팡 파트너스 가입 · 5분","partners.coupang.com → 쿠팡 계정으로 가입(심사 없음, 무료) → 승인 탭의 [가입 완료] 버튼으로 기록. 오픈 API는 최근 30일 수익 15만원(변동 가능) 달성 후 열립니다."]);
   const planNote={ both:"👉 순서 추천: <b>애드센스 사이트를 먼저</b> 세팅해 심사 시계를 돌려두고, 기다리는 동안 쿠팡 사이트를 세팅하세요. 두 사이트는 도메인을 꼭 분리합니다(정책 리스크 격리).",
@@ -7042,7 +7042,7 @@ function showOnboard(step){
   const bg=document.getElementById("obBg"), card=document.getElementById("obCard"), body=document.getElementById("obBody");
   bg.style.display="block"; card.style.display="block";
   if(step===0){
-    body.innerHTML=`<h2 style="margin:0 0 8px">👋 Scripto에 오신 걸 환영해요</h2>
+    body.innerHTML=`<h2 style="margin:0 0 8px">👋 Picto에 오신 걸 환영해요</h2>
       <p style="color:var(--muted);font-size:14px;line-height:1.6">매일 자동으로 수익형 블로그 글을 만들고 올려주는 앱이에요.
       3단계만 설정하면 시작합니다.</p>
       <div class="actions" style="margin-top:16px;justify-content:flex-end">
@@ -8261,7 +8261,7 @@ function wizSteps(){
   // ── 1. 블로그 유무 (역질문) ───────────────────────────────
   {
     id:"has", icon:"🌐", q:"운영 중인 블로그가 있으신가요?",
-    help:"Scripto는 워드프레스 블로그에 글을 올립니다. 아직 없으시면 만드는 방법부터 안내해 드릴게요.",
+    help:"Picto는 워드프레스 블로그에 글을 올립니다. 아직 없으시면 만드는 방법부터 안내해 드릴게요.",
     render(el){
       const cur = WIZ.data.has || (CFG.site ? "yes" : "");
       el.innerHTML = `
@@ -8404,7 +8404,7 @@ function wizSteps(){
           <b>발급 방법</b><br>
           1. 워드프레스 관리자 → <b>사용자 → 프로필</b><br>
           2. 맨 아래 <b>응용 프로그램 비밀번호</b><br>
-          3. 이름에 <b>Scripto</b> 입력 → <b>새로운 응용 프로그램 비밀번호 추가</b><br>
+          3. 이름에 <b>Picto</b> 입력 → <b>새로운 응용 프로그램 비밀번호 추가</b><br>
           4. 나타나는 24자리를 복사 (<b>창을 닫으면 다시 못 봅니다</b>)
           ${base?`<br><br><a href="${escAttr(base)}/wp-admin/profile.php#application-passwords-section"
             target="_blank" rel="noopener" style="color:var(--accent);font-weight:700">→ 프로필 화면 열기</a>`:""}
@@ -8527,7 +8527,7 @@ function wizSteps(){
     render(el){
       el.innerHTML = `
         <input id="wzOwner" placeholder="GitHub 사용자명" autocapitalize="off" value="${escAttr(CFG.ghOwner||"")}">
-        <input id="wzRepo" placeholder="저장소 이름 (예: Scripto)" autocapitalize="off" value="${escAttr(CFG.ghRepo||"")}">
+        <input id="wzRepo" placeholder="저장소 이름 (예: Picto)" autocapitalize="off" value="${escAttr(CFG.ghRepo||"")}">
         <input id="wzTok" placeholder="개인 접근 토큰 (ghp_...)" autocapitalize="off" value="${escAttr(CFG.ghToken||"")}">
         <div class="wiz-note">
           토큰은 GitHub → Settings → Developer settings → <b>Personal access tokens</b> 에서 만듭니다.
