@@ -2,8 +2,8 @@ name: 주간 운영 리포트
 
 # 매주 월요일 아침 8시(KST) = 일요일 23:00 UTC
 on:
-# [Picto 연결 전 비활성] schedule:
-# [Picto 연결 전 비활성]     - cron: "0 23 * * 0"
+  schedule:
+    - cron: "0 23 * * 0"
 
   workflow_dispatch:
 
