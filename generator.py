@@ -254,15 +254,21 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
     ]
     _gain_key, _gain_desc = GAIN_MODES[_variant(str(keyword) + "|gain", len(GAIN_MODES))]
     if not insert_ads:
-        ad_rule = "5. 이미지는 '딱 1개'만 [[IMG:이미지설명]]로 본문 상단부에 넣으세요(광고 마커는 넣지 말 것)."
+        ad_rule = "5. 이미지는 '딱 1개'만 [[IMG:스타일|장면묘사]]로 본문 상단부에 넣으세요(광고 마커는 넣지 말 것)."
     elif ADS_BOOST:   # 승인 후 수익 최적화: 광고 3개(첫 소제목·중반·결론 직전)
-        ad_rule = ("5. 이미지는 '딱 1개'만 [[IMG:이미지설명]]로 본문 상단부에 넣고 그 아래 [[AD]] 1개. "
+        ad_rule = ("5. 이미지는 '딱 1개'만 [[IMG:스타일|장면묘사]]로 본문 상단부에 넣고 그 아래 [[AD]] 1개. "
                    "본문 중간 '정보가 끝나는 문단 뒤'에 [[AD]] 1개, 마지막 결론 문단 직전에 [[AD]] 1개 — "
                    "광고는 총 3개(과밀하지 않게 문단 사이에 자연스럽게).")
     else:
-        ad_rule = ("5. 이미지는 '딱 1개'만 [[IMG:이미지설명]]로 본문 상단부(첫 소제목 부근) 적절한 위치에 넣고, "
+        ad_rule = ("5. 이미지는 '딱 1개'만 [[IMG:스타일|장면묘사]]로 본문 상단부(첫 소제목 부근) 적절한 위치에 넣고, "
                    "그 바로 아래에 [[AD]]를 배치(이미지→광고 순서). 추가로 본문 중간 '정보가 끝나는 문단 뒤'에 "
                    "[[AD]] 1개를 더 넣어 광고는 총 2개.")
+    # 이미지 마커 공통 규격(2026-09-04 품질 개편): 커머스 글은 object(제품 정물)를 우선 고려
+    ad_rule += (" [이미지 마커 작성법] 스타일은 object(정물 사진: 제품·도구 클로즈업 — 커머스 글 기본), "
+                "photo(실사 사진: 제품을 실제 쓰는 생활 장면), diagram(도해: 비교·조건 분기·구조), "
+                "illust(일러스트: 감성·비유) 중 이 글에 가장 어울리는 1개를 고르세요. "
+                "장면묘사는 '무엇이, 어디서, 어떤 상태로'가 담긴 한국어 1~2문장. "
+                "예: [[IMG:object|스테인리스 음식물처리기 본체 클로즈업, 주방 조리대 위]]")
 
     seo_block = ("""
 [상위노출 강화 모드 — 검색량이 많고 경쟁이 있는 키워드]
@@ -426,7 +432,7 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
 (위 tldr·checklist·summary_table·faqs는 '배정된 것만' 채우고, 배정되지 않은 항목은 위처럼 빈 채로 두세요)
 ===BODY===
 <p>첫 문단(검색 의도에 바로 답, 키워드 포함)</p>
-<h2>소제목1</h2><p>내용... [[IMG:대표 이미지 설명]]</p>[[AD]]
+<h2>소제목1</h2><p>내용... [[IMG:photo|대표 장면의 구체적 묘사]]</p>[[AD]]
 <h2>소제목2</h2><p>내용...</p>
 <h2>소제목3</h2><p>마무리 내용... [[AD]]</p>"""
 
@@ -499,7 +505,7 @@ def _convert_markers(html_body, insert_ads, resolver=None, fallback_desc=""):
     # LLM이 [[IMG:]] 마커를 빼먹는 일이 잦다 — 검수 요건(이미지 1장 이상)이 있으므로
     # 마커가 없으면 제목 기반으로 1장을 보장 삽입한다(2026-08-30: 마커 누락→전량 폐기 원인).
     if counter[0] == 0 and resolver and fallback_desc:
-        _html = resolver(f"{fallback_desc} — 작업 과정을 설명하는 도해", 1)
+        _html = resolver(f"object|{fallback_desc} — 대표 제품 정물", 1)
         if _html:
             if "</h2>" in html_body:
                 html_body = html_body.replace("</h2>", "</h2>" + _html, 1)
