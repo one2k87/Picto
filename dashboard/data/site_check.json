@@ -1,9 +1,20 @@
 {
- "at": "2026-09-05T00:58:34",
+ "at": "2026-09-05T23:23:29",
  "n": 4,
  "avg": 100,
  "fails": [],
  "auto_repair": true,
  "repaired": [],
- "repair_fail": []
+ "repair_fail": [],
+ "defaults": [],
+ "noimgv2": {
+  "n": 1,
+  "of": 4,
+  "posts": [
+   {
+    "id": 51,
+    "title": "2026년 9월, 고효율 가전 구매 시 최대 30만원 환급 받으려면 이 "
+   }
+  ]
+ }
 }
