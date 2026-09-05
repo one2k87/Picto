@@ -817,6 +817,19 @@
   <div class="actions"><button class="btn sm" id="keyClose" style="width:100%">닫기</button></div>
 </div>
 
+<!-- 홈 시트 (b144) — 앱을 열면 가장 먼저 보이는 화면.
+     원칙: 여기서 "지금 뭘 하면 되나"가 끝나야 한다. 인박스는 원래 픽 탭의
+     '여정' 서브탭 안에 있어서 두 번 눌러야 보였다(2026-09-05 실측). -->
+<div class="sheet-bg" id="homeBg"></div>
+<div class="sheet" id="homeSheet">
+  <h2>🏠 홈 <span style="font-size:11px;color:var(--muted);font-weight:400">오늘 할 일과 지금 상태</span></h2>
+  <div id="homeTodo"></div>
+  <div id="homePulse"></div>
+  <div id="homeJourney"></div>
+  <div class="field" id="homeJump"></div>
+  <div class="actions"><button class="btn sm" id="homeClose" style="width:100%">닫기</button></div>
+</div>
+
 <!-- 픽 라인 시트 (쿠팡 파트너스) — b143: 애드센스 승인 블록 완전 제거.
      픽담은 심사가 없으므로 '준비→신청→승인' 축이 성립하지 않는다. 서브탭은
      여정(now) / 준비(ready) / 점검(check) 셋이며, 각 블록의 id로 소속이 정해진다
@@ -2179,7 +2192,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=143;
+const APP_BUILD=144;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -2239,13 +2252,9 @@ async function todoItems(){
   return t;
 }
 async function renderTodoInbox(){
-  const page=document.getElementById("adsSheet"); if(!page) return;
-  let box=page.querySelector("#todoBox");
-  if(!box){
-    box=document.createElement("div"); box.id="todoBox";
-    const sec=page.querySelector('.sub-sec[data-k="now"]'); if(!sec) return;
-    sec.prepend(box);
-  }
+  // b144: 인박스는 홈이 집이다. 픽 탭 '여정' 서브탭 안에 있던 시절엔
+  // 앱을 열어도 두 번 눌러야 보였다 — 감지는 앱이 한다는 원칙에 어긋났다.
+  const box=document.getElementById("homeTodo"); if(!box) return;
   const items=await todoItems();
   const toggle=`<label class="hint" style="display:flex;align-items:center;gap:6px;margin-top:7px;cursor:pointer">
     <input type="checkbox" ${CFG.autoRepair?"checked":""} onchange="CFG.autoRepair=this.checked;saveCfg();toast(this.checked?'🔧 자동 수리 켜짐 — 점검에서 걸리면 묻지 않고 고칩니다':'자동 수리 꺼짐')">
@@ -2274,6 +2283,16 @@ async function renderTodoInbox(){
       }
     }catch(e){}
     try{ renderTodoInbox(); }catch(e){}
+    // b144: 로그인이 끝나면 홈으로 착지시킨다(할 일이 먼저 보이도록). 한 번만.
+    (function landHome(){
+      let tries=0;
+      const t=setInterval(()=>{
+        const ov=document.getElementById("loginOverlay");
+        const logged=!ov||ov.style.display==="none"||getComputedStyle(ov).display==="none";
+        if(logged){ clearInterval(t); if(currentTab()==="list") gotoTab("home"); }
+        else if(++tries>120) clearInterval(t);     // 2분 뒤 포기(로그인 안 함)
+      },1000);
+    })();
     // ② 스테일 자동 점검 + ③ 옵트인 자동 수리
     try{
       if(!wpReady()) return;
@@ -2605,6 +2624,8 @@ function openAds(){ refreshApprovedUI(); document.getElementById("adsBg").classL
 function closeAds(){ document.getElementById("adsBg").classList.remove("open"); document.getElementById("adsSheet").classList.remove("open"); }
 document.getElementById("adsBtn").onclick=openAds;
 document.getElementById("adsBg").onclick=closeAds;
+document.getElementById("homeBg").onclick=closeHome;
+document.getElementById("homeClose").onclick=closeHome;
 document.getElementById("adsClose").onclick=closeAds;
 
 // ===== 🔑 AI 키 연결 마법사 =====
@@ -7231,7 +7252,7 @@ async function showChangelog(){
 // ===== 페이지 전환 (UI 3-1) =====
 // 설정·승인·수익 시트를 '아래에서 올라오는 팝업'이 아니라 전체 화면 페이지로 바꾼다.
 // .sheet → .page 로 클래스만 교체하고, 기존 open/close 함수(=.open 토글)는 그대로 쓴다.
-const PAGE_IDS=["sheet","statsSheet","adsSheet"];   // keySheet는 일시 작업이라 모달 유지
+const PAGE_IDS=["sheet","statsSheet","adsSheet","homeSheet"];   // keySheet는 일시 작업이라 모달 유지
 (function toPages(){
   PAGE_IDS.forEach(id=>{
     const el=document.getElementById(id);
@@ -7852,13 +7873,14 @@ async function applyMix(t,s,e){
 }
 
 // ===== 하단 탭은 클릭 전용 / 스와이프는 상단 보조탭에만 =====
-const SWIPE_ORDER=["list","ads","stats","set"];
+const SWIPE_ORDER=["home","list","ads","stats","set"];
 function gotoTab(k){
   const bar=document.getElementById("tabbar"); if(!bar) return;
   const btn=bar.querySelector(`.tb[data-k="${k}"]`);
   if(!btn) return;
   closeAllSheets();
-  if(k==="set") openSheet();
+  if(k==="home") openHome();
+  else if(k==="set") openSheet();
   else if(k==="stats") openStats();
   else if(k==="ads") openAds();
   // 보조탭은 페이지를 처음 열 때 만들고, 마지막으로 보던 위치로 돌아간다
@@ -7912,12 +7934,72 @@ function gotoTab(k){
   },{passive:true});
 })();
 
+// ===== 홈 (b144) =====
+// 인박스 + 오늘 파이프라인 + 픽 라인 진척을 한 화면에. 여기서 다음 행동이 정해진다.
+function openHome(){
+  document.getElementById("homeBg").classList.add("open");
+  document.getElementById("homeSheet").classList.add("open");
+  renderHome();
+}
+function closeHome(){
+  const bg=document.getElementById("homeBg"), sh=document.getElementById("homeSheet");
+  if(bg) bg.classList.remove("open"); if(sh) sh.classList.remove("open");
+}
+async function renderHome(){
+  try{ renderTodoInbox(); }catch(e){ console.warn("홈 인박스:",e); }
+  // ① 오늘 파이프라인 — 어젯밤 자동 생성이 돌았는지
+  const pulse=document.getElementById("homePulse");
+  if(pulse){
+    let h='<div class="card" style="margin-bottom:10px"><b>⚙️ 자동 발행</b>';
+    try{
+      const sj=await (await fetch("data/status.json?nc="+Date.now(),{cache:"no-store"})).json();
+      const lr=sj.last_run||{};
+      const at=(lr.at||sj.updated_at||"").replace("T"," ").slice(0,16);
+      const days=at?Math.floor((Date.now()-new Date(at.replace(" ","T")).getTime())/864e5):null;
+      const stale=days!=null&&days>=2;
+      h+=` <span class="hint">${at||"기록 없음"}</span>
+        <div style="margin-top:6px;font-size:13px">
+          ${lr.ok===false?"⚠️ 마지막 실행 실패":"✅ 정상"} ·
+          발행 ${lr.published||0}편 · 초안 ${lr.draft||0}편${lr.failed?` · 실패 ${lr.failed}편`:""}
+        </div>`;
+      if(stale) h+=`<div class="hint" style="color:#ffb59e;margin-top:4px">${days}일째 새 글이 없습니다 — 워크플로를 확인하세요.</div>`;
+      if((lr.image_errors||[]).length)
+        h+=`<div class="hint" style="color:#ffb59e;margin-top:4px">🖼️ 이미지 생성 실패 ${lr.image_errors.length}건</div>`;
+    }catch(e){ h+='<div class="hint" style="margin-top:6px">상태 파일을 아직 읽지 못했습니다.</div>'; }
+    pulse.innerHTML=h+"</div>";
+  }
+  // ② 픽 라인 진척 — 자세한 8단계는 픽 탭에서
+  const jr=document.getElementById("homeJourney");
+  if(jr){
+    const P=CFG.pick||{};
+    const step=!P.joined?"쿠팡 파트너스 가입":!P.firstSale?"첫 확정 수익 만들기":!P.api?"오픈 API 신청(최근 30일 15만원)":"픽토·캐스토 연동";
+    const done=[P.joined,P.firstSale,P.api].filter(Boolean).length;
+    jr.innerHTML=`<div class="card" style="margin-bottom:10px"><b>🛒 픽 라인</b>
+      <span class="hint">${done}/3 단계</span>
+      <div style="margin-top:6px;font-size:13px">다음: <b>${step}</b></div>
+      <button class="btn sm" style="width:100%;margin-top:7px" onclick="gotoTab('ads')">여정 자세히 보기</button></div>`;
+  }
+  // ③ 빠른 이동
+  const jump=document.getElementById("homeJump");
+  if(jump&&!jump.dataset.built){
+    jump.dataset.built="1";
+    jump.innerHTML=`<label>빠른 이동</label>
+      <div class="actions" style="flex-wrap:wrap;gap:6px;margin-top:6px">
+        <button class="btn sm" onclick="gotoTab('list')">📄 글</button>
+        <button class="btn sm" onclick="gotoTab('ads')">🛒 픽</button>
+        <button class="btn sm" onclick="gotoTab('stats')">📊 수익</button>
+        <button class="btn sm" onclick="gotoTab('set')">⚙️ 설정</button>
+      </div>`;
+  }
+}
+
 // ===== 하단 탭바 (UI 2단계) =====
 // 헤더 우측에 몰려 있던 아이콘을 엄지가 닿는 하단으로 옮긴다.
 // 각 탭은 기존 시트를 열고 닫을 뿐이라 기능 변경은 없다.
 // 인라인 SVG 아이콘 — 이모지는 기기마다 모양·크기가 달라 선명도가 떨어진다.
 // currentColor를 쓰므로 활성/비활성 색이 자동으로 따라온다.
 const ICONS={
+  home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/>',
   list:'<path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M14 4v6h6"/><path d="M7 13h9M7 17h6"/>',
   ads: '<path d="M12 3l7 3v6c0 4.4-3 8.2-7 9-4-.8-7-4.6-7-9V6l7-3z"/><path d="M9 12.5l2 2 4-4.5"/>',
   stats:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
@@ -7928,12 +8010,14 @@ const ICONS={
 };
 const svgIcon=(k,cls)=>`<svg class="i ${cls||""}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]||""}</svg>`;
 const TABS=[
+  {k:"home",  ic:"home",  label:"홈"},
   {k:"list",  ic:"list",  label:"글"},
   {k:"ads",   ic:"ads",   label:"파트너스"},
   {k:"stats", ic:"stats", label:"수익"},
   {k:"set",   ic:"set",   label:"설정"},
 ];
 function closeAllSheets(){
+  try{ closeHome(); }catch(e){}
   try{ closeSheet(); }catch(e){}
   try{ closeStats(); }catch(e){}
   try{ closeAds(); }catch(e){}
@@ -7941,6 +8025,7 @@ function closeAllSheets(){
 }
 function currentTab(){
   const on=id=>{const el=document.getElementById(id);return el&&el.classList.contains("open");};
+  if(on("homeSheet")) return "home";
   if(on("sheet")) return "set";
   if(on("statsSheet")) return "stats";
   if(on("adsSheet")) return "ads";
@@ -7964,6 +8049,7 @@ function syncTabbar(){
     `<button class="tb" data-k="${t.k}" type="button" aria-label="${t.label}">
        ${svgIcon(t.ic)}<span class="dot"></span><span>${t.label}</span>
      </button>`).join("");
+  bar.style.gridTemplateColumns=`repeat(${TABS.length},1fr)`;   // b144: 5탭
   document.body.appendChild(bar);
   bar.querySelectorAll(".tb").forEach(b=>{
     b.onclick=()=>{ gotoTab(b.dataset.k); };   // 페이지 전환(같은 탭 재탭도 그 화면 유지)
