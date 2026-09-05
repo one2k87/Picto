@@ -5644,7 +5644,7 @@ async function adsCheck(){
       {ok:avgLen>=TH.min_avg_length, label:`평균 글 길이 ${avgLen}자`, reason:`글이 짧으면 저품질로 판정됩니다. ${TH.min_avg_length}자 이상, 실경험·구체정보로 채우세요.`},
       {ok:imgRatio>=TH.min_image_ratio, label:`대표 이미지 비율 ${imgRatio}%`, reason:"이미지 없는 글이 많으면 완성도가 낮아 보입니다."},
     ]},
-    {h:"🚨 템플릿성 진단 (반려 1순위 원인)", items:[
+    {h:"🚨 템플릿성 진단 (검색 신뢰도 1순위 원인)", items:[
       {ok:T.ratio<TH.max_title_ending_dup, label:`제목 마무리 동사 반복 ${T.ratio}%`+(T.top.length?` — 최다: "${escAttr(T.top[0][0])}" ${T.top[0][1]}건`:""),
        reason:`<b>왜 문제인가</b> — 심사관은 글을 하나씩 읽는 게 아니라 <u>목록을 훑습니다</u>. 여러 제목이 같은 동사로 끝나면 '자동 생성 사이트'로 보입니다. (합니다/하세요 같은 어미 자체가 겹치는 건 정상 — 어미를 벗긴 <u>동사 어간</u>의 최다 점유율만 봅니다)<br><b>어떻게 고치나</b> — 최다 동사를 쓴 글 몇 편만 다른 동사로 바꾸면 됩니다. 기준: 최다 어간 ${TH.max_title_ending_dup}% 미만.`},
       {ok:T.clicheRatio<TH.max_title_cliche, label:`상투적 제목 표현 ${T.clicheRatio}%`,
@@ -5663,7 +5663,10 @@ async function adsCheck(){
     // 반려 이력이 있으면 본문 점검을 통과 조건에 편입한다.
     // 형식 만점(16/16)에서도 '낮은 가치의 콘텐츠'로 반려된 실사례가 근거 —
     // 반려 후에 본문 점검 없이 "전체 통과"를 보여주는 것은 거짓 안심이다.
+    // b143 픽토: 픽담은 심사·반려가 없어 이 그룹은 항상 비활성.
+    // (스크립토에는 반려 이력 기반 본문 점검으로 살아 있다 — 이식하지 말 것)
     ...(function(){
+      return [];
       const rej=[...adsLog()].reverse().find(e=>e.kind==="reject");
       if(!rej) return [];
       const dc=CFG.deepCheck;
@@ -5729,7 +5732,7 @@ async function adsCheck(){
   }
   const missPages=groups[0].items.filter(i=>!i.ok && i.fix).length;
   if(missPages) html+=`<div style="margin-top:8px"><button class="btn ok sm" style="width:100%" onclick="document.getElementById('adsMakePages').click()">부족한 필수 페이지 ${missPages}개 한번에 생성</button></div>`;
-  html+=`<div class="hint" style="margin-top:8px;color:#ffb59e">※ 가장 중요한 건 각 글의 '가치'(깊이·독창성)입니다. 점수가 만점이어도 얇은 AI 글이 많으면 반려될 수 있어요.</div>`;
+  html+=`<div class="hint" style="margin-top:8px;color:#ffb59e">※ 점검 만점은 <b>형식</b>만 본 결과입니다. 쿠팡 수익은 결국 <b>구매의도</b>(가격·규격·비교)와 상품 링크의 적합성에서 갈립니다.</div>`;
 
   // 고친 뒤 바로 다시 확인할 수 있어야 한다. 리포트를 다 읽은 자리(맨 아래)에
   // 재점검 버튼을 두고, 직전 점수와 비교해 나아졌는지도 함께 보여준다.
