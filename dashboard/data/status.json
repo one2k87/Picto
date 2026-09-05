@@ -1,17 +1,17 @@
 {
-  "updated_at": "2026-09-04T10:00:57+09:00",
+  "updated_at": "2026-09-05T09:58:32+09:00",
   "last_run": {
-    "at": "2026-09-04T10:00:57+09:00",
+    "at": "2026-09-05T09:58:32+09:00",
     "ok": true,
     "articles": 1,
     "published": 1,
     "draft": 0,
     "held": 0,
     "failed": 0,
-    "duration_s": 140,
+    "duration_s": 106,
     "cost": {
       "month_krw": 0,
-      "llm_calls": 60
+      "llm_calls": 68
     },
     "health_bad": [
       "naver"
@@ -20,17 +20,17 @@
   },
   "health": {
     "gemini": {
-      "last_ok": "2026-09-04T10:00:51+09:00"
+      "last_ok": "2026-09-05T09:58:27+09:00"
     },
     "wordpress": {
-      "last_ok": "2026-09-04T10:00:56+09:00"
+      "last_ok": "2026-09-05T09:58:30+09:00"
     }
   },
   "usage": {
     "month": "2026-09",
-    "llm_calls": 60,
+    "llm_calls": 68,
     "image_paid": 0,
-    "image_free": 10,
+    "image_free": 11,
     "est_cost_krw": 0,
     "free_llm_daily": 1000,
     "llm_today": 8
