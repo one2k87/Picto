@@ -602,7 +602,9 @@ def _cp_trace(a, c, stage):
             d = json.load(open(p, encoding="utf-8"))
         except Exception:
             d = {}
-        d.setdefault("apply_trace", []).append({
+        d.setdefault("apply_trace", [])
+        d["apply_trace"] = d["apply_trace"][-5:]      # 최근 6건만 유지
+        d["apply_trace"].append({
             "stage": stage,
             "title": (a.get("title") or "")[:28],
             "enabled": bool(c.get("enabled")),

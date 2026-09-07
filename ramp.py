@@ -161,13 +161,22 @@ def apply_to_config(cfg):
     rev = cfg.setdefault("revenue", {})
     rev["ad_slots"] = o["ad_slots"]
     cfg.setdefault("affiliate", {})["enabled"] = o["affiliate"]
-    cfg.setdefault("coupang", {})["enabled"] = o["coupang"]
+    # ⛔ 쿠팡은 램프가 건드리지 않는다 (2026-09-07, 픽토 전용 결정).
+    #    이 램프는 스크립토의 '애드센스 승인 준비' 장치다. approved_at이 없으면 phase가
+    #    'approval'에 머물며 광고·제휴를 전부 끄는데, 픽담은 애드센스 심사 대상이 아니라
+    #    approved_at이 영원히 null이다. 그래서 쿠팡이 무기한 꺼져 있었다 — 파트너스에
+    #    가입하고 위젯을 넣어도 글에 아무것도 안 붙던 진짜 원인(실측: _cp_trace가
+    #    enabled=False·widget_len=211을 기록).
+    #    쿠팡 수수료는 픽담의 유일한 수익원이고 심사와 무관하므로 램프의 통제 밖에 둔다.
+    #    (광고 밀도 ad_slots 통제는 그대로 유지 — 훗날 픽담에 애드센스를 붙일 때 필요)
+    # cfg.setdefault("coupang", {})["enabled"] = o["coupang"]
     cfg["_ramp"] = {k: v for k, v in o.items() if k.startswith("_")}
     cfg["_ramp_posts_per_day"] = o["posts_per_day"]
     cfg["_ramp_intent_bias"] = o["intent_bias"]
     cfg["_ramp_topic_width"] = o["topic_width"]
     print(f"[램프] {o['_phase_label']} — 하루 {o['posts_per_day']}편 · 광고 {o['ad_slots']}개 "
-          f"· 제휴 {'on' if o['affiliate'] else 'off'} · 최소 {o['min_chars']}자")
+          f"· 제휴 {'on' if o['affiliate'] else 'off'} · 최소 {o['min_chars']}자 "
+          f"· 쿠팡은 램프 통제 밖(설정값 {cfg.get('coupang',{}).get('enabled')})")
     return cfg
 
 
