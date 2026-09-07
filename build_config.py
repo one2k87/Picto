@@ -253,3 +253,23 @@ slots_each = (cfg["counts"]["long_series"] + cfg["counts"]["long_single"]
 print("config.json 생성: 카테고리 %d개, 각 %d슬롯, images=%s, metrics=%s, wp=%s" % (
     len(cfg["categories"]), slots_each, cfg["images"]["provider"],
     cfg["metrics"]["provider"], cfg["wordpress"]["enabled"]))
+
+# 진단(2026-09-07): 쿠팡 배너가 글에 안 붙는 원인을 로그가 아니라 저장소에서 확인하기 위한 흔적.
+# 비밀값은 남기지 않는다 — 켜짐 여부와 길이만.
+_cp = cfg["coupang"]
+print("[coupang] enabled=%s disclosure=%s widget_len=%d (env=%r, file_loaded=%s)" % (
+    _cp["enabled"], _cp["disclosure"], len(_cp["widget_html"] or ""),
+    os.getenv("COUPANG_ENABLED"), bool(_CPF)))
+try:
+    os.makedirs("dashboard/data", exist_ok=True)
+    with open("dashboard/data/coupang_echo.json", "w", encoding="utf-8") as f:
+        json.dump({
+            "enabled": _cp["enabled"],
+            "disclosure": _cp["disclosure"],
+            "widget_len": len(_cp["widget_html"] or ""),
+            "env_COUPANG_ENABLED": os.getenv("COUPANG_ENABLED"),
+            "file_loaded": bool(_CPF),
+            "file_enabled": _CPF.get("enabled"),
+        }, f, ensure_ascii=False, indent=1)
+except Exception as e:
+    print("[coupang] echo 기록 실패: %s" % e)
