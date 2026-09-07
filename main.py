@@ -16,6 +16,7 @@ main.py - 카테고리 집중 애드센스 수익형 파이프라인 (한국어 
 
 import os
 import json
+import re
 import time
 import html as html_mod
 from datetime import datetime
@@ -363,6 +364,16 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
 
     # 이 카테고리의 과거 글만으로 중복방지 + 내부링크
     cat_hist = [a for a in hist["articles"] if a.get("category") == name]
+    # 🚧 사이트 경계 가드 (2026-09-07) — 내 사이트 글만 내부링크에 쓴다.
+    #    픽토 저장소는 스크립토에서 포크돼 history.json에 원더랜드 글 914편이 딸려왔고,
+    #    그 결과 픽담 글이 본문에서 원더랜드로 링크를 걸고 있었다(실측). 데이터를 정리했지만
+    #    이식·복원으로 또 섞일 수 있으므로 코드에서도 막는다.
+    _host = re.sub(r"^https?://", "", (wp_cfg.get("site_url") or "")).strip("/").split("/")[0]
+    if _host:
+        _mine = [a for a in cat_hist if not (a.get("url") or "") or _host in (a.get("url") or "")]
+        if len(_mine) != len(cat_hist):
+            print(f"  · 내부링크 가드: 남의 사이트 글 {len(cat_hist)-len(_mine)}건 제외 (기준 {_host})")
+        cat_hist = _mine
     exclude = [a["title"] for a in cat_hist] + [a.get("keyword", "") for a in cat_hist]
     related_pool = list(reversed(cat_hist))[:6]
 
