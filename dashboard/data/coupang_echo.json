@@ -8,17 +8,17 @@
  "apply_trace": [
   {
    "stage": "진입",
-   "title": "환기 시스템 렌탈과 구매 고민이라면, 2026년 9",
-   "enabled": false,
+   "title": "음식물처리기 보상 판매, 렌탈 약정 18개월 미만이",
+   "enabled": true,
    "widget_len": 211,
-   "h2": 3
+   "h2": 5
   },
   {
-   "stage": "중단:enabled=False",
-   "title": "환기 시스템 렌탈과 구매 고민이라면, 2026년 9",
-   "enabled": false,
+   "stage": "삽입완료 6484→7073 (block 589자)",
+   "title": "음식물처리기 보상 판매, 렌탈 약정 18개월 미만이",
+   "enabled": true,
    "widget_len": 211,
-   "h2": 3
+   "h2": 5
   }
  ]
 }
