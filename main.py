@@ -604,7 +604,16 @@ def _apply_coupang(a, cfg):
         return
     widget = ""
     if c.get("widget_html"):
-        widget = f'<div class="coupang-widget" style="margin:22px 0;text-align:center">{c["widget_html"]}</div>'
+        # 쿠팡 다이나믹 배너는 고정 픽셀 폭(728x90 등)으로 발급된다. 모바일(360~430px)에서
+        # 그대로 두면 페이지 전체에 가로 스크롤이 생겨 본문이 밀린다 — 픽담 방문자는
+        # 콕픽 유입이라 대부분 모바일이므로 치명적이다. 배너를 '자기 상자 안에서만'
+        # 가로 스크롤하게 가둬 레이아웃을 보호한다(배너 자체는 원본 크기 유지 = 정책 안전).
+        widget = (
+            '<div class="coupang-widget" style="margin:22px 0;max-width:100%;overflow-x:auto;'
+            '-webkit-overflow-scrolling:touch">'
+            f'<div style="text-align:center;min-width:min-content">{c["widget_html"]}</div>'
+            '</div>'
+        )
     notice = ""
     if c.get("disclosure", True):
         notice = ('<p class="coupang-notice" style="font-size:12px;color:#98a2b3;margin:10px 0 4px;'
