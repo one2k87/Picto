@@ -1,13 +1,11 @@
 {
-  "at": "2026-09-07T12:05:11",
-  "notes": [
-    "'생활·주방' 완충 — 누적 14편이라 하루 최대 3편(시리즈 금지)"
-  ],
+  "at": "2026-09-07T12:09:40",
+  "notes": [],
   "maturity": [
     {
       "category": "생활·주방",
-      "published": 14,
-      "daily_cap": 3
+      "published": 15,
+      "daily_cap": null
     }
   ]
 }

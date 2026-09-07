@@ -4,5 +4,21 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": true
+ "file_enabled": true,
+ "apply_trace": [
+  {
+   "stage": "진입",
+   "title": "환기 시스템 렌탈과 구매 고민이라면, 2026년 9",
+   "enabled": false,
+   "widget_len": 211,
+   "h2": 3
+  },
+  {
+   "stage": "중단:enabled=False",
+   "title": "환기 시스템 렌탈과 구매 고민이라면, 2026년 9",
+   "enabled": false,
+   "widget_len": 211,
+   "h2": 3
+  }
+ ]
 }
