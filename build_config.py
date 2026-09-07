@@ -168,6 +168,8 @@ cfg = {
         "widget_html": envs("COUPANG_WIDGET_HTML", _cpf("widget_html", "")),
         # 글별 상품 링크(products.py) 스위치 — 위젯과 독립적으로 켜고 끈다
         "product_links": b("COUPANG_PRODUCT_LINKS", _cpf("product_links", True)),
+        # 살 물건이 특정되지 않는 주제를 아예 생성 단계에서 버린다
+        "commerce_only": b("COUPANG_COMMERCE_ONLY", _cpf("commerce_only", True)),
     },
     "affiliate": {                                  # 제휴 SaaS(쿠팡 외 일반 제휴 링크)
         "enabled": b("AFFILIATE_ENABLED", False),

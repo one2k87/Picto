@@ -106,6 +106,14 @@ def collect_lane(cfg, cat, lane, n_slots, exclude):
     cand = [c for c in cand if not topics.is_corporate(c["keyword"])]
     if len(cand) < before:
         print(f"  · 기업·전문가용 주제 {before - len(cand)}개 제외(일반인 관점 유지)")
+    # 쿠팡에서 살 물건이 특정되지 않는 주제 제거 — 픽담은 커머스 블로그다.
+    # (서비스 견적·렌탈 위약금·환급·금융 등: 검색량은 많아도 수수료가 0원이고
+    #  원더랜드(애드센스 라인)와 주제가 겹친다. 2026-09-07 실측 후 도입)
+    if (cfg.get("coupang", {}) or {}).get("commerce_only", True):
+        before = len(cand)
+        cand = [c for c in cand if not topics.is_non_commerce(c["keyword"])]
+        if len(cand) < before:
+            print(f"  · 살 물건 없는 주제 {before - len(cand)}개 제외(커머스 전용)")
 
     # 지속 판별(저경쟁 vs 시즌). 속도 위해 perf.classify=false 면 건너뜀
     # (이미 lane별 프롬프트로 생성했으므로 끄더라도 분류 자체는 유지됨)
