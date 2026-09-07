@@ -152,8 +152,11 @@ jobs:
           DRIP_MAX_HOURS: ${{ github.event.inputs.drip_max != '' && github.event.inputs.drip_max || secrets.DRIP_MAX_HOURS }}
           ADSENSE_APPROVED: ${{ github.event.inputs.adsense_approved != '' && github.event.inputs.adsense_approved || vars.ADSENSE_APPROVED }}
           ADS_BOOST: ${{ github.event.inputs.ads_boost != '' && github.event.inputs.ads_boost || secrets.ADS_BOOST }}
-          COUPANG_ENABLED: ${{ github.event.inputs.coupang != '' && github.event.inputs.coupang || secrets.COUPANG_ENABLED }}
-          COUPANG_WIDGET_HTML: ${{ github.event.inputs.coupang_widget != '' && github.event.inputs.coupang_widget || secrets.COUPANG_WIDGET_HTML }}
+          # 쿠팡 단일 소스(2026-09-07): 수동실행 입력 > data/coupang.json.
+          # 시크릿을 끊은 이유 — 옛 COUPANG_ENABLED=false 시크릿이 파일 설정을 덮어써
+          # 배너가 안 붙었다(카테고리에서 겪은 것과 같은 문제, 같은 방식으로 해결).
+          COUPANG_ENABLED: ${{ github.event.inputs.coupang }}
+          COUPANG_WIDGET_HTML: ${{ github.event.inputs.coupang_widget }}
           AFFILIATE_ENABLED: ${{ github.event.inputs.affiliate != '' && github.event.inputs.affiliate || secrets.AFFILIATE_ENABLED }}
           AFFILIATE_LINKS: ${{ github.event.inputs.affiliate_links != '' && github.event.inputs.affiliate_links || secrets.AFFILIATE_LINKS }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
