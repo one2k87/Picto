@@ -1069,6 +1069,9 @@
     </label>
     <div class="actions" style="margin-top:6px;flex-wrap:wrap">
       <button class="btn sm" id="opsReimage">🖼 이미지 전체 재교체</button>
+      <button class="btn sm" id="opsCleanLinks" style="width:100%">🧹 외부 링크 정리 (원더랜드·구 도메인)</button>
+      <label class="hint" style="display:flex;align-items:center;gap:6px;margin:4px 0 8px">
+        <input type="checkbox" id="opsCleanDry" checked style="width:auto"> 먼저 계획만 보기(수정 안 함)</label>
       <button class="btn sm" id="opsCleanup">🧹 기본 콘텐츠 정리</button>
       <button class="btn sm" id="opsStrategy">📊 주간 전략 분석</button>
       <button class="btn sm" id="opsReport">📋 주간 운영 리포트</button>
@@ -2232,7 +2235,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=149;
+const APP_BUILD=150;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -5993,6 +5996,10 @@ async function opsDispatch(file,inputs,btn,label){
   if(rb) rb.onclick=()=>{ const force=!!(f("opsForce")&&f("opsForce").checked);
     if(force&&!confirm("이미 교체한 글까지 전부 다시 만듭니다. 시간이 걸려요. 진행할까요?")) return;
     opsDispatch("reimage.yml",{limit:"100",dry_run:"false",force:force?"true":"false"},rb,"이미지 재교체"); };
+  const lb=f("opsCleanLinks");
+  if(lb) lb.onclick=()=>{ const dry=!!(f("opsCleanDry")&&f("opsCleanDry").checked);
+    opsDispatch("clean-links.yml",{limit:"100",dry_run:dry?"true":"false"},lb,
+      dry?"외부 링크 정리(계획만)":"외부 링크 정리"); };
   const cb=f("opsCleanup");
   if(cb) cb.onclick=()=>opsDispatch("cleanup.yml",null,cb,"기본 콘텐츠 정리");
   const sb=f("opsStrategy");
