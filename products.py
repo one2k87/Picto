@@ -109,5 +109,6 @@ def missing(articles):
             out.append({"title": (a.get("title") or "")[:40],
                         "slug": a.get("slug", ""),
                         "product": p.get("key", ""),
-                        "search": "https://www.coupang.com/np/search?q=" + (p.get("key") or "")})
+                        "search": "https://www.coupang.com/np/search?q=" +
+                                  (p.get("search") or p.get("key") or "")})
     return out

@@ -2232,7 +2232,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=148;
+const APP_BUILD=149;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -8021,10 +8021,11 @@ async function renderPickLinks(){
   if(!list.length){ box.innerHTML='<div class="hint">제품 대장이 비어 있습니다.</div>'; return; }
   box.innerHTML=list.map((p,i)=>{
     const has=!!(p.coupang_url||"").trim();
-    const q=encodeURIComponent(p.key||"");
+    const q=encodeURIComponent(p.search||p.key||"");   // b149: 주제어가 아니라 실제 구매 검색어
     return `<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:7px">
       <div style="display:flex;align-items:center;gap:6px">
         <b style="font-size:13px;flex:1">${p.name||p.key}</b>
+        <span class="hint" style="font-size:10px">🔍 ${p.search||p.key}</span>
         <span class="hint">${has?"✅ 등록됨":"미등록"}</span>
       </div>
       <input data-pi="${i}" class="pickUrl" placeholder="파트너스 딥링크 붙여넣기 (https://link.coupang.com/...)"
