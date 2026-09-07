@@ -192,6 +192,12 @@ jobs:
             echo "오늘($today) 이미 생성 완료 — 생성 단계 건너뜀(백업 크론). 점검·색인은 계속 진행"
           fi
 
+      # 형제 사이트(원더랜드) 제목을 받아 중복 회피 목록을 갱신한다.
+      # 같은 파이프라인·같은 니치라 두 사이트가 똑같은 제목을 만들 수 있다(2026-09-01 실측).
+      - name: 형제 사이트 제목 갱신
+        if: always()
+        run: python scripts/refresh_sibling_titles.py || true
+
       - name: 블로그 생성 실행
         if: steps.dup.outputs.skip != 'true'
         run: python -u main.py

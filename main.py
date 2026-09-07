@@ -375,6 +375,17 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
             print(f"  · 내부링크 가드: 남의 사이트 글 {len(cat_hist)-len(_mine)}건 제외 (기준 {_host})")
         cat_hist = _mine
     exclude = [a["title"] for a in cat_hist] + [a.get("keyword", "") for a in cat_hist]
+    # 사이트 간 중복 회피: 형제 사이트(원더랜드) 제목도 '쓰지 말 것' 목록에 넣는다.
+    # 링크 후보(related_pool)에는 넣지 않는다 — 남의 사이트로 트래픽을 보내면 안 된다.
+    # 근거: 2026-09-01 픽담과 원더랜드가 똑같은 제목을 생성했다(둘 다 품질 게이트에서 폐기).
+    try:
+        _sib = json.load(open(os.path.join(DASH_DATA, "sibling_titles.json"), encoding="utf-8"))
+        _st = _sib.get("titles") or []
+        if _st:
+            exclude += _st
+            print(f"  · 형제 사이트 중복 회피: 제목 {len(_st)}건 제외 목록에 추가")
+    except Exception:
+        pass
     related_pool = list(reversed(cat_hist))[:6]
 
     print(f"\n########## [{name}] ##########")

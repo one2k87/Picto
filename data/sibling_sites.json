@@ -1,0 +1,5 @@
+{
+  "_설명": "주제 중복을 피해야 할 형제 사이트. 같은 운영자의 다른 사이트끼리 똑같은 글이 나가면 중복 콘텐츠가 된다. 제목 목록은 refresh_sibling_titles.py가 공개 WP REST로 가져와 data/sibling_titles.json에 쌓는다.",
+  "_주의": "이 목록은 중복 회피에만 쓰인다. 내부링크 후보로는 절대 쓰지 않는다(픽담 트래픽이 남의 사이트로 새면 안 된다).",
+  "sites": ["https://wontheland.com"]
+}
