@@ -1101,6 +1101,12 @@
     <label style="margin-top:8px;display:block">쿠팡 위젯/배너 임베드 코드 (선택)</label>
     <textarea id="cfgCoupangWidget" rows="3" placeholder="쿠팡 파트너스에서 발급한 다이나믹 배너/위젯 코드 붙여넣기" style="width:100%;font-size:13px;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:8px"></textarea>
     <div class="hint">쿠팡 파트너스 → 배너/위젯 → 코드 생성 → 여기에 붙여넣기. 비우면 고지문만 들어갑니다.</div>
+    <div class="actions" style="margin-top:10px">
+      <button class="btn primary sm" id="coupangRegister" style="flex:1">GitHub에 자동 등록</button>
+    </div>
+    <div id="coupangRegResult" class="hint" style="margin-top:6px"></div>
+    <div class="hint">⚠️ <b>이 버튼을 눌러야 매일 자동 생성에 반영됩니다.</b> 위 입력값은 이 기기에만 저장되고,
+      서버(GitHub Actions)가 매일 돌릴 때는 저장소 시크릿을 읽기 때문입니다.</div>
   </div>
 
   <div class="divider"></div>
@@ -2211,7 +2217,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=145;
+const APP_BUILD=146;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -2731,6 +2737,28 @@ document.getElementById("authorRegister").onclick=async()=>{
   } else {
     box.innerHTML='<span style="color:#ff6b4a">일부 등록 실패. 토큰에 <b>Secrets 쓰기</b> 권한이 있는지 확인하세요('+
       [r1,r2,r3].map(r=>r.status||r.reason).join(", ")+').</span>';
+  }
+};
+// b146: 쿠팡 설정 → GitHub Secrets. 이게 없으면 스케줄 실행에 쿠팡이 안 붙는다.
+document.getElementById("coupangRegister").onclick=async()=>{
+  const on=document.getElementById("cfgCoupang").checked;
+  const widget=(document.getElementById("cfgCoupangWidget").value||"").trim();
+  const pid=(document.getElementById("cfgCoupangId")?.value||"").trim();
+  const box=document.getElementById("coupangRegResult");
+  if(on&&!widget&&!confirm("위젯 코드가 비어 있습니다. 고지문만 들어가고 상품 링크는 없습니다. 그대로 등록할까요?")) return;
+  box.textContent="등록 중…";
+  CFG.coupang=Object.assign({},CFG.coupang,{enabled:on,widget_html:widget,partner_id:pid}); saveCfg();
+  const rs=[await ghSetSecret("COUPANG_ENABLED", on?"true":"false"),
+            await ghSetSecret("COUPANG_WIDGET_HTML", widget)];
+  if(pid) rs.push(await ghSetSecret("COUPANG_PARTNER_ID", pid));
+  if(rs.every(r=>r.ok)){
+    box.innerHTML='<span style="color:#33c27f">✅ 등록됨 — <b>내일 자동 생성부터</b> 모든 글에 고지문'+
+      (widget?"+위젯":"")+'이 들어갑니다. 지금 확인하려면 픽 탭 > 준비에서 수동 실행하세요.</span>';
+  } else if(rs[0].reason==="no-gh"){
+    box.innerHTML='<span style="color:#ffb020">GitHub 정보가 없어요. ⚙️ "▶ 폰에서 생성 실행"에 저장소·토큰을 먼저 넣으세요.</span>';
+  } else {
+    box.innerHTML='<span style="color:#ff6b4a">일부 등록 실패. 토큰에 <b>Secrets 쓰기</b> 권한이 필요합니다 ('+
+      rs.map(r=>r.status||r.reason).join(", ")+').</span>';
   }
 };
 function supaProjectRef(){
