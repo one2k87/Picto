@@ -593,6 +593,28 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
     return out
 
 
+def _cp_trace(a, c, stage):
+    """쿠팡 삽입 경로 진단 흔적(비밀값 없음). dashboard/data/coupang_echo.json에 누적."""
+    try:
+        p = "dashboard/data/coupang_echo.json"
+        os.makedirs("dashboard/data", exist_ok=True)
+        try:
+            d = json.load(open(p, encoding="utf-8"))
+        except Exception:
+            d = {}
+        d.setdefault("apply_trace", []).append({
+            "stage": stage,
+            "title": (a.get("title") or "")[:28],
+            "enabled": bool(c.get("enabled")),
+            "widget_len": len(c.get("widget_html") or ""),
+            "h2": (a.get("html") or "").count("<h2"),
+        })
+        json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        print(f"[coupang] {stage} · enabled={bool(c.get('enabled'))} widget={len(c.get('widget_html') or '')}")
+    except Exception as e:
+        print(f"[coupang] trace 실패: {e}")
+
+
 def _apply_coupang(a, cfg):
     """쿠팡 파트너스(API 불필요): 위젯 + 필수 고지문을 삽입.
     - 위젯은 '본문 중간'(2번째 소제목 뒤)에 넣어 전환율을 높인다(하단은 CTR 낮음).
@@ -600,7 +622,9 @@ def _apply_coupang(a, cfg):
     - 애드센스 슬롯([[AD]])과 위치가 겹치지 않게 독립적으로 배치된다.
     """
     c = cfg.get("coupang", {}) or {}
+    _cp_trace(a, c, "진입")          # 진단(2026-09-07): 호출 여부·본 값을 저장소에 남긴다
     if not c.get("enabled"):
+        _cp_trace(a, c, "중단:enabled=False")
         return
     widget = ""
     if c.get("widget_html"):
@@ -624,7 +648,9 @@ def _apply_coupang(a, cfg):
         return
     html = a.get("html", "") or ""
     # 본문 중간(2번째 <h2> 앞) 삽입 → 없으면 하단 append
+    before = len(html)
     a["html"] = _insert_mid_body(html, block, nth_h2=2)
+    _cp_trace(a, c, f"삽입완료 {before}→{len(a['html'])} (block {len(block)}자)")
 
 
 def _insert_mid_body(html, block, nth_h2=2):
