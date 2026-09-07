@@ -14,6 +14,24 @@ def envs(name, default=""):
     return v if (v is not None and v.strip() != "") else default
 
 
+def _coupang_file():
+    """data/coupang.json — 쿠팡 배너 설정(공개 정보). 없거나 깨지면 빈 dict."""
+    try:
+        with open("data/coupang.json", encoding="utf-8") as f:
+            return json.load(f) or {}
+    except Exception as e:
+        print(f"[config] data/coupang.json 없음/무시: {e}")
+        return {}
+
+
+_CPF = _coupang_file()
+
+
+def _cpf(key, default):
+    v = _CPF.get(key)
+    return default if v is None or v == "" else v
+
+
 def envi(name, default):
     """환경변수 정수: 없거나 빈 값/이상값이면 default(int)."""
     v = os.getenv(name)
@@ -140,9 +158,14 @@ cfg = {
     },
     "ads": {"insert_slots": b("INSERT_ADS", True)},
     "coupang": {                                    # 쿠팡 파트너스(API 불필요)
-        "enabled": b("COUPANG_ENABLED", False),
-        "disclosure": b("COUPANG_DISCLOSURE", True),
-        "widget_html": envs("COUPANG_WIDGET_HTML", ""),
+        # 시크릿이 아니라 저장소 파일(data/coupang.json)을 기본값으로 쓴다.
+        # 위젯 코드와 trackingCode는 발행된 글 HTML에 그대로 노출되는 공개 정보라
+        # 시크릿으로 둘 이유가 없고, PAT에 Secrets 쓰기 권한이 없어도 스케줄 실행에 반영된다
+        # (2026-09-07 실측: 앱의 시크릿 등록이 403 'Resource not accessible by personal access token').
+        # 환경변수가 있으면 그쪽이 우선 — 워크플로 입력으로 일회성 덮어쓰기가 가능하다.
+        "enabled": b("COUPANG_ENABLED", _cpf("enabled", False)),
+        "disclosure": b("COUPANG_DISCLOSURE", _cpf("disclosure", True)),
+        "widget_html": envs("COUPANG_WIDGET_HTML", _cpf("widget_html", "")),
     },
     "affiliate": {                                  # 제휴 SaaS(쿠팡 외 일반 제휴 링크)
         "enabled": b("AFFILIATE_ENABLED", False),
