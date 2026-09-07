@@ -1,5 +1,5 @@
 {
- "at": "2026-09-07T12:15:55",
+ "at": "2026-09-07T23:48:05",
  "n": 11,
  "avg": 100,
  "fails": [],
@@ -42,6 +42,41 @@
    {
     "id": 51,
     "title": "2026년 9월, 고효율 가전 구매 시 최대 30만원 환급 받으려면 이 "
+   }
+  ]
+ },
+ "link_missing": {
+  "n": 5,
+  "posts": [
+   {
+    "title": "음식물처리기 보상 판매, 렌탈 약정 18개월 미만이라면 위약금 30% 발",
+    "slug": "3-2",
+    "product": "음식물처리기",
+    "search": "https://www.coupang.com/np/search?q=음식물처리기 건조분쇄"
+   },
+   {
+    "title": "음식물처리기 렌탈 36개월 약정, 위약금 50만원 피하려면 이사 전 2가",
+    "slug": "food-waste-disposer-rental-cancellation-fee",
+    "product": "음식물처리기",
+    "search": "https://www.coupang.com/np/search?q=음식물처리기 건조분쇄"
+   },
+   {
+    "title": "2026년 9월, 고효율 가전 구매 시 최대 30만원 환급 받으려면 이 ",
+    "slug": "high-efficiency-appliance-energy-cashback-2026-09",
+    "product": "고효율가전",
+    "search": "https://www.coupang.com/np/search?q=에너지효율 1등급 냉장고"
+   },
+   {
+    "title": "정수기 고장 시 수리비 12만 원 넘는다면, 새 렌탈 위약금 50만 원까",
+    "slug": "broken-water-purifier-rental-penalty-waiver-strategy",
+    "product": "직수정수기",
+    "search": "https://www.coupang.com/np/search?q=직수정수기 자가관리 무설치"
+   },
+   {
+    "title": "비데 자가 설치 비용을 절약하는 데 필요한 공구와 주의사항을 확인합니다",
+    "slug": "bidet-self-installation-cost-saving-tips",
+    "product": "비데설치공구",
+    "search": "https://www.coupang.com/np/search?q=비데 분기밸브 설치 공구 세트"
    }
   ]
  }
