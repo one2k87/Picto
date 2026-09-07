@@ -860,6 +860,21 @@
     <div id="adsPlugList" style="margin-top:8px;font-size:13px"></div>
   </div>
 
+  <div class="field" id="pickLinkBox">
+    <label>🔗 쿠팡 상품 링크</label>
+    <div class="hint">픽담 수익은 여기서 나옵니다. 링크를 한 번 넣으면 <b>그 제품을 다루는 모든 글</b>에
+      자동으로 들어가고, 과거 글도 [소급 적용]으로 한 번에 반영됩니다.
+      링크가 빈 제품은 글에 아무것도 넣지 않으니 안심하고 비워둬도 됩니다.</div>
+    <div id="pickLinkList" style="margin-top:8px"></div>
+    <div class="actions" style="margin-top:8px;gap:6px">
+      <button class="btn primary sm" id="pickLinkSave" style="flex:1">저장</button>
+      <button class="btn sm" id="pickLinkBackfill" style="flex:1">소급 적용</button>
+    </div>
+    <div id="pickLinkResult" class="hint" style="margin-top:6px"></div>
+    <div class="hint" style="margin-top:6px">⚠️ 링크는 <b>파트너스 → 링크 생성 → 딥링크</b>에서 만든 것만 수수료가 잡힙니다.
+      상품 URL을 그대로 붙여넣으면 수익이 안 잡혀요. <code>subid</code>는 글 주소로 자동 부착되니 직접 붙이지 마세요.</div>
+  </div>
+
   <div class="field">
     <button class="btn primary sm" id="adsCheck" style="width:100%">① 전체 점검하기</button>
     <div id="planBox"></div>
@@ -2217,7 +2232,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=146;
+const APP_BUILD=148;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -2264,6 +2279,10 @@ async function todoItems(){
     if(df.length) t.push({i:"🧹",
       x:`워드프레스 기본 글 ${df.length}건이 아직 공개 중 — 검색 품질 신호를 깎습니다`,
       b:"정리 실행", a:"opsDispatch('cleanup.yml',null,this,'기본 콘텐츠 정리')"});
+    const lm=sc.link_missing||{};
+    if(lm.n) t.push({i:"🔗",
+      x:`쿠팡 링크 없는 글 ${lm.n}편 — 이 글들은 수익이 0원입니다`,
+      b:"링크 등록", a:"gotoTab('ads');setTimeout(()=>showSub('adsSheet','links'),300)"});
     const nv=sc.noimgv2||{};
     if(nv.n) t.push({i:"🖼️",
       x:`이미지 v2 미적용 ${nv.n}${nv.of?"/"+nv.of:""}편 — 옛 규격 이미지가 남아 있습니다`,
@@ -7333,6 +7352,7 @@ const SUBTABS={
        ⚠️ 'prep' 키 금지 — moveApprovalControls()가 그 키에 반응해 애드센스용 재배치를 한다. */
     tabs:[
       {k:"now",  label:"여정"},
+      {k:"links",label:"상품", ids:["pickLinkBox"]},
       {k:"ready",label:"준비", ids:["adsMakePages","adsPlugScan"]},
       {k:"check",label:"점검", ids:["adsCheck"]},
     ],
@@ -7939,7 +7959,8 @@ function gotoTab(k){
     setTimeout(()=>{ buildSubtabs(pid);
       // 승인 탭의 보조탭은 여기서 처음 만들어진다. 설정에서 옮겨올 블록은
       // 그 뒤에 붙여야 하므로, 타이머로 기다리지 말고 이 시점에 실행한다.
-      if(pid==="adsSheet"){ try{ moveApprovalControls(); fillApprovalFields(); }
+      if(pid==="adsSheet"){ try{ renderPickLinks(); }catch(e){ console.warn("상품 링크:",e); }
+        try{ moveApprovalControls(); fillApprovalFields(); }
         catch(e){ console.warn("승인 탭 통합:",e); } }
       if(pid==="statsSheet"){ try{ buildMoneyTab(); }catch(e){ console.warn("수익 탭 조립:",e); } }
       // 이어서 하기: 마지막으로 보던 보조탭으로 돌아간다(없으면 현황)
@@ -7979,6 +8000,85 @@ function gotoTab(k){
     // 첫 보조탭에서 더 오른쪽으로 밀면 메인으로 빠져나온다
     if(dir===-1&&page.dataset.sub===cfg.home) gotoTab("list");
   },{passive:true});
+})();
+
+// ===== 상품 링크 대장 (b148) =====
+// data/products.json을 읽어 제품별 링크 입력칸을 만든다. 저장은 GitHub contents API로
+// 저장소 파일을 직접 갱신 — 시크릿이 아니라 파일이라 PAT의 Secrets 권한이 필요없다.
+let _pickProducts=null;
+async function loadPickProducts(force){
+  if(_pickProducts&&!force) return _pickProducts;
+  try{
+    const r=await fetch("../data/products.json?nc="+Date.now(),{cache:"no-store"});
+    _pickProducts=await r.json();
+  }catch(e){ _pickProducts={products:[]}; }
+  return _pickProducts;
+}
+async function renderPickLinks(){
+  const box=document.getElementById("pickLinkList"); if(!box) return;
+  const d=await loadPickProducts(true);
+  const list=d.products||[];
+  if(!list.length){ box.innerHTML='<div class="hint">제품 대장이 비어 있습니다.</div>'; return; }
+  box.innerHTML=list.map((p,i)=>{
+    const has=!!(p.coupang_url||"").trim();
+    const q=encodeURIComponent(p.key||"");
+    return `<div style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:7px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <b style="font-size:13px;flex:1">${p.name||p.key}</b>
+        <span class="hint">${has?"✅ 등록됨":"미등록"}</span>
+      </div>
+      <input data-pi="${i}" class="pickUrl" placeholder="파트너스 딥링크 붙여넣기 (https://link.coupang.com/...)"
+        value="${(p.coupang_url||"").replace(/"/g,"&quot;")}" autocapitalize="off"
+        style="width:100%;margin-top:6px;font-size:12px">
+      <div class="actions" style="margin-top:5px;gap:5px">
+        <a class="btn sm" style="flex:1;text-align:center" target="_blank" rel="noopener"
+           href="https://www.coupang.com/np/search?q=${q}">1) 쿠팡에서 상품 찾기</a>
+        <a class="btn sm" style="flex:1;text-align:center" target="_blank" rel="noopener"
+           href="https://partners.coupang.com/#affiliate/ws/link/deeplink">2) 딥링크 만들기</a>
+      </div>
+    </div>`;
+  }).join("");
+}
+async function savePickLinks(){
+  const res=document.getElementById("pickLinkResult");
+  if(!(CFG.ghToken&&CFG.ghOwner&&CFG.ghRepo)){ res.innerHTML='<span style="color:#ffb020">⚙️ 설정에서 GitHub 연동이 필요합니다</span>'; return; }
+  const bad=[...document.querySelectorAll(".pickUrl")].filter(el=>{
+    const v=(el.value||"").trim(); return v && !/^https?:\/\//.test(v); });
+  if(bad.length){ res.innerHTML='<span style="color:#ff6b4a">주소 형식이 아닌 값이 있습니다(http로 시작해야 합니다)</span>'; return; }
+  const plain=[...document.querySelectorAll(".pickUrl")].filter(el=>/coupang\.com\/vp\/products/.test(el.value||""));
+  if(plain.length && !confirm("상품 페이지 주소가 그대로 들어간 칸이 있습니다.\n이런 링크는 수수료가 잡히지 않습니다(파트너스 딥링크가 필요).\n그래도 저장할까요?")) return;
+  res.textContent="저장 중…";
+  try{
+    const api=`https://api.github.com/repos/${CFG.ghOwner}/${CFG.ghRepo}/contents/data/products.json`;
+    const H={Authorization:"Bearer "+CFG.ghToken,Accept:"application/vnd.github+json"};
+    const g=await fetch(api,{headers:H,cache:"no-store"}); if(!g.ok) throw new Error("읽기 HTTP "+g.status);
+    const cur=await g.json();
+    const j=JSON.parse(decodeURIComponent(escape(atob((cur.content||"").replace(/\n/g,"")))));
+    const today=new Date().toISOString().slice(0,10);
+    let n=0;
+    document.querySelectorAll(".pickUrl").forEach(el=>{
+      const i=+el.dataset.pi, v=(el.value||"").trim();
+      if(j.products[i] && (j.products[i].coupang_url||"")!==v){
+        j.products[i].coupang_url=v; j.products[i].updated=today; n++;
+      }
+    });
+    if(!n){ res.innerHTML='<span class="hint">바뀐 값이 없습니다.</span>'; return; }
+    const body=btoa(unescape(encodeURIComponent(JSON.stringify(j,null,2))));
+    const r=await fetch(api,{method:"PUT",headers:Object.assign({"Content-Type":"application/json"},H),
+      body:JSON.stringify({message:`쿠팡 상품 링크 ${n}건 갱신 (앱)`,content:body,sha:cur.sha})});
+    if(!r.ok) throw new Error("쓰기 HTTP "+r.status);
+    res.innerHTML=`<span style="color:#33c27f">✅ ${n}건 저장됨 — 다음 자동 생성부터 반영됩니다. 과거 글에도 넣으려면 [소급 적용]을 누르세요.</span>`;
+    _pickProducts=null; renderPickLinks();
+  }catch(e){ res.innerHTML='<span style="color:#ff6b4a">저장 실패: '+String(e).slice(0,70)+'</span>'; }
+}
+(function pickLinkBtns(){
+  const sb=document.getElementById("pickLinkSave");
+  if(sb) sb.onclick=savePickLinks;
+  const bb=document.getElementById("pickLinkBackfill");
+  if(bb) bb.onclick=()=>{
+    if(!confirm("이미 발행된 글에 상품 링크를 넣습니다. 링크가 등록된 제품만 대상이며, 이미 넣은 글은 건너뜁니다. 진행할까요?")) return;
+    opsDispatch("backfill-links.yml",{limit:"100",dry_run:"false",force:"false"},bb,"상품 링크 소급");
+  };
 })();
 
 // ===== 홈 (b144) =====

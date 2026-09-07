@@ -222,12 +222,30 @@ except Exception as e:
 
 print(f"[check] 기본 글 잔존 {len(defaults_found)}건 · imgv2 미적용 {len(noimgv2)}/{imgv2_checked}편")
 
+# ── 상품 링크 미등록 글 (2026-09-07) ────────────────────────────
+# 픽담 수익은 글별 쿠팡 상품 링크에서 나온다. 제품은 식별됐는데 링크가 아직
+# 대장(data/products.json)에 없는 글을 세어 앱 '오늘 할 일'로 흘려보낸다.
+# 링크가 없으면 그 글은 아무리 잘 써도 수익이 0이므로, 이건 품질 문제가 아니라 매출 문제다.
+link_missing = []
+try:
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    import products as _prod
+    link_missing = _prod.missing([
+        {"title": strip_tags((p.get("title") or {}).get("rendered", "")),
+         "slug": (p.get("link") or "").rstrip("/").rsplit("/", 1)[-1]}
+        for p in posts
+    ])
+except Exception as e:
+    print(f"[check] 상품 링크 점검 건너뜀: {e}")
+print(f"[check] 상품 링크 미등록 {len(link_missing)}편")
+
 # ── 결과 저장 + 텔레그램 ───────────────────────────────────────
 out = {"at": datetime.datetime.now().isoformat()[:19], "n": len(scored), "avg": avg,
        "fails": [{k: x[k] for k in ("id", "title", "score", "issues")} for x in fails],
        "auto_repair": AUTO_REPAIR, "repaired": repaired, "repair_fail": repair_fail,
        "defaults": defaults_found,
-       "noimgv2": {"n": len(noimgv2), "of": imgv2_checked, "posts": noimgv2[:20]}}
+       "noimgv2": {"n": len(noimgv2), "of": imgv2_checked, "posts": noimgv2[:20]},
+       "link_missing": {"n": len(link_missing), "posts": link_missing[:20]}}
 os.makedirs("dashboard/data", exist_ok=True)
 json.dump(out, open("dashboard/data/site_check.json", "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)
@@ -254,10 +272,14 @@ try:
                 f"({' · '.join(d['title'] for d in defaults_found[:2])}) — 앱 유지관리 > 기본 콘텐츠 정리")
     if noimgv2:
         msg += f"\n🖼️ 이미지 v2 미적용 {len(noimgv2)}/{imgv2_checked}편 — 앱 유지관리 > 이미지 재교체"
+    if link_missing:
+        _ps = " · ".join(sorted({x["product"] for x in link_missing})[:3])
+        msg += (f"\n🔗 쿠팡 링크 없는 글 {len(link_missing)}편 ({_ps}) — 이 글들은 수익 0원입니다. "
+                f"앱 픽 탭 > 상품에서 등록하세요")
     if repaired: msg += "\n🔧 자동 수리: " + " / ".join(repaired[:3])
     if repair_fail: msg += "\n⚠️ 수리 실패: " + " / ".join(repair_fail[:3])
     if fails and not AUTO_REPAIR: msg += "\n앱에서 '한 번에 고치기'를 실행하세요 (또는 자동 수리를 켜세요)"
-    if not (fails or repaired or repair_fail or defaults_found or noimgv2):
+    if not (fails or repaired or repair_fail or defaults_found or noimgv2 or link_missing):
         msg += "\n✅ 이상 없음"
     notify.send(cfg, msg)
 except Exception as e:

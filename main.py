@@ -21,6 +21,7 @@ import html as html_mod
 from datetime import datetime
 
 import random
+import products
 import topics
 import metrics
 import images
@@ -536,7 +537,8 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
     drip_i = 0
     drip_offset = 0.0        # 누적 시간(시간 단위)
     for a in generated:      # 제휴 삽입(설정 시): 애드센스 슬롯과 겹치지 않게 각각 다른 위치에
-        _apply_coupang(a, cfg)      # 쿠팡: 2번째 소제목 앞
+        _apply_product_link(a, cfg) # 글별 쿠팡 상품 링크: 2번째 소제목 앞(수익의 주력)
+        _apply_coupang(a, cfg)      # 쿠팡 위젯: 있으면 함께(현재는 WP가 script를 지워 비활성)
         _apply_affiliate(a, cfg)    # 제휴 SaaS: 3번째 소제목 앞
     out = []
     for a in generated:
@@ -591,6 +593,26 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
           f"(폐기 {sum(1 for a in out if a.get('status')=='폐기')}편 · "
           f"휴지통 {sum(1 for a in out if a.get('trashed'))}편)")
     return out
+
+
+def _apply_product_link(a, cfg):
+    """글이 다루는 제품의 쿠팡 링크를 본문 중간에 삽입한다.
+    - 링크가 대장에 없으면 아무것도 넣지 않는다(빈 카드·헛고지문 방지).
+    - subid에 글 slug를 붙여 어느 글이 벌었는지 구분한다.
+    - 위치는 2번째 소제목 앞 — 하단은 CTR이 낮고, 첫 문단 앞은 글을 읽기도 전에 광고가 된다.
+    """
+    if not (cfg.get("coupang", {}) or {}).get("product_links", True):
+        return False
+    prod = products.find_for(a)
+    if not prod:
+        return False
+    card = products.card_html(prod, a.get("slug") or a.get("focus_keyword") or "")
+    if not card:
+        return False                     # 링크 미등록 — 조용히 건너뛴다
+    a["html"] = _insert_mid_body(a.get("html", "") or "", card, nth_h2=2)
+    a["_product_key"] = prod.get("key", "")
+    print(f"[product] '{prod.get('key')}' 링크 삽입 · subid={a.get('slug','')[:40]}")
+    return True
 
 
 def _cp_trace(a, c, stage):

@@ -1,7 +1,10 @@
 {
-  "_설명": "쿠팡 파트너스 배너 설정. 여기 값은 비밀이 아니다 — 위젯 코드와 trackingCode는 발행된 모든 글의 HTML에 그대로 노출되는 공개 정보다. 그래서 GitHub Secrets가 아니라 저장소 파일로 둔다(시크릿 쓰기 권한 없이도 스케줄 실행에 반영되고, 변경 이력이 git에 남는다). 환경변수 COUPANG_ENABLED/COUPANG_WIDGET_HTML이 있으면 그쪽이 우선한다.",
-  "enabled": true,
-  "disclosure": true,
-  "widget_html": "<script src=\"https://ads-partners.coupang.com/g.js\"></script>\n<script>\n\tnew PartnersCoupang.G({\"id\":1026839,\"template\":\"carousel\",\"trackingCode\":\"AF1091273\",\"width\":\"320\",\"height\":\"100\",\"tsource\":\"\"});\n</script>",
-  "_규격메모": "320x100 = 모바일 안전 규격(최소 360px 화면에도 들어감). 콕픽 유입은 대부분 모바일이라 728x90은 쓰지 않는다."
+ "_설명": "쿠팡 파트너스 배너 설정. 여기 값은 비밀이 아니다 — 위젯 코드와 trackingCode는 발행된 모든 글의 HTML에 그대로 노출되는 공개 정보다. 그래서 GitHub Secrets가 아니라 저장소 파일로 둔다(시크릿 쓰기 권한 없이도 스케줄 실행에 반영되고, 변경 이력이 git에 남는다). 환경변수 COUPANG_ENABLED/COUPANG_WIDGET_HTML이 있으면 그쪽이 우선한다.",
+ "enabled": false,
+ "disclosure": true,
+ "widget_html": "<script src=\"https://ads-partners.coupang.com/g.js\"></script>\n<script>\n\tnew PartnersCoupang.G({\"id\":1026839,\"template\":\"carousel\",\"trackingCode\":\"AF1091273\",\"width\":\"320\",\"height\":\"100\",\"tsource\":\"\"});\n</script>",
+ "_규격메모": "320x100 = 모바일 안전 규격(최소 360px 화면에도 들어감). 콕픽 유입은 대부분 모바일이라 728x90은 쓰지 않는다.",
+ "_왜_껐나": "워드프레스가 REST 발행 시 <script>를 제거해(2026-09-07 실측: 고지문·div는 통과, script만 삭제) 위젯이 실제로는 렌더되지 않는다. 켜두면 죽은 래퍼 div와 '수수료를 제공받습니다' 고지문만 남아 오해를 부른다. 수익은 글별 상품 링크(products.py)가 담당하고, 그쪽이 자기 고지문을 함께 넣는다. 위젯을 살리려면 wp-admin에서 WPCode 숏코드로 우회해야 한다.",
+ "product_links": true,
+ "_product_links": "글별 상품 링크 삽입 스위치. data/products.json의 coupang_url이 채워진 제품만 실제로 들어간다."
 }

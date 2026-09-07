@@ -1,0 +1,46 @@
+name: 상품 링크 소급 삽입
+
+# 수동 전용: data/products.json에 링크를 채운 뒤 실행하면
+# 그 제품을 다루는 기발행 글 전부에 상품 링크가 한 번에 들어간다.
+# <!--picklink--> 마커로 재실행해도 이미 넣은 글은 건너뛴다.
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "이번 실행 최대 글 수"
+        default: "100"
+        required: false
+      dry_run:
+        description: "true면 계획만 출력(수정 없음)"
+        default: "false"
+        required: false
+      force:
+        description: "true면 이미 넣은 글도 카드 교체"
+        default: "false"
+        required: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: 의존성
+        run: pip install requests
+      - name: 설정 생성
+        env:
+          BLOG_URL: ${{ secrets.BLOG_URL }}
+          WP_ENABLED: ${{ secrets.WP_ENABLED }}
+          WP_SITE: ${{ secrets.WP_SITE }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: python build_config.py
+      - name: 소급 삽입
+        env:
+          BACKFILL_LIMIT: ${{ github.event.inputs.limit }}
+          BACKFILL_DRY: ${{ github.event.inputs.dry_run }}
+          BACKFILL_FORCE: ${{ github.event.inputs.force }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python scripts/backfill_product_links.py

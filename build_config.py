@@ -166,6 +166,8 @@ cfg = {
         "enabled": b("COUPANG_ENABLED", _cpf("enabled", False)),
         "disclosure": b("COUPANG_DISCLOSURE", _cpf("disclosure", True)),
         "widget_html": envs("COUPANG_WIDGET_HTML", _cpf("widget_html", "")),
+        # 글별 상품 링크(products.py) 스위치 — 위젯과 독립적으로 켜고 끈다
+        "product_links": b("COUPANG_PRODUCT_LINKS", _cpf("product_links", True)),
     },
     "affiliate": {                                  # 제휴 SaaS(쿠팡 외 일반 제휴 링크)
         "enabled": b("AFFILIATE_ENABLED", False),
