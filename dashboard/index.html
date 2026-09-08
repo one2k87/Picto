@@ -1083,10 +1083,18 @@
   </div>
 
   <div class="divider"></div>
-  <h2 style="font-size:14px">📝 워드프레스 (폰에서 직접 게시)</h2>
+  <h2 style="font-size:14px">📝 워드프레스 <span style="font-size:11px;color:var(--muted);font-weight:400">픽담 전용 · 스크립토와 공유하지 않음</span></h2>
+  <div class="field" id="wpScopeNote">
+    <div class="hint" style="border-left:3px solid var(--accent);padding:8px 10px;background:var(--card2);border-radius:0 8px 8px 0">
+      🔒 <b>이 3칸은 픽담(pickdam.com) 전용입니다.</b> 스크립토(원더랜드)와 도메인·페이지가 다르므로
+      기기 간 동기화에서도 <b>앱별로 따로 보관</b>되고, 다른 앱의 값이 들어오면 자동으로 버립니다.
+      <br>계정·API 키·GitHub 토큰처럼 두 앱이 같이 쓰는 값만 공유됩니다(다시 입력할 필요 없음).
+    </div>
+  </div>
   <div class="field">
     <label>사이트 주소</label>
-    <input id="cfgSite" placeholder="https://내블로그.com">
+    <input id="cfgSite" placeholder="https://pickdam.com">
+    <div class="hint">픽담 주소만 받습니다. 다른 주소를 넣으면 게시 기능이 잠깁니다(남의 블로그 발행 사고 방지).</div>
   </div>
   <div class="field">
     <label>아이디</label>
@@ -1178,7 +1186,9 @@
   <div class="field">
     <div class="hint" style="margin-bottom:8px">폰과 PC가 같은 설정을 쓰도록 자동으로 맞춥니다.
       <b>암호 문구 하나만 정하면 끝</b>이고, 이후엔 버튼을 누를 일이 없습니다 —
-      값이 바뀌면 알아서 올라가고, 앱을 열거나 다른 화면에서 돌아오면 알아서 받아옵니다.</div>
+      값이 바뀌면 알아서 올라가고, 앱을 열거나 다른 화면에서 돌아오면 알아서 받아옵니다.
+      <br><b>앱별로 따로 보관됩니다(b153).</b> 워드프레스·발행 이력·수익 가정값은 픽담 것만,
+      계정·AI 키·GitHub 토큰만 스크립토와 함께 씁니다. 같은 암호 문구를 써도 두 앱의 블로그 설정은 섞이지 않습니다.</div>
     <label>암호 문구</label>
     <input id="cfgSyncPass" type="password" placeholder="기억할 수 있는 문장" autocapitalize="off">
     <div class="hint">이 문구로 설정을 잠그고 풉니다. <b>모든 기기에서 똑같이</b> 넣으세요.
@@ -1519,6 +1529,27 @@ function fixSiteToPickdam(){
 let DATA=null, fKind="all", fLang="all", fCat="all", fSearch="", fStatus="all", sortMode="default";
 let CFG=loadCfg();
 CFG.trackPurpose="coupang";   // Picto는 쿠팡파트너스(픽 라인) 전용 앱 — 항상 픽 여정이 메인
+
+/* b153 1회 이관: 앱별 슬롯으로 갈아타면서 오염된 워드프레스 자격을 씻어낸다.
+   옛 공용 레코드(scripto|slot|)는 읽지 않는다 — 그게 오염원이기 때문이다.
+   새 슬롯은 서버에 비어 있으므로 첫 동기화가 이 기기의 값을 그대로 올려 씨앗이 된다. */
+(function migrateSyncV153(){
+  try{
+    if(localStorage.getItem("picto_sync_v153")) return;
+    const dirty = CFG.site && !siteIsMine();
+    if(dirty){
+      console.warn("[picto] b153 이관: 남의 워드프레스 설정을 비웁니다 —", CFG.site);
+      CFG.site=""; CFG.user=""; CFG.pass=""; CFG.wpPublished=null;
+    }
+    CFG.syncAt="";                       // 새 슬롯 기준으로 다시 시작(첫 동기화=합치기 모드)
+    localStorage.setItem("picto_sync_v153","1");
+    try{ localStorage.setItem(LS,JSON.stringify(CFG)); }catch(e){}
+    if(dirty) setTimeout(()=>{ try{
+      toast("설정 분리 완료 — 픽담 워드프레스 정보를 다시 넣어주세요",1); openSheet();
+    }catch(e){} }, 1200);
+  }catch(e){ console.warn("b153 이관 실패:",e); }
+})();
+
 
 function loadCfg(){try{return JSON.parse(localStorage.getItem(LS))||{}}catch(e){return {}}}
 // 동기화가 값을 적용하는 중인지 표시하는 플래그.
@@ -2289,7 +2320,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=152;
+const APP_BUILD=153;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -3902,7 +3933,23 @@ async function _sha256hex(t){
   const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));
   return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
 }
-async function _slot(){ return _sha256hex("scripto|slot|"+(CFG.syncPass||"")); }
+/* ═══ b153 앱별 설정 분리 ═══
+   실측 사고(2026-09-08): 슬롯 계산식이 세 앱 모두 "scripto|slot|"+암호문구 였다.
+   같은 암호 문구를 쓰면 **세 앱이 하나의 설정 레코드를 공유**한다. 그래서 픽토가
+   스크립토의 워드프레스 주소(wontheland.com)를 통째로 받아왔고, 반대로 픽토가
+   스크립토의 설정을 덮어쓰고 있었다. 공유_경계 §3-3이 요구한 "레코드에 앱 식별자"가
+   빠져 있었던 것.
+   구조:
+     · 앱 전용 슬롯  picto|slot|<pass>   — 워드프레스 자격·발행 이력·수익 가정값 등 전부
+     · 공용 슬롯     solvup|shared|<pass> — 재기입 방지가 필요한 계정·키만(공유_경계 §1)
+   스크립토는 기존 "scripto|slot|"을 그대로 쓰면 되므로 **스크립토 쪽 변경은 필요 없다.**
+   픽토는 이제 그 레코드를 읽지도 쓰지도 않는다. */
+const APP_ID="picto";
+// 공용 슬롯에 올리는 항목 = 공유_경계 §1의 계정·자격 정보뿐. 여기 없는 값은 전부 앱 전용이다.
+// ⚠️ site/user/pass(워드프레스)는 **절대** 넣지 말 것 — 원더랜드≠픽담이고, 이 사고의 원인이다.
+const SHARED_KEYS=["llmKey","ghOwner","ghToken","supabaseUrl","syncKey","auth","plan","license"];
+async function _slot(){ return _sha256hex(APP_ID+"|slot|"+(CFG.syncPass||"")); }
+async function _sharedSlot(){ return _sha256hex("solvup|shared|"+(CFG.syncPass||"")); }
 
 async function _syncKeyMat(pass, slot){
   const enc=new TextEncoder();
@@ -3953,10 +4000,19 @@ async function syncPush(silent){
   if(!syncReady()){ if(!silent) toast("암호 문구를 먼저 정해주세요",1); return false; }
   try{
     const slot=await _slot();
-    const body={};
-    for(const k of Object.keys(CFG)) if(!SYNC_SKIP.includes(k)) body[k]=CFG[k];
+    // b153: 계정·키(공유_경계 §1)는 공용 슬롯, 나머지 전부는 앱 전용 슬롯.
+    const body={}, shared={};
+    for(const k of Object.keys(CFG)){
+      if(SYNC_SKIP.includes(k)) continue;
+      if(SHARED_KEYS.includes(k)) shared[k]=CFG[k]; else body[k]=CFG[k];
+    }
     const payload=await syncEncrypt(body, CFG.syncPass, slot);
     const ts=await _rpc("settings_put",{p_slot:slot,p_payload:payload,p_device:_deviceName(),p_version:APP_VER});
+    try{
+      const ss=await _sharedSlot();
+      await _rpc("settings_put",{p_slot:ss,p_payload:await syncEncrypt(shared, CFG.syncPass, ss),
+                                 p_device:_deviceName(),p_version:APP_VER+"|shared"});
+    }catch(e){ console.warn("공용 설정 올리기 실패(무해):",e); }
     CFG.syncAt=ts||new Date().toISOString();
     _syncApplying=true; saveCfg(); _syncApplying=false;
     if(!silent) toast("설정을 올렸습니다 ✓");
@@ -3997,6 +4053,17 @@ async function syncPull(silent, force){
     try{ obj=await syncDecrypt(row.payload, CFG.syncPass, slot); }
     catch(e){ if(!silent) toast("암호 문구가 다릅니다",1); return false; }
 
+    // b153: 공용 슬롯(계정·키)은 앱 전용 값과 섞이지 않게 따로 받아 합친다.
+    //       워드프레스 자격은 여기에 없으므로 앱 간에 넘어올 길이 없다.
+    try{
+      const ss=await _sharedSlot();
+      const srows=await _rpc("settings_get",{p_slot:ss});
+      if(srows&&srows.length){
+        const sobj=await syncDecrypt(srows[0].payload, CFG.syncPass, ss);
+        for(const k of SHARED_KEYS) if(!_blank(sobj[k])) obj[k]=sobj[k];
+      }
+    }catch(e){ console.warn("공용 설정 받기 건너뜀(무해):",e); }
+
     // ⚠️ 이 기기에서 처음 동기화하는 경우에는 덮어쓰지 않고 '합친다'.
     //    폰에는 Gemini 키가 있고 PC에는 없는 것처럼, 기기마다 채워진 항목이
     //    다를 수 있다. 시각만 보고 덮으면 한쪽에만 있던 값이 사라진다.
@@ -4014,6 +4081,13 @@ async function syncPull(silent, force){
       for(const k of Object.keys(obj)) if(!SYNC_SKIP.includes(k)) CFG[k]=obj[k];
     }
     Object.assign(CFG, keep);
+    // b153: 어떤 경로로든 남의 사이트 주소가 실려오면 워드프레스 자격을 통째로 버린다.
+    //       (구버전 앱이 아직 옛 슬롯에 쓰고 있을 수 있으므로 받는 쪽에서도 막는다)
+    if(CFG.site && !siteIsMine()){
+      console.warn("[picto] 동기화로 들어온 남의 사이트 설정을 버립니다:", CFG.site);
+      CFG.site=""; CFG.user=""; CFG.pass=""; CFG.wpPublished=null;
+      try{ toast("동기화로 들어온 다른 블로그 설정을 버렸습니다 — 픽담 정보를 넣어주세요",1); }catch(e){}
+    }
     CFG.syncAt=row.updated_at; CFG.cfgTouchedAt=row.updated_at;
     _syncApplying=true; saveCfg(); _syncApplying=false;
     try{ openSheet(); }catch(e){}
