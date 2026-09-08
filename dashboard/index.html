@@ -2321,7 +2321,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=155;
+const APP_BUILD=156;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -7535,7 +7535,11 @@ const SUBTABS={
        ⚠️ 'prep' 키 금지 — moveApprovalControls()가 그 키에 반응해 애드센스용 재배치를 한다. */
     tabs:[
       {k:"now",  label:"여정"},
-      {k:"links",label:"상품", ids:["pickLinkBox"]},
+      /* ⚠️ ids에는 '그 블록의 자손' id를 적어야 한다. buildSubtabs의 owner()가
+         el.querySelector("#id")로 판정하므로 **블록 자신의 id**를 적으면 절대 매칭되지
+         않는다(자기 자신은 querySelector에 안 잡힌다). 실측 2026-09-08: 그 이유로
+         '상품' 탭이 계속 비어 있었고 입력칸 10개가 '준비' 탭에 들어가 있었다. */
+      {k:"links",label:"상품", ids:["pickLinkList"]},
       {k:"ready",label:"준비", ids:["adsMakePages","adsPlugScan"]},
       {k:"check",label:"점검", ids:["adsCheck"]},
     ],
