@@ -186,6 +186,9 @@ def publish_to_wordpress(article, wp_cfg):
         rm["rank_math_focus_keyword"] = article["focus_keyword"]
     if article.get("meta"):
         rm["rank_math_description"] = article["meta"]
+    # 콕픽(캐스토) 구조화 블록을 메타로도 노출 — HTML 파싱 없이 REST 한 번으로 읽히게.
+    if article.get("kokpick_json"):
+        rm["kokpick"] = article["kokpick_json"]
     if rm:
         payload["meta"] = rm
 

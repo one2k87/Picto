@@ -170,6 +170,8 @@ cfg = {
         "product_links": b("COUPANG_PRODUCT_LINKS", _cpf("product_links", True)),
         # 살 물건이 특정되지 않는 주제를 아예 생성 단계에서 버린다
         "commerce_only": b("COUPANG_COMMERCE_ONLY", _cpf("commerce_only", True)),
+        # 콕픽(캐스토 유튜브)이 읽어갈 구조화 블록 — 본문 끝 주석 + 글 메타 kokpick
+        "kokpick_block": b("COUPANG_KOKPICK_BLOCK", _cpf("kokpick_block", True)),
     },
     "affiliate": {                                  # 제휴 SaaS(쿠팡 외 일반 제휴 링크)
         "enabled": b("AFFILIATE_ENABLED", False),

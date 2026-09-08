@@ -430,8 +430,14 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
 본문은 JSON이 아니라 그냥 HTML이므로 따옴표를 이스케이프하지 마세요.
 
 ===META===
-{{"title":"클릭 유도형 제목","meta":"120~155자 메타설명(키워드 포함)","slug":"english-hyphen-slug","focus_keyword":"{keyword}","tags":["태그1","태그2","태그3","태그4","태그5"],"hook":"3초 후킹 첫 문장","gain":"{_gain_key}","tldr":[],"checklist":[],"summary_table":{{"headers":[],"rows":[]}},"faqs":[]}}
+{{"title":"클릭 유도형 제목","meta":"120~155자 메타설명(키워드 포함)","slug":"english-hyphen-slug","focus_keyword":"{keyword}","tags":["태그1","태그2","태그3","태그4","태그5"],"hook":"3초 후킹 첫 문장","gain":"{_gain_key}","tldr":[],"checklist":[],"summary_table":{{"headers":[],"rows":[]}},"faqs":[],"kokpick":{{"price_band":"","condition_branch":[],"size_install":"","maintenance":{{"cycle":"","cost_per_year":"","consumable_url":""}},"cautions":[],"alt_uses":[],"alt_uses_source":""}}}}
 (위 tldr·checklist·summary_table·faqs는 '배정된 것만' 채우고, 배정되지 않은 항목은 위처럼 빈 채로 두세요)
+(kokpick = 유튜브 채널이 읽어갈 구조화 정보입니다. **본문에 실제로 쓴 내용만** 옮겨 담고,
+ 본문에 없는 값은 반드시 빈 채로 두세요 — 지어내면 영상과 글의 근거가 어긋납니다.
+ price_band='40만원대'처럼 대략 가격대 / condition_branch=['4인 가구 이상이면 이득','1인 자취는 X가 나음']
+ / size_install=설치 규격·공간 조건 한 줄 / maintenance.cycle·cost_per_year=소모품 주기·연간 비용
+ / cautions=고장·실패 원인 / alt_uses=원래 용도 외 활용은 **본문에 근거를 쓴 경우에만** 채우고
+ 그때 alt_uses_source에 그 근거를 적으세요. 근거가 없으면 alt_uses는 [] 로 둡니다.)
 ===BODY===
 <p>첫 문단(검색 의도에 바로 답, 키워드 포함)</p>
 <h2>소제목1</h2><p>내용... [[IMG:photo|대표 장면의 구체적 묘사]]</p>[[AD]]
@@ -868,6 +874,7 @@ def _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,
         "meta": data.get("meta", ""), "slug": slug,
         "focus_keyword": data.get("focus_keyword", keyword),
         "tags": data.get("tags", []), "faqs": data.get("faqs", []),
+        "kokpick": data.get("kokpick") if isinstance(data.get("kokpick"), dict) else {},
         "html": full_html, "links": links,
     }
 

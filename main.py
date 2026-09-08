@@ -23,6 +23,7 @@ from datetime import datetime
 
 import random
 import products
+import kokpick
 import topics
 import metrics
 import images
@@ -568,6 +569,7 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
     drip_offset = 0.0        # 누적 시간(시간 단위)
     for a in generated:      # 제휴 삽입(설정 시): 애드센스 슬롯과 겹치지 않게 각각 다른 위치에
         _apply_product_link(a, cfg) # 글별 쿠팡 상품 링크: 2번째 소제목 앞(수익의 주력)
+        _apply_kokpick(a, cfg)      # 콕픽(유튜브) 구조화 블록: 본문 끝 주석 + 메타
         _apply_coupang(a, cfg)      # 쿠팡 위젯: 있으면 함께(현재는 WP가 script를 지워 비활성)
         _apply_affiliate(a, cfg)    # 제휴 SaaS: 3번째 소제목 앞
     out = []
@@ -642,6 +644,34 @@ def _apply_product_link(a, cfg):
     a["html"] = _insert_mid_body(a.get("html", "") or "", card, nth_h2=2)
     a["_product_key"] = prod.get("key", "")
     print(f"[product] '{prod.get('key')}' 링크 삽입 · subid={a.get('slug','')[:40]}")
+    return True
+
+
+def _apply_kokpick(a, cfg):
+    """캐스토(콕픽 유튜브)가 읽어갈 구조화 블록을 본문 끝 주석 + 글 메타로 남긴다.
+
+    브리프 6-C. 두 경로에 같은 값을 넣는 이유:
+      주석은 플러그인 없이도 content.rendered만으로 읽히고,
+      메타는 HTML 파싱 없이 REST 한 번으로 읽힌다. 캐스토가 편한 쪽을 쓰면 된다.
+    끄고 싶으면 config의 coupang.kokpick_block = false.
+    """
+    if not (cfg.get("coupang", {}) or {}).get("kokpick_block", True):
+        return False
+    prod = products.find_for(a)
+    url = ""
+    if prod:
+        url = products.with_subid(prod.get("coupang_url") or "",
+                                  a.get("slug") or a.get("focus_keyword") or "")
+    data = kokpick.build(a, prod, url)
+    a["kokpick_data"] = data
+    a["kokpick_json"] = kokpick.to_json(data)
+    html = kokpick.strip_block(a.get("html", "") or "")
+    a["html"] = html + kokpick.block_html(data)
+    if kokpick.is_empty(data):
+        print(f"[kokpick] '{data.get('product','')}' 근거 필드가 비어 캐스토가 폴백함")
+    else:
+        print(f"[kokpick] '{data.get('product','')}' 블록 삽입 "
+              f"(조건 {len(data.get('condition_branch') or [])} · 주의 {len(data.get('cautions') or [])})")
     return True
 
 

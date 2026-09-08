@@ -8,5 +8,7 @@
  "product_links": true,
  "_product_links": "글별 상품 링크 삽입 스위치. data/products.json의 coupang_url이 채워진 제품만 실제로 들어간다.",
  "commerce_only": true,
- "_commerce_only": "살 물건이 특정되지 않는 주제(서비스 견적·렌탈 위약금·환급·금융)를 생성 단계에서 버린다. 픽담은 쿠팡 커머스 블로그이고, 그런 주제는 수수료가 0원이며 원더랜드(애드센스 라인)와 겹친다."
+ "_commerce_only": "살 물건이 특정되지 않는 주제(서비스 견적·렌탈 위약금·환급·금융)를 생성 단계에서 버린다. 픽담은 쿠팡 커머스 블로그이고, 그런 주제는 수수료가 0원이며 원더랜드(애드센스 라인)와 겹친다.",
+ "kokpick_block": true,
+ "_kokpick_block": "콕픽(캐스토 유튜브)이 읽어갈 구조화 블록 삽입 스위치. 본문 끝 주석(<!--KOKPICK …-->)과 글 메타 `kokpick`에 같은 JSON을 넣는다. 메타 경로는 픽담 WPCode 스니펫 'Rank Math 메타 REST 등록'이 필요하다(설치됨). 확정 형식은 _Master_Context/casto_kokpick_운영_브리프.md 6-C 참조."
 }
