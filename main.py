@@ -93,7 +93,8 @@ def collect_lane(cfg, cat, lane, n_slots, exclude):
 
     raw = chat(topics.build_topic_prompt(cat["name"], cat["desc"], lane, pool, exclude=exclude,
                                          winners=cfg.get("_insight_hints"),
-                                         intent=cfg.get("_today_intent")),
+                                         intent=cfg.get("_today_intent"),
+                                         must_products=cfg.get("_pending_products")),
                cfg["llm"], max_tokens=900, temperature=0.9)
     cand = topics.parse_topics(raw, pool)
     # 금지·위험 주제 필터(성인/도박/과장의료/저작권/전쟁 등 자동 제외)
@@ -985,6 +986,18 @@ def run():
         raise SystemExit(1)
 
     hist = load_history()
+    # 링크는 있는데 글이 없는 제품을 주제 생성에 자동 주입한다(사람이 매번 지시하지 않게).
+    try:
+        cfg["_pending_products"] = products.pending(hist.get("articles"))
+        if cfg["_pending_products"]:
+            print("[상품] 링크 있는데 글 없는 제품 "
+                  f"{len(cfg['_pending_products'])}종 → 주제 우선 배정: "
+                  + ", ".join((p.get("name") or p.get("key") or "") for p in cfg["_pending_products"][:6]))
+        else:
+            print("[상품] 링크 등록된 제품은 모두 글이 있다.")
+    except Exception as e:
+        cfg["_pending_products"] = []
+        print(f"[상품] 대기 제품 계산 실패(무시): {e}")
 
     # 성과·수익 실측 연동(선택) → insights.json 저장 + 잘 되는 주제를 다음 주제 선정에 반영
     try:

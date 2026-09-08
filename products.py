@@ -116,6 +116,33 @@ def card_html(product, subid, with_notice=True):
     return (NOTICE + card) if with_notice else card
 
 
+def pending(articles):
+    """링크는 등록됐는데 그 제품을 다루는 글이 아직 없는 제품들.
+
+    왜 필요한가:
+      링크를 사람이 한 번 만들어 넣어도, 그 제품 주제의 글이 없으면 수수료는 0원이다.
+      매번 사람이 "이번엔 이 품목으로 써줘"라고 지시하게 두면 반드시 빠뜨린다.
+      그래서 주제 생성 단계에서 이 목록을 읽어 자동으로 우선 배정한다.
+
+    반환: 제품 dict 리스트(글이 하나도 없는 것부터). 링크 없는 제품은 제외 —
+          글부터 써두면 나중에 링크만 채워도 소급 스크립트가 붙여주지만,
+          '지금 당장 돈이 되는' 순서는 링크가 이미 있는 쪽이다.
+    """
+    used = set()
+    for a in articles or []:
+        pr = find_for(a)
+        if pr:
+            used.add(pr.get("key"))
+    out = []
+    for pr in all_products():
+        if not (pr.get("coupang_url") or "").strip():
+            continue
+        if pr.get("key") in used:
+            continue
+        out.append(pr)
+    return out
+
+
 def coverage(articles):
     """발행 글의 링크 적재 상태 — 앱 수익 탭이 '커버리지'로 쓴다.
     of=전체, matched=제품이 식별된 글, linked=실제로 링크가 들어가는 글,

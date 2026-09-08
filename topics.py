@@ -58,11 +58,25 @@ INTENT_GUIDE = {
 
 
 def build_topic_prompt(category, category_desc, kind, count, exclude=None, today=None,
-                       winners=None, intent=None):
+                       winners=None, intent=None, must_products=None):
     exclude = exclude or []
     ex_text = "\n".join(f"- {t}" for t in exclude[:60]) or "(없음)"
     winners = winners or []
     intent_text = INTENT_GUIDE.get(intent or "", "")
+    # 링크는 있는데 글이 없는 제품 — 여기부터 채우는 게 수수료로 직결된다.
+    must_text = ""
+    if must_products:
+        lines = []
+        for pr in must_products[:6]:
+            nm = pr.get("name") or pr.get("key") or ""
+            sq = pr.get("search") or ""
+            lines.append(f"- {nm}" + (f" (구매 검색어: {sq})" if sq else ""))
+        must_text = ("\n[🔴 최우선 — 이 제품들은 제휴 링크가 이미 등록됐는데 글이 없다]\n"
+                     + "\n".join(lines)
+                     + "\n→ 이번 주제 목록의 **앞자리를 이 제품들로 채운다**. 제품 하나당 주제 하나씩,\n"
+                       "   위 순서대로 배정하고, 슬롯이 남을 때만 그 밖의 주제를 넣는다.\n"
+                       "   각 주제는 그 제품을 사려는 사람이 검색할 말이어야 한다\n"
+                       "   (규격·용량 고르는 법 / 유형 비교 / 상황별 추천 / 사기 전 후회 포인트 / 소모품 교체).\n")
     win_text = ""
     if winners:
         win_text = ("\n[성과 피드백 — 최근 실제 유입이 많았던 검색어]\n"
@@ -72,7 +86,7 @@ def build_topic_prompt(category, category_desc, kind, count, exclude=None, today
     common = f"""당신은 '{category}' 카테고리에 집중하는 **쿠팡파트너스 커머스 블로그**의 주제 기획자입니다.
 이 블로그는 '{category}' 미니사이트로 운영되며, 아래 세부 분야를 다룹니다:
 {category_desc}
-
+{must_text}
 [독자 = 일반 개인(가장 중요)]
 - 이 블로그의 독자는 '평범한 일반인'이다. 회사 실무자·투자 전문가·기업 담당자가 아니다.
 - 그래서 **일반인이 실제로 검색하고 클릭할 '내 생활·내 돈·내 문제'와 직결된 주제**만 뽑는다.
