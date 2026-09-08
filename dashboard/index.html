@@ -1487,6 +1487,35 @@ const K_LEARN="picto_learn";         // 점검 학습 로그
     console.log("[picto] 저장소 격리 완료 — 이후 스크립토 데이터를 읽거나 쓰지 않습니다");
   }catch(e){}
 })();
+/* ═══ b152 사이트 경계 가드 ═══
+   실측 사고(2026-09-08): 이 앱의 CFG.site가 wontheland.com(스크립토의 블로그)으로
+   저장돼 있었다. 그 상태에서 '게시'를 누르면 픽담 커머스 글이 원더랜드(애드센스 라인)로
+   발행된다 — 어제 파이프라인에서 걷어낸 바로 그 경계 침범이 앱에서 재현될 뻔했다.
+   공유_경계 계약: 계정·키는 공유, **워드프레스 자격은 앱별**(원더랜드≠픽담).
+   그래서 픽토는 픽담 이외의 호스트를 향한 워드프레스 동작을 아예 거부한다. */
+const PICTO_HOST="pickdam.com";
+function _host(u){ return String(u||"").replace(/^https?:\/\//,"").replace(/^www\./,"").split("/")[0].toLowerCase(); }
+function siteIsMine(){ const h=_host(CFG.site); return !h || h===PICTO_HOST || h.endsWith("."+PICTO_HOST); }
+function siteGuardBanner(){
+  const id="siteGuardBar"; let el=document.getElementById(id);
+  if(siteIsMine()){ if(el) el.remove(); return; }
+  if(!el){ el=document.createElement("div"); el.id=id;
+    el.style.cssText="position:fixed;left:0;right:0;top:0;z-index:9999;background:#7f1d1d;color:#fff;"
+      +"padding:10px 12px;font-size:13px;line-height:1.5;box-shadow:0 2px 10px rgba(0,0,0,.4)";
+    document.body.appendChild(el); }
+  el.innerHTML='🚨 <b>워드프레스 주소가 픽담이 아닙니다</b> — 현재 <b>'+escAttr(_host(CFG.site))+'</b>. '
+    +'이 상태에서 게시하면 <b>남의 블로그에 글이 올라갑니다.</b> 워드프레스 동작을 모두 막아 뒀어요.'
+    +'<div style="margin-top:7px"><button class="btn sm" style="background:#fff;color:#7f1d1d;font-weight:700" '
+    +'onclick="fixSiteToPickdam()">픽담으로 바로잡기</button></div>';
+}
+function fixSiteToPickdam(){
+  CFG.site="https://"+PICTO_HOST;
+  CFG.user=""; CFG.pass="";          // 남의 사이트 자격은 픽담에서 쓸 수 없다 — 지우고 다시 받는다
+  CFG.wpPublished=null;
+  saveCfg(); siteGuardBanner();
+  try{ openSheet(); }catch(e){}
+  toast("픽담으로 바꿨어요 — 워드프레스 사용자·앱 비밀번호를 다시 넣어 주세요",1);
+}
 let DATA=null, fKind="all", fLang="all", fCat="all", fSearch="", fStatus="all", sortMode="default";
 let CFG=loadCfg();
 CFG.trackPurpose="coupang";   // Picto는 쿠팡파트너스(픽 라인) 전용 앱 — 항상 픽 여정이 메인
@@ -1835,6 +1864,7 @@ async function wpTagIds(base,auth,names){
 // 워드프레스에 글 1개 게시(단일·전체 공용). 성공 시 a.status/post_url 갱신
 async function wpPost(a){
   if(a.status==="게시됨") return {ok:true, skip:true};
+  if(!siteIsMine()) return {ok:false, err:"남의 사이트 주소("+_host(CFG.site)+") — 게시를 막았습니다"};
   if(!CFG.site||!CFG.user||!CFG.pass) return {ok:false, err:"no-wp"};
   try{
     const base=CFG.site.replace(/\/+$/,"");
@@ -1858,6 +1888,7 @@ async function wpPost(a){
 }
 async function publish(i,btn){
   const a=visible()[i];
+  if(!siteIsMine()){ siteGuardBanner(); toast("워드프레스 주소가 픽담이 아니어서 게시를 막았습니다",1); return; }
   if(!CFG.site||!CFG.user||!CFG.pass){toast("설정에서 워드프레스 정보를 먼저 입력하세요",1);openSheet();return;}
   btn.textContent="게시 중…";btn.disabled=true;
   const res=await wpPost(a);
@@ -1881,6 +1912,7 @@ function updateBulkBar(){
   const b=document.getElementById("btnPubSel"); if(b) b.disabled=(n===0);
 }
 async function bulkPublish(items,label){
+  if(!siteIsMine()){ siteGuardBanner(); toast("워드프레스 주소가 픽담이 아니어서 게시를 막았습니다",1); return; }
   if(!CFG.site||!CFG.user||!CFG.pass){toast("설정에서 워드프레스 정보를 먼저 입력하세요",1);openSheet();return;}
   const todo=items.filter(a=>a&&a.status!=="게시됨");
   if(!todo.length){toast("게시할(미게시) 글이 없습니다");return;}
@@ -2140,6 +2172,7 @@ document.getElementById("cfgSave").onclick=()=>{
     max_similarity:parseFloat(document.getElementById("cfgMaxSim").value)||undefined
   });
   CFG.site=document.getElementById("cfgSite").value.trim();
+  setTimeout(()=>{ try{ siteGuardBanner(); }catch(e){} },0);   // b152: 주소를 바꾸면 즉시 재검사
   CFG.user=document.getElementById("cfgUser").value.trim();
   CFG.pass=document.getElementById("cfgPass").value.trim();
   CFG.status=document.getElementById("cfgStatus").value;
@@ -2256,7 +2289,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=151;
+const APP_BUILD=152;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -2675,7 +2708,7 @@ async function adsTrack(){
 // ===== 🛡️ 애드센스 승인 준비 탭 =====
 function wpBase(){ return (CFG.site||"").replace(/\/+$/,""); }
 function wpAuth(){ return {Authorization:"Basic "+btoa((CFG.user||"")+":"+(CFG.pass||""))}; }
-function wpReady(){ return CFG.site&&CFG.user&&CFG.pass; }
+function wpReady(){ return CFG.site&&CFG.user&&CFG.pass&&siteIsMine(); }
 function refreshApprovedUI(){
   const on=!!CFG.adsenseApproved;
   const b=document.getElementById("adsApprovedBtn");
@@ -6571,6 +6604,7 @@ async function openStats(){
   computeStats();
 }
 async function fetchWpPublished(){
+  if(!siteIsMine()) return;                      // b152: 남의 사이트 수치를 내 수익 지표로 쓰지 않는다
   if(!CFG.site||!CFG.user||!CFG.pass) return;
   try{
     const base=CFG.site.replace(/\/+$/,"");const auth="Basic "+btoa(CFG.user+":"+CFG.pass);
@@ -9068,6 +9102,12 @@ function wizBind(){
 }
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",wizBind);
 else wizBind();
+// b152: 사이트 경계 배너 — 부팅 직후 한 번, 그리고 설정을 바꿀 때마다(saveCfg 경로).
+(function bootSiteGuard(){
+  const run=()=>{ try{ siteGuardBanner(); }catch(e){ console.warn("siteGuard:",e); } };
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",()=>setTimeout(run,300));
+  else setTimeout(run,300);
+})();
 
 // 승인 탭 통합은 gotoTab("ads")에서 보조탭을 만든 직후에 실행한다.
 // (여기서 타이머로 기다리면 사용자가 탭을 열기 전에 재시도가 끝나버린다)
