@@ -4,21 +4,5 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false,
- "apply_trace": [
-  {
-   "stage": "진입",
-   "title": "정수기 필터 3개월 주기 놓치면 침전 필터 5천 원",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 4
-  },
-  {
-   "stage": "중단:enabled=False",
-   "title": "정수기 필터 3개월 주기 놓치면 침전 필터 5천 원",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 4
-  }
- ]
+ "file_enabled": false
 }
