@@ -638,7 +638,8 @@ def _apply_product_link(a, cfg):
     prod = products.find_for(a)
     if not prod:
         return False
-    card = products.card_html(prod, a.get("slug") or a.get("focus_keyword") or "")
+    card = products.card_html(prod, products.safe_subid(
+        a.get("slug") or "", a.get("wp_id"), a.get("focus_keyword") or ""))
     if not card:
         return False                     # 링크 미등록 — 조용히 건너뛴다
     a["html"] = _insert_mid_body(a.get("html", "") or "", card, nth_h2=2)

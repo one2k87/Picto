@@ -71,6 +71,22 @@ def with_subid(url, subid):
     return url + ("&" if "?" in url else "?") + "subid=" + sid
 
 
+def safe_subid(slug, post_id=None, keyword=""):
+    """추적용 subid를 만든다. slug가 망가진 글(예: '3-2', 'post')이 실제로 있어서
+    그대로 쓰면 성과 리포트에서 어느 글이 벌었는지 못 알아본다(2026-09-08 실측).
+    쓸 만한 slug가 아니면 글 ID로 폴백한다 — 짧아도 유일하기 때문."""
+    sid = re.sub(r"[^A-Za-z0-9_]", "_", (slug or "")).strip("_")
+    core = re.sub(r"[^A-Za-z0-9]", "", sid)
+    bad = len(core) < 6 or core.isdigit() or sid.lower() in ("post", "posts", "article")
+    if bad:
+        if post_id:
+            return "post%s" % post_id
+        alt = re.sub(r"[^A-Za-z0-9_]", "_", (keyword or "")).strip("_")
+        if len(re.sub(r"[^A-Za-z0-9]", "", alt)) >= 6:
+            return alt[:50]
+    return sid[:50]
+
+
 NOTICE = ('<p class="coupang-notice" style="font-size:12px;color:#98a2b3;margin:10px 0 4px;'
           'padding:8px 12px;background:#fafbfc;border-left:3px solid #ff5a5f">'
           '이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>')

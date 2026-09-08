@@ -74,7 +74,7 @@ def main():
         if not prod:
             nolink += 1
             continue
-        card = products.card_html(prod, slug)
+        card = products.card_html(prod, products.safe_subid(slug, pid, title))
         if not card:
             nolink += 1                      # 링크 미등록 제품 — 건너뛴다
             continue
