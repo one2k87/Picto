@@ -1,6 +1,6 @@
 {
- "at": "2026-09-07T23:48:05",
- "n": 11,
+ "at": "2026-09-08T01:14:20",
+ "n": 12,
  "avg": 100,
  "fails": [],
  "auto_repair": true,
@@ -8,9 +8,13 @@
  "repair_fail": [],
  "defaults": [],
  "noimgv2": {
-  "n": 8,
-  "of": 11,
+  "n": 9,
+  "of": 12,
   "posts": [
+   {
+    "id": 71,
+    "title": "정수기 필터 3개월 주기 놓치면 침전 필터 5천 원으로도 해결 못 하는 "
+   },
    {
     "id": 67,
     "title": "음식물처리기 보상 판매, 렌탈 약정 18개월 미만이라면 위약금 30% 발"
@@ -46,8 +50,14 @@
   ]
  },
  "link_missing": {
-  "n": 5,
+  "n": 6,
   "posts": [
+   {
+    "title": "정수기 필터 3개월 주기 놓치면 침전 필터 5천 원으로도 해결 못 하는 ",
+    "slug": "water-purifier-filter-replacement-guide-2026",
+    "product": "정수기필터",
+    "search": "https://www.coupang.com/np/search?q=정수기 필터 교체"
+   },
    {
     "title": "음식물처리기 보상 판매, 렌탈 약정 18개월 미만이라면 위약금 30% 발",
     "slug": "3-2",
