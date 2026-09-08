@@ -2320,7 +2320,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=153;
+const APP_BUILD=154;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -6757,7 +6757,10 @@ function computeStats(){
        <br>※ <b>초안·품질보류 글은 계산에서 제외</b>됩니다(공개 발행된 글만 반영).
        ${covLinked===0?`<div class="wiz-note" style="margin-top:8px;border-color:var(--warn)">
           🚨 <b>링크가 붙은 글이 0편입니다 — 지금 수익은 구조적으로 0원.</b>
-          제품이 식별된 글이 ${covMatched}편 있는데 대장에 링크가 없어 카드가 안 들어갑니다.
+          ${cov.matched!=null
+            ? `제품이 식별된 글이 ${covMatched}편 있는데 대장에 링크가 없어 카드가 안 들어갑니다.`
+            : `상품 대장 ${fill.of}종 중 링크가 등록된 것이 <b>${fill.have}종</b>이라 어느 글에도 카드가 들어가지 않습니다.
+               (글별 상세 집계는 내일 아침 점검부터 표시됩니다)`}
           <div style="margin-top:6px"><button class="btn sm primary"
             onclick="closeStats();gotoTab('ads');setTimeout(()=>showSub('adsSheet','links'),300)">
             상품 링크 등록하러 가기</button></div></div>`
