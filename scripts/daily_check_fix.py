@@ -227,17 +227,21 @@ print(f"[check] 기본 글 잔존 {len(defaults_found)}건 · imgv2 미적용 {l
 # 대장(data/products.json)에 없는 글을 세어 앱 '오늘 할 일'로 흘려보낸다.
 # 링크가 없으면 그 글은 아무리 잘 써도 수익이 0이므로, 이건 품질 문제가 아니라 매출 문제다.
 link_missing = []
+link_cov, link_fill = {}, {}
 try:
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     import products as _prod
-    link_missing = _prod.missing([
-        {"title": strip_tags((p.get("title") or {}).get("rendered", "")),
-         "slug": (p.get("link") or "").rstrip("/").rsplit("/", 1)[-1]}
-        for p in posts
-    ])
+    _arts = [{"title": strip_tags((p.get("title") or {}).get("rendered", "")),
+              "slug": (p.get("link") or "").rstrip("/").rsplit("/", 1)[-1]}
+             for p in posts]
+    link_missing = _prod.missing(_arts)
+    link_cov = _prod.coverage(_arts)     # 앱 수익 탭의 '링크 커버리지' 분모
+    link_fill = _prod.fill_rate()        # 대장 자체의 적재율
 except Exception as e:
     print(f"[check] 상품 링크 점검 건너뜀: {e}")
-print(f"[check] 상품 링크 미등록 {len(link_missing)}편")
+print(f"[check] 상품 링크 미등록 {len(link_missing)}편 · "
+      f"커버리지 {link_cov.get('linked', 0)}/{link_cov.get('of', 0)}편 · "
+      f"대장 {link_fill.get('have', 0)}/{link_fill.get('of', 0)}종")
 
 # ── 결과 저장 + 텔레그램 ───────────────────────────────────────
 out = {"at": datetime.datetime.now().isoformat()[:19], "n": len(scored), "avg": avg,
@@ -245,7 +249,8 @@ out = {"at": datetime.datetime.now().isoformat()[:19], "n": len(scored), "avg": 
        "auto_repair": AUTO_REPAIR, "repaired": repaired, "repair_fail": repair_fail,
        "defaults": defaults_found,
        "noimgv2": {"n": len(noimgv2), "of": imgv2_checked, "posts": noimgv2[:20]},
-       "link_missing": {"n": len(link_missing), "posts": link_missing[:20]}}
+       "link_missing": {"n": len(link_missing), "posts": link_missing[:20]},
+       "link_coverage": link_cov, "link_fill": link_fill}
 os.makedirs("dashboard/data", exist_ok=True)
 json.dump(out, open("dashboard/data/site_check.json", "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)

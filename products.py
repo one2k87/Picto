@@ -100,6 +100,30 @@ def card_html(product, subid, with_notice=True):
     return (NOTICE + card) if with_notice else card
 
 
+def coverage(articles):
+    """발행 글의 링크 적재 상태 — 앱 수익 탭이 '커버리지'로 쓴다.
+    of=전체, matched=제품이 식별된 글, linked=실제로 링크가 들어가는 글,
+    unmatched=제품 자체가 안 잡힌 글(주제가 커머스가 아니거나 대장에 없는 제품)."""
+    of = matched = linked = 0
+    for a in articles or []:
+        of += 1
+        p = find_for(a)
+        if not p:
+            continue
+        matched += 1
+        if (p.get("coupang_url") or "").strip():
+            linked += 1
+    return {"of": of, "matched": matched, "linked": linked,
+            "unmatched": of - matched}
+
+
+def fill_rate():
+    """상품 대장 자체의 링크 적재율(제품 n종 중 몇 종에 링크가 있나)."""
+    ps = all_products()
+    have = len([p for p in ps if (p.get("coupang_url") or "").strip()])
+    return {"of": len(ps), "have": have}
+
+
 def missing(articles):
     """제품은 식별됐는데 링크가 아직 없는 글 — 앱 '오늘 할 일'이 읽는다."""
     out = []

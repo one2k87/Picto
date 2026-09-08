@@ -431,6 +431,7 @@
   .mchip b{color:var(--txt)}
   .m-vol b{color:#ffd479}
   .m-steady b{color:var(--ok)}
+  .m-warn b{color:#ff6b4a}
   .title{font-size:16px;font-weight:700;line-height:1.4;cursor:pointer;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
     position:relative;padding-right:16px}
@@ -1348,12 +1349,12 @@
 <!-- 조회·수익 시트 -->
 <div class="sheet-bg" id="statsBg"></div>
 <div class="sheet" id="statsSheet">
-  <h2>📊 조회·애드센스 예상 수익</h2>
+  <h2>💰 쿠팡 수익 추정</h2>
   <div id="statsSummary" style="margin-bottom:12px"></div>
 
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-    <a class="btn sm" id="lnkAdsense" href="https://adsense.google.com/adsense/home" target="_blank" rel="noopener">💰 애드센스 열기</a>
-    <a class="btn sm" id="lnkGa" href="https://analytics.google.com" target="_blank" rel="noopener">📈 애널리틱스</a>
+    <a class="btn sm" id="lnkCpReport" href="https://partners.coupang.com/#affiliate/ws/reports/summary" target="_blank" rel="noopener">🛒 파트너스 리포트</a>
+    <a class="btn sm" id="lnkGsc" href="https://search.google.com/search-console" target="_blank" rel="noopener">🔎 서치콘솔</a>
     <a class="btn sm" id="lnkWp" href="#" target="_blank" rel="noopener">🌐 워드프레스 통계</a>
   </div>
 
@@ -1378,24 +1379,43 @@
     <div id="stratBox" style="margin-top:10px;font-size:13px"></div>
   </div>
 
-  <h2 style="font-size:14px">가정값 입력</h2>
+  <div>
+  <h2 style="font-size:14px">전환 퍼널 가정값</h2>
+  <div class="hint" id="stAssumeHint" style="margin:-4px 0 10px">조회 → 링크 클릭 → 구매 → 수수료. 각 칸은 파트너스 리포트에서
+    실제 값을 확인하면 그대로 바꿔 넣으세요. 링크가 <b>등록된 제품을 다루는 글</b>만 계산에 들어갑니다.</div>
+  </div>
   <div class="field">
     <label>글당 월 평균 조회수</label>
     <input id="stViews" type="number" inputmode="numeric" placeholder="예: 300">
     <div class="hint">글 1개가 한 달에 평균 몇 번 조회되는지(감으로 시작해도 됩니다).</div>
   </div>
   <div class="field">
-    <label>RPM · 1,000회 조회당 수익 (원)</label>
-    <input id="stRpm" type="number" inputmode="numeric" placeholder="예: 5000">
-    <div class="hint">금융 등 고단가는 보통 높음. AdSense 실제 RPM을 알면 그 값을 넣으세요.</div>
+    <label>링크 클릭률 (%) · 조회 대비</label>
+    <input id="stCtr" type="number" inputmode="decimal" step="0.1" placeholder="예: 6">
+    <div class="hint">본문 안 상품 카드를 누르는 비율. 구매의도 글은 보통 4~10%.</div>
+  </div>
+  <div class="field">
+    <label>구매 전환율 (%) · 클릭 대비</label>
+    <input id="stCvr" type="number" inputmode="decimal" step="0.1" placeholder="예: 3.5">
+    <div class="hint">쿠팡 특성상 <b>클릭한 상품이 아니어도 24시간 안에 산 것</b>이 잡힙니다.</div>
+  </div>
+  <div class="field">
+    <label>평균 주문금액 (원)</label>
+    <input id="stAov" type="number" inputmode="numeric" placeholder="예: 45000">
+  </div>
+  <div class="field">
+    <label>수수료율 (%)</label>
+    <input id="stRate" type="number" inputmode="decimal" step="0.1" placeholder="예: 3">
+    <div class="hint">카테고리별 1~4%(생활·주방 대체로 3%). 리포트의 실제 요율을 넣으면 정확해집니다.</div>
   </div>
   <div class="field">
     <label>실제 월 조회수 (선택 · 알면 입력)</label>
     <input id="stRealViews" type="number" inputmode="numeric" placeholder="비우면 위 가정으로 계산">
   </div>
   <div class="field">
-    <label>실제 월 수익 (선택 · AdSense 확인값)</label>
+    <label>실제 월 수수료 (선택 · 파트너스 리포트 확인값)</label>
     <input id="stRealRev" type="number" inputmode="numeric" placeholder="비우면 예상값 사용">
+    <div class="hint">여기에 값을 넣으면 위 추정 대신 <b>이 값</b>이 표시됩니다.</div>
   </div>
 
   <div class="field">
@@ -1405,8 +1425,9 @@
 
   <div id="statsResult" style="margin:10px 0"></div>
 
-  <div class="hint">※ 예상치는 입력한 가정에 따른 계산값입니다. <b>정확한 실제 조회수·수익은 위 애드센스/애널리틱스
-    버튼</b>을 눌러 확인하세요. 확인한 값을 위 '실제' 칸에 넣으면 이 화면이 정확한 값으로 바뀝니다.</div>
+  <div class="hint">※ 예상치는 입력한 가정에 따른 계산값입니다. <b>실제 클릭·주문·수수료는 위 파트너스 리포트</b>에서
+    확인하세요. 확인한 값을 '실제' 칸에 넣으면 이 화면이 실측 기준으로 바뀝니다.
+    <br>※ 쿠팡 수수료는 <b>링크를 누른 사람이 24시간 안에 산 모든 상품</b>에 붙습니다 — 그래서 전환율이 일반 쇼핑몰 제휴보다 높게 나옵니다.</div>
   <div class="divider"></div>
   <div class="actions">
     <button class="btn primary" id="stSave" style="flex:1">저장 & 계산</button>
@@ -2235,7 +2256,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=150;
+const APP_BUILD=151;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -3096,12 +3117,13 @@ function buildMoneyTab(){
   if(st.dataset.moneyBuilt) return;
 
   const sec=k=>st.querySelector(`.sub-sec[data-k="${k}"]`);
-  const now=sec("now"), setg=sec("ads"), extra=sec("extra");
+  const now=sec("now"), extra=sec("extra");
   const mkNote=(html)=>{ const d=document.createElement("div"); d.className="wiz-note"; d.innerHTML=html; return d; };
 
   // ① 수익: 대시보드가 이미 맨 위. 가정값·실측은 아래에 붙는다(ids로 이동됨)
   if(now) now.insertBefore(
-    mkNote(`💰 <b>지금 얼마나 벌고 있나</b> — 실측값을 넣을수록 아래 추정이 정확해집니다.`),
+    mkNote(`💰 <b>지금 얼마나 벌고 있나</b> — 쿠팡 수수료 기준입니다.
+      수익은 <b>링크가 등록된 제품을 다루는 글</b>에서만 나오므로, 아래 '링크 커버리지'가 곧 매출 상한입니다.`),
     now.firstChild.nextSibling);
 
   // ② 전략 안내 + 주제 전환 완충 상태
@@ -3176,27 +3198,24 @@ function buildMoneyTab(){
     })();
   }
 
-  // ③ 애드센스 세팅: 승인 탭 현황에 있던 수익 최적화 블록을 이동
-  if(setg){
-    setg.appendChild(mkNote(`📐 <b>광고 세팅</b> — 승인 후 광고를 어디에 몇 개 붙일지.
-      램프가 3주에 걸쳐 단계적으로 늘리므로, 처음부터 최대로 켜지 마세요.`));
-    ["adsRevenueBox","revAdsBoost","revRelated"].forEach(id=>{
-      const el=document.getElementById(id); const f=el&&el.closest(".field");
-      if(f) setg.appendChild(f);
-    });
-  }
+  // ③ (b151) 애드센스 광고 세팅 블록 삭제 — 픽담은 애드센스 라인이 아니다.
+  //    id는 다른 저장 코드가 참조하므로 DOM에서 지우지 않고 감추기만 한다.
+  ["adsRevenueBox","revAdsBoost","revRelated"].forEach(id=>{
+    const el=document.getElementById(id); const f=el&&el.closest(".field");
+    if(f) f.style.display="none";
+  });
 
   // ④ 확장: 쿠팡·제휴를 '제안 → 수락 시 세팅' 구조로
   if(extra){
     extra.appendChild(mkNote(
-      `🧭 <b>애드센스 외의 수익원</b> — 아래는 이 블로그와 궁합이 맞는 제안입니다.
-       켜는 순간 글 본문에 자동 삽입이 시작되니, <b>승인 이후에</b> 켜는 것을 권합니다.`));
+      `🧭 <b>수익원 설정</b> — 픽담의 수익은 <b>글별 쿠팡 상품 링크</b>에서 나옵니다.
+       링크 대장은 <b>파트너스 탭 → 상품</b>에서 관리하고, 여기서는 배너·제휴 같은 부가 수단만 켭니다.`));
     const prop=document.createElement("div");
     prop.className="field";
-    prop.innerHTML=`<label>🛒 제안 1 · 쿠팡 파트너스</label>
-      <div class="hint">생활·인테리어 글과 전환 궁합이 가장 좋습니다. 수수료 약 3%,
-      <b>누적 판매 15만원</b>을 넘어야 최종 승인·API가 열립니다.
-      링크가 든 모든 글에 대가성 문구가 자동으로 들어갑니다.</div>`;
+    prop.innerHTML=`<label>🛒 쿠팡 배너 위젯 <span style="font-size:11px;color:var(--muted);font-weight:400">보조 수단</span></label>
+      <div class="hint">⚠️ 워드프레스가 REST 발행 때 <code>&lt;script&gt;</code>를 지워 <b>현재 위젯은 렌더되지 않습니다</b>(실측).
+      수익은 글별 상품 링크가 담당합니다. 최종 승인·오픈 API는 <b>최근 30일 확정 수익 15만원</b>이 관문입니다.
+      링크가 든 글에는 대가성 문구가 자동으로 들어갑니다.</div>`;
     extra.appendChild(prop);
     ["cfgCoupang","cfgCoupangWidget"].forEach(id=>{
       const el=document.getElementById(id); const f=el&&el.closest(".field");
@@ -6516,11 +6535,28 @@ async function loadInsightsData(){
   return null;
 }
 function won(n){return "₩"+Math.round(n).toLocaleString();}
+// 쿠팡 퍼널 기본 가정 — 값이 비었을 때만 쓰는 출발점(사용자가 리포트 값으로 덮어쓴다)
+const CP_DEF={views:300, ctr:6, cvr:3.5, aov:45000, rate:3};
+let LINKCOV=null;   // {of, matched, linked, unmatched} — 아침 점검이 남긴 실측
+let LINKFILL=null;  // {of, have} — 상품 대장 적재율
+async function loadLinkStatus(){
+  try{
+    const sc=await (await fetch("data/site_check.json?nc="+Date.now(),{cache:"no-store"})).json();
+    LINKCOV=sc.link_coverage||null; LINKFILL=sc.link_fill||null;
+  }catch(e){}
+  if(!LINKFILL){                       // 점검 파일이 아직 옛 형식이면 대장에서 직접 센다
+    try{
+      const d=await (await fetch("../data/products.json?nc="+Date.now(),{cache:"no-store"})).json();
+      const ps=d.products||[];
+      LINKFILL={of:ps.length, have:ps.filter(p=>(p.coupang_url||"").trim()).length};
+    }catch(e){}
+  }
+}
 async function openStats(){
-  document.getElementById("stViews").value=CFG.stViews||"";
-  document.getElementById("stRpm").value=CFG.stRpm||"";
-  document.getElementById("stRealViews").value=CFG.stRealViews||"";
-  document.getElementById("stRealRev").value=CFG.stRealRev||"";
+  const put=(id,v)=>{const el=document.getElementById(id); if(el) el.value=v||"";};
+  put("stViews",CFG.stViews); put("stCtr",CFG.stCtr); put("stCvr",CFG.stCvr);
+  put("stAov",CFG.stAov); put("stRate",CFG.stRate);
+  put("stRealViews",CFG.stRealViews); put("stRealRev",CFG.stRealRev);
   // 워드프레스 통계/관리자 바로가기 (사이트 주소 기반)
   const wp=document.getElementById("lnkWp");
   if(CFG.site){const base=CFG.site.replace(/\/+$/,"");wp.href=base+"/wp-admin/index.php";wp.style.display="";}
@@ -6529,6 +6565,7 @@ async function openStats(){
   document.getElementById("statsSheet").classList.add("open");
   HISTCOUNTS=await loadHistoryCounts();
   INS=await loadInsightsData();
+  await loadLinkStatus();
   // 워드프레스에 실제 '공개 발행'된 글 수 자동 조회(초안 제외) → 수익 기준
   await fetchWpPublished();
   computeStats();
@@ -6568,53 +6605,80 @@ function computeStats(){
   const publishedPosts = (CFG.wpPublished!=null && CFG.wpPublished!=="") ? parseInt(CFG.wpPublished,10)
                          : (HISTCOUNTS?HISTCOUNTS.published:0);
 
-  const vpp=parseFloat(CFG.stViews)||300;
-  const rpm=parseFloat(CFG.stRpm)||5000;
+  const vpp =parseFloat(CFG.stViews)||CP_DEF.views;
+  const ctr =(parseFloat(CFG.stCtr) ||CP_DEF.ctr) /100;
+  const cvr =(parseFloat(CFG.stCvr) ||CP_DEF.cvr) /100;
+  const aov = parseFloat(CFG.stAov) ||CP_DEF.aov;
+  const rate=(parseFloat(CFG.stRate)||CP_DEF.rate)/100;
   const realViews=parseFloat(CFG.stRealViews)||0;
   const realRev=parseFloat(CFG.stRealRev)||0;
 
-  // 실측 애드센스 수익(연동됐으면 최우선)
-  const ad = INS && INS.adsense;
-  const adRev = ad && ad.earnings ? parseFloat(String(ad.earnings).replace(/[^0-9.]/g,""))||0 : 0;
+  // 링크 커버리지 = 매출 상한. 링크가 없는 글은 아무리 잘 써도 수수료가 0원이다.
+  const cov = LINKCOV||{};
+  const covOf     = cov.of!=null ? cov.of : publishedPosts;
+  const covLinked = cov.linked!=null ? cov.linked : 0;
+  const covMatched= cov.matched!=null ? cov.matched : 0;
+  const fill = LINKFILL||{of:0,have:0};
 
-  const estViews = realViews>0 ? realViews : publishedPosts*vpp;
-  const estRev = adRev>0 ? adRev : realRev>0 ? realRev : (estViews/1000*rpm);
-  const basis = adRev>0?"(애드센스 실측 · 최근 28일)":realRev>0?"(실제 입력값)":realViews>0?"(실제 조회수 기반)":"(가정값 기반 추정)";
+  // 조회 → 클릭 → 주문 → 수수료. 수익을 내는 글은 '링크가 실제로 들어간 글'뿐이다.
+  const earnPosts = covLinked;
+  const estViews  = realViews>0 ? realViews : publishedPosts*vpp;
+  const earnViews = realViews>0 ? (publishedPosts? realViews*earnPosts/publishedPosts : 0)
+                                : earnPosts*vpp;
+  const clicks = earnViews*ctr;
+  const orders = clicks*cvr;
+  const estRev = realRev>0 ? realRev : orders*aov*rate;
+  const basis  = realRev>0 ? "(파트너스 리포트 실측)"
+               : realViews>0 ? "(실제 조회수 + 가정 퍼널)" : "(전부 가정값 기반 추정)";
+  const covPct = covOf? Math.round(covLinked/covOf*100) : 0;
 
   document.getElementById("statsSummary").innerHTML=
     `<div class="metrics">
       <span class="mchip m-vol">📢 공개 발행 <b>${publishedPosts}</b></span>
-      <span class="mchip">🗂 생성 누적 <b>${totalGen}</b></span>
-      <span class="mchip">👁 예상 월조회 <b>${(estViews).toLocaleString()}</b></span>
-      <span class="mchip m-steady">💰 ${adRev>0?"실측":"예상"} ${adRev>0?"수익(28일)":"월수익"} <b>${won(estRev)}</b></span>
+      <span class="mchip ${covLinked?"m-steady":"m-warn"}">🔗 링크 붙은 글 <b>${covLinked}/${covOf}</b> (${covPct}%)</span>
+      <span class="mchip">🛒 상품 대장 <b>${fill.have}/${fill.of}</b>종</span>
+      <span class="mchip">👆 예상 월 클릭 <b>${Math.round(clicks).toLocaleString()}</b></span>
+      <span class="mchip m-steady">💰 ${realRev>0?"실측":"예상"} 월 수수료 <b>${won(estRev)}</b></span>
      </div>
      <div class="hint" style="margin-top:6px">
-       ${adRev>0?`실제 애드센스 수익 <b style="color:var(--ok)">${won(estRev)}</b> ${basis}`
-                :`연 환산 약 <b style="color:var(--ok)">${won(estRev*12)}</b> ${basis}`}
-       <br>※ <b>초안·품질보류 글은 수익 계산에서 제외</b>됩니다(공개 발행된 글만 반영).
-       ${publishedPosts===0?`<br><span style="color:var(--warn)">아직 공개 발행된 글이 0개예요. 워드프레스에서 초안을 발행하면 반영됩니다.</span>`:""}</div>`;
+       ${realRev>0?`파트너스 실측 <b style="color:var(--ok)">${won(estRev)}</b> ${basis}`
+                  :`연 환산 약 <b style="color:var(--ok)">${won(estRev*12)}</b> ${basis}`}
+       <br>계산: 수익 나는 글 <b>${earnPosts}</b>편 × 월 ${Math.round(vpp).toLocaleString()}회 조회
+       → 클릭 ${(ctr*100).toFixed(1)}% → 구매 ${(cvr*100).toFixed(1)}%
+       → 객단가 ${won(aov)} × 수수료 ${(rate*100).toFixed(1)}%
+       <br>※ <b>초안·품질보류 글은 계산에서 제외</b>됩니다(공개 발행된 글만 반영).
+       ${covLinked===0?`<div class="wiz-note" style="margin-top:8px;border-color:var(--warn)">
+          🚨 <b>링크가 붙은 글이 0편입니다 — 지금 수익은 구조적으로 0원.</b>
+          제품이 식별된 글이 ${covMatched}편 있는데 대장에 링크가 없어 카드가 안 들어갑니다.
+          <div style="margin-top:6px"><button class="btn sm primary"
+            onclick="closeStats();gotoTab('ads');setTimeout(()=>showSub('adsSheet','links'),300)">
+            상품 링크 등록하러 가기</button></div></div>`
+        : covLinked<covOf?`<br><span style="color:var(--warn)">링크 없는 글 ${covOf-covLinked}편이 남아 있습니다 — 파트너스 탭 → 상품에서 채우면 그만큼 늘어납니다.</span>`:""}
+       ${estViews&&0?"":""}</div>`;
 
-  // 카테고리별(공개 발행만)
+  // 카테고리별(공개 발행만) — 조회 기준. 수수료는 링크 커버리지에 좌우되므로 여기선 조회만 본다.
   const rows=Object.keys(cum).map(c=>{
-    const posts=cum[c];const v=posts*vpp;const rev=v/1000*rpm;
+    const posts=cum[c];const v=posts*vpp;
     return `<tr><td style='padding:6px 4px'>${c}</td>
       <td style='padding:6px 4px;text-align:right'>${posts}</td>
       <td style='padding:6px 4px;text-align:right'>${v.toLocaleString()}</td>
-      <td style='padding:6px 4px;text-align:right;color:#ffd479'>${won(rev)}</td></tr>`;}).join("");
+      <td style='padding:6px 4px;text-align:right;color:#ffd479'>${won(v*ctr*cvr*aov*rate)}</td></tr>`;}).join("");
   document.getElementById("statsResult").innerHTML=Object.keys(cum).length?
     `<table style='width:100%;border-collapse:collapse;font-size:13px'>
       <thead><tr style='color:var(--muted)'><th style='text-align:left;padding:6px 4px'>카테고리</th>
       <th style='text-align:right;padding:6px 4px'>글</th><th style='text-align:right;padding:6px 4px'>월조회</th>
-      <th style='text-align:right;padding:6px 4px'>예상수익</th></tr></thead><tbody>${rows}</tbody></table>`:"";
+      <th style='text-align:right;padding:6px 4px'>링크 다 있을 때</th></tr></thead><tbody>${rows}</tbody></table>`:"";
+  // 링크 상태를 늦게 받아온 경우에도 상단 대시보드가 같은 값을 쓰도록 다시 그린다
+  try{ renderMoneyDash(); }catch(e){}
 }
 document.getElementById("statsBtn").onclick=openStats;
 document.getElementById("statsBg").onclick=closeStats;
 document.getElementById("stClose").onclick=closeStats;
 document.getElementById("stSave").onclick=()=>{
-  CFG.stViews=document.getElementById("stViews").value;
-  CFG.stRpm=document.getElementById("stRpm").value;
-  CFG.stRealViews=document.getElementById("stRealViews").value;
-  CFG.stRealRev=document.getElementById("stRealRev").value;
+  const get=id=>{const el=document.getElementById(id);return el?el.value:"";};
+  CFG.stViews=get("stViews"); CFG.stCtr=get("stCtr"); CFG.stCvr=get("stCvr");
+  CFG.stAov=get("stAov");     CFG.stRate=get("stRate");
+  CFG.stRealViews=get("stRealViews"); CFG.stRealRev=get("stRealRev");
   saveCfg();computeStats();toast("계산 완료 ✓");};
 document.getElementById("stWpCount").onclick=async()=>{
   if(!CFG.site||!CFG.user||!CFG.pass){toast("설정에 워드프레스 정보를 먼저 입력",1);return;}
@@ -7366,14 +7430,14 @@ const SUBTABS={
     home:"now", render:()=>renderAdsDash(),
   },
   statsSheet:{
-    // 수익 탭의 흐름: ①얼마 벌고 있나(수익) → ②무엇을 쓰면 더 버나(전략,
-    // 구독제 글의 테마·형식을 여기서 정해 글 탭의 자동 작성에 반영)
-    // → ③애드센스 광고 세팅 → ④그 외 돈 될 방법(쿠팡 등 제안·수락 시 세팅)
+    /* b151 픽토 전용: 애드센스 RPM 축을 버리고 쿠팡 전환 퍼널로.
+       ①얼마 벌고 있나(수익) → ②무엇을 쓰면 더 버나(전략) → ③쿠팡·제휴 설정.
+       ⚠️ 'ads' 키를 되살리지 말 것 — buildMoneyTab이 그 키에 애드센스 광고 세팅 블록을 붙인다. */
     tabs:[
-      {k:"now",  label:"수익", ids:["stRealViews","stRealRev","stWpCount","stViews","stRpm"]},
+      {k:"now",  label:"수익", ids:["stRealViews","stRealRev","stWpCount","stViews",
+                                   "stCtr","stCvr","stAov","stRate","stAssumeHint"]},
       {k:"strat",label:"전략", ids:["stratBox"]},
-      {k:"ads",  label:"세팅"},
-      {k:"extra",label:"확장"},
+      {k:"extra",label:"설정"},
     ],
     home:"now", render:()=>renderMoneyDash(),
   },
@@ -7800,27 +7864,39 @@ function renderMoneyDash(){
   const arts=(DATA&&DATA.articles)||[];
   const pub=arts.filter(a=>a.status==="게시됨").length;
   const won=n=>"₩"+Math.round(n||0).toLocaleString("ko-KR");
-  const realRev=+(CFG.stRealRev||0), views=+(CFG.stViews||0), rpm=+(CFG.stRpm||0);
-  const est=realRev>0?realRev:Math.round(pub*views*rpm/1000);
-  const ad=(typeof INS!=="undefined"&&INS&&INS.adsense)?INS.adsense:null;
-  const shown=ad&&ad.earnings?ad.earnings:est;
-  const basis=ad&&ad.earnings?"애드센스 실측":realRev>0?"직접 입력값":"가정값 추정";
+  // b151: 애드센스 RPM 축 폐기 — 쿠팡은 '링크 커버리지 × 전환 퍼널'이 수익 구조다.
+  const vpp=+(CFG.stViews||0)||CP_DEF.views;
+  const ctr=(+(CFG.stCtr||0)||CP_DEF.ctr)/100;
+  const cvr=(+(CFG.stCvr||0)||CP_DEF.cvr)/100;
+  const aov=+(CFG.stAov||0)||CP_DEF.aov;
+  const rate=(+(CFG.stRate||0)||CP_DEF.rate)/100;
+  const realRev=+(CFG.stRealRev||0);
+  const cov=LINKCOV||{}, fill=LINKFILL||{of:0,have:0};
+  const linked=cov.linked!=null?cov.linked:0;
+  const covOf =cov.of!=null?cov.of:pub;
+  const est=Math.round(linked*vpp*ctr*cvr*aov*rate);
+  const shown=realRev>0?realRev:est;
+  const basis=realRev>0?"파트너스 실측":"가정값 추정";
+  const clicks=Math.round(linked*vpp*ctr);
   // 카테고리 분포를 막대로 — 어느 주제에 쏠렸는지 숫자보다 빨리 읽힌다
   const byCat={}; arts.forEach(a=>{const c=a.category||"기타"; byCat[c]=(byCat[c]||0)+1;});
   const pairs=Object.entries(byCat).sort((x,y)=>y[1]-x[1]).slice(0,5);
   box.innerHTML=`
     <div class="dash">
-      <div class="dcard"><div class="dl">월 수익 · ${basis}</div><div class="dv">${won(shown)}</div></div>
-      <div class="dcard"><div class="dl">공개 발행 글</div><div class="dv" data-cnt="${pub}">0편</div></div>
-      <div class="dcard"><div class="dl">글당 월 조회</div><div class="dv">${views||"-"}</div></div>
-      <div class="dcard"><div class="dl">RPM</div><div class="dv">${rpm?won(rpm):"-"}</div></div>
+      <div class="dcard"><div class="dl">월 수수료 · ${basis}</div><div class="dv">${won(shown)}</div></div>
+      <div class="dcard"><div class="dl">링크 붙은 글</div><div class="dv" data-cnt="${linked}">0편</div>
+        <div class="dl" style="font-size:10px">전체 ${covOf}편 중</div></div>
+      <div class="dcard"><div class="dl">상품 대장</div><div class="dv">${fill.have}/${fill.of}종</div></div>
+      <div class="dcard"><div class="dl">예상 월 클릭</div><div class="dv">${clicks.toLocaleString()}</div></div>
     </div>
     ${sparkHtml(dailyCounts(arts,14))}
     ${pairs.length?`<div class="dl" style="font-size:11px;color:var(--muted);margin-top:12px">카테고리 분포 (전체 ${arts.length}편)</div>`+barsHtml(pairs):""}
-    ${pub===0?`<div class="dnext"><div class="dl">아직 공개된 글이 없습니다</div>
-      <div class="dv">승인 후 발행을 시작하면 실제 수치가 쌓입니다</div></div>`:""}`;
+    ${linked===0?`<div class="dnext"><div class="dl">링크가 붙은 글이 0편입니다</div>
+      <div class="dv" style="font-size:13px">파트너스 탭 → 상품에서 딥링크를 넣으면 그때부터 수익이 발생합니다</div></div>`
+      :pub===0?`<div class="dnext"><div class="dl">아직 공개된 글이 없습니다</div>
+      <div class="dv">발행을 시작하면 실제 수치가 쌓입니다</div></div>`:""}`;
   animateBars(box);
-  countUp(box.querySelector("[data-cnt]"),pub,"편");
+  countUp(box.querySelector("[data-cnt]"),linked,"편");
   try{ renderDigest(); }catch(e){ console.warn("digest",e); }
 }
 
