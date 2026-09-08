@@ -8,71 +8,138 @@
       "key": "문풍지",
       "name": "문풍지 (문틈 바람막이)",
       "search": "현관문 문풍지 방풍",
-      "match": ["문틈", "문풍지", "웃풍", "외풍"],
-      "coupang_url": "", "price_band": "", "note": "", "updated": ""
+      "match": [
+        "문틈",
+        "문풍지",
+        "웃풍",
+        "외풍"
+      ],
+      "coupang_url": "https://link.coupang.com/a/gSIWf8PQ3U",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-09-08"
     },
     {
       "key": "창문단열시트",
       "name": "창문 단열 시트 (뽁뽁이·방풍비닐)",
       "search": "창문 단열 뽁뽁이 방풍비닐",
-      "match": ["창문 단열", "결로", "곰팡이 예방", "단열 시공"],
-      "coupang_url": "", "price_band": "", "note": "", "updated": ""
+      "match": [
+        "창문 단열",
+        "결로",
+        "곰팡이 예방",
+        "단열 시공"
+      ],
+      "coupang_url": "https://link.coupang.com/a/gSI24EbLPM",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-09-08"
     },
     {
       "key": "비데",
       "name": "비데 본체",
       "search": "비데 자가설치형",
-      "match": ["비데"],
-      "coupang_url": "", "price_band": "", "note": "", "updated": ""
+      "match": [
+        "비데"
+      ],
+      "coupang_url": "https://link.coupang.com/a/gSJa9UTY5s",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-09-08"
     },
     {
       "key": "비데설치공구",
       "name": "비데 설치 부자재 (분기밸브·테프론테이프)",
       "search": "비데 분기밸브 설치 공구 세트",
-      "match": ["비데 자가 설치", "비데 설치"],
-      "coupang_url": "", "price_band": "", "note": "", "updated": ""
+      "match": [
+        "비데 자가 설치",
+        "비데 설치"
+      ],
+      "coupang_url": "https://link.coupang.com/a/gSJg9yprAi",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-09-08"
     },
     {
       "key": "직수정수기",
       "name": "직수 정수기 (자가관리형)",
       "search": "직수정수기 자가관리 무설치",
-      "match": ["정수기"],
-      "coupang_url": "", "price_band": "", "note": "", "updated": ""
+      "match": [
+        "정수기"
+      ],
+      "coupang_url": "https://link.coupang.com/a/gSJqdpDdx6",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-09-08"
     },
     {
       "key": "정수기필터",
       "name": "정수기 교체 필터",
       "search": "정수기 필터 교체",
-      "match": ["정수기 필터", "정수기 관리", "정수기 수리"],
-      "coupang_url": "", "price_band": "", "note": "", "updated": ""
+      "match": [
+        "정수기 필터",
+        "정수기 관리",
+        "정수기 수리"
+      ],
+      "coupang_url": "https://link.coupang.com/a/gSJvUctvzw",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-09-08"
     },
     {
       "key": "음식물처리기",
       "name": "음식물처리기",
       "search": "음식물처리기 건조분쇄",
-      "match": ["음식물처리기", "음식물 처리기", "음식물분쇄기"],
-      "coupang_url": "", "price_band": "", "note": "", "updated": ""
+      "match": [
+        "음식물처리기",
+        "음식물 처리기",
+        "음식물분쇄기"
+      ],
+      "coupang_url": "https://link.coupang.com/a/gSJyxAkstU",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-09-08"
     },
     {
       "key": "음식물처리기필터",
       "name": "음식물처리기 탈취 필터",
       "search": "음식물처리기 탈취필터",
-      "match": ["음식물처리기 필터", "음식물처리기 관리", "음식물처리기 냄새"],
-      "coupang_url": "", "price_band": "", "note": "", "updated": ""
+      "match": [
+        "음식물처리기 필터",
+        "음식물처리기 관리",
+        "음식물처리기 냄새"
+      ],
+      "coupang_url": "https://link.coupang.com/a/gSJD0d6VR6",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-09-08"
     },
     {
       "key": "고효율가전",
       "name": "에너지효율 1등급 가전",
       "search": "에너지효율 1등급 냉장고",
-      "match": ["고효율 가전", "에너지 캐시백", "1등급 가전", "에너지효율"],
-      "coupang_url": "", "price_band": "", "note": "환급 대상 품목이 넓어 링크 1개로 다 못 받는다. 글이 가장 많이 다루는 품목 하나로 좁혀 거는 것이 낫다.", "updated": ""
+      "match": [
+        "고효율 가전",
+        "에너지 캐시백",
+        "1등급 가전",
+        "에너지효율"
+      ],
+      "coupang_url": "",
+      "price_band": "",
+      "note": "환급 대상 품목이 넓어 링크 1개로 다 못 받는다. 글이 가장 많이 다루는 품목 하나로 좁혀 거는 것이 낫다.",
+      "updated": ""
     },
     {
       "key": "제습기",
       "name": "제습기",
       "search": "제습기 20L",
-      "match": ["제습기", "습기 제거"],
-      "coupang_url": "", "price_band": "", "note": "", "updated": ""
+      "match": [
+        "제습기",
+        "습기 제거"
+      ],
+      "coupang_url": "https://link.coupang.com/a/gSJQaQqxVI",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-09-08"
     }
   ]
 }
