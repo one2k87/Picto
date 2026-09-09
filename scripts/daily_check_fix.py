@@ -222,6 +222,32 @@ except Exception as e:
 
 print(f"[check] 기본 글 잔존 {len(defaults_found)}건 · imgv2 미적용 {len(noimgv2)}/{imgv2_checked}편")
 
+# ── ③ 라인 격리 감시 (2026-09-09) ──────────────────────────────
+# 픽담은 쿠팡 커머스 라인이고 원더랜드는 애드센스 라인이다. 두 앱이 같은 코드에서
+# 갈라져 나왔고 같은 오리진을 쓰므로, 한쪽 자산이 다른 쪽 글에 섞여 들어가는 사고가
+# 실제로 있었다(내부링크 생성기가 원더랜드를 '내 과거 글'로 착각 — clean_foreign_links.py).
+# 규약만으로는 설정 한 줄로 무너지므로 매일 눈으로 확인하는 대신 여기서 세어 알린다.
+# 세 가지를 본다: ①타 사이트 링크 ②구 도메인 잔재 ③애드센스 코드(픽담은 미신청)
+LINE_PATTERNS = {
+    "원더랜드 링크": "wontheland.com",
+    "구 도메인": "one2k.mycafe24.com",
+    "애드센스 코드": "adsbygoogle",
+    "빈 광고자리": "[ 광고 자리 ]",
+}
+line_leaks = []
+try:
+    for p_ in posts:
+        c_ = (p_.get("content") or {}).get("rendered") or ""
+        hit = [k for k, pat in LINE_PATTERNS.items() if pat in c_]
+        if hit:
+            line_leaks.append({"id": p_["id"], "title": _title_of(p_), "kinds": hit})
+except Exception as e:
+    print(f"[check] 라인 격리 감시 건너뜀: {e}")
+print(f"[check] 라인 격리: 오염 {len(line_leaks)}편"
+      + (f" → {[x['id'] for x in line_leaks]}" if line_leaks else " (청정)"))
+
+
+
 # ── 상품 링크 미등록 글 (2026-09-07) ────────────────────────────
 # 픽담 수익은 글별 쿠팡 상품 링크에서 나온다. 제품은 식별됐는데 링크가 아직
 # 대장(data/products.json)에 없는 글을 세어 앱 '오늘 할 일'로 흘려보낸다.
@@ -250,7 +276,8 @@ out = {"at": datetime.datetime.now().isoformat()[:19], "n": len(scored), "avg": 
        "defaults": defaults_found,
        "noimgv2": {"n": len(noimgv2), "of": imgv2_checked, "posts": noimgv2[:20]},
        "link_missing": {"n": len(link_missing), "posts": link_missing[:20]},
-       "link_coverage": link_cov, "link_fill": link_fill}
+       "link_coverage": link_cov, "link_fill": link_fill,
+       "line_leaks": {"n": len(line_leaks), "posts": line_leaks[:20]}}
 os.makedirs("dashboard/data", exist_ok=True)
 json.dump(out, open("dashboard/data/site_check.json", "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)
@@ -281,6 +308,10 @@ try:
         _ps = " · ".join(sorted({x["product"] for x in link_missing})[:3])
         msg += (f"\n🔗 쿠팡 링크 없는 글 {len(link_missing)}편 ({_ps}) — 이 글들은 수익 0원입니다. "
                 f"앱 픽 탭 > 상품에서 등록하세요")
+    if line_leaks:
+        _kinds = sorted({k for x in line_leaks for k in x["kinds"]})
+        msg += (f"\n🚨 라인 격리 위반 {len(line_leaks)}편 ({' · '.join(_kinds)}) — "
+                f"픽담(쿠팡) 글에 다른 라인 자산이 섞였습니다. 글 ID {[x['id'] for x in line_leaks][:5]}")
     if repaired: msg += "\n🔧 자동 수리: " + " / ".join(repaired[:3])
     if repair_fail: msg += "\n⚠️ 수리 실패: " + " / ".join(repair_fail[:3])
     if fails and not AUTO_REPAIR: msg += "\n앱에서 '한 번에 고치기'를 실행하세요 (또는 자동 수리를 켜세요)"
