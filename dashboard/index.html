@@ -2337,7 +2337,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=161;
+const APP_BUILD=162;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -2397,6 +2397,42 @@ async function todoItems(){
     const sj=await (await fetch("data/status.json?nc="+Date.now(),{cache:"no-store"})).json();
     const lr=sj.last_run||{};
     if((lr.image_errors||[]).length) t.push({i:"🖼️", x:`어젯밤 이미지 생성 실패: ${lr.image_errors[0].slice(0,50)}`, b:null, a:null});
+    // b162: '오늘 글이 아직 안 나왔다'를 앱이 먼저 말한다.
+    // 크론이 조용히 건너뛴 적이 실제로 있었고(UTC 가드), 그때 화면 어디에도
+    // "오늘 안 나왔음"이 없어서 사람이 눈치채지 못했다(2026-09-09).
+    const at=(lr.at||sj.updated_at||"").slice(0,10);
+    const today=new Date(Date.now()+9*36e5).toISOString().slice(0,10);   // KST 기준
+    if(at && at!==today)
+      t.push({i:"📝", x:`오늘(${today.slice(5)}) 새 글이 아직 없습니다 — 마지막 생성 ${at.slice(5)}`,
+              b:"지금 생성", a:"document.getElementById('runBtn').click()"});
+  }catch(e){}
+  // b162: 라인 격리 위반 — 픽담(쿠팡) 글에 원더랜드·구도메인·애드센스 자산이 섞인 경우.
+  // 규약만으로는 설정 한 줄로 무너지므로 눈에 보이는 자리에 띄운다.
+  try{
+    const sc2=await (await fetch("data/site_check.json?nc="+Date.now(),{cache:"no-store"})).json();
+    const ll=sc2.line_leaks||{};
+    if(ll.n) t.push({i:"🚨",
+      x:`라인 격리 위반 ${ll.n}편 — 다른 라인 자산이 섞였습니다 (글 ${(ll.posts||[]).map(p=>p.id).slice(0,3).join(", ")})`,
+      b:"링크 정리", a:"opsDispatch('clean-links.yml',{dry_run:'false'},this,'외부 링크 정리')"});
+  }catch(e){}
+  // b162: 링크는 있는데 그 제품 글이 아직 없는 경우 — 파이프라인이 자동 배정하지만
+  // "며칠 뒤에 채워진다"는 사실을 사람이 알 곳이 없었다.
+  try{
+    const d=await loadPickProducts(false);
+    const list=(d&&d.products)||[];
+    const arts=(DATA&&DATA.articles)?DATA.articles:[];
+    // 파이썬 products.pending()과 같은 기준으로 본다: 제목·키워드에서 띄어쓰기를 없앤 건초더미에
+    // 그 제품의 match 키워드나 구매 검색어가 있으면 '이미 다룬 것'.
+    const norm=x=>String(x||"").replace(/[\s\-_·/]/g,"").toLowerCase();
+    const hay=norm(arts.map(a=>(a.title||"")+" "+(a.keyword||"")).join(" "));
+    const waiting=list.filter(p=>{
+      if(!(p.coupang_url||"").trim()) return false;          // 링크 없는 건 아직 내 일이 아니다
+      const keys=[...(p.match||[]), p.search||""].map(norm).filter(k=>k.length>=2);
+      return !keys.some(k=>hay.includes(k));
+    });
+    if(waiting.length) t.push({i:"🕒",
+      x:`링크는 있는데 글이 없는 제품 ${waiting.length}종 (${waiting.slice(0,3).map(p=>p.name||p.key).join(" · ")}) — 다음 생성부터 자동 배정됩니다`,
+      b:"지금 생성", a:"document.getElementById('runBtn').click()"});
   }catch(e){}
   return t;
 }
