@@ -47,7 +47,7 @@ diag = {}
 try:
     r = requests.get(f"{site}/wp-json/wp/v2/posts",
                      params={"per_page": 30, "orderby": "modified", "_fields": "link,modified"},
-                     headers={"User-Agent": "Mozilla/5.0 (ScriptoBot)"}, timeout=20)
+                     headers={"User-Agent": "Mozilla/5.0 (PickdamBot)"}, timeout=20)
     diag = {"http": r.status_code, "body_head": r.text[:120]}
     posts = r.json() if r.ok else []
 except Exception as e:
@@ -132,7 +132,7 @@ try:
             continue
         try:
             code = requests.head(path, timeout=15, allow_redirects=True,
-                                 headers={"User-Agent": "Mozilla/5.0 (ScriptoBot)"}).status_code
+                                 headers={"User-Agent": "Mozilla/5.0 (PickdamBot)"}).status_code
         except Exception:
             continue                      # 네트워크 오류는 판단 보류(삭제하지 않음)
         if code == 404:

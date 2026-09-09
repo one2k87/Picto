@@ -893,7 +893,7 @@ def _save_status_and_notify(cfg, all_articles, start_t, ok=True, error=""):
 
     # 텔레그램 알림
     if error:
-        notify.send(cfg, f"⛔ <b>Scripto 실행 실패</b>\n🕖 {monitor.now_kst()}\n{str(error)[:400]}")
+        notify.send(cfg, f"⛔ <b>{monitor.APP_NAME} 실행 실패</b>\n🕖 {monitor.now_kst()}\n{str(error)[:400]}")
     else:
         notify.send(cfg, notify.run_summary(cfg, stats))
     if snap["llm_calls"] >= FREE_LLM_DAILY * 0.8:
@@ -957,7 +957,7 @@ def run():
     if cfg.get("paused"):
         print("⏸️ 자동 생성 일시정지 상태 — 오늘 생성을 건너뜁니다.")
         try:
-            notify.send(cfg, "⏸️ Scripto 일시정지 상태 — 오늘 자동 생성을 건너뛰었습니다.")
+            notify.send(cfg, f"⏸️ {monitor.APP_NAME} 일시정지 상태 — 오늘 자동 생성을 건너뛰었습니다.")
         except Exception:
             pass
         return

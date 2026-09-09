@@ -7,6 +7,7 @@ report.py - 운영자 주간 리포트(무료). 주 1회 실행해 텔레그램�
 실행: python report.py   (config.json 필요)
 """
 
+import monitor
 import os
 import json
 from datetime import datetime, timedelta
@@ -36,7 +37,7 @@ def build():
     by_cat = Counter(a.get("category", "") for a in arts)
     cat_line = " · ".join(f"{k} {v}" for k, v in by_cat.items()) or "없음"
 
-    lines = ["📊 <b>Scripto 주간 리포트</b>", f"🗓 최근 7일 · {datetime.now():%Y-%m-%d}",
+    lines = [f"📊 <b>{monitor.APP_NAME} 주간 리포트</b>", f"🗓 최근 7일 · {datetime.now():%Y-%m-%d}",
              f"📝 생성 {len(arts)}편 ({cat_line})"]
 
     sc = (ins.get("search_console") or {}).get("queries") or []

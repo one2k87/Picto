@@ -98,7 +98,7 @@ for pg in (1, 2):
     try:
         r = requests.get(f"{site}/wp-json/wp/v2/posts",
                          params={"per_page": 50, "page": pg, "_fields": "id,title,content,link"},
-                         headers={"User-Agent": "Mozilla/5.0 (ScriptoBot)"}, timeout=30)
+                         headers={"User-Agent": "Mozilla/5.0 (PickdamBot)"}, timeout=30)
         if not r.ok: break
         chunk = r.json(); posts += chunk
         if len(chunk) < 50: break
@@ -165,7 +165,7 @@ if AUTO_REPAIR and fails:
 IMGV2_MARK = "<!--imgv2-->"
 DEFAULT_SLUGS = {"posts": ["hello-world"], "pages": ["sample-page"]}
 
-_H = {"User-Agent": "Mozilla/5.0 (ScriptoBot)"}
+_H = {"User-Agent": "Mozilla/5.0 (PickdamBot)"}
 try:
     from publisher import _auth_header
     if wp.get("username") and wp.get("app_password"):

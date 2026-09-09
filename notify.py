@@ -7,6 +7,7 @@ notify.py - 실행 결과/오류를 텔레그램으로 자동 전송(무료).
 둘 중 하나라도 없으면 조용히 건너뛴다(다른 기능엔 영향 없음).
 """
 
+import monitor
 import os
 
 
@@ -42,7 +43,7 @@ def run_summary(cfg, stats):
     """실행 요약 메시지 문자열 만들기."""
     icon = "✅" if stats.get("ok") else "⚠️"
     lines = [
-        f"{icon} <b>Scripto 실행 리포트</b>",
+        f"{icon} <b>{monitor.APP_NAME} 실행 리포트</b>",
         f"🕖 {stats.get('at','')}",
         f"📝 생성 {stats.get('articles',0)}편 · 게시 {stats.get('published',0)} · "
         f"초안 {stats.get('draft',0)}",

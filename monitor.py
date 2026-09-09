@@ -7,6 +7,7 @@ monitor.py - 운영 안전망(헬스체크 + 사용량/비용 집계)용 초경�
 스레드에서 호출돼도 안전하도록 단순 정수 증가만 사용(GIL).
 """
 
+import os
 from datetime import datetime, timezone, timedelta
 
 KST = timezone(timedelta(hours=9))
@@ -17,6 +18,13 @@ _state = {
     "image_paid": 0,    # 유료 이미지 생성 수(비용 발생)
     "image_free": 0,    # 무료 이미지(스톡/썸네일) 수
 }
+
+
+# 이 저장소가 운영하는 앱 이름. 텔레그램 알림·리포트에 찍힌다.
+# 스크립토에서 갈라져 나온 코드라 곳곳에 "Scripto"가 하드코딩돼 있었고,
+# 두 앱이 같은 채팅방에 똑같은 문구로 알림을 보내 어느 쪽 알림인지
+# 구분이 안 됐다(2026-09-09 자체점검에서 발견). 저장소마다 다르게 둔다.
+APP_NAME = os.getenv("APP_BRAND") or "픽담"
 
 
 def now_kst():
