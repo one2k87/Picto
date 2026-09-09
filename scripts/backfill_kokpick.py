@@ -13,6 +13,9 @@
   - alt_uses → **항상 빈 배열**. 소급 대상 글에는 '용도 외 활용' 근거가 없다.
     (브리프 안전 규칙: 근거 없는 활용법은 캐스토가 영상으로 만들면 안 된다)
 
+보고서: 실행 결과를 `dashboard/data/kokpick_backfill.json`에 남긴다.
+  (액션 로그는 압축 아티팩트라 세션에서 되읽기 어렵다 — 결과를 레포에 남겨야 검증이 된다)
+
 재실행 안전: 이미 블록 + 메타가 둘 다 있으면 건너뛴다.
 환경: KOKPICK_DRY(기본 true) / KOKPICK_LIMIT(기본 100) / KOKPICK_FORCE(true면 기존 블록도 재작성)
 """
@@ -106,6 +109,7 @@ def main():
     print(f"발행 글 {len(posts)}개 (dry={dry}, limit={limit}, force={force})")
 
     done = skip = fail = empty = nolink = 0
+    report = []
     for p in posts:
         if done >= limit:
             break
@@ -115,6 +119,7 @@ def main():
         title = re.sub(r"<[^>]+>", "", (p.get("title") or {}).get("rendered") or "").strip()
         if not force and kokpick.has_block(html) and (meta.get("kokpick") or "").strip():
             skip += 1
+            report.append({"id": pid, "title": title[:40], "action": "skip"})
             continue
 
         art = {"title": title, "slug": p.get("slug") or "",
@@ -133,6 +138,15 @@ def main():
         data = kokpick.build(art, prod, url)
         if kokpick.is_empty(data):
             empty += 1
+        row = {"id": pid, "title": title[:40], "action": "plan" if dry else "write",
+               "product": data.get("product", ""), "price_band": data.get("price_band", ""),
+               "condition_branch": len(data["condition_branch"]),
+               "cautions": len(data["cautions"]),
+               "size_install": bool(data.get("size_install")),
+               "maintenance": bool(data["maintenance"]["cycle"] or
+                                   data["maintenance"]["cost_per_year"]),
+               "coupang": bool(url), "empty": kokpick.is_empty(data)}
+        report.append(row)
         print(f"[{pid}] {title[:34]} — 제품 '{data.get('product','')}' · "
               f"조건 {len(data['condition_branch'])} · 주의 {len(data['cautions'])} · "
               f"링크 {'O' if url else 'X'}")
@@ -150,12 +164,22 @@ def main():
             done += 1
         else:
             fail += 1
+            row["action"] = "fail"
+            row["http"] = rr.status_code
             print(f"  ✗ 저장 실패 {rr.status_code}: {rr.text[:150]}")
         time.sleep(1)
 
     summary = (f"콕픽 블록 소급: 처리 {done}편 · 이미있음 {skip}편 · 실패 {fail}편 | "
                f"근거 없음(캐스토 폴백) {empty}편 · 쿠팡링크 없음 {nolink}편")
     print(summary)
+    try:
+        os.makedirs("dashboard/data", exist_ok=True)
+        with open("dashboard/data/kokpick_backfill.json", "w", encoding="utf-8") as f:
+            json.dump({"ran_at": time.strftime("%Y-%m-%d %H:%M"), "dry": dry,
+                       "summary": summary, "rows": report}, f,
+                      ensure_ascii=False, indent=1)
+    except Exception as e:
+        print(f"보고서 저장 실패: {e}")
     tok, chat = os.getenv("TELEGRAM_TOKEN", ""), os.getenv("TELEGRAM_CHAT_ID", "")
     if tok and chat and not dry:
         try:

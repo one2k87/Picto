@@ -20,6 +20,9 @@ on:
         default: "false"
         required: false
 
+permissions:
+  contents: write   # 결과 보고서(kokpick_backfill.json) 커밋용
+
 jobs:
   kokpick:
     runs-on: ubuntu-latest
@@ -50,3 +53,12 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python scripts/backfill_kokpick.py
+      - name: 결과 보고서 커밋
+        if: always()
+        run: |
+          git config user.name "picto-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add dashboard/data/kokpick_backfill.json || true
+          git diff --cached --quiet || git commit -m "콕픽 소급 결과 보고서 ($(date +%F\ %H:%M) KST)"
+          git pull --rebase -q || true
+          git push -q || true
