@@ -1,0 +1,55 @@
+name: 본문 이미지 보강(3장)
+
+# 수동 전용. 기발행 글의 본문 이미지를 목표 장수(기본 3장)까지 채운다.
+# 예전 파이프라인이 글당 1장만 넣어 글이 단조로웠다(2026-09-09 사용자 지적).
+# 이미 3장 이상인 글은 건드리지 않는다. 첫 이미지(=대표이미지)는 유지한다.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true면 계획만 출력(이미지 생성·수정 없음)"
+        default: "true"
+        required: false
+      limit:
+        description: "이번 실행 최대 글 수"
+        default: "100"
+        required: false
+      target:
+        description: "글당 목표 이미지 장수"
+        default: "3"
+        required: false
+
+jobs:
+  topup:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: 한글 폰트 설치
+        run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+      - name: 의존성
+        run: pip install -r requirements.txt
+      - name: 설정 생성
+        env:
+          LLM_PROVIDER: ${{ secrets.LLM_PROVIDER }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
+          BLOG_URL: ${{ secrets.BLOG_URL }}
+          WP_ENABLED: ${{ secrets.WP_ENABLED }}
+          WP_SITE: ${{ secrets.WP_SITE }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          IMAGE_PROVIDER: ${{ secrets.IMAGE_PROVIDER }}
+          IMAGE_API_KEY: ${{ secrets.IMAGE_API_KEY }}
+        run: python build_config.py
+      - name: 이미지 보강
+        env:
+          TOPUP_DRY: ${{ github.event.inputs.dry_run }}
+          TOPUP_LIMIT: ${{ github.event.inputs.limit }}
+          TOPUP_TARGET: ${{ github.event.inputs.target }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python scripts/topup_images.py
