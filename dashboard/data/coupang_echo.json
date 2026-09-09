@@ -8,17 +8,17 @@
  "apply_trace": [
   {
    "stage": "진입",
-   "title": "현관문 문풍지, 틈새 3mm 이상이라면 모헤어, 1",
+   "title": "비데 자가설치, 생각보다 어려울까? 2026년 9월",
    "enabled": false,
    "widget_len": 211,
-   "h2": 4
+   "h2": 5
   },
   {
    "stage": "중단:enabled=False",
-   "title": "현관문 문풍지, 틈새 3mm 이상이라면 모헤어, 1",
+   "title": "비데 자가설치, 생각보다 어려울까? 2026년 9월",
    "enabled": false,
    "widget_len": 211,
-   "h2": 4
+   "h2": 5
   }
  ]
 }

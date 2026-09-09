@@ -246,6 +246,19 @@
       "intent": "evergreen",
       "date": "2026-09-09",
       "series_id": ""
+    },
+    {
+      "title": "비데 자가설치, 생각보다 어려울까? 2026년 9월 기준 모델별 비교와 설치 전 확인 사항",
+      "slug": "bidet-self-installation-guide-2026",
+      "url": "https://pickdam.com/?p=100",
+      "post_id": 100,
+      "status": "게시됨",
+      "kind": "long",
+      "keyword": "비데 자가설치형,",
+      "category": "생활·주방",
+      "intent": "revenue",
+      "date": "2026-09-09",
+      "series_id": ""
     }
   ],
   "_정리": "2026-09-07: 픽토 저장소가 스크립토에서 포크될 때 원더랜드 글 기록이 통째로 딸려왔다. 이 기록이 ①픽담 글 본문의 '함께 보면 좋은 글' 내부링크를 원더랜드로 보내고 ②주제 중복 판정에 쓰여 픽담이 쓸 수 있는 주제를 914편만큼 막고 있었다. 픽담(구 도메인 one2k.mycafe24.com 포함) 기록만 남기고 정리했다."
