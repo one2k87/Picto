@@ -141,6 +141,9 @@ def make_slug(llm_slug="", title="", keyword="", when=None):
 # '가치 낮은 콘텐츠' 신호가 된다.
 AD_CODE = ""
 
+# 글 한 편에 넣을 본문 이미지 수. 대표이미지(목록 카드)는 이 중 첫 장을 승격해 쓴다.
+IMG_PER_POST = 3
+
 
 def _ad_slot():
     """광고 코드가 있을 때만 광고 블록을 만든다. 없으면 빈 문자열."""
@@ -327,17 +330,25 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
         ("branch", "조건별 분기표 — 상황(자재·구조·예산)에 따라 답이 갈리는 지점을 표로 정리."),
         ("range", "국내 기준 실측 범위 정리 — 규격·가격대·소요 시간을 범위로 제시하고 무엇에 따라 달라지는지."),
     ]
+    # 이미지 3장 규칙(2026-09-09): 예전에는 글당 1장만 넣었는데, 대표이미지가 그 1장을
+    # 그대로 다시 보여줘 "같은 그림이 두 번" 나오고 글이 단조로워 보였다(사용자 지적·실측).
+    # 대표이미지는 목록 카드 전용으로 돌리고, 본문에는 **서로 다른 3장**을 넣는다.
+    IMG_RULE = (
+        "5. 이미지는 **정확히 3장**을 [[IMG:스타일|장면묘사]]로 서로 **다른 위치**에 넣으세요 — "
+        "①본문 상단부(첫 소제목 부근) ②본문 중반(비교·조건 설명이 나오는 대목) ③후반(마무리 직전). "
+        "⚠️ 세 장은 **스타일도 장면도 서로 달라야 합니다.** 같은 사물을 같은 각도로 세 번 그리지 마세요. "
+        "권장 조합: ①object(제품 정물 클로즈업) ②diagram(비교·조건 분기·구조 도해) ③photo(실제 쓰는 생활 장면). "
+        "글 성격에 따라 ②를 photo로, ③을 illust로 바꿔도 됩니다."
+    )
     _gain_key, _gain_desc = GAIN_MODES[_variant(str(keyword) + "|gain", len(GAIN_MODES))]
     if not insert_ads:
-        ad_rule = "5. 이미지는 '딱 1개'만 [[IMG:스타일|장면묘사]]로 본문 상단부에 넣으세요(광고 마커는 넣지 말 것)."
+        ad_rule = IMG_RULE + " (광고 마커는 넣지 말 것)"
     elif ADS_BOOST:   # 승인 후 수익 최적화: 광고 3개(첫 소제목·중반·결론 직전)
-        ad_rule = ("5. 이미지는 '딱 1개'만 [[IMG:스타일|장면묘사]]로 본문 상단부에 넣고 그 아래 [[AD]] 1개. "
-                   "본문 중간 '정보가 끝나는 문단 뒤'에 [[AD]] 1개, 마지막 결론 문단 직전에 [[AD]] 1개 — "
-                   "광고는 총 3개(과밀하지 않게 문단 사이에 자연스럽게).")
+        ad_rule = (IMG_RULE + " 광고는 첫 이미지 아래 [[AD]] 1개, 본문 중간 '정보가 끝나는 문단 뒤' 1개, "
+                   "마지막 결론 문단 직전 1개 — 총 3개(과밀하지 않게).")
     else:
-        ad_rule = ("5. 이미지는 '딱 1개'만 [[IMG:스타일|장면묘사]]로 본문 상단부(첫 소제목 부근) 적절한 위치에 넣고, "
-                   "그 바로 아래에 [[AD]]를 배치(이미지→광고 순서). 추가로 본문 중간 '정보가 끝나는 문단 뒤'에 "
-                   "[[AD]] 1개를 더 넣어 광고는 총 2개.")
+        ad_rule = (IMG_RULE + " 첫 이미지 바로 아래에 [[AD]] 1개, 본문 중간 '정보가 끝나는 문단 뒤'에 "
+                   "[[AD]] 1개 — 광고는 총 2개.")
     # 이미지 마커 공통 규격(2026-09-04 품질 개편): 커머스 글은 object(제품 정물)를 우선 고려
     ad_rule += (" [이미지 마커 작성법] 스타일은 object(정물 사진: 제품·도구 클로즈업 — 커머스 글 기본), "
                 "photo(실사 사진: 제품을 실제 쓰는 생활 장면), diagram(도해: 비교·조건 분기·구조), "
@@ -575,7 +586,7 @@ def _convert_markers(html_body, insert_ads, resolver=None, fallback_desc=""):
 
     def img_repl(m):
         counter[0] += 1
-        if counter[0] > 1:                # 글당 이미지 1개만: 초과 마커 제거
+        if counter[0] > IMG_PER_POST:     # 상한 초과 마커는 제거
             return ""
         desc = m.group(1)
         if resolver:                      # 이미지 자동 생성 시도
@@ -585,15 +596,27 @@ def _convert_markers(html_body, insert_ads, resolver=None, fallback_desc=""):
         return _img_slot(desc)            # 실패/미설정 시 자리 표시
 
     html_body = re.sub(r"\[\[IMG:([^\]]*)\]\]", img_repl, html_body)
-    # LLM이 [[IMG:]] 마커를 빼먹는 일이 잦다 — 검수 요건(이미지 1장 이상)이 있으므로
-    # 마커가 없으면 제목 기반으로 1장을 보장 삽입한다(2026-08-30: 마커 누락→전량 폐기 원인).
-    if counter[0] == 0 and resolver and fallback_desc:
-        _html = resolver(f"object|{fallback_desc} — 대표 제품 정물", 1)
-        if _html:
-            if "</h2>" in html_body:
-                html_body = html_body.replace("</h2>", "</h2>" + _html, 1)
+    # LLM이 [[IMG:]] 마커를 빼먹거나 모자라게 넣는 일이 잦다(2026-08-30: 마커 누락→전량 폐기 원인).
+    # 모자란 만큼 제목 기반으로 채우되, **스타일과 장면을 서로 다르게** 준다 —
+    # 예전엔 1장만 보충해서 글이 단조로웠다(2026-09-09 사용자 지적).
+    if resolver and fallback_desc and counter[0] < IMG_PER_POST:
+        _fill = [("object", f"{fallback_desc} — 제품 정물 클로즈업"),
+                 ("diagram", f"{fallback_desc} — 조건별 선택 기준을 정리한 도해"),
+                 ("photo", f"{fallback_desc} — 집에서 실제로 쓰는 생활 장면")]
+        # 소제목 뒤에 하나씩 흩어 넣는다(같은 자리에 몰리면 그것대로 단조롭다)
+        _spots = [m.end() for m in re.finditer(r"</h2>", html_body)]
+        _added = 0
+        for _i in range(counter[0], IMG_PER_POST):
+            _style, _desc = _fill[_i % len(_fill)]
+            _html = resolver(f"{_style}|{_desc}", _i + 1)
+            if not _html:
+                continue
+            if _spots:
+                _at = _spots[min(_added, len(_spots) - 1)] + len(_html) * _added
+                html_body = html_body[:_at] + _html + html_body[_at:]
             else:
-                html_body = _html + html_body
+                html_body += _html
+            _added += 1
     if insert_ads and _ad_slot():          # 코드가 없으면 아무것도 넣지 않는다
         if "[[AD]]" in html_body:
             html_body = html_body.replace("[[AD]]", _ad_slot())
