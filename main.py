@@ -36,6 +36,7 @@ import notify
 import insights
 import supabase_client
 from llm import chat
+import generator
 from generator import generate_article, generate_series
 from publisher import (publish_to_wordpress, upload_media, add_update_banner,
                        submit_indexnow, get_post, update_post_content, trash_post)
@@ -366,6 +367,9 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
     name = cat["name"]
     blog_url = cfg.get("blog_url", "") or cfg.get("site", {}).get("blog_url", "")
     insert_ads = cfg.get("ads", {}).get("insert_slots", True)
+    # 실제 광고 코드를 생성기에 넘긴다. 비어 있으면 generator가 광고 블록을
+    # 아예 만들지 않는다(예전에는 빈 "[ 광고 자리 ]" 상자가 독자에게 보였다).
+    generator.AD_CODE = (cfg.get("ads", {}) or {}).get("code", "") or ""
     author = cfg.get("author") or "편집부"
     author_bio = cfg.get("author_bio") or ""
     author_type = cfg.get("author_type") or "Organization"

@@ -1,0 +1,42 @@
+name: 빈 광고자리 정리
+
+# 수동 전용. 광고 코드가 없는데도 본문에 들어간 「[ 광고 자리 ]」 점선 상자를 걷어낸다.
+# 실제 광고 코드(ins/adsbygoogle/iframe/script)가 든 상자는 건드리지 않는다.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true면 계획만 출력(수정 없음)"
+        default: "true"
+        required: false
+      limit:
+        description: "이번 실행 최대 글 수"
+        default: "100"
+        required: false
+
+jobs:
+  strip:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: 의존성
+        run: pip install requests
+      - name: 설정 생성
+        env:
+          BLOG_URL: ${{ secrets.BLOG_URL }}
+          WP_ENABLED: ${{ secrets.WP_ENABLED }}
+          WP_SITE: ${{ secrets.WP_SITE }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: python build_config.py
+      - name: 정리
+        env:
+          STRIP_DRY: ${{ github.event.inputs.dry_run }}
+          STRIP_LIMIT: ${{ github.event.inputs.limit }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python scripts/strip_ad_slots.py

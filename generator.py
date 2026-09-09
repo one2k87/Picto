@@ -133,14 +133,26 @@ def make_slug(llm_slug="", title="", keyword="", when=None):
     return f"post-{d}-{hashlib.sha1(seed).hexdigest()[:6]}"
 
 
+# 실제로 넣을 광고 코드. 비어 있으면 광고 상자를 **아예 만들지 않는다**.
+# 왜 이렇게 바꿨나: 예전에는 코드가 없어도 점선 상자를 그리고 그 안에
+# "[ 광고 자리 ]"를 **독자에게 보이는 텍스트로** 찍었다. 픽담은 애드센스
+# 미신청이라 채울 코드가 없는데도 공개 14편 전부에 빈 상자가 나갔다
+# (2026-09-09 실측 19개). 독자 신뢰를 깎고, 애드센스 심사에서는
+# '가치 낮은 콘텐츠' 신호가 된다.
+AD_CODE = ""
+
+
 def _ad_slot():
+    """광고 코드가 있을 때만 광고 블록을 만든다. 없으면 빈 문자열."""
+    code = (AD_CODE or "").strip()
+    if not code:
+        return ""
     cta = random.choice(CTA_LINES)
     return (
         '<div class="ad-slot" style="margin:26px 0;padding:14px;border:1px dashed #d8dbe0;'
         'border-radius:10px;text-align:center;background:#fafbfc">'
         f'<p style="margin:0 0 8px;color:#666;font-size:14px">{cta}</p>'
-        '<!-- 애드센스 광고 코드를 이 자리에 붙여넣으세요 -->'
-        '<div style="color:#b6bcc6;font-size:13px">[ 광고 자리 ]</div>'
+        f'{code}'
         '</div>'
     )
 
@@ -582,7 +594,7 @@ def _convert_markers(html_body, insert_ads, resolver=None, fallback_desc=""):
                 html_body = html_body.replace("</h2>", "</h2>" + _html, 1)
             else:
                 html_body = _html + html_body
-    if insert_ads:
+    if insert_ads and _ad_slot():          # 코드가 없으면 아무것도 넣지 않는다
         if "[[AD]]" in html_body:
             html_body = html_body.replace("[[AD]]", _ad_slot())
         else:
