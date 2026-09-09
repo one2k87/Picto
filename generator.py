@@ -63,11 +63,74 @@ CTA_LINES = [
 ]
 
 
-def slugify(text, max_words=8):
-    text = text.lower().strip()
+# ── 한글 로마자 변환 (국어의 로마자 표기법 근사) ──────────────────────────
+# 왜 필요한가: slugify가 [a-z0-9]만 남기는 탓에 **한글 제목은 통째로 지워지고**
+# 숫자만 남았다. 그래서 '현관문 문풍지, 틈새 3mm…' → '3mm-1mm-15',
+# '정수기 필터 3개월…' → '3-5', 남는 게 없으면 'post'가 됐다.
+# 실제로 픽담에 slug이 '3-2' · 'post' · 'post-2'인 글이 생겼다(2026-09-09 실측).
+_CHO = ["g","kk","n","d","tt","r","m","b","pp","s","ss","","j","jj","ch","k","t","p","h"]
+_JUNG = ["a","ae","ya","yae","eo","e","yeo","ye","o","wa","wae","oe","yo",
+         "u","wo","we","wi","yu","eu","ui","i"]
+_JONG = ["","k","k","k","n","n","n","t","l","k","m","p","l","l","l","p","m",
+         "p","p","t","t","ng","t","t","k","t","p","t"]
+
+
+def romanize_ko(text):
+    """한글을 로마자로 옮긴다. 한글이 아닌 글자는 그대로 둔다."""
+    out = []
+    for ch in text or "":
+        code = ord(ch) - 0xAC00
+        if 0 <= code <= 11171:
+            out.append(_CHO[code // 588] + _JUNG[(code % 588) // 28] + _JONG[code % 28])
+        else:
+            out.append(ch)
+    return "".join(out)
+
+
+def _slug_core(text, max_words=8):
+    """문자열 → 슬러그 조각. 쓸 만한 게 없으면 빈 문자열(호출부가 폴백을 고르게)."""
+    text = (text or "").lower().strip()
     text = re.sub(r"[^a-z0-9\s-]", "", text)
     text = re.sub(r"[\s-]+", "-", text).strip("-")
-    return "-".join(text.split("-")[:max_words]) or "post"
+    words = [w for w in text.split("-") if w][:max_words]
+    # 60자 안에서 **낱말 단위로** 자른다(중간에서 끊으면 'mim' 같은 조각이 남는다)
+    kept, n = [], 0
+    for w in words:
+        if kept and n + 1 + len(w) > 60:
+            break
+        n += (1 if kept else 0) + len(w)
+        kept.append(w)
+    slug = "-".join(kept).strip("-")
+    # 숫자가 섞인 조각만 남은 건 슬러그가 아니다.
+    # '3-2' · '2026-9' · '3mm-1mm' 같은 쓰레기를 여기서 전부 막는다.
+    # 기준: 순수 알파벳 3자 이상인 낱말이 최소 하나는 있어야 한다.
+    if not slug or not any(re.fullmatch(r"[a-z]{3,}", w) for w in slug.split("-")):
+        return ""
+    return slug
+
+
+def slugify(text, max_words=8):
+    """호환용. 예전에는 실패 시 'post'를 돌려줬는데, 그게 중복 슬러그의 원인이었다."""
+    return _slug_core(text, max_words)
+
+
+def make_slug(llm_slug="", title="", keyword="", when=None):
+    """글 주소를 정한다. 앞에서부터 되는 것을 쓴다.
+      ① LLM이 준 영문 슬러그 ② 제목 속 영문 ③ 키워드 속 영문
+      ④ 제목의 한글 로마자 ⑤ 날짜+해시(최후 — 그래도 유일하다)
+    어느 경우에도 'post'·'3-2' 같은 값은 나오지 않는다."""
+    import hashlib
+    from datetime import datetime
+    for cand in (llm_slug, title, keyword):
+        s = _slug_core(cand)
+        if len(s) >= 6:
+            return s
+    s = _slug_core(romanize_ko(title) or romanize_ko(keyword))
+    if len(s) >= 6:
+        return s
+    seed = (title or keyword or "").encode("utf-8")
+    d = (when or datetime.now()).strftime("%Y%m%d")
+    return f"post-{d}-{hashlib.sha1(seed).hexdigest()[:6]}"
 
 
 def _ad_slot():
@@ -864,7 +927,8 @@ def _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,
         # 폴백 제목도 상투어를 쓰지 않는다(품질 게이트가 잡는 표현이므로)
         title = f"{keyword}, 신청 전에 확인해야 할 조건"
     data["title"] = title
-    slug = slugify((data.get("slug") or "").strip() or slugify(title))
+    slug = make_slug((data.get("slug") or "").strip(), title,
+                     data.get("focus_keyword") or keyword)
     full_html = _assemble(data, related, blog_url, insert_ads, image_resolver, series_nav,
                           category=category, author=author, author_bio=author_bio,
                           author_type=author_type)
@@ -930,7 +994,8 @@ def generate_series(topic, kind, n_parts, llm_cfg, category="", related=None,
     import uuid as _uuid
     series_id = "s" + _uuid.uuid4().hex[:8]
     # 2) 편별 슬러그 먼저 확정(상호 링크용)
-    parts_meta = [{"slug": slugify(kw) + f"-{i+1}", "url": ""} for i, kw in enumerate(part_kws)]
+    parts_meta = [{"slug": make_slug("", kw, kw) + f"-{i+1}", "url": ""}
+                  for i, kw in enumerate(part_kws)]
 
     links = find_reference_links(topic, max_results=2)
     arts = []
