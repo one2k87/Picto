@@ -1,0 +1,178 @@
+{
+ "ran_at": "2026-09-09 23:47",
+ "dry": true,
+ "summary": "콕픽 블록 소급: 처리 12편 · 이미있음 3편 · 실패 0편 | 근거 없음(캐스토 폴백) 12편 · 쿠팡링크 없음 6편",
+ "rows": [
+  {
+   "id": 164,
+   "title": "비데 자가설치, 흔한 고장 원인과 2026년 9월 모델별 비교로 현명한 ",
+   "action": "skip"
+  },
+  {
+   "id": 100,
+   "title": "비데 자가설치, 생각보다 어려울까? 2026년 9월 기준 모델별 비교와 ",
+   "action": "skip"
+  },
+  {
+   "id": 90,
+   "title": "현관문 문풍지, 틈새 3mm 이상이라면 모헤어, 1mm 미만이라면 실리콘",
+   "action": "skip"
+  },
+  {
+   "id": 71,
+   "title": "정수기 필터 3개월 주기 놓치면 침전 필터 5천 원으로도 해결 못 하는 ",
+   "action": "plan",
+   "product": "정수기 교체 필터",
+   "price_band": "",
+   "condition_branch": 0,
+   "cautions": 0,
+   "size_install": false,
+   "maintenance": false,
+   "coupang": true,
+   "empty": true
+  },
+  {
+   "id": 67,
+   "title": "음식물처리기 보상 판매, 렌탈 약정 18개월 미만이라면 위약금 30% 발",
+   "action": "plan",
+   "product": "음식물처리기",
+   "price_band": "",
+   "condition_branch": 0,
+   "cautions": 0,
+   "size_install": false,
+   "maintenance": false,
+   "coupang": true,
+   "empty": true
+  },
+  {
+   "id": 65,
+   "title": "환기 시스템 렌탈과 구매 고민이라면, 2026년 9월 설치 전 우리 집 ",
+   "action": "plan",
+   "product": "",
+   "price_band": "",
+   "condition_branch": 0,
+   "cautions": 0,
+   "size_install": false,
+   "maintenance": false,
+   "coupang": false,
+   "empty": true
+  },
+  {
+   "id": 63,
+   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이",
+   "action": "plan",
+   "product": "",
+   "price_band": "",
+   "condition_branch": 0,
+   "cautions": 0,
+   "size_install": false,
+   "maintenance": false,
+   "coupang": false,
+   "empty": true
+  },
+  {
+   "id": 61,
+   "title": "새 아파트 시스템 에어컨, 30만원 추가 비용 막으려면 실외기실 너비 7",
+   "action": "plan",
+   "product": "",
+   "price_band": "",
+   "condition_branch": 0,
+   "cautions": 0,
+   "size_install": false,
+   "maintenance": false,
+   "coupang": false,
+   "empty": true
+  },
+  {
+   "id": 59,
+   "title": "포장이사 비용 20% 줄이려면, 짐 부피 측정부터 계약서 특약 3가지 확",
+   "action": "plan",
+   "product": "",
+   "price_band": "",
+   "condition_branch": 0,
+   "cautions": 0,
+   "size_install": false,
+   "maintenance": false,
+   "coupang": false,
+   "empty": true
+  },
+  {
+   "id": 57,
+   "title": "음식물처리기 렌탈 36개월 약정, 위약금 50만원 피하려면 이사 전 2가",
+   "action": "plan",
+   "product": "음식물처리기",
+   "price_band": "",
+   "condition_branch": 0,
+   "cautions": 0,
+   "size_install": false,
+   "maintenance": false,
+   "coupang": true,
+   "empty": true
+  },
+  {
+   "id": 53,
+   "title": "20평대 이사청소 30만원 vs 45만원, 계약서에 명시해야 할 3가지 ",
+   "action": "plan",
+   "product": "",
+   "price_band": "",
+   "condition_branch": 0,
+   "cautions": 0,
+   "size_install": false,
+   "maintenance": false,
+   "coupang": false,
+   "empty": true
+  },
+  {
+   "id": 51,
+   "title": "2026년 9월, 고효율 가전 구매 시 최대 30만원 환급 받으려면 이 ",
+   "action": "plan",
+   "product": "대기전력 차단 멀티탭",
+   "price_band": "",
+   "condition_branch": 0,
+   "cautions": 0,
+   "size_install": false,
+   "maintenance": false,
+   "coupang": true,
+   "empty": true
+  },
+  {
+   "id": 32,
+   "title": "정수기 고장 시 수리비 12만 원 넘는다면, 새 렌탈 위약금 50만 원까",
+   "action": "plan",
+   "product": "직수 정수기 (자가관리형)",
+   "price_band": "",
+   "condition_branch": 0,
+   "cautions": 0,
+   "size_install": false,
+   "maintenance": false,
+   "coupang": true,
+   "empty": true
+  },
+  {
+   "id": 24,
+   "title": "새 아파트 시스템 가전, 2026년 9월 4인 가족 기준 1,000만원 ",
+   "action": "plan",
+   "product": "",
+   "price_band": "",
+   "condition_branch": 0,
+   "cautions": 0,
+   "size_install": false,
+   "maintenance": false,
+   "coupang": false,
+   "empty": true
+  },
+  {
+   "id": 21,
+   "title": "비데 자가 설치 비용을 절약하는 데 필요한 공구와 주의사항을 확인합니다",
+   "action": "plan",
+   "product": "비데 본체",
+   "price_band": "",
+   "condition_branch": 0,
+   "cautions": 0,
+   "size_install": false,
+   "maintenance": false,
+   "coupang": true,
+   "empty": true
+  }
+ ]
+}
