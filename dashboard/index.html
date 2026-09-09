@@ -1105,7 +1105,7 @@
 
   <div class="divider"></div>
   <h2 style="font-size:14px">📝 워드프레스 <span style="font-size:11px;color:var(--muted);font-weight:400">픽담 전용 · 스크립토와 공유하지 않음</span></h2>
-  <div class="field" id="wpScopeNote"><span id="grpBlogMark" hidden></span>
+  <div class="field" id="wpScopeNote">
     <div class="hint" style="border-left:3px solid var(--accent);padding:8px 10px;background:var(--card2);border-radius:0 8px 8px 0">
       🔒 <b>이 3칸은 픽담(pickdam.com) 전용입니다.</b> 스크립토(원더랜드)와 도메인·페이지가 다르므로
       기기 간 동기화에서도 <b>앱별로 따로 보관</b>되고, 다른 앱의 값이 들어오면 자동으로 버립니다.
@@ -2337,7 +2337,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=158;
+const APP_BUILD=159;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -7431,23 +7431,10 @@ const SUBTABS={
     ],
     home:"now", render:()=>renderAdsDash(),
   },
-  /* b157: 설정 탭에도 보조탭을 넣는다.
-     실측 근거 — 화면에 보이는 글자의 84%(6,705자)가 설정 한 곳에 있었고 블록이 44개인데
-     정작 보조탭은 더 가벼운 파트너스·수익에만 있었다. 구조가 거꾸로였다.
-     ⚠️ ids에는 반드시 '그 블록의 자손' id를 적는다(블록 자기 id는 owner()에 안 잡힌다 — b156).
-     ⚠️ DOM 순서를 바꾸지 않고 경계만 긋는다. 재배치하면 buildMoneyTab()이 옮겨가는
-        쿠팡·제휴·전략 블록과 충돌한다. */
-  sheet:{
-    tabs:[
-      {k:"start",label:"시작",   ids:["planBadge"]},
-      {k:"write",label:"글쓰기", ids:["catCount"]},
-      {k:"run",  label:"실행",   ids:["cfgData"]},
-      {k:"blog", label:"블로그", ids:["grpBlogMark"]},
-      {k:"link", label:"연동",   ids:["cfgSyncPass"]},
-      {k:"app",  label:"앱",     ids:["themeBtn"]},
-    ],
-    home:"start",
-  },
+  /* 설정 탭의 보조탭은 여기서 정의하지 않는다.
+     settingsToSubtabs()가 화면의 .grp 접이식 그룹을 읽어 런타임에 SUBTABS.sheet를
+     통째로 만들어 넣는다(v47부터). b158에서 여기에 따로 정의를 넣었다가
+     그쪽이 덮어써서 무용지물이 됐다 — 실측으로 확인하고 철회했다. */
   statsSheet:{
     /* b151 픽토 전용: 애드센스 RPM 축을 버리고 쿠팡 전환 퍼널로.
        ①얼마 벌고 있나(수익) → ②무엇을 쓰면 더 버나(전략) → ③쿠팡·제휴 설정.
@@ -7528,7 +7515,6 @@ function buildSubtabs(pageId){
   bar.after(hint);
   Object.values(secs).forEach(d=>page.appendChild(d));
   bar.querySelectorAll(".st").forEach(b=>b.onclick=()=>showSub(pageId,b.dataset.k));
-  if(pageId==="sheet") mountSettingsSearch(page,bar);
   page.dataset.subtabbed="1"; page.dataset.sub=cfg.home;
   showSub(pageId,cfg.home);
 }
@@ -7589,6 +7575,7 @@ function settingsToSubtabs(){
   SUBTABS.sheet={tabs:secs.map(s=>({k:s.k,label:s.label})),home:"g0"};
   bar.querySelectorAll(".st").forEach(b=>b.onclick=()=>showSub("sheet",b.dataset.k));
   page.dataset.subtabbed="1";
+  mountSettingsSearch(page,bar);     // b158: 항목이 40개가 넘어 '그게 어디 있더라'가 반복된다
   showSub("sheet","g0");
 }
 function showSub(pageId,k){
@@ -8094,12 +8081,6 @@ function gotoTab(k){
   else if(k==="stats") openStats();
   else if(k==="ads") openAds();
   // 보조탭은 페이지를 처음 열 때 만들고, 마지막으로 보던 위치로 돌아간다
-  if(k==="set"){
-    const remembered=(CFG.lastSub||{}).sheet;
-    setTimeout(()=>{ buildSubtabs("sheet");
-      const valid=remembered && SUBTABS.sheet.tabs.some(t=>t.k===remembered);
-      showSub("sheet", valid?remembered:SUBTABS.sheet.home); },60);
-  }
   if(k==="ads"||k==="stats"){
     const pid=k==="ads"?"adsSheet":"statsSheet";
     // ⚠️ 기억해 둔 위치를 '먼저' 읽어야 한다. buildSubtabs()가 내부에서
