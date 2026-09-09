@@ -672,9 +672,11 @@
   .appsw a[data-hue="s"]:hover{color:#8b5cf6}
   .appsw a[data-hue="p"]:hover{color:#2e9e6b}
   .appsw a[data-hue="c"]:hover{color:#5b8def}
+  .appsw a[data-hue="m"]:hover{color:#ed8f47}
   .appsw a.on[data-hue="s"]{background:rgba(139,92,246,.16);color:#8b5cf6}
   .appsw a.on[data-hue="p"]{background:rgba(46,158,107,.16);color:#2e9e6b}
   .appsw a.on[data-hue="c"]{background:rgba(91,141,239,.16);color:#5b8def}
+  .appsw a.on[data-hue="m"]{background:rgba(237,143,71,.18);color:#ed8f47}
 </style>
 <!-- 구글 로그인(애드센스 상태 조회 전용, 읽기 권한만). 없어도 나머지 기능은 정상 동작 -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -693,7 +695,7 @@
     cursor:pointer;flex:0 0 auto;margin-right:6px;padding:0;background:#7a8291"></button>
   <button class="icon-btn" id="keyBtn" title="AI 키 연결 마법사">🔑</button>
   <button class="icon-btn" id="adsBtn" title="쿠팡 파트너스 허브">🤝</button>
-  <nav class="appsw" id="appSwitch" aria-label="앱 전환"><a data-hue="s" href="https://one2k87.github.io/Scripto/dashboard/" title="Scripto — 애드센스 라인">S</a><a class="on" data-hue="p" href="#" onclick="return false">P</a><a data-hue="c" href="https://one2k87.github.io/Casto/dashboard/" title="Casto — 쇼츠 배포 라인">C</a></nav>
+  <nav class="appsw" id="appSwitch" aria-label="앱 전환"><a data-hue="s" href="https://one2k87.github.io/Scripto/dashboard/" title="Scripto — 애드센스 라인">S</a><a class="on" data-hue="p" href="#" onclick="return false">P</a><a data-hue="c" href="https://one2k87.github.io/Casto/dashboard/" title="Casto — 쇼츠 배포 라인">C</a><a data-hue="m" href="https://one2k87.github.io/Markto/dashboard/" title="Markto — 핀터레스트 배포 라인">M</a></nav>
   <button class="icon-btn" id="statsBtn" title="조회·수익">📊</button>
   <div class="run-wrap" id="runWrap" title="지금 생성 실행">
     <svg class="run-ring" viewBox="0 0 44 44" aria-hidden="true">
@@ -2321,7 +2323,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=156;
+const APP_BUILD=157;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -9288,6 +9290,13 @@ setTimeout(maybeOnboard, 800);   // 첫 실행이면 온보딩 위저드
     show("처리되지 않은 오류: "+m);
   });
 })();
+</script>
+<script>
+// iOS 인앱 시트/bfcache 복귀 후 상단 고정 요소가 밀려 못 누르게 되는 현상 보정(1px 스크롤 흔들기)
+window.addEventListener("pageshow",e=>{
+  if(!e.persisted) return;
+  requestAnimationFrame(()=>{ const y=window.scrollY; window.scrollTo(0,y+1); window.scrollTo(0,y); });
+});
 </script>
 </body>
 </html>
