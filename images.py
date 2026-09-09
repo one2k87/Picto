@@ -267,9 +267,14 @@ def _stock(desc, category, cfg, size):
 # ── 코드 썸네일 (Pillow, 완전 무료·키 불필요) ────────────────────────
 _CAT_COLOR = {
     "금융": (124, 92, 255), "재테크": (124, 92, 255),
-    "건강": (46, 179, 127), "생활": (46, 179, 127),
+    # 픽담 브랜드 그린 #2E9E6B — 사이트 팔레트와 같은 값이라야 홈 카드가 한 세트로 보인다
+    "주방": (46, 158, 107), "생활": (46, 158, 107), "건강": (46, 179, 127),
     "경제": (255, 138, 76), "IT": (74, 144, 226),
 }
+
+# 썸네일 하단 워드마크. 예전에는 "Scripto"가 박혀 있어 픽담 글에 남의 브랜드가 찍혔다
+# (2026-09-09 발견). 저장소마다 다르므로 환경변수로 덮어쓸 수 있게 둔다.
+BRAND_NAME = os.getenv("BRAND_NAME") or "픽담"
 
 
 def _find_kr_font():
@@ -349,10 +354,10 @@ def _thumbnail(desc, category, size):
             draw.text((x, y), ln, font=font, fill=(255, 255, 255))
             y += line_h
         # 상단 카테고리 태그
-        tag = f"{category}".strip() or "Scripto"
+        tag = f"{category}".strip() or BRAND_NAME
         draw.text((int(w * 0.06), int(h * 0.06)), tag, font=small, fill=(255, 255, 255))
         # 하단 브랜드
-        draw.text((int(w * 0.06), int(h * 0.90)), "Scripto", font=small, fill=(255, 255, 255))
+        draw.text((int(w * 0.06), int(h * 0.90)), BRAND_NAME, font=small, fill=(255, 255, 255))
     else:
         print("[images] 한글 폰트 없음 → 글자 없는 배경 썸네일 생성")
 

@@ -77,6 +77,13 @@ permissions:
 jobs:
   generate:
     runs-on: ubuntu-latest
+    # 러너 기본 시간대는 UTC다. 그런데 이 블로그는 '한국 하루 1편'으로 운영되고
+    # 발행은 06:47 KST = 전날 21:47 UTC에 일어난다. 아래 '중복 실행 가드'가
+    # UTC 날짜로 비교하던 탓에, 한국 낮에 수동 실행하면 그 다음 날 아침 자동
+    # 생성이 '오늘 이미 했다'로 오판돼 조용히 건너뛰었다(2026-09-09 실측: 초록인데 글 없음).
+    # 잡 전체를 KST로 돌려 가드의 date와 파이썬 datetime.now()가 같은 하루를 보게 한다.
+    env:
+      TZ: Asia/Seoul
     steps:
       - uses: actions/checkout@v4
 
@@ -185,7 +192,7 @@ jobs:
         id: dup
         if: github.event_name == 'schedule'
         run: |
-          today=$(date -u +%F)
+          today=$(date +%F)          # KST (잡 env TZ=Asia/Seoul)
           gen=$(python3 -c "import json;print(json.load(open('dashboard/data/latest.json')).get('generated_at','')[:10])" 2>/dev/null || echo "")
           if [ "$gen" = "$today" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
@@ -227,7 +234,7 @@ jobs:
           git config user.name "blog-bot"
           git config user.email "bot@users.noreply.github.com"
           git add dashboard/data/*.json 2>/dev/null || true
-          git commit -m "자동 생성: $(date -u '+%Y-%m-%d %H:%M')" || { echo "변경 없음"; exit 0; }
+          git commit -m "자동 생성: $(date '+%Y-%m-%d %H:%M') KST" || { echo "변경 없음"; exit 0; }
           # push 경쟁 재시도 루프(2026-09-01): '1회 rebase 후 push || echo'는 rebase나 push가
           # 실패하면 결과가 조용히 사라졌다(#100에서 재현 — 사용자 push와 경쟁해 점검 결과 유실).
           # --autostash: 실행 중 파이프라인이 건드린 다른 파일(예: 카테고리 적용의 재기록)이

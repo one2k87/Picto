@@ -6,6 +6,8 @@ status: "publish"(즉시 게시) 또는 "draft"(임시저장, 검토 후 발행)
 """
 
 import base64
+import os
+import re
 from urllib.parse import urlparse
 import requests
 
@@ -59,6 +61,86 @@ def submit_indexnow(urls, key, site_url, key_location=None):
     return ok
 
 
+# 업로드한 이미지의 URL→미디어 ID. 대표이미지(featured_media) 지정에 쓴다.
+# 예전에는 upload_media가 URL만 돌려주고 ID를 버려서, 본문에는 이미지가 있는데
+# 홈·목록의 카드 썸네일은 전부 비어 있었다(2026-09-09 실측: 발행 12편 전부 featured_media=0).
+MEDIA_ID_BY_URL = {}
+
+_IMG_SRC_RE = re.compile(r'<img[^>]+src="([^"]+)"', re.I)
+
+
+def first_uploaded_image(html, base_url):
+    """본문에서 이 사이트에 업로드된 첫 이미지 URL. data: URI·외부 이미지는 제외
+    (대표이미지는 미디어 라이브러리 항목이어야 지정된다)."""
+    root = (base_url or "").rstrip("/")
+    for m in _IMG_SRC_RE.finditer(html or ""):
+        src = m.group(1)
+        if src.startswith("data:"):
+            continue
+        if "/wp-content/uploads/" in src and (not root or src.startswith(root)):
+            return src
+    return None
+
+
+def find_media_id(wp_cfg, url):
+    """이미지 URL → 미디어 ID. 방금 올린 것은 기억해 둔 표에서 즉시,
+    과거 글은 파일명으로 미디어 라이브러리를 조회한다. 못 찾으면 None."""
+    if not url:
+        return None
+    if url in MEDIA_ID_BY_URL:
+        return MEDIA_ID_BY_URL[url]
+    base = wp_cfg["site_url"].rstrip("/")
+    headers = _auth_header(wp_cfg["username"], wp_cfg["app_password"])
+    stem = os.path.splitext(os.path.basename(url.split("?")[0]))[0]
+    # 워드프레스가 리사이즈본을 본문에 넣었을 수 있다: name-1024x576 → name
+    stem = re.sub(r"-\d{2,5}x\d{2,5}$", "", stem)
+    try:
+        r = requests.get(f"{base}/wp-json/wp/v2/media", headers=headers,
+                         params={"search": stem, "per_page": 20,
+                                 "_fields": "id,source_url"}, timeout=30)
+        if not r.ok:
+            return None
+        items = r.json()
+        for it in items:                      # 정확히 같은 URL 우선
+            if it.get("source_url") == url:
+                MEDIA_ID_BY_URL[url] = it["id"]
+                return it["id"]
+        for it in items:                      # 없으면 파일명이 같은 원본
+            if stem in (it.get("source_url") or ""):
+                MEDIA_ID_BY_URL[url] = it["id"]
+                return it["id"]
+    except Exception as e:
+        print(f"[wp] 미디어 조회 실패({stem}): {e}")
+    return None
+
+
+def set_featured(wp_cfg, post_id, media_id):
+    base = wp_cfg["site_url"].rstrip("/")
+    headers = _auth_header(wp_cfg["username"], wp_cfg["app_password"])
+    headers["Content-Type"] = "application/json"
+    try:
+        r = requests.post(f"{base}/wp-json/wp/v2/posts/{post_id}",
+                          json={"featured_media": media_id}, headers=headers, timeout=30)
+        return r.status_code in (200, 201)
+    except Exception as e:
+        print(f"[wp] 대표이미지 지정 예외 {post_id}: {e}")
+        return False
+
+
+def ensure_featured(wp_cfg, post_id, html):
+    """본문 첫 이미지를 대표이미지로 승격. 이미 지정돼 있으면 건드리지 않는다.
+    반환: 지정한 media_id, 또는 None(이미 있음/이미지 없음/조회 실패)."""
+    if not post_id:
+        return None
+    url = first_uploaded_image(html, wp_cfg.get("site_url", ""))
+    if not url:
+        return None
+    mid = find_media_id(wp_cfg, url)
+    if not mid:
+        return None
+    return mid if set_featured(wp_cfg, post_id, mid) else None
+
+
 def upload_media(image_path, wp_cfg, alt=""):
     """이미지를 WordPress 미디어로 업로드하고 공개 URL을 반환(실패 시 None)."""
     import os
@@ -74,6 +156,8 @@ def upload_media(image_path, wp_cfg, alt=""):
         if r.status_code in (200, 201):
             data = r.json()
             mid, url = data.get("id"), data.get("source_url")
+            if mid and url:
+                MEDIA_ID_BY_URL[url] = mid      # 대표이미지 지정에 필요(예전엔 여기서 버렸다)
             if mid and alt:
                 requests.post(f"{base_url}/wp-json/wp/v2/media/{mid}",
                               headers={**_auth_header(wp_cfg["username"], wp_cfg["app_password"]),
@@ -214,6 +298,10 @@ def publish_to_wordpress(article, wp_cfg):
                 monitor.mark("wordpress")
             except Exception:
                 pass
+            # 대표이미지: 본문 첫 이미지를 승격한다(카드 썸네일이 비지 않게)
+            if not data.get("featured_media"):
+                mid = ensure_featured(wp_cfg, data.get("id"), payload.get("content") or "")
+                print(f"[wp] 대표이미지 {'지정 ' + str(mid) if mid else '없음(본문 이미지 미발견)'}")
             print(f"[wp] 게시 성공({payload['status']}): {data.get('link')}")
             return data.get("link")
         print(f"[wp] 게시 실패 {r.status_code}: {r.text[:300]}")

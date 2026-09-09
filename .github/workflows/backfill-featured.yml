@@ -1,0 +1,52 @@
+name: 대표이미지·요약 소급 채움
+
+# 수동 전용. 기발행 글의 대표이미지(featured_media)와 요약(excerpt)을 채운다.
+# 발행 파이프라인이 본문 이미지는 올리면서 대표이미지를 지정하지 않아
+# 홈·목록 카드 썸네일이 전부 비어 있었다(2026-09-09 실측: 12편 전부 featured_media=0).
+# 이미 값이 있는 글은 건드리지 않으므로 몇 번 돌려도 안전하다.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true면 계획만 출력(수정 없음)"
+        default: "true"
+        required: false
+      limit:
+        description: "이번 실행 최대 글 수"
+        default: "100"
+        required: false
+      make_card:
+        description: "본문 이미지가 없는 글에 브랜드 카드 생성 (true/false)"
+        default: "true"
+        required: false
+
+jobs:
+  featured:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: 한글 폰트 설치 (브랜드 카드용)
+        run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+      - name: 의존성
+        run: pip install requests pillow
+      - name: 설정 생성
+        env:
+          BLOG_URL: ${{ secrets.BLOG_URL }}
+          WP_ENABLED: ${{ secrets.WP_ENABLED }}
+          WP_SITE: ${{ secrets.WP_SITE }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: python build_config.py
+      - name: 대표이미지·요약 채움
+        env:
+          FEATURED_DRY: ${{ github.event.inputs.dry_run }}
+          FEATURED_LIMIT: ${{ github.event.inputs.limit }}
+          FEATURED_CARD: ${{ github.event.inputs.make_card }}
+          BRAND_NAME: 픽담
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python scripts/backfill_featured.py
