@@ -65,6 +65,53 @@ PROMPT = """당신은 블로그 글에서 **글에 이미 쓰여 있는 사실�
 LAST_ERR = ""
 
 
+def _loads_lenient(t):
+    """잘린 JSON도 살린다.
+
+    실측(2026-09-09): gemini-2.5-flash는 생각 토큰을 함께 소모해 1500 토큰에서
+    응답이 **중간에 끊겼다**. 여는 괄호는 있는데 닫는 괄호가 없어 파서가 통째로 버렸고,
+    멀쩡히 뽑힌 앞부분(조건분기 2~3개)까지 같이 날아갔다. 그래서 토큰을 4000으로 올리되,
+    그래도 끊기면 마지막 완결 항목까지만 살려 닫는다.
+    """
+    t = t.strip()
+    i = t.find("{")
+    if i < 0:
+        return None
+    t = t[i:]
+    try:
+        return json.loads(t[:t.rfind("}") + 1]) if t.rfind("}") > 0 else json.loads(t)
+    except Exception:
+        pass
+    # 꼬리를 한 글자씩 줄이며 열린 괄호를 닫아 본다(최대 400회)
+    for cut in range(len(t), max(len(t) - 4000, 1), -1):
+        frag = t[:cut].rstrip().rstrip(",")
+        close = ""
+        depth = []
+        instr = esc = False
+        for ch in frag:
+            if esc:
+                esc = False; continue
+            if ch == "\\" and instr:
+                esc = True; continue
+            if ch == '"':
+                instr = not instr; continue
+            if instr:
+                continue
+            if ch in "{[":
+                depth.append(ch)
+            elif ch in "}]" and depth:
+                depth.pop()
+        if instr:
+            continue
+        for ch in reversed(depth):
+            close += "}" if ch == "{" else "]"
+        try:
+            return json.loads(frag + close)
+        except Exception:
+            continue
+    return None
+
+
 def extract(title, body, llm_cfg):
     """본문에서 근거 필드를 뽑는다. 실패하면 빈 dict(= 캐스토가 폴백).
 
@@ -77,14 +124,13 @@ def extract(title, body, llm_cfg):
     LAST_ERR = ""
     try:
         t = llm.chat(PROMPT.format(title=title, body=body[:6000]),
-                     llm_cfg, max_tokens=1500, temperature=0.1)
+                     llm_cfg, max_tokens=4000, temperature=0.1)
         t = re.sub(r"^```(json)?\s*|\s*```$", "", (t or "").strip(), flags=re.M)
-        i, j = t.find("{"), t.rfind("}")
-        if i < 0 or j < 0:
-            LAST_ERR = "JSON 없음: " + t[:80]
+        d = _loads_lenient(t)
+        if not isinstance(d, dict):
+            LAST_ERR = "JSON 파싱 실패: " + (t or "")[:100]
             return {}
-        d = json.loads(t[i:j + 1])
-        return d if isinstance(d, dict) else {}
+        return d
     except Exception as e:
         LAST_ERR = f"{type(e).__name__}: {e}"[:160]
         print(f"  [llm] 추출 실패(빈 블록으로 진행): {LAST_ERR}")
