@@ -222,6 +222,19 @@ def ensure_tags(base_url, headers, tag_names):
     return ids
 
 
+def _to_utc_iso(local_iso):
+    """러너의 지역시각 ISO 문자열 → UTC ISO(초 단위, 타임존 표기 없음).
+    워드프레스 REST의 date_gmt가 기대하는 형식이다."""
+    from datetime import datetime, timezone
+    try:
+        dt = datetime.fromisoformat(local_iso)
+    except Exception:
+        return local_iso
+    if dt.tzinfo is None:                     # 지역시각으로 간주(러너 TZ)
+        dt = dt.astimezone()
+    return dt.astimezone(timezone.utc).replace(tzinfo=None).isoformat(timespec="seconds")
+
+
 def publish_to_wordpress(article, wp_cfg):
     """
     article: generator가 만든 dict
@@ -249,7 +262,12 @@ def publish_to_wordpress(article, wp_cfg):
     }
     # 드립(예약) 발행: 미래 시각이 지정되면 'future'로 예약
     if article.get("_schedule_date"):
-        payload["date"] = article["_schedule_date"]
+        # ⚠️ 워드프레스에 예약 시각을 넘길 땐 반드시 UTC(date_gmt)로 준다.
+        #    `date`는 '사이트 시간대의 시각'으로 해석되는데, 픽담의 WP 시간대는 UTC(gmt_offset 0)이고
+        #    러너는 KST로 돈다(2026-09-09 TZ 전환). 그대로 넘기면 모든 글이 9시간 뒤로 예약돼
+        #    'future' 상태로 굳는다 — 실제로 90·100번 글이 그렇게 멈춰 있었다(실측).
+        #    date_gmt로 주면 사이트 시간대 설정이 무엇이든 어긋나지 않는다.
+        payload["date_gmt"] = _to_utc_iso(article["_schedule_date"])
         payload["status"] = "future"
     if article.get("slug"):
         payload["slug"] = article["slug"]           # SEO 친화 URL
