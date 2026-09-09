@@ -2337,7 +2337,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=160;
+const APP_BUILD=161;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -7464,30 +7464,33 @@ function mountSettingsSearch(page,bar){
   inp.addEventListener("input",()=>{
     const q=inp.value.trim().toLowerCase();
     const secs=[...page.querySelectorAll(".sub-sec")];
+    // ⚠️ 그룹(.sub-sec) 밖에 남는 .field가 실제로 있다(실측 2건: 유지관리·동기화 암호).
+    //    그래서 검색은 설정 화면 전체를 훑는다 — 그렇지 않으면 그 항목만 계속 떠 있다.
+    const all=()=>[...page.querySelectorAll(".field")];
     if(!q){                                  // 원상 복귀
       info.style.display="none";
-      secs.forEach(s=>{
-        s.querySelectorAll(".field").forEach(f=>{ f.hidden=false; f.removeAttribute("data-grp"); });
-        [...s.children].forEach(el=>{ el.hidden=false; });
-      });
+      all().forEach(f=>{ f.hidden=false; f.removeAttribute("data-grp"); });
+      secs.forEach(s=>[...s.children].forEach(el=>{ el.hidden=false; }));
       showSub("sheet", page.dataset.sub||SUBTABS.sheet.home);
       return;
     }
     let n=0;
-    secs.forEach(s=>{
-      s.classList.add("on");                 // 검색 중엔 모든 그룹을 한꺼번에 훑는다
-      // .field는 감싸는 상자 안에 중첩돼 있기도 하다 — 직계 자식만 보면 놓친다(실측).
-      s.querySelectorAll(".field").forEach(f=>{
-        const hit=(f.textContent||"").toLowerCase().includes(q);
-        f.hidden=!hit;
-        if(hit){ n++; f.dataset.grp=label(s.dataset.k); } else f.removeAttribute("data-grp");
-      });
-      // 제목·구분선처럼 .field가 아닌 직계 요소는, 살아남은 항목을 품고 있을 때만 남긴다
-      [...s.children].forEach(el=>{
-        if(el.classList.contains("field")) return;
-        el.hidden = !el.querySelector(".field:not([hidden])");
-      });
+    secs.forEach(s=>s.classList.add("on"));  // 검색 중엔 모든 그룹을 한꺼번에 훑는다
+    // .field는 감싸는 상자 안에 중첩돼 있기도 하다 — 직계 자식만 보면 놓친다(실측).
+    all().forEach(f=>{
+      const hit=(f.textContent||"").toLowerCase().includes(q);
+      f.hidden=!hit;
+      if(hit){
+        n++;
+        const sec=f.closest(".sub-sec");
+        f.dataset.grp = sec ? label(sec.dataset.k) : "기타";
+      } else f.removeAttribute("data-grp");
     });
+    // 제목·구분선처럼 .field가 아닌 직계 요소는, 살아남은 항목을 품고 있을 때만 남긴다
+    secs.forEach(s=>[...s.children].forEach(el=>{
+      if(el.classList.contains("field")) return;
+      el.hidden = !el.querySelector(".field:not([hidden])");
+    }));
     info.style.display="block";
     info.textContent = n ? `${n}개 찾음 — 지우면 원래 화면으로 돌아갑니다` : "찾은 항목이 없습니다";
   });
