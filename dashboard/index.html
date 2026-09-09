@@ -151,7 +151,13 @@
   /* ── 상단 보조탭(3-2): 스크롤해도 사라지지 않게 고정 + 좌우 스와이프 ── */
   .subtabs{position:sticky;top:0;z-index:18;display:flex;gap:4px;
     padding:8px 0 8px;margin:0 0 4px;background:var(--bg);
-    border-bottom:1px solid var(--line);overflow:hidden}
+    border-bottom:1px solid var(--line);overflow-x:auto;overflow-y:hidden;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .subtabs::-webkit-scrollbar{display:none}
+  .field[data-grp]::before{content:attr(data-grp);display:inline-block;font-size:10px;
+    color:var(--muted);border:1px solid var(--line);border-radius:6px;
+    padding:1px 6px;margin-bottom:5px}
+  .subtabs .st{flex:0 0 auto;white-space:nowrap}
   .st{flex:1 1 0;min-width:0;padding:7px 4px;font-size:12px;border:1px solid var(--line);
     background:var(--card);color:var(--muted);border-radius:9px;cursor:pointer;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
@@ -836,7 +842,7 @@
 <!-- 픽 라인 시트 (쿠팡 파트너스) — b143: 애드센스 승인 블록 완전 제거.
      픽담은 심사가 없으므로 '준비→신청→승인' 축이 성립하지 않는다. 서브탭은
      여정(now) / 준비(ready) / 점검(check) 셋이며, 각 블록의 id로 소속이 정해진다
-     (buildSubtabs 규칙). ⚠️ 'prep' 키는 쓰지 말 것 — moveApprovalControls()가
+     (buildSubtabs 규칙). ⚠️ 'prep' 키는 쓰지 말 것 — 애드센스 시절 재배치 함수가
      그 키를 보고 애드센스용 재배치를 시작한다. -->
 <div class="sheet-bg" id="adsBg"></div>
 <div class="sheet" id="adsSheet">
@@ -869,6 +875,18 @@
       자동으로 들어가고, 과거 글도 [소급 적용]으로 한 번에 반영됩니다.
       링크가 빈 제품은 글에 아무것도 넣지 않으니 안심하고 비워둬도 됩니다.</div>
     <div id="pickLinkProgress" style="margin:8px 0 4px"></div>
+    <!-- b157: 링크 10개를 한 칸씩 옮겨 붙이느라 오래 걸린다는 실제 불편에서 나온 기능.
+         파트너스에서 만든 딥링크를 줄바꿈으로 죽 붙여넣으면 위(미등록)부터 순서대로 꽂는다. -->
+    <details style="margin:6px 0 8px">
+      <summary class="hint" style="cursor:pointer">📥 여러 개 한 번에 붙여넣기</summary>
+      <textarea id="pickBulk" rows="4" placeholder="딥링크를 한 줄에 하나씩 붙여넣으세요&#10;https://link.coupang.com/a/AAAA&#10;https://link.coupang.com/a/BBBB"
+        style="width:100%;margin-top:6px;font-size:12px;background:var(--card);color:var(--txt);
+               border:1px solid var(--line);border-radius:9px;padding:8px"></textarea>
+      <div class="actions" style="margin-top:6px;gap:6px">
+        <button class="btn sm" id="pickBulkFill" style="flex:1">위에서부터 채우기</button>
+      </div>
+      <div id="pickBulkInfo" class="hint" style="margin-top:4px"></div>
+    </details>
     <div id="pickLinkList" style="margin-top:8px"></div>
     <div class="actions" style="margin-top:8px;gap:6px">
       <button class="btn primary sm" id="pickLinkSave" style="flex:1">저장</button>
@@ -921,7 +939,7 @@
   </div>
   <div class="field">
     <label>🧹 블로그 정리 러너 <span style="font-size:11px;color:var(--danger);font-weight:400">되돌릴 수 없음</span></label>
-    <button class="btn sm" id="runnerBtn" style="width:100%;border-color:#e5484d;color:#ff9a9a">승인용으로 한 번에 정리</button>
+    <button class="btn sm" id="runnerBtn" style="width:100%;border-color:#e5484d;color:#ff9a9a">블로그 기본 정리</button>
     <div class="hint">태그 전량 삭제 · 빈 카테고리 삭제 · 태그라인 설정 · 색인 허용 · 필수 페이지 생성을 순서대로 실행합니다. <b>글은 삭제되지 않습니다.</b></div>
     <div id="runnerBar" style="display:none;margin-top:8px">
       <div style="height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden">
@@ -938,12 +956,12 @@
     <div id="setupGuideBox" style="margin-top:8px;font-size:13px"></div>
   </div>
   <div class="field">
-    <label>🎯 승인 니치</label>
+    <label>🎯 다루는 분야</label>
     <div id="nicheNow" class="hint" style="margin-bottom:6px"></div>
     <button class="btn primary sm" id="nicheDetectBtn" style="width:100%;margin-bottom:6px">🔍 내 블로그 보고 자동 추천</button>
     <div id="nicheDetectBox" style="margin-bottom:6px"></div>
     <button class="btn sm" id="nicheRedo" style="width:100%">질문으로 정하기</button>
-    <div class="hint">몇 가지 질문으로 쓸 분야를 좁힙니다. 승인 단계에서는 <b>한 분야만</b> 다뤄야 유리합니다.</div>
+    <div class="hint">몇 가지 질문으로 쓸 분야를 좁힙니다. 픽담은 <b>생활·주방</b> 한 분야에 모을수록 상품 매칭이 정확해집니다.</div>
   </div>
   <div class="field">
     <label>내 카테고리 (<span id="catCount">0</span>/<span id="catMax">2</span>)</label>
@@ -967,7 +985,7 @@
   </div>
 
   <div class="divider"></div>
-  <h2 style="font-size:14px">🛡️ 품질·안전 강도 (애드센스 보호)</h2>
+  <h2 style="font-size:14px">🛡️ 품질·안전 강도</h2>
   <div class="field">
     <label>강도 프리셋</label>
     <select id="cfgStrength" style="width:100%">
@@ -1087,7 +1105,7 @@
 
   <div class="divider"></div>
   <h2 style="font-size:14px">📝 워드프레스 <span style="font-size:11px;color:var(--muted);font-weight:400">픽담 전용 · 스크립토와 공유하지 않음</span></h2>
-  <div class="field" id="wpScopeNote">
+  <div class="field" id="wpScopeNote"><span id="grpBlogMark" hidden></span>
     <div class="hint" style="border-left:3px solid var(--accent);padding:8px 10px;background:var(--card2);border-radius:0 8px 8px 0">
       🔒 <b>이 3칸은 픽담(pickdam.com) 전용입니다.</b> 스크립토(원더랜드)와 도메인·페이지가 다르므로
       기기 간 동기화에서도 <b>앱별로 따로 보관</b>되고, 다른 앱의 값이 들어오면 자동으로 버립니다.
@@ -1104,7 +1122,6 @@
     <input id="cfgUser" placeholder="wp_id" autocapitalize="off">
     <div class="hint">워드프레스에 <b>실제로 로그인할 때 쓰는 값</b>을 넣으세요. 계정에 따라 <b>아이디</b>일 수도, <b>이메일</b>일 수도 있습니다
       (워드프레스는 둘 다 받습니다). 401이 나면 아래 진단에서 반대쪽 형식도 자동으로 시도합니다.</div>
-    <div id="cfgUserWarn" class="hint" style="display:none;color:var(--danger)"></div>
   </div>
   <div class="field">
     <label>응용 프로그램 비밀번호</label>
@@ -1282,14 +1299,20 @@
     <button class="btn sm" id="themeBtn" style="width:100%">✨ 글래스 라이트</button>
     <div class="hint">기본은 글래스(파스텔 퍼플). 눌러서 다크와 전환합니다.</div>
   </div>
+  <!-- 2026-09-09: '설정 백업'과 '설정 백업/복원' 두 블록이 따로 있었다(같은 목적·다른 저장 방식).
+       하나로 합치되 id는 5개 모두 남긴다 — 기존 바인딩·복원 코드를 건드리지 않기 위해서다. -->
   <div class="field">
-    <label>💾 설정 백업</label>
-    <div style="display:flex;gap:6px">
-      <button class="btn sm" id="cfgExportBtn" style="flex:1">내보내기</button>
-      <button class="btn sm" id="cfgImportBtn" style="flex:1">가져오기</button>
+    <label>💾 설정 백업 <span style="font-size:11px;color:var(--muted);font-weight:400">파일 또는 텍스트</span></label>
+    <div class="hint">기기를 바꾸거나 설정이 사라졌을 때 되살립니다. ⚠️ 키·비밀번호가 들어 있으니 안전한 곳에 두세요.</div>
+    <div style="display:flex;gap:6px;margin-top:7px">
+      <button class="btn sm" id="cfgExportBtn" style="flex:1">📄 파일로 저장</button>
+      <button class="btn sm" id="cfgImportBtn" style="flex:1">📂 파일에서 복원</button>
     </div>
     <input type="file" id="cfgImportFile" accept=".json" style="display:none">
-    <div class="hint">이 기기의 설정 전체를 파일로 저장/복원합니다. ⚠️ 키·비밀번호가 포함되니 파일을 안전하게 보관하세요.</div>
+    <div style="display:flex;gap:6px;margin-top:6px">
+      <button class="btn sm" id="cfgBackup" style="flex:1">📋 텍스트로 복사</button>
+      <button class="btn sm" id="cfgRestore" style="flex:1">📥 붙여넣어 복원</button>
+    </div>
   </div>
   <div class="field">
     <label>🙋 도움</label>
@@ -1316,19 +1339,10 @@
   </div>
 
   <div class="field">
-    <label>💾 설정 백업 / 복원</label>
-    <div class="actions">
-      <button class="btn sm" id="cfgBackup" style="flex:1">백업(복사)</button>
-      <button class="btn sm" id="cfgRestore" style="flex:1">복원(붙여넣기)</button>
-    </div>
-    <div class="hint">혹시 설정이 사라져도 <b>복원</b>에 백업값을 붙여넣으면 한 번에 되살아납니다. 안전하게 메모장 등에 보관하세요.</div>
-  </div>
-
-  <div class="field">
     <label>🗑️ 누적 데이터 리셋</label>
     <button class="btn sm" id="cfgReset" style="width:100%;border-color:#e5484d;color:#ff9a9a">누적 기록·통계 초기화</button>
     <div class="hint">발행 이력(누적 글)·사용량/비용·유입 기록을 <b>0에서 다시</b> 시작합니다.
-      애드센스 승인 후 새로 시작할 때 사용하세요. <b>글 자체는 워드프레스에 그대로</b> 남습니다(앱 기록만 초기화).
+      새 기준으로 다시 시작할 때 사용하세요. <b>글 자체는 워드프레스에 그대로</b> 남습니다(앱 기록만 초기화).
       GitHub 정보가 있으면 클라우드 기록(history/status)도 함께 비웁니다.</div>
   </div>
 
@@ -2323,7 +2337,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=157;
+const APP_BUILD=158;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -3302,142 +3316,12 @@ function buildMoneyTab(){
   st.dataset.moneyBuilt="1";
 }
 
-function moveApprovalControls(){
-  const ads=document.getElementById("adsSheet"); if(!ads) return false;
-  const check=ads.querySelector('.sub-sec[data-k="check"]');
-  const prep =ads.querySelector('.sub-sec[data-k="prep"]');
-  if(!check||!prep) return false;                       // 서브탭이 아직 안 만들어졌으면 나중에 다시
-  if(ads.dataset.merged) return true;
+/* moveApprovalControls()는 2026-09-09에 삭제했다(135줄).
+   애드센스 시절 '준비(prep)' 서브탭으로 설정 블록을 옮기던 함수인데,
+   b143에서 픽토가 서브탭 키를 now/links/ready/check로 바꾸면서
+   `if(!check||!prep) return false;`에 걸려 **한 번도 실행되지 않았다**(실측).
+   호출부도 함께 제거했다. 되살릴 일이 생기면 git 히스토리에서 꺼낼 것. */
 
-  const head=(t,d)=>{ const h=document.createElement("div"); h.className="field";
-    h.innerHTML=`<label>${t}</label><div class="hint">${d}</div>`; return h; };
-
-  // ① 현황 = "지금 어디까지 왔나" + 전체 순서 안내 + 블로그 연결 정보.
-  //    처음 온 사람이 여기서 시작해 화살표 방향(점검→준비→신청→결과)으로 간다.
-  const nowSec=ads.querySelector('.sub-sec[data-k="now"]');
-  if(nowSec){
-    const guide=document.createElement("div");
-    guide.className="wiz-note"; guide.id="adsFlowGuide";
-    nowSec.prepend(guide);
-    const c=[head("🔗 블로그 연결","여기 넣은 값은 <b>자동으로 저장</b>됩니다. 아직 블로그가 없다면 준비 탭의 개설 안내를 보세요.")];
-    ["cfgSite","cfgUser","cfgPass","wpDiagBtn"].forEach(id=>{ const f=fieldOf(id); if(f) c.push(f); });
-    c.forEach(el=>nowSec.appendChild(el));
-  }
-  // 점검 탭 맨 위: 직전 반려 사유 참고 상자(있을 때만 내용 표시)
-  const rejRef=document.createElement("div");
-  rejRef.id="checkRejectRef"; check.prepend(rejRef);
-
-  // ② 준비 = 승인 프로그램만 보인다. 옮겨온 설정 필드는 프로그램의 버튼이
-  //    호출할 수 있도록 존재해야 하지만, 화면에서는 접힌 상자 안에 숨긴다.
-  //    (준비 탭이 '설정 목록'처럼 보이던 문제의 해결)
-  const plan=document.createElement("div");
-  plan.className="field"; plan.style.cssText="border:1px solid var(--accent);border-radius:12px;padding:12px";
-  plan.innerHTML=`<label>🧭 승인까지 가는 길 <span style="font-size:11px;color:var(--muted);font-weight:400">위에서 아래로 순서대로</span></label>
-    <div id="prepPlan"><div class="hint">상태를 읽는 중…</div></div>
-    <button class="btn sm" style="width:100%;margin-top:10px" onclick="renderPrepPlan()">🔄 상태 다시 읽기</button>`;
-  prep.prepend(plan);
-  setTimeout(()=>{ try{ renderPrepPlan(); }catch(e){ console.warn(e); } }, 300);
-
-  const det=document.createElement("details");
-  det.style.marginTop="10px";
-  det.innerHTML=`<summary class="hint" style="cursor:pointer">🔧 세부 도구 직접 열기 (평소엔 필요 없음)</summary>`;
-  const inner=document.createElement("div");
-  ["nicheDetectBtn","cfgAuthorName","cfgContactEmail","runnerBtn","setupGuideBtn"]
-    .forEach(id=>{ const f=fieldOf(id); if(f) inner.appendChild(f); });
-  det.appendChild(inner);
-  prep.appendChild(det);
-
-  // ③ 승인 탭에서 고친 값은 자동 저장
-  // ⚠️ 여기서 한 번 사고가 났다. 입력칸을 CFG로 채우기 전에 자동 저장이 돌면
-  //    빈 화면의 값이 그대로 CFG를 덮어써서 저장해둔 접속 정보가 사라진다.
-  //    그래서 ①먼저 채우고 ②사용자가 실제로 건드린 칸만 ③빈 값으로는 덮어쓰지 않는다.
-  const badge=document.createElement("div");
-  badge.className="hint"; badge.style.cssText="text-align:right;opacity:0;transition:opacity .3s";
-  badge.textContent="설정에 저장됨 ✓";
-  check.prepend(badge);
-
-  const touched=new Set();
-  let t=null;
-  const flush=()=>{
-    if(!touched.size) return;                       // 손댄 적 없으면 아무것도 쓰지 않는다
-    const g=id=>{const e=document.getElementById(id); return e?e.value.trim():"";};
-    const put=(id,key)=>{
-      if(!touched.has(id)) return;
-      const v=g(id);
-      if(!v && CFG[key]) return;                    // 빈 값으로 기존 값을 지우지 않는다
-      CFG[key]=v;
-    };
-    if(touched.has("cfgAuthorName")||touched.has("cfgAuthorBio")) CFG.authorAuto=false;
-    put("cfgSite","site"); put("cfgUser","user"); put("cfgPass","pass");
-    put("cfgContactEmail","contactEmail");
-    put("cfgAuthorName","author"); put("cfgAuthorBio","authorBio");
-    saveCfg();
-    badge.style.opacity="1"; setTimeout(()=>badge.style.opacity="0",1400);
-  };
-  APPROVAL_FIELDS.forEach(([id])=>{ const e=document.getElementById(id); if(!e) return;
-    const mark=()=>touched.add(id);
-    e.addEventListener("input",()=>{ mark(); clearTimeout(t); t=setTimeout(flush,700); });
-    e.addEventListener("change",()=>{ mark(); flush(); });
-  });
-
-  fillApprovalFields();          // 저장돼 있던 값을 화면에 올린다(설정을 안 열었어도)
-  try{ buildMoneyTab(); }catch(e){ console.warn("수익 탭 조립:",e); }
-
-  // ── 신청 탭을 실제 진행 순서대로 재배치 ─────────────────────────
-  // 반려 사유 분석이 맨 위에 있었는데, 그건 '신청하고 반려된 뒤'에나 쓰는
-  // 도구다. 처음 온 사람이 맨 먼저 보는 건 '어떻게 신청하는가'여야 한다.
-  // 순서: ①절차 안내 → ②심사 모드(신청 직전 필수) → ③신청 이력 기록
-  //       → ④상태 자동 추적 → ⑤반려 분석(반려됐을 때만, 맨 아래)
-  // 신청 탭은 '지금 상태'에 따라 주인공이 바뀐다.
-  //   미신청 → 절차·심사모드가 위, 반려분석은 아직 볼 일 없으니 맨 아래
-  //   심사중 → 상태 추적과 결과 기록이 위 ("결과가 오면 여기 누르세요")
-  //   반려됨 → 반려 분석이 맨 위로 ("사유를 붙여넣으세요") → 보완 → 재신청 루프
-  //   승인됨 → 축하 + 다음 단계(램프) 안내
-  // 신청 탭: 절차 안내 → 심사 모드 → '신청을 마쳤습니다' 기록 버튼
-  const applySec=ads.querySelector('.sub-sec[data-k="apply"]');
-  if(applySec && !document.getElementById("applyDoneBtn")){
-    ["adsGuide","adsReviewMode"].forEach(id=>{ const f=fieldOf(id); if(f) applySec.appendChild(f); });
-    const doneF=document.createElement("div");
-    doneF.className="field";
-    doneF.innerHTML=`<button class="btn primary" id="applyDoneBtn" style="width:100%">✅ 애드센스 신청을 마쳤습니다 (기록하고 결과 탭으로)</button>
-      <div class="hint">몇 회차인지, 이번에 무엇을 고치고 신청했는지가 기록됩니다. 이 기록이 쌓일수록 승인이 빨라집니다.</div>`;
-    applySec.appendChild(doneF);
-    doneF.querySelector("#applyDoneBtn").onclick=()=>{ adsAddEntry("apply"); gotoSub("adsSheet","result"); };
-  }
-  applyStateLayout(ads);
-  // 번호를 탭 안 순서에 맞게 다시 붙인다(옛 전역 번호 ④⑥⑦⑧의 잔재 정리)
-  const relabel=(id, from, to)=>{
-    const f=fieldOf(id); if(!f) return;
-    const lb=f.querySelector("label");
-    if(lb && lb.firstChild && lb.firstChild.nodeType===3)
-      lb.firstChild.textContent=lb.firstChild.textContent.replace(from, to);
-  };
-  relabel("adsGuide","⑦ 신청 절차 안내","📋 신청 절차 안내");
-  relabel("adsLogApply","⑥ 신청 이력","📒 신청 이력");
-  relabel("adsTrackBtn","⑧ 승인 상태 자동 추적","📡 승인 상태 자동 추적");
-  relabel("adsAnalyze","④ 반려 사유 분석 & 보완","🔁 반려 사유 분석 & 보완");
-  const rvBtn=document.getElementById("adsReviewMode");
-  if(rvBtn) rvBtn.textContent=rvBtn.textContent.replace(/^[③②]\s*/,"🛡️ ").replace("(대량 생성 정지 + 엄격)","(신청 직전 필수 — 대량 생성 정지)");
-  const mkBtn=document.getElementById("adsMakePages");
-  if(mkBtn) mkBtn.textContent=mkBtn.textContent.replace(/^②\s*/,"① ");
-  const pg=fieldOf("adsPlugScan");
-  if(pg){ const lb=pg.querySelector("label");
-    if(lb&&lb.firstChild&&lb.firstChild.nodeType===3)
-      lb.firstChild.textContent=lb.firstChild.textContent.replace("⑤ 필수 플러그인","② 필수 플러그인"); }
-
-  ads.dataset.merged="1";
-  // 설정 탭에는 어디로 갔는지 표시를 남긴다
-  const sheet=document.getElementById("sheet");
-  const title=sheet&&sheet.querySelector("h2");
-  if(title && !document.getElementById("moveNotice")){
-    const d=document.createElement("div");
-    d.id="moveNotice"; d.className="wiz-note"; d.style.margin="10px 0 0";
-    d.innerHTML=`블로그 연결·진단·주제·정리는 <b>🛡️ 승인 탭</b>으로 옮겼습니다.
-      승인에 필요한 일은 그 탭 안에서 전부 끝납니다. 여기는 나머지 설정을 보관하는 곳입니다.`;
-    title.after(d);
-  }
-  return true;
-}
 
 /* ===== 공통 진행 로그 =====
    작업 로그가 줄마다 쌓이면 화면이 수백 줄로 늘어나 스크롤이 끝없이 길어진다.
@@ -7534,7 +7418,7 @@ const SUBTABS={
   adsSheet:{
     /* b143 픽토 전용: 애드센스 '신청·결과' 축을 버리고 픽 라인 3탭으로.
        여정(now, 8단계 진척+유입) → 준비(ready, 1회성 세팅) → 점검(check, 품질).
-       ⚠️ 'prep' 키 금지 — moveApprovalControls()가 그 키에 반응해 애드센스용 재배치를 한다. */
+       ⚠️ 'prep' 키 금지 — 애드센스용 재배치 함수가 그 키에 반응했다(2026-09-09 그 함수는 삭제). */
     tabs:[
       {k:"now",  label:"여정"},
       /* ⚠️ ids에는 '그 블록의 자손' id를 적어야 한다. buildSubtabs의 owner()가
@@ -7546,6 +7430,23 @@ const SUBTABS={
       {k:"check",label:"점검", ids:["adsCheck"]},
     ],
     home:"now", render:()=>renderAdsDash(),
+  },
+  /* b157: 설정 탭에도 보조탭을 넣는다.
+     실측 근거 — 화면에 보이는 글자의 84%(6,705자)가 설정 한 곳에 있었고 블록이 44개인데
+     정작 보조탭은 더 가벼운 파트너스·수익에만 있었다. 구조가 거꾸로였다.
+     ⚠️ ids에는 반드시 '그 블록의 자손' id를 적는다(블록 자기 id는 owner()에 안 잡힌다 — b156).
+     ⚠️ DOM 순서를 바꾸지 않고 경계만 긋는다. 재배치하면 buildMoneyTab()이 옮겨가는
+        쿠팡·제휴·전략 블록과 충돌한다. */
+  sheet:{
+    tabs:[
+      {k:"start",label:"시작",   ids:["planBadge"]},
+      {k:"write",label:"글쓰기", ids:["catCount"]},
+      {k:"run",  label:"실행",   ids:["cfgData"]},
+      {k:"blog", label:"블로그", ids:["grpBlogMark"]},
+      {k:"link", label:"연동",   ids:["cfgSyncPass"]},
+      {k:"app",  label:"앱",     ids:["themeBtn"]},
+    ],
+    home:"start",
   },
   statsSheet:{
     /* b151 픽토 전용: 애드센스 RPM 축을 버리고 쿠팡 전환 퍼널로.
@@ -7560,11 +7461,49 @@ const SUBTABS={
     home:"now", render:()=>renderMoneyDash(),
   },
 };
+// b157: 설정 항목이 40개가 넘어 "그게 어디 있더라"가 반복됐다.
+// 한 글자만 치면 여섯 그룹을 가로질러 찾아준다. 비우면 원래 보던 탭으로 돌아간다.
+function mountSettingsSearch(page,bar){
+  if(page.querySelector(".setsearch")) return;
+  const wrap=document.createElement("div");
+  wrap.className="setsearch";
+  wrap.style.cssText="margin:6px 0 8px;position:relative";
+  wrap.innerHTML=`<input id="setSearch" placeholder="🔎 설정 찾기 (예: 쿠팡, 비밀번호, 백업)"
+      autocapitalize="off" style="width:100%;font-size:13px">
+    <div id="setSearchInfo" class="hint" style="margin-top:4px;display:none"></div>`;
+  bar.after(wrap);
+  const inp=wrap.querySelector("#setSearch"), info=wrap.querySelector("#setSearchInfo");
+  const label=k=>((SUBTABS.sheet.tabs.find(t=>t.k===k)||{}).label||k);
+  inp.addEventListener("input",()=>{
+    const q=inp.value.trim().toLowerCase();
+    const secs=[...page.querySelectorAll(".sub-sec")];
+    if(!q){                                  // 원상 복귀
+      info.style.display="none";
+      secs.forEach(s=>[...s.children].forEach(el=>{ el.hidden=false; el.removeAttribute("data-grp"); }));
+      showSub("sheet", page.dataset.sub||SUBTABS.sheet.home);
+      return;
+    }
+    let n=0;
+    secs.forEach(s=>{
+      s.classList.add("on");                 // 검색 중엔 여섯 그룹을 한꺼번에 훑는다
+      [...s.children].forEach(el=>{
+        const hit=el.classList.contains("field") &&
+                  (el.textContent||"").toLowerCase().includes(q);
+        el.hidden=!hit;
+        if(hit){ n++; el.dataset.grp=label(s.dataset.k); }
+      });
+    });
+    info.style.display="block";
+    info.textContent = n ? `${n}개 찾음 — 지우면 원래 화면으로 돌아갑니다` : "찾은 항목이 없습니다";
+  });
+}
+
 function buildSubtabs(pageId){
   const page=document.getElementById(pageId), cfg=SUBTABS[pageId];
   if(!page||!cfg||page.dataset.subtabbed) return;
   const title=page.querySelector("h2");
-  const fields=[...page.children].filter(el=>el!==title&&!el.classList.contains("subtabs"));
+  const fields=[...page.children].filter(el=>el!==title
+    &&!el.classList.contains("subtabs")&&!el.classList.contains("wizcta"));
   // 각 탭의 소속 판정: 지정된 id를 품고 있는 블록을 그 탭으로 보낸다
   const owner=el=>{
     for(const t of cfg.tabs){ if(t.ids&&t.ids.some(id=>el.querySelector&&el.querySelector("#"+id))) return t.k; }
@@ -7583,10 +7522,13 @@ function buildSubtabs(pageId){
   bar.innerHTML=cfg.tabs.map(t=>`<button class="st" type="button" data-k="${t.k}">${t.label}</button>`).join("");
   const hint=document.createElement("div");
   hint.className="swipehint"; hint.textContent="← 좌우로 밀어 탭 이동 →";
-  if(title&&title.nextSibling) page.insertBefore(bar,title.nextSibling); else page.prepend(bar);
+  // 마법사 CTA가 있으면 그 아래에 탭 줄을 넣는다(CTA가 늘 맨 위에 보이게)
+  const anchor=page.querySelector(".wizcta")||title;
+  if(anchor&&anchor.nextSibling) page.insertBefore(bar,anchor.nextSibling); else page.prepend(bar);
   bar.after(hint);
   Object.values(secs).forEach(d=>page.appendChild(d));
   bar.querySelectorAll(".st").forEach(b=>b.onclick=()=>showSub(pageId,b.dataset.k));
+  if(pageId==="sheet") mountSettingsSearch(page,bar);
   page.dataset.subtabbed="1"; page.dataset.sub=cfg.home;
   showSub(pageId,cfg.home);
 }
@@ -8152,6 +8094,12 @@ function gotoTab(k){
   else if(k==="stats") openStats();
   else if(k==="ads") openAds();
   // 보조탭은 페이지를 처음 열 때 만들고, 마지막으로 보던 위치로 돌아간다
+  if(k==="set"){
+    const remembered=(CFG.lastSub||{}).sheet;
+    setTimeout(()=>{ buildSubtabs("sheet");
+      const valid=remembered && SUBTABS.sheet.tabs.some(t=>t.k===remembered);
+      showSub("sheet", valid?remembered:SUBTABS.sheet.home); },60);
+  }
   if(k==="ads"||k==="stats"){
     const pid=k==="ads"?"adsSheet":"statsSheet";
     // ⚠️ 기억해 둔 위치를 '먼저' 읽어야 한다. buildSubtabs()가 내부에서
@@ -8161,7 +8109,7 @@ function gotoTab(k){
       // 승인 탭의 보조탭은 여기서 처음 만들어진다. 설정에서 옮겨올 블록은
       // 그 뒤에 붙여야 하므로, 타이머로 기다리지 말고 이 시점에 실행한다.
       if(pid==="adsSheet"){ try{ renderPickLinks(); }catch(e){ console.warn("상품 링크:",e); }
-        try{ moveApprovalControls(); fillApprovalFields(); }
+        try{ fillApprovalFields(); }
         catch(e){ console.warn("승인 탭 통합:",e); } }
       if(pid==="statsSheet"){ try{ buildMoneyTab(); }catch(e){ console.warn("수익 탭 조립:",e); } }
       // 이어서 하기: 마지막으로 보던 보조탭으로 돌아간다(없으면 현황)
@@ -8215,6 +8163,31 @@ async function loadPickProducts(force){
   }catch(e){ _pickProducts={products:[]}; }
   return _pickProducts;
 }
+// b157: 붙여넣은 줄을 화면 순서(미등록이 위)대로 빈 칸에 꽂는다.
+// 이미 값이 있는 칸은 건드리지 않는다 — 실수로 등록된 링크를 덮어쓰지 않기 위해서다.
+function bindPickBulk(){
+  const btn=document.getElementById("pickBulkFill"); if(!btn||btn.dataset.bound) return;
+  btn.dataset.bound="1";
+  btn.onclick=()=>{
+    const ta=document.getElementById("pickBulk");
+    const info=document.getElementById("pickBulkInfo");
+    const lines=(ta.value||"").split(/[\r\n]+/).map(s=>s.trim()).filter(Boolean);
+    if(!lines.length){ info.textContent="붙여넣은 링크가 없습니다."; return; }
+    const empties=[...document.querySelectorAll("#pickLinkList .pickUrl")].filter(el=>!el.value.trim());
+    if(!empties.length){ info.textContent="빈 칸이 없습니다 — 채울 곳이 없어요."; return; }
+    const bad=lines.filter(u=>!/(link\.coupang\.com|coupa\.ng)/.test(u));
+    let n=0;
+    empties.forEach((el,i)=>{ if(i<lines.length){ el.value=lines[i]; checkPickUrl(el); n++; } });
+    updatePickProgress();
+    const left=lines.length-n;
+    info.innerHTML=`${n}칸 채웠습니다`
+      + (left>0?` · 남은 링크 ${left}개(빈 칸 부족)`:"")
+      + (bad.length?` · <span style="color:var(--danger)">딥링크가 아닌 줄 ${bad.length}개 — 초록 표시를 확인하세요</span>`:"")
+      + ` · <b>아래 [저장]</b>을 눌러야 반영됩니다`;
+    ta.value="";
+  };
+}
+
 async function renderPickLinks(){
   const box=document.getElementById("pickLinkList"); if(!box) return;
   const d=await loadPickProducts(true);
@@ -8253,6 +8226,7 @@ async function renderPickLinks(){
     el.addEventListener("input",()=>{ checkPickUrl(el); updatePickProgress(); });
     checkPickUrl(el);
   });
+  bindPickBulk();
   updatePickProgress();
 }
 // 붙여넣은 값이 '수수료가 잡히는 링크'인지 그 자리에서 알려준다.
@@ -9123,7 +9097,7 @@ function wizSteps(){
         <div class="wiz-note">
           <b>다음에 할 일</b><br>
           1. 🛡️ 승인 탭에서 <b>진단</b> 실행<br>
-          2. 문제가 나오면 <b>승인용으로 한 번에 정리</b><br>
+          2. 문제가 나오면 <b>블로그 기본 정리</b><br>
           3. 주제에 맞는 글을 쌓고 애드센스 신청
         </div>`;
     },
