@@ -1,8 +1,8 @@
 {
- "ran_at": "2026-09-09 23:50",
+ "ran_at": "2026-09-09 23:53",
  "dry": true,
  "llm": "gemini/gemini-2.5-flash",
- "summary": "콕픽 블록 소급: 처리 3편 · 이미있음 3편 · 실패 0편 | 근거 없음(캐스토 폴백) 3편 · 쿠팡링크 없음 1편",
+ "summary": "콕픽 블록 소급: 처리 4편 · 이미있음 3편 · 실패 0편 | 근거 없음(캐스토 폴백) 0편 · 쿠팡링크 없음 2편",
  "rows": [
   {
    "id": 164,
@@ -25,13 +25,13 @@
    "action": "plan",
    "product": "정수기 교체 필터",
    "price_band": "",
-   "condition_branch": 0,
-   "cautions": 0,
+   "condition_branch": 4,
+   "cautions": 4,
    "size_install": false,
-   "maintenance": false,
+   "maintenance": true,
    "coupang": true,
-   "empty": true,
-   "llm_error": "JSON 없음: {\"price_band\":\"5만원~15만원\",\n  \"condition_branch\":[\n    \"물맛/냄새 이상 시 필터 교체 시급\",\n    "
+   "empty": false,
+   "llm_error": ""
   },
   {
    "id": 67,
@@ -39,27 +39,41 @@
    "action": "plan",
    "product": "음식물처리기",
    "price_band": "",
-   "condition_branch": 0,
-   "cautions": 0,
-   "size_install": false,
+   "condition_branch": 4,
+   "cautions": 4,
+   "size_install": true,
    "maintenance": false,
    "coupang": true,
-   "empty": true,
-   "llm_error": "JSON 없음: {\"price_band\":\"\",\n  \"condition_branch\":[\"렌탈 약정 18개월 미만 해지 시 위약금 30% 발생\", \"약정 18개"
+   "empty": false,
+   "llm_error": ""
   },
   {
    "id": 65,
    "title": "환기 시스템 렌탈과 구매 고민이라면, 2026년 9월 설치 전 우리 집 ",
    "action": "plan",
    "product": "",
-   "price_band": "",
-   "condition_branch": 0,
-   "cautions": 0,
+   "price_band": "30만원대부터 100만원 이상",
+   "condition_branch": 4,
+   "cautions": 3,
    "size_install": false,
    "maintenance": false,
    "coupang": false,
-   "empty": true,
-   "llm_error": "JSON 없음: {\n  \"price_band\": \"30만원대~100만원 이상\",\n  \"condition_branch\": [\n    \"자주 이사하거나 단기간 사용"
+   "empty": false,
+   "llm_error": ""
+  },
+  {
+   "id": 63,
+   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이",
+   "action": "plan",
+   "product": "",
+   "price_band": "수백만 원대",
+   "condition_branch": 4,
+   "cautions": 4,
+   "size_install": false,
+   "maintenance": false,
+   "coupang": false,
+   "empty": false,
+   "llm_error": ""
   }
  ]
 }
