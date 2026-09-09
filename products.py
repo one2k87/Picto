@@ -129,9 +129,19 @@ def pending(articles):
           '지금 당장 돈이 되는' 순서는 링크가 이미 있는 쪽이다.
     """
     used = set()
+    hay = " ".join(_norm((a.get("title") or "") + " " + (a.get("keyword") or ""))
+                   for a in articles or [])
     for a in articles or []:
         pr = find_for(a)
         if pr:
+            used.add(pr.get("key"))
+    # 안전망: match가 다른 제품에 뺏겨도, 그 제품의 '구매 검색어'가 이미 쓴 글에
+    # 나왔다면 다룬 것으로 본다. 이게 없으면 무한 반복이 난다 —
+    # 비데 본체 match를 부속품(비데설치공구)이 전부 가져가는 바람에 「비데」가
+    # 영원히 대기로 남아 비데 글만 3편 생성됐다(2026-09-09 실측).
+    for pr in all_products():
+        s_ = _norm(pr.get("search") or "")
+        if s_ and len(s_) >= 4 and s_ in hay:
             used.add(pr.get("key"))
     out = []
     for pr in all_products():

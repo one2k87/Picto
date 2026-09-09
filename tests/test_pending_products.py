@@ -45,6 +45,27 @@ check("must_products 없으면 블록 없음",
       "최우선" not in topics.build_topic_prompt("생활", "설명", "long", 3))
 check("링크 없는 제품은 프롬프트에도 안 뜬다", "다제품" not in pr)
 
+# ── 안전망: match를 부속품에 뺏긴 제품이 무한 대기로 남지 않는가 (2026-09-09) ──
+products._CACHE = {"products": [
+    {"key": "본체", "name": "본체", "search": "비데 자가설치형", "match": ["비데"],
+     "coupang_url": "https://link.coupang.com/a/AAA"},
+    {"key": "부속", "name": "부속", "search": "비데 분기밸브", "match": ["비데 자가 설치"],
+     "coupang_url": "https://link.coupang.com/a/BBB"},
+]}
+arts2 = [{"title": "비데 자가 설치 비용 절약", "keyword": "비데 자가설치형 고르는 법"}]
+check("긴 match가 이긴다(전제 확인)", products.find_for(arts2[0])["key"] == "부속")
+check("검색어가 이미 나온 제품은 대기에서 빠진다",
+      "본체" not in [x["key"] for x in products.pending(arts2)])
+check("정말 안 다룬 제품은 남는다",
+      "부속" not in [x["key"] for x in products.pending(arts2)])
+
+products._CACHE = {"products": [
+    {"key": "가", "name": "가", "search": "제습기 20L", "match": ["제습기"],
+     "coupang_url": "https://link.coupang.com/a/CCC"},
+]}
+check("무관한 글이면 대기 유지",
+      [x["key"] for x in products.pending([{"title": "정수기 필터", "keyword": ""}])] == ["가"])
+
 products._CACHE = None
 print(f"test_pending_products: {ok} pass / {fail} fail")
 sys.exit(1 if fail else 0)
