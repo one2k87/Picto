@@ -29,6 +29,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import requests
 
 import kokpick
+import llm
 import products
 from publisher import _auth_header
 
@@ -61,22 +62,32 @@ PROMPT = """당신은 블로그 글에서 **글에 이미 쓰여 있는 사실�
 - 모든 문자열에서 연속 하이픈(--)을 쓰지 마라."""
 
 
-def extract(title, body, key, model):
-    """본문에서 근거 필드를 뽑는다. 실패하면 빈 dict(= 캐스토가 폴백)."""
+LAST_ERR = ""
+
+
+def extract(title, body, llm_cfg):
+    """본문에서 근거 필드를 뽑는다. 실패하면 빈 dict(= 캐스토가 폴백).
+
+    주의(2026-09-09 실측): 처음엔 Gemini REST를 직접 때렸는데 12편 전부 빈 값이 나왔다.
+    이 레포에는 제공자 분기·일일한도 폴백·재시도를 담은 `llm.chat()`이 이미 있고,
+    설정의 provider가 gemini가 아닐 수도 있다. 직접 호출은 그걸 전부 우회해
+    **조용히 실패**한다. 그래서 공용 경로만 쓴다.
+    """
+    global LAST_ERR
+    LAST_ERR = ""
     try:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-        r = requests.post(url,
-                          headers={"x-goog-api-key": key, "Content-Type": "application/json"},
-                          json={"contents": [{"parts": [{"text": PROMPT.format(
-                              title=title, body=body[:6000])}]}],
-                              "generationConfig": {"maxOutputTokens": 900, "temperature": 0.1}},
-                          timeout=90)
-        t = r.json()["candidates"][0]["content"]["parts"][0]["text"]
-        t = re.sub(r"^```(json)?\s*|\s*```$", "", t.strip(), flags=re.M)
-        d = json.loads(t[t.find("{"):t.rfind("}") + 1])
+        t = llm.chat(PROMPT.format(title=title, body=body[:6000]),
+                     llm_cfg, max_tokens=1500, temperature=0.1)
+        t = re.sub(r"^```(json)?\s*|\s*```$", "", (t or "").strip(), flags=re.M)
+        i, j = t.find("{"), t.rfind("}")
+        if i < 0 or j < 0:
+            LAST_ERR = "JSON 없음: " + t[:80]
+            return {}
+        d = json.loads(t[i:j + 1])
         return d if isinstance(d, dict) else {}
     except Exception as e:
-        print(f"  [llm] 추출 실패(빈 블록으로 진행): {e}")
+        LAST_ERR = f"{type(e).__name__}: {e}"[:160]
+        print(f"  [llm] 추출 실패(빈 블록으로 진행): {LAST_ERR}")
         return {}
 
 
@@ -85,9 +96,8 @@ def main():
     wp = cfg.get("wordpress", {}) or {}
     if not (wp.get("enabled") and wp.get("site_url")):
         print("WP 설정 없음 — 종료"); return
-    llm = cfg.get("llm") or {}
-    key = llm.get("api_key", "")
-    model = llm.get("model") or "gemini-2.5-flash"
+    llm_cfg = cfg.get("llm") or {}
+    key = llm_cfg.get("api_key", "")
     dry = (os.getenv("KOKPICK_DRY") or "true").lower() == "true"
     limit = int(os.getenv("KOKPICK_LIMIT") or "100")
     force = (os.getenv("KOKPICK_FORCE") or "false").lower() == "true"
@@ -106,7 +116,8 @@ def main():
         if len(b) < 50:
             break
         page += 1
-    print(f"발행 글 {len(posts)}개 (dry={dry}, limit={limit}, force={force})")
+    print(f"발행 글 {len(posts)}개 (dry={dry}, limit={limit}, force={force} · "
+          f"llm={llm_cfg.get('provider','?')}/{llm_cfg.get('model','?')} key={'O' if key else 'X'})")
 
     done = skip = fail = empty = nolink = 0
     report = []
@@ -132,7 +143,7 @@ def main():
         if not url:
             nolink += 1
 
-        art["kokpick"] = extract(title, strip_tags(html), key, model) if key else {}
+        art["kokpick"] = extract(title, strip_tags(html), llm_cfg) if key else {}
         art["kokpick"]["alt_uses"] = []          # 소급분은 근거가 없다 — 안전 규칙
         art["kokpick"]["alt_uses_source"] = ""
         data = kokpick.build(art, prod, url)
@@ -145,7 +156,8 @@ def main():
                "size_install": bool(data.get("size_install")),
                "maintenance": bool(data["maintenance"]["cycle"] or
                                    data["maintenance"]["cost_per_year"]),
-               "coupang": bool(url), "empty": kokpick.is_empty(data)}
+               "coupang": bool(url), "empty": kokpick.is_empty(data),
+               "llm_error": LAST_ERR}
         report.append(row)
         print(f"[{pid}] {title[:34]} — 제품 '{data.get('product','')}' · "
               f"조건 {len(data['condition_branch'])} · 주의 {len(data['cautions'])} · "
@@ -176,6 +188,7 @@ def main():
         os.makedirs("dashboard/data", exist_ok=True)
         with open("dashboard/data/kokpick_backfill.json", "w", encoding="utf-8") as f:
             json.dump({"ran_at": time.strftime("%Y-%m-%d %H:%M"), "dry": dry,
+                       "llm": f"{llm_cfg.get('provider','?')}/{llm_cfg.get('model','?')}",
                        "summary": summary, "rows": report}, f,
                       ensure_ascii=False, indent=1)
     except Exception as e:
