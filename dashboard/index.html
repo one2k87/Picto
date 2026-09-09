@@ -2337,7 +2337,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=162;
+const APP_BUILD=163;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -2418,18 +2418,11 @@ async function todoItems(){
   // b162: 링크는 있는데 그 제품 글이 아직 없는 경우 — 파이프라인이 자동 배정하지만
   // "며칠 뒤에 채워진다"는 사실을 사람이 알 곳이 없었다.
   try{
-    const d=await loadPickProducts(false);
-    const list=(d&&d.products)||[];
-    const arts=(DATA&&DATA.articles)?DATA.articles:[];
-    // 파이썬 products.pending()과 같은 기준으로 본다: 제목·키워드에서 띄어쓰기를 없앤 건초더미에
-    // 그 제품의 match 키워드나 구매 검색어가 있으면 '이미 다룬 것'.
-    const norm=x=>String(x||"").replace(/[\s\-_·/]/g,"").toLowerCase();
-    const hay=norm(arts.map(a=>(a.title||"")+" "+(a.keyword||"")).join(" "));
-    const waiting=list.filter(p=>{
-      if(!(p.coupang_url||"").trim()) return false;          // 링크 없는 건 아직 내 일이 아니다
-      const keys=[...(p.match||[]), p.search||""].map(norm).filter(k=>k.length>=2);
-      return !keys.some(k=>hay.includes(k));
-    });
+    // ⚠️ 여기서 직접 계산하지 않는다. 앱이 가진 글 목록은 latest.json(오늘치)뿐이라
+    //    이미 쓴 제품까지 '대기'로 세는 오판이 났다(2026-09-09 실측: 9종 → 실제 4종).
+    //    서버 아침 점검(daily_check_fix.py)이 전체 이력으로 계산해 넣어준 값을 그대로 쓴다.
+    const sc3=await (await fetch("data/site_check.json?nc="+Date.now(),{cache:"no-store"})).json();
+    const waiting=sc3.pending_products||[];
     if(waiting.length) t.push({i:"🕒",
       x:`링크는 있는데 글이 없는 제품 ${waiting.length}종 (${waiting.slice(0,3).map(p=>p.name||p.key).join(" · ")}) — 다음 생성부터 자동 배정됩니다`,
       b:"지금 생성", a:"document.getElementById('runBtn').click()"});

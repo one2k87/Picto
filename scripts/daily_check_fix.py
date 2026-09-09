@@ -254,6 +254,7 @@ print(f"[check] 라인 격리: 오염 {len(line_leaks)}편"
 # 링크가 없으면 그 글은 아무리 잘 써도 수익이 0이므로, 이건 품질 문제가 아니라 매출 문제다.
 link_missing = []
 link_cov, link_fill = {}, {}
+pending_products = []
 try:
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     import products as _prod
@@ -261,7 +262,13 @@ try:
               "slug": (p.get("link") or "").rstrip("/").rsplit("/", 1)[-1]}
              for p in posts]
     link_missing = _prod.missing(_arts)
-    link_cov = _prod.coverage(_arts)     # 앱 수익 탭의 '링크 커버리지' 분모
+    link_cov = _prod.coverage(_arts)
+    # 링크는 있는데 그 제품 글이 없는 제품 — 앱 '오늘 할 일'이 그대로 읽는다.
+    # 앱에서 따로 계산하게 두면 앱이 가진 글 목록(latest.json=오늘치)만 보고
+    # 이미 쓴 제품까지 '대기'로 세는 오판이 난다(2026-09-09 실측). 기준은 여기 하나뿐.
+    pending_products = [{"key": _p.get("key"), "name": _p.get("name") or _p.get("key"),
+                         "search": _p.get("search", "")}
+                        for _p in _prod.pending(_arts)]     # 앱 수익 탭의 '링크 커버리지' 분모
     link_fill = _prod.fill_rate()        # 대장 자체의 적재율
 except Exception as e:
     print(f"[check] 상품 링크 점검 건너뜀: {e}")
@@ -277,6 +284,7 @@ out = {"at": datetime.datetime.now().isoformat()[:19], "n": len(scored), "avg": 
        "noimgv2": {"n": len(noimgv2), "of": imgv2_checked, "posts": noimgv2[:20]},
        "link_missing": {"n": len(link_missing), "posts": link_missing[:20]},
        "link_coverage": link_cov, "link_fill": link_fill,
+       "pending_products": pending_products,
        "line_leaks": {"n": len(line_leaks), "posts": line_leaks[:20]}}
 os.makedirs("dashboard/data", exist_ok=True)
 json.dump(out, open("dashboard/data/site_check.json", "w", encoding="utf-8"),
