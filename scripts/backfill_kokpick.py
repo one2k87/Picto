@@ -18,6 +18,7 @@
 
 재실행 안전: 이미 블록 + 메타가 둘 다 있으면 건너뛴다.
 환경: KOKPICK_DRY(기본 true) / KOKPICK_LIMIT(기본 100) / KOKPICK_FORCE(true면 기존 블록도 재작성)
+      KOKPICK_IDS(쉼표로 글 ID 지정 — 그 글만 처리. 잘못 들어간 블록만 골라 고칠 때)
 """
 import json
 import os
@@ -147,6 +148,7 @@ def main():
     dry = (os.getenv("KOKPICK_DRY") or "true").lower() == "true"
     limit = int(os.getenv("KOKPICK_LIMIT") or "100")
     force = (os.getenv("KOKPICK_FORCE") or "false").lower() == "true"
+    only = {int(x) for x in re.findall(r"\d+", os.getenv("KOKPICK_IDS") or "")}
 
     base = wp["site_url"].rstrip("/")
     headers = _auth_header(wp["username"], wp["app_password"])
@@ -171,6 +173,8 @@ def main():
         if done >= limit:
             break
         pid = p["id"]
+        if only and pid not in only:
+            continue
         html = (p.get("content") or {}).get("raw") or ""
         meta = p.get("meta") or {}
         title = re.sub(r"<[^>]+>", "", (p.get("title") or {}).get("rendered") or "").strip()

@@ -45,6 +45,24 @@ SCHEMA = {
 }
 
 
+# consumable_url(소모품 구매처)에 허용되는 호스트.
+# 실측(2026-09-09): LLM이 글에 없던 **외부 쇼핑몰 링크**(kr.atomy.com)를 지어내 넣었다.
+# 이 값은 캐스토가 영상 설명란에 그대로 쓸 수 있어, 남의 상점으로 트래픽을 보내거나
+# 남의 제휴 링크를 대신 홍보하게 된다. 그래서 우리 라인 밖 호스트는 통째로 버린다.
+ALLOWED_URL_HOSTS = ("pickdam.com", "link.coupang.com", "www.coupang.com")
+
+
+def _safe_url(u):
+    u = (u or "").strip()
+    if not u:
+        return ""
+    m = re.match(r"https?://([^/?#]+)", u, re.I)
+    host = (m.group(1) if m else "").lower()
+    if any(host == h or host.endswith("." + h) for h in ALLOWED_URL_HOSTS):
+        return u
+    return ""
+
+
 def _clean(v):
     """주석 안전화: 연속 하이픈 제거, 제어문자 제거, 양끝 공백 정리."""
     if isinstance(v, str):
@@ -86,6 +104,9 @@ def build(article, product=None, coupang_url=""):
         data["product"] = (article.get("focus_keyword") or "").strip()
     if coupang_url:
         data["coupang_url"] = coupang_url
+
+    # 외부 쇼핑몰 링크는 버린다(위 ALLOWED_URL_HOSTS 주석 참조).
+    data["maintenance"]["consumable_url"] = _safe_url(data["maintenance"]["consumable_url"])
 
     # 근거 없는 '용도 외 활용'은 통째로 버린다(브리프의 안전 규칙).
     if not data["alt_uses_source"]:
