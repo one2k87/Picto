@@ -2337,7 +2337,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=164;
+const APP_BUILD=165;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -2392,6 +2392,22 @@ async function todoItems(){
     if(nv.n) t.push({i:"🖼️",
       x:`이미지 v2 미적용 ${nv.n}${nv.of?"/"+nv.of:""}편 — 옛 규격 이미지가 남아 있습니다`,
       b:"재교체 실행", a:"opsDispatch('reimage.yml',{limit:'100',dry_run:'false',force:'false'},this,'이미지 재교체')"});
+    // b165: 발행 위생 — 소급 워크플로는 '실행 시점까지의 글'만 고친다. 그 뒤 발행된 글이
+    // 같은 항목을 빠뜨리면 아무도 몰랐다(post 90 요약이 그렇게 비어 있었다, 2026-09-10).
+    // 서버 아침 점검이 매일 다시 세어주므로 여기서는 띄우기만 한다.
+    const hy=sc.hygiene||{};
+    if((hy.no_featured||[]).length) t.push({i:"🏞️",
+      x:`대표이미지 없는 글 ${hy.no_featured.length}편 — 목록·홈 카드가 빈 회색으로 보입니다`,
+      b:"대표이미지 채우기", a:"opsDispatch('backfill-featured.yml',{limit:'100',dry_run:'false'},this,'대표이미지 소급')"});
+    if((hy.few_images||[]).length) t.push({i:"🎞️",
+      x:`본문 이미지가 3장 미만인 글 ${hy.few_images.length}편 — 글이 단조로워 보입니다`,
+      b:"이미지 보강", a:"opsDispatch('topup-images.yml',{limit:'100',dry_run:'false',target:'3'},this,'본문 이미지 보강')"});
+    if((hy.no_kokpick||[]).length) t.push({i:"🎬",
+      x:`콕픽 데이터 없는 글 ${hy.no_kokpick.length}편 — 유튜브가 근거를 지어내게 됩니다`,
+      b:"콕픽 블록 넣기", a:"opsDispatch('backfill-kokpick.yml',{limit:'100',dry_run:'false',force:'false'},this,'콕픽 블록 소급')"});
+    if((hy.no_excerpt||[]).length) t.push({i:"✂️",
+      x:`요약을 만들지 못한 글 ${hy.no_excerpt.length}편 — 카드에 엉뚱한 문장이 나옵니다`,
+      b:null, a:null});
   }catch(e){}
   try{
     const sj=await (await fetch("data/status.json?nc="+Date.now(),{cache:"no-store"})).json();

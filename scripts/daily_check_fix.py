@@ -276,6 +276,83 @@ print(f"[check] 상품 링크 미등록 {len(link_missing)}편 · "
       f"커버리지 {link_cov.get('linked', 0)}/{link_cov.get('of', 0)}편 · "
       f"대장 {link_fill.get('have', 0)}/{link_fill.get('of', 0)}종")
 
+# ── ④ 발행 위생 점검 (2026-09-10) ──────────────────────────────
+# 왜: 소급 워크플로(대표이미지·요약·이미지 3장·콕픽 블록)는 **실행한 시점까지의 글만** 고친다.
+#     그 뒤에 발행된 글이 같은 항목을 빠뜨리면 아무도 모른다 — 실제로 post 90의 요약이
+#     소급 실행 직후 발행돼 비어 있었고, 사람이 눈으로 찾아서야 발견했다(2026-09-10).
+#     그래서 '한 번 고친 항목'을 매일 다시 세어, 새 글이 규격에서 벗어나면 그날 알린다.
+# 요약(excerpt)만 여기서 바로 채운다 — 비어 있을 때만, 본문에서 가져오므로 새 내용이 없고
+# 되돌릴 필요가 없다. 나머지(대표이미지·이미지 장수·콕픽 블록)는 생성 비용이 들어
+# 자동 실행하지 않고 '오늘 할 일'로 올려 사람이 워크플로를 누르게 한다.
+KOKPICK_RE = re.compile(r"<!--KOKPICK\s.*?KOKPICK-->", re.S)
+IMG_TARGET = 3
+hyg = {"no_excerpt": [], "no_featured": [], "no_kokpick": [], "few_images": [],
+       "excerpt_filled": [], "of": 0}
+
+
+def _first_sentence(html, limit=150):
+    """카드에 쓸 한 문장. 고지문으로 시작하면 그 문장은 건너뛴다."""
+    txt = strip_tags(KOKPICK_RE.sub("", html or ""))
+    parts = [x for x in re.split(r"(?<=[.!?])\s+", txt) if x.strip()]
+    parts = [x for x in parts if not x.startswith(("이 포스팅은 쿠팡", "이 글은 정보 제공"))]
+    if not parts:
+        return ""
+    out = parts[0].strip()
+    if len(out) < 30 and len(parts) > 1:
+        out = (out + " " + parts[1]).strip()
+    return out[:limit].strip()
+
+
+try:
+    _hp, _pg = [], 1
+    while True:
+        r = requests.get(f"{site}/wp-json/wp/v2/posts", headers=_H,
+                         params={"per_page": 50, "page": _pg, "status": "publish",
+                                 "context": "edit",
+                                 "_fields": "id,title,content,excerpt,featured_media,meta"},
+                         timeout=30)
+        if not r.ok:
+            raise RuntimeError(f"HTTP {r.status_code}")
+        b = r.json(); _hp += b
+        if len(b) < 50:
+            break
+        _pg += 1
+    hyg["of"] = len(_hp)
+    for it in _hp:
+        pid, ttl = it["id"], _title_of(it)
+        raw = (it.get("content") or {}).get("raw") or ""
+        if not it.get("featured_media"):
+            hyg["no_featured"].append({"id": pid, "title": ttl})
+        figs = len(re.findall(r"<figure\b", raw)) or len(re.findall(r"<img\b", raw))
+        if figs < IMG_TARGET:
+            hyg["few_images"].append({"id": pid, "title": ttl, "n": figs})
+        if not (KOKPICK_RE.search(raw) and ((it.get("meta") or {}).get("kokpick") or "").strip()):
+            hyg["no_kokpick"].append({"id": pid, "title": ttl})
+        exc = ((it.get("excerpt") or {}).get("raw") or "").strip()
+        if exc:
+            continue
+        text = ((it.get("meta") or {}).get("rank_math_description") or "").strip() \
+            or _first_sentence(raw)
+        if not text:
+            hyg["no_excerpt"].append({"id": pid, "title": ttl})
+            continue
+        try:
+            rr = requests.post(f"{site}/wp-json/wp/v2/posts/{pid}", json={"excerpt": text},
+                               headers={**_H, "Content-Type": "application/json"}, timeout=30)
+            if rr.status_code in (200, 201):
+                hyg["excerpt_filled"].append({"id": pid, "title": ttl})
+            else:
+                hyg["no_excerpt"].append({"id": pid, "title": ttl})
+        except Exception as e:
+            print(f"[check] 요약 저장 실패 {pid}: {e}")
+            hyg["no_excerpt"].append({"id": pid, "title": ttl})
+except Exception as e:
+    print(f"[check] 발행 위생 점검 건너뜀: {e}")
+print(f"[check] 발행 위생 {hyg['of']}편 — 요약 채움 {len(hyg['excerpt_filled'])} · "
+      f"요약 없음 {len(hyg['no_excerpt'])} · 대표이미지 없음 {len(hyg['no_featured'])} · "
+      f"이미지 {IMG_TARGET}장 미만 {len(hyg['few_images'])} · 콕픽 블록 없음 {len(hyg['no_kokpick'])}")
+
+
 # ── 결과 저장 + 텔레그램 ───────────────────────────────────────
 out = {"at": datetime.datetime.now().isoformat()[:19], "n": len(scored), "avg": avg,
        "fails": [{k: x[k] for k in ("id", "title", "score", "issues")} for x in fails],
@@ -285,7 +362,8 @@ out = {"at": datetime.datetime.now().isoformat()[:19], "n": len(scored), "avg": 
        "link_missing": {"n": len(link_missing), "posts": link_missing[:20]},
        "link_coverage": link_cov, "link_fill": link_fill,
        "pending_products": pending_products,
-       "line_leaks": {"n": len(line_leaks), "posts": line_leaks[:20]}}
+       "line_leaks": {"n": len(line_leaks), "posts": line_leaks[:20]},
+       "hygiene": hyg}
 os.makedirs("dashboard/data", exist_ok=True)
 json.dump(out, open("dashboard/data/site_check.json", "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)
