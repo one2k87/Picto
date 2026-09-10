@@ -61,6 +61,29 @@ cutoff = (datetime.datetime.utcnow() - datetime.timedelta(days=14)).strftime("%Y
 # 교차 확인으로 12편+ 색인 확인, API만 0/29 오답). 디코딩해 보내야 정답이 나온다.
 urls = [site + "/"] + [unquote(p["link"]) for p in posts if p.get("modified", "") >= cutoff]
 
+# 속성 형식 자동 판별(2026-09-10 신설).
+# 픽담의 Search Console 속성은 **도메인 속성**(`sc-domain:pickdam.com`)인데
+# `sc_site_url` 기본값은 WP 주소(`https://pickdam.com/`)라 형식이 어긋난다.
+# 어긋나면 모든 검사가 403으로 떨어지고, 워크플로는 `|| true`라 초록으로 보인다.
+# 그래서 첫 URL로 두 형식을 시험해 되는 쪽을 쓴다.
+_host = site.split("//", 1)[-1].strip("/")
+SITE_FORMS = [sc_site, "sc-domain:" + _host]
+site_form, form_err = None, ""
+for _f in SITE_FORMS:
+    try:
+        svc.urlInspection().index().inspect(
+            body={"inspectionUrl": site + "/", "siteUrl": _f}).execute()
+        site_form = _f
+        break
+    except Exception as e:
+        form_err = f"{_f} → {str(e)[:160]}"
+if not site_form:
+    print(f"[inspect] 속성 형식 판별 실패: {form_err}")
+    site_form = sc_site
+else:
+    print(f"[inspect] 속성 형식 = {site_form}")
+sc_site = site_form
+
 results, ok_n = [], 0
 for u in urls[:30]:
     try:
@@ -100,6 +123,7 @@ if ghosts:
 
 out = {"updated_at": datetime.datetime.now().isoformat()[:19],
        "site": site, "checked": ok_n, "indexed": passed, "ghosts": ghosts,
+       "site_form": site_form, "form_err": form_err,
        "posts_diag": diag, "posts_n": len(posts), "results": results}
 json.dump(out, open("dashboard/data/index_status.json", "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)
