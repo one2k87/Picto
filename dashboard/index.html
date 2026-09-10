@@ -2337,7 +2337,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=166;
+const APP_BUILD=167;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -4893,7 +4893,32 @@ async function sprintCompose(auto){
    자동화 API가 없다(구글이 막음). 그래서 도구는 ①오늘 요청할 10개를
    '최근 수정 글 우선'으로 골라주고 ②복사 버튼과 SC 링크를 주고
    ③완료 체크를 저장해 내일은 다음 10개를 보여준다. */
-function idxDone(){ return CFG.idxReq||{}; }
+/* b167: 이 기록은 **현재 사이트 것만** 센다.
+   실측(2026-09-10): `CFG.idxReq`에 20건이 들어 있었는데 **전부 원더랜드(wontheland.com) URL**이었고
+   픽담은 0건이었다. 포크로 갈라져 나올 때 따라온 잔재다(같은 계열: index_status.json·일자별 스냅샷).
+   그 탓에 화면이 "빠른 등록 부스터 — 누적 20/30"이라며 **남의 사이트에서 한 작업을 픽담 진척으로**
+   보여줬고, 실제로는 색인 요청을 한 건도 안 한 상태였다. 진척 수치는 사람이 '이제 안 해도 되나'를
+   판단하는 근거라, 틀린 진척은 없는 것보다 나쁘다. */
+function idxHost(){ try{ return new URL(wpBase()).host; }catch(e){ return ""; } }
+function idxDone(){
+  const m=CFG.idxReq||{}, h=idxHost(); if(!h) return m;
+  const keep={}; let dropped=0;
+  for(const [u,v] of Object.entries(m)){
+    let ok=false; try{ ok=new URL(u).host===h; }catch(e){}
+    if(ok) keep[u]=v; else dropped++;
+  }
+  if(dropped){ CFG.idxReq=keep; saveCfg();
+    console.warn(`[idx] 다른 사이트 기록 ${dropped}건 제거(현재 ${h})`); }
+  return keep;
+}
+/* Search Console 속성 주소. 홈(`/search-console`)으로 보내면 마지막에 보던 다른 속성이 열려
+   "누르면 전혀 다른 게 나온다"가 된다(2026-09-10 사용자 지적, 실측 확인).
+   ⚠️ URL 검사 화면으로 바로 가는 딥링크는 없다 — `/search-console/inspect?...&id=<url>`은
+   404 뒤 개요로 리다이렉트된다(실측). 그래서 '복사 → 맨 위 검색창 붙여넣기'가 유일한 경로다. */
+function scPropUrl(){
+  const res=CFG.scRes||("sc-domain:"+idxHost());
+  return "https://search.google.com/search-console?resource_id="+encodeURIComponent(res);
+}
 function idxMark(url){ const m=idxDone(); m[url]=new Date().toISOString().slice(0,10); CFG.idxReq=m; saveCfg(); renderIdxQueue(); }
 /* 🔔 자동 색인 켜기(원탭) — IndexNow.
    키를 만들고 → 키 파일을 WP 미디어에 올리고(루트 접근 불필요, keyLocation 스펙 활용)
@@ -4974,14 +4999,15 @@ async function renderIdxQueue(){
       <b>🚀 빠른 등록 부스터 — 오늘 ${today.length}개</b> <span class="hint">(완료 ${doneN} / 전체 ${urls.length})</span>
       <div class="hint" style="margin-top:3px"><b>신청 전 며칠만</b> 쓰는 예외 작업입니다. 위의 자동 알림은 "새 글 있어요"까지만 전할 수 있고,
         "지금 당장 가져가"라고 <u>강제하는 버튼</u>만은 구글이 자동화를 막아뒀습니다. 그래서 이 부분만 하루 5분, 사람이 누릅니다.
-        방법: 복사 → Search Console 검색창에 붙여넣기 → <b>색인 생성 요청</b> → ✓완료.</div>
+        방법: <b>[복사]</b> → 아래 파란 버튼으로 Search Console 열기 → <b>화면 맨 위 검색창</b>("모든 URL 검사")에 붙여넣고 Enter
+        → 결과 화면의 <b>[색인 생성 요청]</b> → 앱으로 돌아와 <b>[✓완료]</b>.</div>
       <div class="hint" style="margin-top:5px;max-height:170px;overflow-y:auto">
         ${today.map(u=>`<div style="margin:3px 0;display:flex;gap:6px;align-items:center">
           <button class="btn sm" style="padding:1px 7px;font-size:11px" onclick="navigator.clipboard.writeText('${u}');toast('복사됨',0)">복사</button>
           <button class="btn sm" style="padding:1px 7px;font-size:11px" onclick="idxMark('${u}')">✓완료</button>
           <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escAttr(decodeURIComponent(u).replace(/^https?:\/\//,''))}</span></div>`).join("")}
       </div>
-      <a href="https://search.google.com/search-console" target="_blank" class="btn primary sm" style="display:block;text-align:center;margin-top:7px">Search Console 열기</a>
+      <a href="${scPropUrl()}" target="_blank" rel="noopener" class="btn primary sm" style="display:block;text-align:center;margin-top:7px">Search Console 열기 (픽담 속성으로 바로)</a>
     </div>`;
   }else if(doneN){
     booster=`<div class="hint" style="margin-top:9px;padding-top:8px;border-top:1px solid var(--line)">
