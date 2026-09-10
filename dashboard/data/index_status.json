@@ -1,6 +1,122 @@
 {
+ "updated_at": "2026-09-10T10:42:28",
  "site": "https://pickdam.com",
- "results": [],
+ "checked": 17,
+ "indexed": 3,
  "ghosts": [],
- "_note": "2026-09-07 초기화 — 포크 잔재로 원더랜드(wontheland.com) 색인 결과가 들어 있어 앱 홈의 구글 색인 수치가 남의 사이트 값을 보여줬다. 다음 inspect_recent 실행이 픽담 기준으로 다시 채운다."
+ "site_form": "sc-domain:pickdam.com",
+ "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
+ "posts_diag": {
+  "http": 200,
+  "body_head": "[{\"modified\":\"2026-09-10T09:31:07\",\"link\":\"https:\\/\\/pickdam.com\\/door-draft-stopper-guide-2026\\/\"},{\"modified\":\"2026-09"
+ },
+ "posts_n": 16,
+ "results": [
+  {
+   "url": "https://pickdam.com/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-03"
+  },
+  {
+   "url": "https://pickdam.com/door-draft-stopper-guide-2026/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-03"
+  },
+  {
+   "url": "https://pickdam.com/new-apartment-system-appliance-guide-2026-september/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-03"
+  },
+  {
+   "url": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
+   "verdict": "NEUTRAL",
+   "state": "Crawled - currently not indexed",
+   "lastCrawl": "2026-09-08"
+  },
+  {
+   "url": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/moving-cleaning-quote-cost-comparison-2026/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/food-waste-disposer-rental-cancellation-fee/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/moving-packing-cost-conditions/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/new-apartment-system-aircon-guide-2026/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/kitchen-ventilation-rental-vs-buy-2026-september/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/food-waste-disposer-trade-in-vs-rental-2026/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/water-purifier-filter-replacement-guide-2026/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/bidet-self-installation-guide-2026/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/bidet-self-installation-2026-sep-comparison/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  }
+ ],
+ "sitemaps_submitted": [
+  "pickdam.com",
+  "feed"
+ ]
 }
