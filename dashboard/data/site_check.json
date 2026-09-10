@@ -1,5 +1,5 @@
 {
- "at": "2026-09-10T08:33:43",
+ "at": "2026-09-10T09:28:20",
  "n": 16,
  "avg": 100,
  "fails": [],
@@ -99,5 +99,13 @@
  "line_leaks": {
   "n": 0,
   "posts": []
+ },
+ "hygiene": {
+  "no_excerpt": [],
+  "no_featured": [],
+  "no_kokpick": [],
+  "few_images": [],
+  "excerpt_filled": [],
+  "of": 16
  }
 }

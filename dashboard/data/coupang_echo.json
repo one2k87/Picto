@@ -4,21 +4,5 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false,
- "apply_trace": [
-  {
-   "stage": "진입",
-   "title": "2026년 9월 창문 단열 뽁뽁이와 방풍비닐, 우리",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 4
-  },
-  {
-   "stage": "중단:enabled=False",
-   "title": "2026년 9월 창문 단열 뽁뽁이와 방풍비닐, 우리",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 4
-  }
- ]
+ "file_enabled": false
 }
