@@ -67,5 +67,30 @@ check("무관한 글이면 대기 유지",
       [x["key"] for x in products.pending([{"title": "정수기 필터", "keyword": ""}])] == ["가"])
 
 products._CACHE = None
+
+# ── 2026-09-11 추가: 같은 주제 반복 루프 재발 방지 ─────────────────
+# 실측 재현: 부속품(비데 설치 부자재)을 정면으로 다룬 글이 나왔는데도 본체로 매칭돼
+# 부속품이 계속 '대기'로 남았고, 자동 배정이 매일 그걸 집어 비데 글이 4편이 됐다.
+def test_distinctive_word_closes_loop():
+    arts = [{"title": "2026년 9월 비데 자가 설치, 우리 집 변기에 맞지 않는 분기밸브는 절대 사지 마세요"},
+            {"title": "비데 자가설치, 흔한 고장 원인과 모델별 비교"}]
+    keys = [p.get("key") for p in products.pending(arts)]
+    assert "비데설치공구" not in keys, f"분기밸브 글이 있는데 부자재가 대기로 남았다: {keys}"
+    assert "비데" not in keys, f"비데 본체가 대기로 남았다: {keys}"
+
+def test_distinctive_words_exclude_shared_tokens():
+    pr = next(p for p in products.all_products() if p.get("key") == "비데설치공구")
+    w = products._distinctive_words(pr)
+    assert "비데" not in w, "남의 match에도 들어가는 '비데'가 식별 낱말로 쓰이면 안 된다"
+    assert "분기밸브" in w, f"식별 낱말에 분기밸브가 없다: {w}"
+
+for _fn in (test_distinctive_word_closes_loop, test_distinctive_words_exclude_shared_tokens):
+    try:
+        _fn(); print(f"  ✓ {_fn.__name__}")
+    except AssertionError as e:
+        print(f"  ✗ {_fn.__name__}: {e}"); raise SystemExit(1)
+print("추가 2건 통과")
+
+products._CACHE = None
 print(f"test_pending_products: {ok} pass / {fail} fail")
 sys.exit(1 if fail else 0)
