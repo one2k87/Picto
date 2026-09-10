@@ -1066,7 +1066,7 @@
   </div>
   <div class="field">
     <label>액세스 토큰 (fine-grained PAT · Actions 쓰기)</label>
-    <input id="cfgGhToken" placeholder="github_pat_..." autocapitalize="off">
+    <input id="cfgGhToken" type="password" placeholder="github_pat_..." autocapitalize="off">
     <div class="hint">github.com → Settings → Developer settings → Fine-grained tokens.
       이 저장소의 Actions(Read/Write) 권한만 주세요. 이 기기에만 저장됩니다.</div>
   </div>
@@ -1125,7 +1125,7 @@
   </div>
   <div class="field">
     <label>응용 프로그램 비밀번호</label>
-    <input id="cfgPass" placeholder="abcd efgh ijkl mnop" autocapitalize="off">
+    <input id="cfgPass" type="password" placeholder="abcd efgh ijkl mnop" autocapitalize="off">
     <div class="hint">아래 버튼을 누르면 발급 화면이 바로 열립니다 — 이름 아무거나 입력 → [새 응용 프로그램 비밀번호 추가] → 나온 값을 복사해 붙여넣으세요.
       <button class="btn sm" style="margin-top:5px" onclick="openAppPassPage()">🔑 발급 화면 바로 열기</button></div>
   </div>
@@ -2337,7 +2337,7 @@ document.getElementById("pauseBtn").onclick=togglePause;
    원칙: ①감지는 앱이 한다(사용자가 문제를 발견하게 두지 않는다)
         ②반복 작업(점검·수리)은 자동화한다 ③수동은 1회성·3클릭 이내로.
    여기서: 새 버전 감지 배너 / 24시간 지난 점검 자동 실행 / (옵트인) 자동 수리 / 할 일 인박스 */
-const APP_BUILD=163;
+const APP_BUILD=164;
 // 사용자에게 보이는 제품 버전 — 규칙·이력은 저장소 CHANGELOG.md (v0 여정은 docs/버전0_개발기.md)
 const SCRIPTO_VER="0.4";
 
@@ -7575,6 +7575,24 @@ function splitGroupBody(body,plan){
   }
   return out.filter(o=>o.nodes.length);
 }
+/* b164: 비밀값 입력칸 마스킹 + 보기 토글.
+   마크토 통지(2026-09-09)로 실측 확인 — GitHub PAT·워드프레스 앱 비밀번호 칸이 type="text"라
+   화면에 값이 그대로 보였다(서파베이스 칸들은 이미 password였다 = 일관성 결함).
+   폰을 남에게 보여주거나 화면을 공유할 때 자격증명이 그대로 노출된다.
+   붙여넣기 확인이 필요한 값들이라 가리기만 하면 못 쓰므로, 눈 버튼으로 잠깐 볼 수 있게 한다. */
+function bindSecretToggles(root){
+  (root||document).querySelectorAll('input[type="password"]').forEach(inp=>{
+    if(inp.dataset.eye) return;                 // 재실행 안전(설정 탭은 여러 번 조립된다)
+    inp.dataset.eye="1";
+    const b=document.createElement("button");
+    b.type="button"; b.className="btn sm eye"; b.textContent="👁";
+    b.title="잠깐 보기"; b.setAttribute("aria-label","입력한 값 잠깐 보기");
+    b.style.cssText="margin-left:6px;padding:4px 8px;vertical-align:middle";
+    b.onclick=()=>{ const on=inp.type==="password";
+      inp.type=on?"text":"password"; b.textContent=on?"🙈":"👁"; };
+    inp.insertAdjacentElement("afterend", b);
+  });
+}
 function settingsToSubtabs(){
   const page=document.getElementById("sheet");
   if(!page||page.dataset.subtabbed) return;
@@ -7616,6 +7634,7 @@ function settingsToSubtabs(){
   bar.querySelectorAll(".st").forEach(b=>b.onclick=()=>showSub("sheet",b.dataset.k));
   page.dataset.subtabbed="1";
   mountSettingsSearch(page,bar);     // b158: 항목이 40개가 넘어 '그게 어디 있더라'가 반복된다
+  bindSecretToggles(page);           // b164: 자격증명 칸 마스킹·보기 토글
   showSub("sheet","g0");
 }
 function showSub(pageId,k){
@@ -9073,12 +9092,13 @@ function wizSteps(){
       el.innerHTML = `
         <input id="wzOwner" placeholder="GitHub 사용자명" autocapitalize="off" value="${escAttr(CFG.ghOwner||"")}">
         <input id="wzRepo" placeholder="저장소 이름 (예: Picto)" autocapitalize="off" value="${escAttr(CFG.ghRepo||"")}">
-        <input id="wzTok" placeholder="개인 접근 토큰 (ghp_...)" autocapitalize="off" value="${escAttr(CFG.ghToken||"")}">
+        <input id="wzTok" type="password" placeholder="개인 접근 토큰 (ghp_...)" autocapitalize="off" value="${escAttr(CFG.ghToken||"")}">
         <div class="wiz-note">
           토큰은 GitHub → Settings → Developer settings → <b>Personal access tokens</b> 에서 만듭니다.
           권한은 <b>repo</b> 와 <b>workflow</b> 두 개면 충분합니다.
         </div>
         <div class="wiz-res" id="wzAutoRes"></div>`;
+      bindSecretToggles(el);          // b164: 마법사 토큰 칸도 가린다(런타임 렌더라 별도 호출)
     },
     async next(){
       const o=(document.getElementById("wzOwner").value||"").trim();
