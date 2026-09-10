@@ -116,6 +116,23 @@ def card_html(product, subid, with_notice=True):
     return (NOTICE + card) if with_notice else card
 
 
+def _distinctive_words(pr):
+    """이 제품에만 있는 식별 낱말들. 다른 제품의 match에 부분문자열로 들어가는 말
+    (예: 부속품의 '비데')은 제외한다 — 그건 구분에 쓸 수 없는 말이다."""
+    others = [_norm(k) for q in all_products() if q.get("key") != pr.get("key")
+              for k in (q.get("match") or [q.get("key", "")]) if _norm(k)]
+    out = set()
+    for kw in (pr.get("match") or []) + [pr.get("name", "")]:
+        for w in re.split(r"[\s()·,/]+", kw or ""):
+            w = _norm(w)
+            if len(w) < 3:
+                continue
+            if any(w in o for o in others):      # 남의 match에도 들어가는 말 = 식별 불가
+                continue
+            out.add(w)
+    return out
+
+
 def pending(articles):
     """링크는 등록됐는데 그 제품을 다루는 글이 아직 없는 제품들.
 
@@ -142,6 +159,17 @@ def pending(articles):
     for pr in all_products():
         s_ = _norm(pr.get("search") or "")
         if s_ and len(s_) >= 4 and s_ in hay:
+            used.add(pr.get("key"))
+    # 안전망 2 (2026-09-11): 검색어 **전체 문장**이 제목에 그대로 나오는 일은 거의 없어서
+    # 위 그물이 사실상 비어 있었다. 실측: 부속품(비데 설치 부자재)을 정면으로 다룬 글
+    # 「…맞지 않는 분기밸브는…」이 나왔는데도 본체로 매칭돼 부속품은 계속 대기로 남고,
+    # 자동 배정이 매일 그걸 1순위로 집어 **비데 글이 4편**이 됐다(중복 주제 = 수수료 0,
+    # 검색 품질만 깎임). 그래서 제품의 **식별 낱말**(분기밸브·테프론·부자재 …)이
+    # 글 제목에 나오면 다룬 것으로 본다. 남의 match에도 들어가는 말('비데')은 쓰지 않는다.
+    for pr in all_products():
+        if pr.get("key") in used:
+            continue
+        if any(w in hay for w in _distinctive_words(pr)):
             used.add(pr.get("key"))
     out = []
     for pr in all_products():
