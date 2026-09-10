@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-10T10:42:28",
+ "updated_at": "2026-09-11T08:29:58",
  "site": "https://pickdam.com",
  "checked": 17,
  "indexed": 3,
@@ -8,15 +8,21 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-10T09:31:07\",\"link\":\"https:\\/\\/pickdam.com\\/door-draft-stopper-guide-2026\\/\"},{\"modified\":\"2026-09"
+  "body_head": "[{\"modified\":\"2026-09-11T08:27:54\",\"link\":\"https:\\/\\/pickdam.com\\/bidet-self-installation-check-valve\\/\"},{\"modified\":\"2"
  },
- "posts_n": 16,
+ "posts_n": 17,
  "results": [
   {
    "url": "https://pickdam.com/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-03"
+  },
+  {
+   "url": "https://pickdam.com/bidet-self-installation-check-valve/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/door-draft-stopper-guide-2026/",
@@ -27,7 +33,7 @@
   {
    "url": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -69,7 +75,7 @@
   {
    "url": "https://pickdam.com/moving-packing-cost-conditions/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -92,8 +98,8 @@
   },
   {
    "url": "https://pickdam.com/food-waste-disposer-trade-in-vs-rental-2026/",
-   "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "verdict": "ERROR",
+   "state": "<HttpError 500 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?a",
    "lastCrawl": ""
   },
   {
