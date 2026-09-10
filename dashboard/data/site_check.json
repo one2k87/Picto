@@ -1,5 +1,5 @@
 {
- "at": "2026-09-10T09:28:20",
+ "at": "2026-09-10T09:31:09",
  "n": 16,
  "avg": 100,
  "fails": [],
@@ -105,7 +105,12 @@
   "no_featured": [],
   "no_kokpick": [],
   "few_images": [],
-  "excerpt_filled": [],
+  "excerpt_filled": [
+   {
+    "id": 90,
+    "title": "현관문 문풍지, 틈새 3mm 이상이라면 모헤어, 1mm 미만이라면 실리콘"
+   }
+  ],
   "of": 16
  }
 }
