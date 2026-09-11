@@ -1,6 +1,6 @@
 {
- "at": "2026-09-11T10:06:23",
- "n": 17,
+ "at": "2026-09-12T08:38:09",
+ "n": 18,
  "avg": 100,
  "fails": [],
  "auto_repair": true,
@@ -8,9 +8,13 @@
  "repair_fail": [],
  "defaults": [],
  "noimgv2": {
-  "n": 14,
-  "of": 17,
+  "n": 15,
+  "of": 18,
   "posts": [
+   {
+    "id": 216,
+    "title": "음식물처리기 탈취필터 3개월마다 교체하지 않으면, 주방 냄새 왜 더 심해"
+   },
    {
     "id": 211,
     "title": "2026년 9월 비데 자가 설치, 우리 집 변기에 맞지 않는 분기밸브는 "
@@ -74,9 +78,9 @@
   "posts": []
  },
  "link_coverage": {
-  "of": 17,
-  "matched": 11,
-  "linked": 11,
+  "of": 18,
+  "matched": 12,
+  "linked": 12,
   "unmatched": 6
  },
  "link_fill": {
@@ -84,11 +88,6 @@
   "have": 10
  },
  "pending_products": [
-  {
-   "key": "음식물처리기필터",
-   "name": "음식물처리기 탈취 필터",
-   "search": "음식물처리기 탈취필터"
-  },
   {
    "key": "제습기",
    "name": "제습기",
@@ -104,7 +103,12 @@
   "no_featured": [],
   "no_kokpick": [],
   "few_images": [],
-  "excerpt_filled": [],
-  "of": 17
+  "excerpt_filled": [
+   {
+    "id": 216,
+    "title": "음식물처리기 탈취필터 3개월마다 교체하지 않으면, 주방 냄새 왜 더 심해"
+   }
+  ],
+  "of": 18
  }
 }
