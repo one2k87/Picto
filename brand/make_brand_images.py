@@ -18,6 +18,11 @@ CREAM = (247, 245, 239)
 MUTED = (168, 199, 185)
 SS = 4                                    # 슈퍼샘플링 배율(가장자리 계단 제거)
 
+# 마크가 제 캔버스에서 차지하는 폭(0.88-0.12). 아래 app_icon()의 축소 계산 기준.
+MARK_SPAN = 0.76
+# 크롭 안전 아이콘에서 마크가 차지할 폭. 0.76 그대로면 원·둥근사각 크롭에 잘린다.
+MARK_RATIO_SAFE = 0.66
+
 
 def f(path, size):
     return ImageFont.truetype(path, size, index=KR)
@@ -54,8 +59,38 @@ def logo(size):
     return im
 
 
+def app_icon(size):
+    """크롭 안전 아이콘 — 플랫폼이 원·둥근사각으로 잘라도 형태가 온전히 남는다.
+
+    왜 logo()와 따로 두는가. logo()는 마크가 캔버스의 76%라 가장자리에 거의 붙어 있어,
+    핀터레스트처럼 원으로 잘라 보여주는 곳에서는 **가격표의 뾰족한 왼쪽 끝이 잘려
+    체크만 남는다**(2026-09-09 핀터레스트 프로필, 2026-09-10 개발자 앱 아이콘에서 연속 실측
+    — 마크토 세션 보고). 여기서는 마크를 66%로 줄여 가운데 놓는다.
+
+    모서리를 직접 둥글리지 않는 것도 의도다 — 플랫폼 곡률과 어긋나면 흰 귀퉁이가 비친다.
+    """
+    im = Image.new("RGB", (size, size), BG)
+    inner = int(round(size * MARK_RATIO_SAFE / MARK_SPAN))
+    m = tag_mark(inner)                        # 투명 배경 + 구멍은 BG
+    off = (size - inner) // 2
+    im.paste(m, (off, off), m)
+    return im
+
+
+def crop_safety():
+    """마크 모서리가 반지름의 몇 배 지점인지. 1.00 미만이면 원 크롭에 안 잘린다."""
+    w = MARK_RATIO_SAFE
+    h = w * (0.78 - 0.22) / (0.88 - 0.12)      # 마크의 세로/가로 비
+    return ((w / 2) ** 2 + (h / 2) ** 2) ** 0.5 / 0.5
+
+
 for n in (512, 192, 112):
     logo(n).save(f"pickdam-logo-{n}.png", optimize=True)
+
+# 크롭 안전판 — 핀터레스트·SNS 프로필/앱 아이콘용. 마크토가 이 파일을 가져다 쓴다.
+for n in (512, 192):
+    app_icon(n).save(f"pickdam-app-icon-{n}.png", optimize=True)
+print(f"원 크롭 여유: 마크 모서리가 반지름의 {crop_safety():.2f}배 지점 (1.00 미만이면 안전)")
 
 # ── 기본 소셜 공유 이미지 1200x630
 W, H = 1200, 630

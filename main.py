@@ -860,7 +860,14 @@ def _save_status_and_notify(cfg, all_articles, start_t, ok=True, error=""):
     # 어떤 연동이 '오늘 기대됐는데 실패'인지
     today = monitor.now_kst()[:10]
     expected = ["gemini"]
-    if str(cfg.get("metrics", {}).get("provider")) == "naver":
+    # 네이버 검색광고 키워드도구는 **키가 실제로 있을 때만** 기대한다.
+    # provider 기본값이 "naver"라서, 키가 없어도 매일 health_bad=["naver"]가 찍혔다.
+    # 실측(2026-09-11): 9/4~9/11 전 실행에서 예외 없이 빨간불 → 텔레그램 경고가 항상 떠
+    # '늘 빨간 신호'가 됐고, 정작 워드프레스·제미나이가 진짜로 죽는 날을 가릴 판이었다.
+    # 키 미설정은 '실패'가 아니라 '미연동'이다. (키 발급은 사용자 판단 — inbox 참조)
+    _m = cfg.get("metrics", {}) or {}
+    _nv = _m.get("naver") or {}
+    if str(_m.get("provider")) == "naver" and _nv.get("api_key") and _nv.get("secret_key"):
         expected.append("naver")
     if cfg.get("wordpress", {}).get("enabled"):
         expected.append("wordpress")
