@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-12T08:37:52",
+ "updated_at": "2026-09-12T10:08:03",
  "site": "https://pickdam.com",
  "checked": 19,
  "indexed": 13,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-12T08:35:39\",\"link\":\"https:\\/\\/pickdam.com\\/eumsikmulcheorigi-talchwipilteo-naemsae-an-nage-jettae"
+  "body_head": "[{\"modified\":\"2026-09-12T08:38:07\",\"link\":\"https:\\/\\/pickdam.com\\/eumsikmulcheorigi-talchwipilteo-naemsae-an-nage-jettae"
  },
  "posts_n": 18,
  "results": [
@@ -21,7 +21,7 @@
   {
    "url": "https://pickdam.com/eumsikmulcheorigi-talchwipilteo-naemsae-an-nage-jettae/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -117,7 +117,7 @@
   {
    "url": "https://pickdam.com/bidet-self-installation-guide-2026/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
