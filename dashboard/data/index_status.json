@@ -1,22 +1,28 @@
 {
- "updated_at": "2026-09-12T10:08:03",
+ "updated_at": "2026-09-13T08:31:43",
  "site": "https://pickdam.com",
- "checked": 19,
+ "checked": 20,
  "indexed": 13,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-12T08:38:07\",\"link\":\"https:\\/\\/pickdam.com\\/eumsikmulcheorigi-talchwipilteo-naemsae-an-nage-jettae"
+  "body_head": "[{\"modified\":\"2026-09-13T08:29:24\",\"link\":\"https:\\/\\/pickdam.com\\/jeseupgi-20l-uri-jip-pyeongsue-matneun-yongryang-seont"
  },
- "posts_n": 18,
+ "posts_n": 19,
  "results": [
   {
    "url": "https://pickdam.com/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-03"
+  },
+  {
+   "url": "https://pickdam.com/jeseupgi-20l-uri-jip-pyeongsue-matneun-yongryang-seontaek/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/eumsikmulcheorigi-talchwipilteo-naemsae-an-nage-jettae/",
@@ -117,7 +123,7 @@
   {
    "url": "https://pickdam.com/bidet-self-installation-guide-2026/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {

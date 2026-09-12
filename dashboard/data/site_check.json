@@ -1,6 +1,6 @@
 {
- "at": "2026-09-12T10:08:13",
- "n": 18,
+ "at": "2026-09-13T08:31:56",
+ "n": 19,
  "avg": 100,
  "fails": [],
  "auto_repair": true,
@@ -8,9 +8,13 @@
  "repair_fail": [],
  "defaults": [],
  "noimgv2": {
-  "n": 15,
-  "of": 18,
+  "n": 16,
+  "of": 19,
   "posts": [
+   {
+    "id": 222,
+    "title": "제습기 20L 용량, 30평대 아파트에서 곰팡이 해결보다 전기요금 폭탄 "
+   },
    {
     "id": 216,
     "title": "음식물처리기 탈취필터 3개월마다 교체하지 않으면, 주방 냄새 왜 더 심해"
@@ -78,22 +82,16 @@
   "posts": []
  },
  "link_coverage": {
-  "of": 18,
-  "matched": 12,
-  "linked": 12,
+  "of": 19,
+  "matched": 13,
+  "linked": 13,
   "unmatched": 6
  },
  "link_fill": {
   "of": 10,
   "have": 10
  },
- "pending_products": [
-  {
-   "key": "제습기",
-   "name": "제습기",
-   "search": "제습기 20L"
-  }
- ],
+ "pending_products": [],
  "line_leaks": {
   "n": 0,
   "posts": []
@@ -103,7 +101,12 @@
   "no_featured": [],
   "no_kokpick": [],
   "few_images": [],
-  "excerpt_filled": [],
-  "of": 18
+  "excerpt_filled": [
+   {
+    "id": 222,
+    "title": "제습기 20L 용량, 30평대 아파트에서 곰팡이 해결보다 전기요금 폭탄 "
+   }
+  ],
+  "of": 19
  }
 }
