@@ -9,6 +9,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import generator
 from generator import _slug_core, make_slug, romanize_ko, slugify
 
 ok = fail = 0
@@ -70,4 +71,27 @@ check("로마자 비한글 보존", romanize_ko("20L 제습기").startswith("20L
 check("slugify 호환", slugify("3-2") == "")
 
 print(f"test_slug: {ok} pass / {fail} fail")
+
+# ── 2026-09-13 추가: 영문 슬러그 재요청 갈고리 ───────────────────
+# 실측: 프롬프트가 영문 슬러그를 요구해도 모델이 한글/빈값을 주는 날이 있어
+# 공개 19편 중 2편이 `jeseupgi-20l-...` 같은 로마자 주소로 나갔다.
+_T = "제습기 20L 용량, 30평대 아파트에서 곰팡이"
+_ok = 0
+def _c(name, cond):
+    global _ok
+    print(("  ✓ " if cond else "  ✗ ") + name)
+    if not cond: raise SystemExit(1)
+    _ok += 1
+
+generator.SLUG_TRANSLATOR = None
+_c("갈고리 없으면 기존 로마자 폴백 유지", generator.make_slug("", _T, "제습기 20L").startswith("jeseupgi"))
+generator.SLUG_TRANSLATOR = lambda t: "dehumidifier-20l-apartment-size-guide"
+_c("갈고리가 영문을 주면 그걸 쓴다",
+   generator.make_slug("", _T, "제습기 20L") == "dehumidifier-20l-apartment-size-guide")
+generator.SLUG_TRANSLATOR = lambda t: (_ for _ in ()).throw(RuntimeError("boom"))
+_c("갈고리가 터져도 로마자로 계속 간다", generator.make_slug("", _T, "제습기 20L").startswith("jeseupgi"))
+generator.SLUG_TRANSLATOR = lambda t: "한글 슬러그"
+_c("갈고리가 한글을 주면 버린다", generator.make_slug("", _T, "제습기 20L").startswith("jeseupgi"))
+generator.SLUG_TRANSLATOR = None
+print(f"test_slug 추가 {_ok}건 통과")
 sys.exit(1 if fail else 0)

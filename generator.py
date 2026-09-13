@@ -114,6 +114,15 @@ def slugify(text, max_words=8):
     return _slug_core(text, max_words)
 
 
+# 제목을 영문 슬러그로 옮겨주는 갈고리(선택). main이 llm을 물려준다.
+# 왜 필요한가(2026-09-13 실측): 생성 프롬프트가 영문 슬러그를 요구해도 모델이
+# 한글 슬러그를 주거나 비워 보내는 날이 있다. 그날 글은 로마자 폴백으로 넘어가
+# `jeseupgi-20l-uri-jip-pyeongsue-...` 같은 주소가 된다. 깨진 건 아니지만 사람이
+# 읽지 못하고 검색에도 불리하다(공개 19편 중 2편만 이 꼴이라 더 눈에 띈다).
+# 프롬프트 한 줄로는 못 막는 게 실측으로 드러나, 실패하면 한 번 더 물어본다.
+SLUG_TRANSLATOR = None
+
+
 def make_slug(llm_slug="", title="", keyword="", when=None):
     """글 주소를 정한다. 앞에서부터 되는 것을 쓴다.
       ① LLM이 준 영문 슬러그 ② 제목 속 영문 ③ 키워드 속 영문
@@ -125,6 +134,13 @@ def make_slug(llm_slug="", title="", keyword="", when=None):
         s = _slug_core(cand)
         if len(s) >= 6:
             return s
+    if SLUG_TRANSLATOR:                      # 갈고리가 없으면(테스트 등) 조용히 건너뛴다
+        try:
+            s = _slug_core(SLUG_TRANSLATOR(title or keyword) or "")
+            if len(s) >= 6:
+                return s
+        except Exception as e:
+            print(f"[slug] 영문 슬러그 재요청 실패(로마자로 진행): {str(e)[:80]}")
     s = _slug_core(romanize_ko(title) or romanize_ko(keyword))
     if len(s) >= 6:
         return s
@@ -516,7 +532,7 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
 본문은 JSON이 아니라 그냥 HTML이므로 따옴표를 이스케이프하지 마세요.
 
 ===META===
-{{"title":"클릭 유도형 제목","meta":"120~155자 메타설명(키워드 포함)","slug":"english-hyphen-slug","focus_keyword":"{keyword}","tags":["태그1","태그2","태그3","태그4","태그5"],"hook":"3초 후킹 첫 문장","gain":"{_gain_key}","tldr":[],"checklist":[],"summary_table":{{"headers":[],"rows":[]}},"faqs":[],"kokpick":{{"price_band":"","condition_branch":[],"size_install":"","maintenance":{{"cycle":"","cost_per_year":"","consumable_url":""}},"cautions":[],"alt_uses":[],"alt_uses_source":""}}}}
+{{"title":"클릭 유도형 제목","meta":"120~155자 메타설명(키워드 포함)","slug":"english-hyphen-slug(소문자 영문 낱말 3~6개를 하이픈으로. 한글·숫자만·빈값 금지)","focus_keyword":"{keyword}","tags":["태그1","태그2","태그3","태그4","태그5"],"hook":"3초 후킹 첫 문장","gain":"{_gain_key}","tldr":[],"checklist":[],"summary_table":{{"headers":[],"rows":[]}},"faqs":[],"kokpick":{{"price_band":"","condition_branch":[],"size_install":"","maintenance":{{"cycle":"","cost_per_year":"","consumable_url":""}},"cautions":[],"alt_uses":[],"alt_uses_source":""}}}}
 (위 tldr·checklist·summary_table·faqs는 '배정된 것만' 채우고, 배정되지 않은 항목은 위처럼 빈 채로 두세요)
 (kokpick = 유튜브 채널이 읽어갈 구조화 정보입니다. **본문에 실제로 쓴 내용만** 옮겨 담고,
  본문에 없는 값은 반드시 빈 채로 두세요 — 지어내면 영상과 글의 근거가 어긋납니다.

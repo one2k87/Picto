@@ -370,6 +370,16 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
     # 실제 광고 코드를 생성기에 넘긴다. 비어 있으면 generator가 광고 블록을
     # 아예 만들지 않는다(예전에는 빈 "[ 광고 자리 ]" 상자가 독자에게 보였다).
     generator.AD_CODE = (cfg.get("ads", {}) or {}).get("code", "") or ""
+    # 한글 제목만 남았을 때 영문 슬러그를 한 번 더 물어본다(2026-09-13 실측 대응).
+    # 짧은 호출이라 비용은 무시할 수준이고, 실패하면 기존 로마자 폴백으로 내려간다.
+    def _slug_ask(text):
+        if not text:
+            return ""
+        return chat("다음 한국어 제목을 블로그 주소용 영문 슬러그로 바꿔라.\n"
+                    "규칙: 소문자 영문 낱말 3~6개를 하이픈으로 잇고, 숫자는 의미가 있을 때만 남긴다.\n"
+                    "설명·따옴표·마침표 없이 슬러그 한 줄만 출력한다.\n"
+                    f"제목: {text}", cfg["llm"], max_tokens=40, temperature=0)
+    generator.SLUG_TRANSLATOR = _slug_ask
     author = cfg.get("author") or "편집부"
     author_bio = cfg.get("author_bio") or ""
     author_type = cfg.get("author_type") or "Organization"
