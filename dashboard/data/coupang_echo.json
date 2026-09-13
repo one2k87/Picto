@@ -4,21 +4,5 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false,
- "apply_trace": [
-  {
-   "stage": "진입",
-   "title": "제습기 20L 용량, 30평대 아파트에서 곰팡이 해",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 5
-  },
-  {
-   "stage": "중단:enabled=False",
-   "title": "제습기 20L 용량, 30평대 아파트에서 곰팡이 해",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 5
-  }
- ]
+ "file_enabled": false
 }

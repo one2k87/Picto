@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-13T08:31:43",
+ "updated_at": "2026-09-13T10:01:57",
  "site": "https://pickdam.com",
  "checked": 20,
  "indexed": 13,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-13T08:29:24\",\"link\":\"https:\\/\\/pickdam.com\\/jeseupgi-20l-uri-jip-pyeongsue-matneun-yongryang-seont"
+  "body_head": "[{\"modified\":\"2026-09-13T08:31:54\",\"link\":\"https:\\/\\/pickdam.com\\/jeseupgi-20l-uri-jip-pyeongsue-matneun-yongryang-seont"
  },
  "posts_n": 19,
  "results": [
@@ -21,7 +21,7 @@
   {
    "url": "https://pickdam.com/jeseupgi-20l-uri-jip-pyeongsue-matneun-yongryang-seontaek/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -111,7 +111,7 @@
   {
    "url": "https://pickdam.com/food-waste-disposer-trade-in-vs-rental-2026/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
