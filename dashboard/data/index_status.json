@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-14T08:40:47",
+ "updated_at": "2026-09-14T10:05:41",
  "site": "https://pickdam.com",
  "checked": 21,
  "indexed": 14,
@@ -21,19 +21,19 @@
   {
    "url": "https://pickdam.com/food-waste-smell-filter-cleaning/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/food-waste-disposer-deodorizing-filter-replacement/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/dehumidifier-20l-electricity-bill-30pyeong/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -111,7 +111,7 @@
   {
    "url": "https://pickdam.com/kitchen-ventilation-rental-vs-buy-2026-september/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
