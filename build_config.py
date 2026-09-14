@@ -158,6 +158,15 @@ cfg = {
     },
     # code가 비어 있으면 광고 블록을 만들지 않는다(빈 "[ 광고 자리 ]" 상자 방지).
     "ads": {"insert_slots": b("INSERT_ADS", True), "code": envs("ADS_CODE", "")},
+    # 검색 수요 게이트(2026-09-15) — 네이버 검색광고 키워드도구.
+    # 키가 없으면 조회가 빈 결과를 주고 아무것도 거르지 않는다(발행은 절대 안 멈춘다).
+    "demand": {
+        "enabled": b("DEMAND_GATE", True),
+        "min_volume": int(envs("DEMAND_MIN_VOLUME", "100") or 100),
+        "api_key": envs("NAVER_AD_API_KEY", ""),
+        "secret": envs("NAVER_AD_SECRET", ""),
+        "customer_id": envs("NAVER_AD_CUSTOMER_ID", ""),
+    },
     "coupang": {                                    # 쿠팡 파트너스(API 불필요)
         # 시크릿이 아니라 저장소 파일(data/coupang.json)을 기본값으로 쓴다.
         # 위젯 코드와 trackingCode는 발행된 글 HTML에 그대로 노출되는 공개 정보라

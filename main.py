@@ -118,6 +118,20 @@ def collect_lane(cfg, cat, lane, n_slots, exclude):
         if len(cand) < before:
             print(f"  · 살 물건 없는 주제 {before - len(cand)}개 제외(커머스 전용)")
 
+    # 검색 수요 게이트(2026-09-15) — 실제로 찾는 말인지 보고 나서 쓴다.
+    # 도입 근거: 3개월 누적 노출 51·클릭 3인데 평균 게재순위는 7위였다.
+    # 순위가 아니라 '그 말을 아무도 안 친다'가 원인이라는 뜻이라, 생성 전에 거른다.
+    # 키가 없거나 조회가 실패하면 아무것도 거르지 않는다 — 발행이 멈추면 안 되니까.
+    try:
+        import demand as _demand
+        cand, _vol, _cut = _demand.filter_by_demand(cand, cfg)
+        if _vol:
+            _top = sorted(_vol.items(), key=lambda kv: -kv[1])[:3]
+            print(f"  · 검색 수요 확인: {len(_vol)}개 조회 · {_cut}개 제외 "
+                  f"(상위 {', '.join(f'{k[:14]} {v}' for k, v in _top)})")
+    except Exception as e:
+        print(f"  · 검색 수요 조회 건너뜀({str(e)[:60]})")
+
     # 지속 판별(저경쟁 vs 시즌). 속도 위해 perf.classify=false 면 건너뜀
     # (이미 lane별 프롬프트로 생성했으므로 끄더라도 분류 자체는 유지됨)
     if cfg.get("perf", {}).get("classify", True):
