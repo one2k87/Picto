@@ -30,6 +30,7 @@ import requests
 BASE = "https://api.searchad.naver.com"
 PATH = "/keywordstool"
 _CACHE = {}
+COMP = {}          # {키워드: 경쟁정도} — filter_by_demand가 함께 본다
 LAST_ERR = ""      # 조회 실패 사유(진단용) — 액션 로그를 되읽기 어려워 파일로 남긴다
 
 
@@ -99,6 +100,7 @@ def monthly_volume(keywords, cfg):
             if not hit:
                 continue
             v = _num(hit.get("monthlyPcQcCnt")) + _num(hit.get("monthlyMobileQcCnt"))
+            COMP[kw] = hit.get("compIdx", "")
             _CACHE[q] = v
             out[kw] = v
             time.sleep(0.3)                      # 초당 호출 제한 회피
@@ -201,11 +203,27 @@ def filter_by_demand(cands, cfg, key="keyword"):
                 print(f"[demand] 네이버 키 없음 → 자동완성 대리 신호로 {cut}개 제외")
             return keep, {}, cut
         return cands, {}, 0                      # 조회 자체가 안 됐으면 건드리지 않는다
-    floor = int(c.get("min_volume", 100))
-    keep = [x for x in cands if vol.get(x.get(key, ""), 0) >= floor]
+    # 적정 구간(2026-09-15 실측 분포로 정함):
+    #   하한 — 월 300 미만은 1위를 해도 클릭이 안 난다(실측: 우리가 써온 제목형이 월 20회였다).
+    #   상한 — 월 3만 초과는 신규 도메인이 넘볼 자리가 아니다(3개월 클릭 3회인 사이트다).
+    #   경쟁 — '높음'은 광고주가 몰린 자리라 자연검색도 레드오션. 제외한다.
+    # 셋 다 config로 조절한다. 색인·순위가 오르면 상한을 올리는 것이 정상 경로다.
+    floor = int(c.get("min_volume", 300))
+    ceil = int(c.get("max_volume", 30000))
+    block = set(c.get("block_comp") or ["높음"])
+
+    def ok(x):
+        k = x.get(key, "")
+        v = vol.get(k, 0)
+        return floor <= v <= ceil and COMP.get(k, "") not in block
+
+    keep = [x for x in cands if ok(x)]
     if not keep:
-        best = max(cands, key=lambda x: vol.get(x.get(key, ""), 0))
-        print(f"[demand] 전부 월 {floor}회 미만 — 그중 가장 큰 것 하나만 남긴다: "
-              f"{best.get(key,'')[:22]}({vol.get(best.get(key,''),0)})")
+        # 전부 걸리면 '적정 구간에 가장 가까운' 하나를 남긴다(그날 발행이 멈추면 안 된다).
+        mid = (floor + min(ceil, 5000)) / 2
+        best = min(cands, key=lambda x: abs(vol.get(x.get(key, ""), 0) - mid))
+        print(f"[demand] 적정 구간({floor}~{ceil}, 경쟁 {sorted(block)} 제외)에 든 후보가 없다 — "
+              f"가장 가까운 것 하나만 남긴다: {best.get(key,'')[:22]}"
+              f"({vol.get(best.get(key,''),0)}/{COMP.get(best.get(key,''),'?')})")
         return [best], vol, len(cands) - 1
     return keep, vol, len(cands) - len(keep)
