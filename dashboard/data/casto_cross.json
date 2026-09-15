@@ -1,0 +1,418 @@
+{
+ "at": "2026-09-15 13:03",
+ "floor": 300,
+ "ceil": 30000,
+ "block_comp": [
+  "높음"
+ ],
+ "rows": [
+  {
+   "candidate": "센서등",
+   "head": {
+    "keyword": "현관센서등",
+    "volume": 18230,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "현관센서등",
+    "volume": 18230,
+    "comp": "중간",
+    "clicks": 483,
+    "depth": 8
+   },
+   "fit_n": 4
+  },
+  {
+   "candidate": "음식물 쓰레기처리기",
+   "head": {
+    "keyword": "음식물처리기",
+    "volume": 159700,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "음식물분쇄기",
+    "volume": 19770,
+    "comp": "중간",
+    "clicks": 437,
+    "depth": 8
+   },
+   "fit_n": 4
+  },
+  {
+   "candidate": "자동회전냄비",
+   "head": {
+    "keyword": "자동회전냄비",
+    "volume": 9790,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "자동회전냄비",
+    "volume": 9790,
+    "comp": "중간",
+    "clicks": 347,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "무드등",
+   "head": {
+    "keyword": "무드등",
+    "volume": 25930,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "무드등",
+    "volume": 25930,
+    "comp": "중간",
+    "clicks": 194,
+    "depth": 8
+   },
+   "fit_n": 2
+  },
+  {
+   "candidate": "주방 슬라이딩 선반",
+   "head": {
+    "keyword": "주방슬라이딩선반",
+    "volume": 2810,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "주방슬라이딩선반",
+    "volume": 2810,
+    "comp": "중간",
+    "clicks": 104,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "오일 스프레이",
+   "head": {
+    "keyword": "오일스프레이",
+    "volume": 5610,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "오일스프레이",
+    "volume": 5610,
+    "comp": "중간",
+    "clicks": 76,
+    "depth": 8
+   },
+   "fit_n": 2
+  },
+  {
+   "candidate": "차량용 공기청정기",
+   "head": {
+    "keyword": "차량용공기청정기",
+    "volume": 5660,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "차량용공기청정기",
+    "volume": 5660,
+    "comp": "중간",
+    "clicks": 38,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "레트로 수화기",
+   "head": {
+    "keyword": "레트로수화기",
+    "volume": 620,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "레트로수화기",
+    "volume": 620,
+    "comp": "중간",
+    "clicks": 15,
+    "depth": 6
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "접이식 블루투스 키보드",
+   "head": {
+    "keyword": "접이식블루투스키보드",
+    "volume": 1670,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "접이식블루투스키보드",
+    "volume": 1670,
+    "comp": "중간",
+    "clicks": 5,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "얼음 보관통",
+   "head": {
+    "keyword": "얼음보관통",
+    "volume": 1340,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "얼음보관통",
+    "volume": 1340,
+    "comp": "중간",
+    "clicks": 5,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "늘어나는 밀폐용기",
+   "head": {
+    "keyword": "늘어나는밀폐용기",
+    "volume": 20,
+    "comp": "낮음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "레이저가이드가위",
+   "head": {
+    "keyword": "레이저가이드가위",
+    "volume": 20,
+    "comp": "낮음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "얼음틀 얼음보관통",
+   "head": {
+    "keyword": "얼음틀얼음보관통",
+    "volume": 20,
+    "comp": "낮음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "쌀통 쌀보관",
+   "head": {
+    "keyword": "쌀통쌀보관",
+    "volume": 20,
+    "comp": "낮음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "에그크래커",
+   "head": {
+    "keyword": "에그크래커",
+    "volume": 30,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "미니세탁기",
+   "head": {
+    "keyword": "미니세탁기",
+    "volume": 30270,
+    "comp": "중간"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "그릇정리대",
+   "head": null,
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "싱크대 식기세척기",
+   "head": {
+    "keyword": "싱크대개수대교체",
+    "volume": 1080,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "접이식 플러스도마",
+   "head": {
+    "keyword": "접이식플러스도마",
+    "volume": 20,
+    "comp": "낮음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "이케아 트로네스 신발장",
+   "head": {
+    "keyword": "이케아트로네스신발장",
+    "volume": 280,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "미니 가습기 무선",
+   "head": {
+    "keyword": "미니가습기무선",
+    "volume": 20,
+    "comp": "낮음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "캡슐 커피 머신 소형",
+   "head": {
+    "keyword": "캡슐커피머신소형",
+    "volume": 20,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "무선 물걸레 청소기",
+   "head": null,
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "휴대용 선풍기 넥밴드",
+   "head": {
+    "keyword": "휴대용선풍기넥밴드",
+    "volume": 30,
+    "comp": "낮음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "얼음틀/보관통",
+   "head": {
+    "keyword": "얼음틀보관통",
+    "volume": 20,
+    "comp": "낮음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "계란 흰자 분리기",
+   "head": {
+    "keyword": "계란흰자분리기",
+    "volume": 20,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "손끼임 방지가드",
+   "head": {
+    "keyword": "손끼임방지가드",
+    "volume": 20,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "계란보관 트레이",
+   "head": {
+    "keyword": "계란보관트레이",
+    "volume": 160,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "코에서 계란 흰자 주방용품",
+   "head": {
+    "keyword": "코에서계란흰자주방용품",
+    "volume": 20,
+    "comp": "낮음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "자동 과일깎이",
+   "head": {
+    "keyword": "자동과일깎이",
+    "volume": 20,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "기름 분사 용기",
+   "head": {
+    "keyword": "기름분사용기",
+    "volume": 20,
+    "comp": "낮음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "자동 과일껍질제거기",
+   "head": {
+    "keyword": "자동과일껍질제거기",
+    "volume": 20,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "자동 키친타올 디스펜서",
+   "head": {
+    "keyword": "자동키친타올디스펜서",
+    "volume": 20,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "육즙 주입기",
+   "head": {
+    "keyword": "육즙주입기",
+    "volume": 20,
+    "comp": "낮음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "넘침방지 냄비뚜껑",
+   "head": {
+    "keyword": "넘침방지냄비뚜껑",
+    "volume": 20,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "스텐 선반",
+   "head": null,
+   "best": null,
+   "fit_n": 0
+  }
+ ]
+}
