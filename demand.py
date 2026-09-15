@@ -89,6 +89,43 @@ def monthly_volume(keywords, cfg):
     return out
 
 
+SUGGEST = "https://suggestqueries.google.com/complete/search"
+
+
+def suggest_hits(keyword, timeout=8):
+    """키 없이 쓰는 **대리 신호** — 구글 자동완성에 이 말이 뜨는가.
+
+    ⚠️ 이건 검색량이 아니다. 자동완성은 '실제로 입력된 적이 있는 질의'에서 만들어지므로
+    **0건이면 아무도 안 친다는 쪽의 증거**가 되지만, 건수가 많다고 검색량이 크다는 뜻은 아니다.
+    그래서 숫자 기준으로 자르지 않고 '신호가 아예 없는 후보'만 걸러내는 데만 쓴다.
+    네이버 키가 등록되면 이 함수는 쓰이지 않는다(실측 검색량이 언제나 우선).
+    """
+    q = _clean(keyword)[:30]
+    if not q:
+        return 0
+    try:
+        r = requests.get(SUGGEST, params={"client": "firefox", "hl": "ko", "q": keyword},
+                         timeout=timeout)
+        if r.status_code != 200:
+            return -1                      # -1 = 판단 불가(거르지 않는다)
+        data = json.loads(r.text)
+        return len(data[1]) if isinstance(data, list) and len(data) > 1 else 0
+    except Exception:
+        return -1
+
+
+def _suggest_filter(cands, key):
+    """자동완성 신호가 **0인 후보만** 버린다. 전부 0이면 손대지 않는다."""
+    hits = {}
+    for c in cands:
+        hits[c.get(key, "")] = suggest_hits(c.get(key, ""))
+        time.sleep(0.2)
+    keep = [c for c in cands if hits.get(c.get(key, ""), -1) != 0]
+    if not keep:
+        return cands, hits, 0              # 전부 0이면 조회가 이상한 것 — 그냥 통과
+    return keep, hits, len(cands) - len(keep)
+
+
 def filter_by_demand(cands, cfg, key="keyword"):
     """검색량 기준 미달 후보를 버린다. 전부 미달이면 가장 큰 것 1건만 남긴다.
     반환: (남은 후보, 조회된 검색량 dict, 버린 수)"""
@@ -97,6 +134,13 @@ def filter_by_demand(cands, cfg, key="keyword"):
         return cands, {}, 0
     vol = monthly_volume([x.get(key, "") for x in cands], cfg)
     if not vol:
+        # 네이버 키가 없을 때의 대비책: 자동완성 신호가 0인 후보만 버린다.
+        # 검색량이 아니라 대리 신호이므로 '전혀 안 뜨는 것'만 거른다(위 주석 참조).
+        if c.get("suggest_fallback", True):
+            keep, hits, cut = _suggest_filter(cands, key)
+            if cut:
+                print(f"[demand] 네이버 키 없음 → 자동완성 대리 신호로 {cut}개 제외")
+            return keep, {}, cut
         return cands, {}, 0                      # 조회 자체가 안 됐으면 건드리지 않는다
     floor = int(c.get("min_volume", 100))
     keep = [x for x in cands if vol.get(x.get(key, ""), 0) >= floor]
