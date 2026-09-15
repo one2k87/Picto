@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-15T09:06:24",
+ "updated_at": "2026-09-15T10:29:15",
  "site": "https://pickdam.com",
  "checked": 21,
  "indexed": 14,
@@ -21,7 +21,7 @@
   {
    "url": "https://pickdam.com/one-person-food-disposer-install/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -129,7 +129,7 @@
   {
    "url": "https://pickdam.com/food-waste-disposer-trade-in-vs-rental-2026/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
