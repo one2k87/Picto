@@ -33,7 +33,10 @@ FLOOR = int(dc.get("min_volume", 300))
 CEIL = int(dc.get("max_volume", 30000))
 BLOCK = set(dc.get("block_comp") or ["높음"])
 
-cands = (json.load(open("data/product_candidates.json", encoding="utf-8")) or {}).get("candidates", [])
+SRC = os.getenv("SCOUT_FILE") or "data/product_candidates.json"
+OUT = os.getenv("SCOUT_OUT") or "dashboard/data/product_scout.json"
+cands = (json.load(open(SRC, encoding="utf-8")) or {}).get("candidates", [])
+print(f"후보 파일: {SRC} ({len(cands)}종)")
 have = " ".join(re.sub(r"\s", "", json.dumps(p, ensure_ascii=False)) for p in products.all_products())
 
 rows = []
@@ -61,6 +64,6 @@ rows.sort(key=lambda r: -((r["best"] or {}).get("clicks") or 0))
 os.makedirs("dashboard/data", exist_ok=True)
 json.dump({"at": time.strftime("%Y-%m-%d %H:%M"), "floor": FLOOR, "ceil": CEIL,
            "block_comp": sorted(BLOCK), "rows": rows},
-          open("dashboard/data/product_scout.json", "w", encoding="utf-8"),
+          open(OUT, "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)
 print(f"\n저장 완료 — 후보 {len(rows)}종, 적정 구간 보유 {sum(1 for r in rows if r['best'])}종")
