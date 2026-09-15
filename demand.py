@@ -63,7 +63,10 @@ def _clean(kw):
 def monthly_volume(keywords, cfg):
     """{키워드: 월간 검색량}. 조회 불가·실패면 빈 dict(= 거르지 않음)."""
     c = (cfg or {}).get("demand") or {}
-    key, sec, cid = c.get("api_key", ""), c.get("secret", ""), str(c.get("customer_id", ""))
+    # 시크릿에 줄바꿈·공백이 딸려오면 서명이 어긋나 403이 난다(붙여넣기 사고가 흔하다).
+    key = (c.get("api_key") or "").strip()
+    sec = (c.get("secret") or "").strip()
+    cid = str(c.get("customer_id") or "").strip()
     if not (key and sec and cid):
         return {}
     out = {}
