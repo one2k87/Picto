@@ -1,87 +1,417 @@
 {
- "at": "2026-09-15 11:14",
+ "at": "2026-09-15 11:16",
  "products": [
   {
    "key": "문풍지",
    "name": "문풍지 (문틈 바람막이)",
-   "hint": "현관문 문풍지 방풍",
+   "hint": [
+    "문풍지",
+    "문틈",
+    "웃풍",
+    "외풍",
+    "바람막이"
+   ],
    "has_link": true,
    "rows": [
     {
-     "keyword": "현관문문풍지방풍",
-     "volume": 20,
-     "comp": "낮음",
-     "clicks": 0,
-     "depth": 0
+     "keyword": "유니클로세일",
+     "volume": 88410,
+     "comp": "높음",
+     "clicks": 419,
+     "depth": 9
+    },
+    {
+     "keyword": "운동화",
+     "volume": 75300,
+     "comp": "높음",
+     "clicks": 1074,
+     "depth": 10
+    },
+    {
+     "keyword": "쇼파",
+     "volume": 74100,
+     "comp": "중간",
+     "clicks": 2064,
+     "depth": 8
+    },
+    {
+     "keyword": "바람막이",
+     "volume": 70900,
+     "comp": "높음",
+     "clicks": 432,
+     "depth": 9
+    },
+    {
+     "keyword": "경량패딩",
+     "volume": 56600,
+     "comp": "중간",
+     "clicks": 557,
+     "depth": 8
+    },
+    {
+     "keyword": "후드집업",
+     "volume": 49410,
+     "comp": "중간",
+     "clicks": 378,
+     "depth": 8
+    },
+    {
+     "keyword": "나이키바람막이",
+     "volume": 48060,
+     "comp": "높음",
+     "clicks": 504,
+     "depth": 10
+    },
+    {
+     "keyword": "후드티",
+     "volume": 23260,
+     "comp": "높음",
+     "clicks": 115,
+     "depth": 10
+    },
+    {
+     "keyword": "티셔츠주문제작",
+     "volume": 17320,
+     "comp": "높음",
+     "clicks": 797,
+     "depth": 8
+    },
+    {
+     "keyword": "백패킹",
+     "volume": 17300,
+     "comp": "높음",
+     "clicks": 75,
+     "depth": 10
+    },
+    {
+     "keyword": "자켓",
+     "volume": 17100,
+     "comp": "높음",
+     "clicks": 23,
+     "depth": 10
+    },
+    {
+     "keyword": "우비",
+     "volume": 17080,
+     "comp": "높음",
+     "clicks": 96,
+     "depth": 10
+    },
+    {
+     "keyword": "티셔츠",
+     "volume": 16710,
+     "comp": "높음",
+     "clicks": 67,
+     "depth": 10
+    },
+    {
+     "keyword": "커텐",
+     "volume": 16530,
+     "comp": "높음",
+     "clicks": 316,
+     "depth": 10
+    },
+    {
+     "keyword": "윈드브레이커",
+     "volume": 15880,
+     "comp": "높음",
+     "clicks": 42,
+     "depth": 10
+    },
+    {
+     "keyword": "후리스",
+     "volume": 14880,
+     "comp": "높음",
+     "clicks": 118,
+     "depth": 8
+    },
+    {
+     "keyword": "천막",
+     "volume": 13890,
+     "comp": "높음",
+     "clicks": 104,
+     "depth": 8
+    },
+    {
+     "keyword": "모기장",
+     "volume": 13710,
+     "comp": "중간",
+     "clicks": 33,
+     "depth": 7
+    },
+    {
+     "keyword": "트렌치코트",
+     "volume": 13540,
+     "comp": "높음",
+     "clicks": 105,
+     "depth": 7
+    },
+    {
+     "keyword": "반바지",
+     "volume": 13390,
+     "comp": "높음",
+     "clicks": 86,
+     "depth": 10
+    },
+    {
+     "keyword": "창문시트지",
+     "volume": 11480,
+     "comp": "중간",
+     "clicks": 185,
+     "depth": 8
+    },
+    {
+     "keyword": "등산",
+     "volume": 11420,
+     "comp": "높음",
+     "clicks": 15,
+     "depth": 10
+    },
+    {
+     "keyword": "남자바람막이",
+     "volume": 10360,
+     "comp": "높음",
+     "clicks": 98,
+     "depth": 10
+    },
+    {
+     "keyword": "러브버그",
+     "volume": 10320,
+     "comp": "높음",
+     "clicks": 18,
+     "depth": 7
+    },
+    {
+     "keyword": "가을옷",
+     "volume": 9990,
+     "comp": "높음",
+     "clicks": 191,
+     "depth": 8
     }
    ]
   },
   {
    "key": "창문단열시트",
    "name": "창문 단열 시트 (뽁뽁이·방풍비닐)",
-   "hint": "창문 단열 뽁뽁이 방풍비닐",
+   "hint": [
+    "창문단열시트",
+    "창문",
+    "단열",
+    "결로",
+    "곰팡이"
+   ],
    "has_link": true,
    "rows": [
     {
-     "keyword": "창문단열뽁뽁이방풍비닐",
-     "volume": 20,
-     "comp": "낮음",
-     "clicks": 0,
-     "depth": 0
+     "keyword": "화장실리모델링",
+     "volume": 21130,
+     "comp": "높음",
+     "clicks": 789,
+     "depth": 10
+    },
+    {
+     "keyword": "곰팡이제거제",
+     "volume": 19540,
+     "comp": "높음",
+     "clicks": 80,
+     "depth": 10
+    },
+    {
+     "keyword": "거실인테리어",
+     "volume": 19180,
+     "comp": "높음",
+     "clicks": 276,
+     "depth": 10
+    },
+    {
+     "keyword": "벽지",
+     "volume": 17200,
+     "comp": "중간",
+     "clicks": 216,
+     "depth": 8
+    },
+    {
+     "keyword": "욕실수납장",
+     "volume": 16710,
+     "comp": "중간",
+     "clicks": 537,
+     "depth": 8
+    },
+    {
+     "keyword": "벽지곰팡이제거",
+     "volume": 14230,
+     "comp": "높음",
+     "clicks": 348,
+     "depth": 10
+    },
+    {
+     "keyword": "모기장",
+     "volume": 13710,
+     "comp": "중간",
+     "clicks": 33,
+     "depth": 7
+    },
+    {
+     "keyword": "폴딩도어",
+     "volume": 13540,
+     "comp": "높음",
+     "clicks": 363,
+     "depth": 10
+    },
+    {
+     "keyword": "슬라이딩도어",
+     "volume": 13500,
+     "comp": "중간",
+     "clicks": 194,
+     "depth": 8
+    },
+    {
+     "keyword": "욕실장",
+     "volume": 12850,
+     "comp": "높음",
+     "clicks": 259,
+     "depth": 8
+    },
+    {
+     "keyword": "KCC글라스",
+     "volume": 11910,
+     "comp": "중간",
+     "clicks": 11,
+     "depth": 7
+    },
+    {
+     "keyword": "창문시트지",
+     "volume": 11480,
+     "comp": "중간",
+     "clicks": 185,
+     "depth": 8
+    },
+    {
+     "keyword": "방문",
+     "volume": 11210,
+     "comp": "중간",
+     "clicks": 124,
+     "depth": 8
+    },
+    {
+     "keyword": "샷시",
+     "volume": 11180,
+     "comp": "높음",
+     "clicks": 98,
+     "depth": 10
+    },
+    {
+     "keyword": "사생활보호필름",
+     "volume": 10780,
+     "comp": "중간",
+     "clicks": 95,
+     "depth": 8
+    },
+    {
+     "keyword": "썬팅",
+     "volume": 9720,
+     "comp": "높음",
+     "clicks": 87,
+     "depth": 10
+    },
+    {
+     "keyword": "실크벽지",
+     "volume": 9510,
+     "comp": "중간",
+     "clicks": 177,
+     "depth": 8
+    },
+    {
+     "keyword": "필름",
+     "volume": 8880,
+     "comp": "높음",
+     "clicks": 14,
+     "depth": 10
+    },
+    {
+     "keyword": "단열재",
+     "volume": 8410,
+     "comp": "높음",
+     "clicks": 103,
+     "depth": 8
+    },
+    {
+     "keyword": "LX지인",
+     "volume": 7950,
+     "comp": "높음",
+     "clicks": 24,
+     "depth": 10
+    },
+    {
+     "keyword": "붙이는벽지",
+     "volume": 7710,
+     "comp": "높음",
+     "clicks": 199,
+     "depth": 10
+    },
+    {
+     "keyword": "집먼지진드기",
+     "volume": 7450,
+     "comp": "높음",
+     "clicks": 38,
+     "depth": 10
+    },
+    {
+     "keyword": "ABS도어",
+     "volume": 7160,
+     "comp": "중간",
+     "clicks": 201,
+     "depth": 8
+    },
+    {
+     "keyword": "새집증후군",
+     "volume": 6590,
+     "comp": "중간",
+     "clicks": 56,
+     "depth": 8
+    },
+    {
+     "keyword": "창문",
+     "volume": 6400,
+     "comp": "높음",
+     "clicks": 21,
+     "depth": 10
     }
    ]
   },
   {
    "key": "비데",
    "name": "비데 본체",
-   "hint": "비데 자가설치형",
+   "hint": [
+    "비데",
+    "자가설치",
+    "자가",
+    "설치",
+    "추천"
+   ],
    "has_link": true,
    "rows": [
     {
-     "keyword": "비데자가설치형",
-     "volume": 20,
-     "comp": "낮음",
-     "clicks": 0,
-     "depth": 0
-    }
-   ]
-  },
-  {
-   "key": "비데설치공구",
-   "name": "비데 설치 부자재 (분기밸브·테프론테이프)",
-   "hint": "비데 분기밸브 설치 공구 세트",
-   "has_link": true,
-   "rows": [
+     "keyword": "매트리스",
+     "volume": 114000,
+     "comp": "중간",
+     "clicks": 1587,
+     "depth": 8
+    },
     {
-     "keyword": "비데분기밸브설치공구세트",
-     "volume": 20,
-     "comp": "낮음",
-     "clicks": 0,
-     "depth": 0
-    }
-   ]
-  },
-  {
-   "key": "직수정수기",
-   "name": "직수 정수기 (자가관리형)",
-   "hint": "직수정수기 자가관리 무설치",
-   "has_link": true,
-   "rows": [
+     "keyword": "침대",
+     "volume": 103900,
+     "comp": "중간",
+     "clicks": 2196,
+     "depth": 8
+    },
     {
-     "keyword": "직수정수기자가관리무설치",
-     "volume": 20,
-     "comp": "낮음",
-     "clicks": 0,
-     "depth": 0
-    }
-   ]
-  },
-  {
-   "key": "정수기필터",
-   "name": "정수기 교체 필터",
-   "hint": "정수기 필터 교체",
-   "has_link": true,
-   "rows": [
+     "keyword": "비데",
+     "volume": 99000,
+     "comp": "중간",
+     "clicks": 751,
+     "depth": 8
+    },
     {
      "keyword": "정수기",
      "volume": 77500,
@@ -90,18 +420,39 @@
      "depth": 8
     },
     {
-     "keyword": "싱크대수전",
-     "volume": 48900,
+     "keyword": "침대프레임",
+     "volume": 76600,
      "comp": "중간",
-     "clicks": 274,
+     "clicks": 1317,
      "depth": 8
     },
     {
-     "keyword": "SK매직정수기",
-     "volume": 19940,
+     "keyword": "얼음정수기",
+     "volume": 37590,
      "comp": "높음",
-     "clicks": 206,
+     "clicks": 1002,
      "depth": 10
+    },
+    {
+     "keyword": "정수기렌탈가격비교",
+     "volume": 29480,
+     "comp": "높음",
+     "clicks": 2326,
+     "depth": 10
+    },
+    {
+     "keyword": "아기비데",
+     "volume": 24550,
+     "comp": "높음",
+     "clicks": 56,
+     "depth": 10
+    },
+    {
+     "keyword": "변기",
+     "volume": 20790,
+     "comp": "중간",
+     "clicks": 96,
+     "depth": 8
     },
     {
      "keyword": "주방수전",
@@ -111,24 +462,436 @@
      "depth": 8
     },
     {
-     "keyword": "SK정수기",
-     "volume": 14710,
+     "keyword": "양변기",
+     "volume": 15850,
+     "comp": "중간",
+     "clicks": 145,
+     "depth": 8
+    },
+    {
+     "keyword": "침대렌탈",
+     "volume": 15370,
      "comp": "높음",
-     "clicks": 166,
+     "clicks": 1101,
      "depth": 10
     },
     {
-     "keyword": "정수",
-     "volume": 11020,
+     "keyword": "변기교체",
+     "volume": 14190,
+     "comp": "중간",
+     "clicks": 506,
+     "depth": 8
+    },
+    {
+     "keyword": "직수정수기",
+     "volume": 12450,
+     "comp": "중간",
+     "clicks": 253,
+     "depth": 8
+    },
+    {
+     "keyword": "저상형침대",
+     "volume": 12250,
      "comp": "높음",
-     "clicks": 6,
-     "depth": 7
+     "clicks": 251,
+     "depth": 8
     },
     {
      "keyword": "씽크대수전",
      "volume": 10520,
      "comp": "중간",
      "clicks": 91,
+     "depth": 8
+    },
+    {
+     "keyword": "비데구입",
+     "volume": 10090,
+     "comp": "높음",
+     "clicks": 427,
+     "depth": 10
+    },
+    {
+     "keyword": "코웨이침대렌탈",
+     "volume": 9130,
+     "comp": "높음",
+     "clicks": 188,
+     "depth": 10
+    },
+    {
+     "keyword": "비데렌탈",
+     "volume": 9110,
+     "comp": "높음",
+     "clicks": 525,
+     "depth": 10
+    },
+    {
+     "keyword": "대림변기",
+     "volume": 7890,
+     "comp": "중간",
+     "clicks": 122,
+     "depth": 8
+    },
+    {
+     "keyword": "얼음정수기렌탈",
+     "volume": 7780,
+     "comp": "높음",
+     "clicks": 369,
+     "depth": 10
+    },
+    {
+     "keyword": "공기청정기렌탈",
+     "volume": 6510,
+     "comp": "높음",
+     "clicks": 370,
+     "depth": 10
+    },
+    {
+     "keyword": "정수기추천",
+     "volume": 6310,
+     "comp": "높음",
+     "clicks": 178,
+     "depth": 10
+    },
+    {
+     "keyword": "매트리스렌탈",
+     "volume": 6280,
+     "comp": "높음",
+     "clicks": 258,
+     "depth": 10
+    },
+    {
+     "keyword": "대림바스비데",
+     "volume": 6230,
+     "comp": "높음",
+     "clicks": 28,
+     "depth": 9
+    }
+   ]
+  },
+  {
+   "key": "비데설치공구",
+   "name": "비데 설치 부자재 (분기밸브·테프론테이프)",
+   "hint": [
+    "비데설치공구",
+    "비데",
+    "분기밸브",
+    "설치",
+    "공구"
+   ],
+   "has_link": true,
+   "rows": [
+    {
+     "keyword": "무선청소기",
+     "volume": 118800,
+     "comp": "높음",
+     "clicks": 1000,
+     "depth": 10
+    },
+    {
+     "keyword": "매트리스",
+     "volume": 114000,
+     "comp": "중간",
+     "clicks": 1587,
+     "depth": 8
+    },
+    {
+     "keyword": "예초기",
+     "volume": 108200,
+     "comp": "중간",
+     "clicks": 1621,
+     "depth": 8
+    },
+    {
+     "keyword": "침대",
+     "volume": 103900,
+     "comp": "중간",
+     "clicks": 2196,
+     "depth": 8
+    },
+    {
+     "keyword": "비데",
+     "volume": 99000,
+     "comp": "중간",
+     "clicks": 751,
+     "depth": 8
+    },
+    {
+     "keyword": "정수기",
+     "volume": 77500,
+     "comp": "중간",
+     "clicks": 2140,
+     "depth": 8
+    },
+    {
+     "keyword": "침대프레임",
+     "volume": 76600,
+     "comp": "중간",
+     "clicks": 1317,
+     "depth": 8
+    },
+    {
+     "keyword": "얼음정수기",
+     "volume": 37590,
+     "comp": "높음",
+     "clicks": 1002,
+     "depth": 10
+    },
+    {
+     "keyword": "A4용지",
+     "volume": 34300,
+     "comp": "높음",
+     "clicks": 40,
+     "depth": 10
+    },
+    {
+     "keyword": "정수기렌탈가격비교",
+     "volume": 29480,
+     "comp": "높음",
+     "clicks": 2326,
+     "depth": 10
+    },
+    {
+     "keyword": "전동드릴",
+     "volume": 28350,
+     "comp": "중간",
+     "clicks": 350,
+     "depth": 8
+    },
+    {
+     "keyword": "아기비데",
+     "volume": 24550,
+     "comp": "높음",
+     "clicks": 56,
+     "depth": 10
+    },
+    {
+     "keyword": "스텐리",
+     "volume": 23740,
+     "comp": "높음",
+     "clicks": 131,
+     "depth": 10
+    },
+    {
+     "keyword": "변기",
+     "volume": 20790,
+     "comp": "중간",
+     "clicks": 96,
+     "depth": 8
+    },
+    {
+     "keyword": "지벤안전화",
+     "volume": 20340,
+     "comp": "중간",
+     "clicks": 784,
+     "depth": 8
+    },
+    {
+     "keyword": "공구",
+     "volume": 18010,
+     "comp": "높음",
+     "clicks": 158,
+     "depth": 10
+    },
+    {
+     "keyword": "전동그라인더",
+     "volume": 17890,
+     "comp": "중간",
+     "clicks": 186,
+     "depth": 8
+    },
+    {
+     "keyword": "주방수전",
+     "volume": 17420,
+     "comp": "중간",
+     "clicks": 112,
+     "depth": 8
+    },
+    {
+     "keyword": "그라인더",
+     "volume": 17320,
+     "comp": "중간",
+     "clicks": 97,
+     "depth": 8
+    },
+    {
+     "keyword": "마끼다",
+     "volume": 16710,
+     "comp": "높음",
+     "clicks": 108,
+     "depth": 10
+    },
+    {
+     "keyword": "양변기",
+     "volume": 15850,
+     "comp": "중간",
+     "clicks": 145,
+     "depth": 8
+    },
+    {
+     "keyword": "전동드라이버",
+     "volume": 15670,
+     "comp": "중간",
+     "clicks": 181,
+     "depth": 8
+    },
+    {
+     "keyword": "박스테이프",
+     "volume": 15620,
+     "comp": "높음",
+     "clicks": 143,
+     "depth": 8
+    },
+    {
+     "keyword": "침대렌탈",
+     "volume": 15370,
+     "comp": "높음",
+     "clicks": 1101,
+     "depth": 10
+    },
+    {
+     "keyword": "변기교체",
+     "volume": 14190,
+     "comp": "중간",
+     "clicks": 506,
+     "depth": 8
+    }
+   ]
+  },
+  {
+   "key": "직수정수기",
+   "name": "직수 정수기 (자가관리형)",
+   "hint": [
+    "직수정수기",
+    "정수기",
+    "직수",
+    "자가관리형"
+   ],
+   "has_link": true,
+   "rows": [
+    {
+     "keyword": "매트리스",
+     "volume": 114000,
+     "comp": "중간",
+     "clicks": 1587,
+     "depth": 8
+    },
+    {
+     "keyword": "침대",
+     "volume": 103900,
+     "comp": "중간",
+     "clicks": 2196,
+     "depth": 8
+    },
+    {
+     "keyword": "비데",
+     "volume": 99000,
+     "comp": "중간",
+     "clicks": 751,
+     "depth": 8
+    },
+    {
+     "keyword": "정수기",
+     "volume": 77500,
+     "comp": "중간",
+     "clicks": 2140,
+     "depth": 8
+    },
+    {
+     "keyword": "침대프레임",
+     "volume": 76600,
+     "comp": "중간",
+     "clicks": 1317,
+     "depth": 8
+    },
+    {
+     "keyword": "얼음정수기",
+     "volume": 37590,
+     "comp": "높음",
+     "clicks": 1002,
+     "depth": 10
+    },
+    {
+     "keyword": "정수기렌탈가격비교",
+     "volume": 29480,
+     "comp": "높음",
+     "clicks": 2326,
+     "depth": 10
+    },
+    {
+     "keyword": "LG정수기",
+     "volume": 24230,
+     "comp": "높음",
+     "clicks": 514,
+     "depth": 10
+    },
+    {
+     "keyword": "물병",
+     "volume": 18170,
+     "comp": "중간",
+     "clicks": 67,
+     "depth": 8
+    },
+    {
+     "keyword": "침대렌탈",
+     "volume": 15370,
+     "comp": "높음",
+     "clicks": 1101,
+     "depth": 10
+    },
+    {
+     "keyword": "삼성정수기",
+     "volume": 12530,
+     "comp": "높음",
+     "clicks": 259,
+     "depth": 7
+    },
+    {
+     "keyword": "직수정수기",
+     "volume": 12450,
+     "comp": "중간",
+     "clicks": 253,
+     "depth": 8
+    },
+    {
+     "keyword": "물통",
+     "volume": 10880,
+     "comp": "중간",
+     "clicks": 43,
+     "depth": 8
+    },
+    {
+     "keyword": "LG얼음정수기",
+     "volume": 9910,
+     "comp": "높음",
+     "clicks": 270,
+     "depth": 10
+    },
+    {
+     "keyword": "렌탈",
+     "volume": 9460,
+     "comp": "높음",
+     "clicks": 214,
+     "depth": 10
+    },
+    {
+     "keyword": "비데렌탈",
+     "volume": 9110,
+     "comp": "높음",
+     "clicks": 525,
+     "depth": 10
+    },
+    {
+     "keyword": "웅진코웨이정수기",
+     "volume": 8410,
+     "comp": "높음",
+     "clicks": 174,
+     "depth": 10
+    },
+    {
+     "keyword": "미니정수기",
+     "volume": 8390,
+     "comp": "중간",
+     "clicks": 95,
      "depth": 8
     },
     {
@@ -139,307 +902,800 @@
      "depth": 8
     },
     {
-     "keyword": "샤워필터",
-     "volume": 4750,
-     "comp": "중간",
-     "clicks": 162,
-     "depth": 8
-    },
-    {
-     "keyword": "SK정수기렌탈",
-     "volume": 4160,
+     "keyword": "웰스정수기",
+     "volume": 8030,
      "comp": "높음",
-     "clicks": 167,
+     "clicks": 151,
      "depth": 10
     },
     {
-     "keyword": "주방수전필터",
-     "volume": 2990,
+     "keyword": "얼음정수기렌탈",
+     "volume": 7780,
      "comp": "높음",
-     "clicks": 89,
-     "depth": 8
-    },
-    {
-     "keyword": "세면대수전필터",
-     "volume": 2880,
-     "comp": "중간",
-     "clicks": 69,
-     "depth": 8
-    },
-    {
-     "keyword": "정수기설치",
-     "volume": 2660,
-     "comp": "높음",
-     "clicks": 65,
+     "clicks": 369,
      "depth": 10
     },
     {
-     "keyword": "싱크대수전필터",
-     "volume": 2550,
-     "comp": "중간",
+     "keyword": "현대큐밍",
+     "volume": 7460,
+     "comp": "높음",
      "clicks": 76,
+     "depth": 10
+    },
+    {
+     "keyword": "LG퓨리케어정수기",
+     "volume": 7240,
+     "comp": "높음",
+     "clicks": 113,
+     "depth": 7
+    },
+    {
+     "keyword": "엘지얼음정수기",
+     "volume": 6480,
+     "comp": "높음",
+     "clicks": 181,
+     "depth": 10
+    },
+    {
+     "keyword": "정수기추천",
+     "volume": 6310,
+     "comp": "높음",
+     "clicks": 178,
+     "depth": 10
+    }
+   ]
+  },
+  {
+   "key": "정수기필터",
+   "name": "정수기 교체 필터",
+   "hint": [
+    "정수기필터",
+    "정수기",
+    "필터",
+    "관리",
+    "수리"
+   ],
+   "has_link": true,
+   "rows": [
+    {
+     "keyword": "수능디데이",
+     "volume": 153100,
+     "comp": "높음",
+     "clicks": 68,
+     "depth": 9
+    },
+    {
+     "keyword": "침대",
+     "volume": 103900,
+     "comp": "중간",
+     "clicks": 2196,
      "depth": 8
     },
     {
-     "keyword": "정수기구매",
-     "volume": 2400,
+     "keyword": "비데",
+     "volume": 99000,
+     "comp": "중간",
+     "clicks": 751,
+     "depth": 8
+    },
+    {
+     "keyword": "정수기",
+     "volume": 77500,
+     "comp": "중간",
+     "clicks": 2140,
+     "depth": 8
+    },
+    {
+     "keyword": "침대프레임",
+     "volume": 76600,
+     "comp": "중간",
+     "clicks": 1317,
+     "depth": 8
+    },
+    {
+     "keyword": "얼음정수기",
+     "volume": 37590,
+     "comp": "높음",
+     "clicks": 1002,
+     "depth": 10
+    },
+    {
+     "keyword": "정수기렌탈가격비교",
+     "volume": 29480,
+     "comp": "높음",
+     "clicks": 2326,
+     "depth": 10
+    },
+    {
+     "keyword": "구인구직사이트",
+     "volume": 25500,
+     "comp": "높음",
+     "clicks": 847,
+     "depth": 10
+    },
+    {
+     "keyword": "무전기",
+     "volume": 24670,
+     "comp": "중간",
+     "clicks": 291,
+     "depth": 8
+    },
+    {
+     "keyword": "LG정수기",
+     "volume": 24230,
+     "comp": "높음",
+     "clicks": 514,
+     "depth": 10
+    },
+    {
+     "keyword": "한국사",
+     "volume": 22040,
+     "comp": "높음",
+     "clicks": 18,
+     "depth": 10
+    },
+    {
+     "keyword": "물병",
+     "volume": 18170,
+     "comp": "중간",
+     "clicks": 67,
+     "depth": 8
+    },
+    {
+     "keyword": "주방수전",
+     "volume": 17420,
+     "comp": "중간",
+     "clicks": 112,
+     "depth": 8
+    },
+    {
+     "keyword": "침대렌탈",
+     "volume": 15370,
+     "comp": "높음",
+     "clicks": 1101,
+     "depth": 10
+    },
+    {
+     "keyword": "나노레시피",
+     "volume": 14930,
+     "comp": "중간",
+     "clicks": 306,
+     "depth": 3
+    },
+    {
+     "keyword": "집진기",
+     "volume": 13450,
+     "comp": "높음",
+     "clicks": 147,
+     "depth": 7
+    },
+    {
+     "keyword": "필터",
+     "volume": 13160,
+     "comp": "중간",
+     "clicks": 27,
+     "depth": 8
+    },
+    {
+     "keyword": "가스버너",
+     "volume": 13090,
      "comp": "높음",
      "clicks": 46,
      "depth": 8
     },
     {
-     "keyword": "수도꼭지필터",
-     "volume": 1930,
-     "comp": "중간",
-     "clicks": 19,
-     "depth": 8
-    },
-    {
-     "keyword": "정수필터",
-     "volume": 1840,
-     "comp": "중간",
-     "clicks": 14,
-     "depth": 8
-    },
-    {
-     "keyword": "파라곤필터",
-     "volume": 1510,
-     "comp": "중간",
-     "clicks": 15,
-     "depth": 7
-    },
-    {
-     "keyword": "수돗물",
-     "volume": 1430,
+     "keyword": "경제",
+     "volume": 12610,
      "comp": "높음",
-     "clicks": 1,
+     "clicks": 22,
      "depth": 9
     },
     {
-     "keyword": "직수형정수기",
-     "volume": 1400,
+     "keyword": "삼성정수기",
+     "volume": 12530,
+     "comp": "높음",
+     "clicks": 259,
+     "depth": 7
+    },
+    {
+     "keyword": "직수정수기",
+     "volume": 12450,
      "comp": "중간",
-     "clicks": 13,
+     "clicks": 253,
      "depth": 8
     },
     {
-     "keyword": "SK렌탈",
-     "volume": 1240,
+     "keyword": "정수",
+     "volume": 11020,
      "comp": "높음",
-     "clicks": 9,
-     "depth": 10
+     "clicks": 6,
+     "depth": 7
     },
     {
-     "keyword": "필터교체",
-     "volume": 990,
-     "comp": "높음",
-     "clicks": 2,
-     "depth": 10
-    },
-    {
-     "keyword": "정수기필터교체주기",
-     "volume": 930,
-     "comp": "높음",
-     "clicks": 7,
-     "depth": 10
-    },
-    {
-     "keyword": "정수기필터교체방법",
-     "volume": 820,
-     "comp": "높음",
-     "clicks": 11,
-     "depth": 10
-    },
-    {
-     "keyword": "제빙기필터",
-     "volume": 700,
+     "keyword": "물통",
+     "volume": 10880,
      "comp": "중간",
-     "clicks": 8,
+     "clicks": 43,
      "depth": 8
+    },
+    {
+     "keyword": "씽크대수전",
+     "volume": 10520,
+     "comp": "중간",
+     "clicks": 91,
+     "depth": 8
+    },
+    {
+     "keyword": "엑소좀",
+     "volume": 10110,
+     "comp": "높음",
+     "clicks": 47,
+     "depth": 10
     }
    ]
   },
   {
    "key": "음식물처리기",
    "name": "음식물처리기",
-   "hint": "음식물처리기 건조분쇄",
+   "hint": [
+    "음식물처리기",
+    "음식물",
+    "처리기",
+    "음식물분쇄기"
+   ],
    "has_link": true,
    "rows": [
     {
-     "keyword": "음식물처리기건조분쇄",
-     "volume": 350,
-     "comp": "높음",
-     "clicks": 4,
+     "keyword": "음식물처리기",
+     "volume": 159700,
+     "comp": "중간",
+     "clicks": 1777,
      "depth": 8
+    },
+    {
+     "keyword": "전기차",
+     "volume": 108200,
+     "comp": "높음",
+     "clicks": 269,
+     "depth": 10
+    },
+    {
+     "keyword": "집들이선물추천",
+     "volume": 31440,
+     "comp": "높음",
+     "clicks": 100,
+     "depth": 10
+    },
+    {
+     "keyword": "음식물쓰레기통",
+     "volume": 23460,
+     "comp": "중간",
+     "clicks": 241,
+     "depth": 8
+    },
+    {
+     "keyword": "음식물분쇄기",
+     "volume": 19770,
+     "comp": "중간",
+     "clicks": 437,
+     "depth": 8
+    },
+    {
+     "keyword": "로봇",
+     "volume": 16320,
+     "comp": "높음",
+     "clicks": 34,
+     "depth": 10
+    },
+    {
+     "keyword": "ESG",
+     "volume": 16030,
+     "comp": "높음",
+     "clicks": 16,
+     "depth": 10
+    },
+    {
+     "keyword": "개업선물",
+     "volume": 15870,
+     "comp": "높음",
+     "clicks": 111,
+     "depth": 10
+    },
+    {
+     "keyword": "생일선물",
+     "volume": 15710,
+     "comp": "높음",
+     "clicks": 47,
+     "depth": 10
+    },
+    {
+     "keyword": "임산부선물",
+     "volume": 12960,
+     "comp": "높음",
+     "clicks": 73,
+     "depth": 10
+    },
+    {
+     "keyword": "음식물쓰레기봉투",
+     "volume": 11440,
+     "comp": "높음",
+     "clicks": 45,
+     "depth": 10
+    },
+    {
+     "keyword": "파쇄기",
+     "volume": 11310,
+     "comp": "중간",
+     "clicks": 99,
+     "depth": 8
+    },
+    {
+     "keyword": "결혼기념일선물",
+     "volume": 10380,
+     "comp": "높음",
+     "clicks": 70,
+     "depth": 10
+    },
+    {
+     "keyword": "음식짤순이",
+     "volume": 9310,
+     "comp": "높음",
+     "clicks": 598,
+     "depth": 8
+    },
+    {
+     "keyword": "수소",
+     "volume": 9150,
+     "comp": "높음",
+     "clicks": 10,
+     "depth": 10
+    },
+    {
+     "keyword": "ESG경영",
+     "volume": 8950,
+     "comp": "높음",
+     "clicks": 32,
+     "depth": 10
+    },
+    {
+     "keyword": "지구온난화",
+     "volume": 8580,
+     "comp": "높음",
+     "clicks": 12,
+     "depth": 9
+    },
+    {
+     "keyword": "음쓰처리기",
+     "volume": 8380,
+     "comp": "중간",
+     "clicks": 50,
+     "depth": 8
+    },
+    {
+     "keyword": "쓰레기",
+     "volume": 7570,
+     "comp": "높음",
+     "clicks": 11,
+     "depth": 10
+    },
+    {
+     "keyword": "결혼선물",
+     "volume": 7540,
+     "comp": "높음",
+     "clicks": 11,
+     "depth": 10
+    },
+    {
+     "keyword": "환갑선물",
+     "volume": 7490,
+     "comp": "높음",
+     "clicks": 35,
+     "depth": 10
+    },
+    {
+     "keyword": "싱크대음식물분쇄기",
+     "volume": 7390,
+     "comp": "높음",
+     "clicks": 245,
+     "depth": 8
+    },
+    {
+     "keyword": "미생물음식물처리",
+     "volume": 7140,
+     "comp": "높음",
+     "clicks": 102,
+     "depth": 8
+    },
+    {
+     "keyword": "SDGS",
+     "volume": 7090,
+     "comp": "높음",
+     "clicks": 1,
+     "depth": 3
+    },
+    {
+     "keyword": "탄소중립",
+     "volume": 6890,
+     "comp": "높음",
+     "clicks": 20,
+     "depth": 10
     }
    ]
   },
   {
    "key": "음식물처리기필터",
    "name": "음식물처리기 탈취 필터",
-   "hint": "음식물처리기 탈취필터",
+   "hint": [
+    "음식물처리기필터",
+    "음식물처리기",
+    "필터",
+    "관리",
+    "냄새"
+   ],
    "has_link": true,
    "rows": [
     {
-     "keyword": "스마트카라블레이드X필터",
-     "volume": 320,
-     "comp": "높음",
-     "clicks": 0,
-     "depth": 3
-    },
-    {
-     "keyword": "스마트카라필터리필",
-     "volume": 230,
-     "comp": "높음",
-     "clicks": 8,
-     "depth": 7
-    },
-    {
-     "keyword": "스마트카라음식물처리기필터",
-     "volume": 170,
-     "comp": "높음",
-     "clicks": 10,
-     "depth": 8
-    },
-    {
-     "keyword": "스마트카라리필필터",
-     "volume": 90,
-     "comp": "높음",
-     "clicks": 0,
-     "depth": 3
-    },
-    {
-     "keyword": "루펜음식물처리기필터",
-     "volume": 80,
+     "keyword": "미세먼지",
+     "volume": 290600,
      "comp": "중간",
-     "clicks": 1,
+     "clicks": 0,
+     "depth": 3
+    },
+    {
+     "keyword": "음식물처리기",
+     "volume": 159700,
+     "comp": "중간",
+     "clicks": 1777,
      "depth": 8
     },
     {
-     "keyword": "스마트카라리필",
-     "volume": 60,
+     "keyword": "수능디데이",
+     "volume": 153100,
      "comp": "높음",
-     "clicks": 0,
+     "clicks": 68,
+     "depth": 9
+    },
+    {
+     "keyword": "탈취제",
+     "volume": 39500,
+     "comp": "중간",
+     "clicks": 882,
+     "depth": 8
+    },
+    {
+     "keyword": "디퓨저",
+     "volume": 36000,
+     "comp": "중간",
+     "clicks": 323,
+     "depth": 8
+    },
+    {
+     "keyword": "집들이선물추천",
+     "volume": 31440,
+     "comp": "높음",
+     "clicks": 100,
+     "depth": 10
+    },
+    {
+     "keyword": "구인구직사이트",
+     "volume": 25500,
+     "comp": "높음",
+     "clicks": 847,
+     "depth": 10
+    },
+    {
+     "keyword": "하수구트랩",
+     "volume": 24190,
+     "comp": "중간",
+     "clicks": 298,
+     "depth": 8
+    },
+    {
+     "keyword": "음식물쓰레기통",
+     "volume": 23460,
+     "comp": "중간",
+     "clicks": 241,
+     "depth": 8
+    },
+    {
+     "keyword": "모기퇴치기",
+     "volume": 21740,
+     "comp": "중간",
+     "clicks": 275,
+     "depth": 8
+    },
+    {
+     "keyword": "음식물분쇄기",
+     "volume": 19770,
+     "comp": "중간",
+     "clicks": 437,
+     "depth": 8
+    },
+    {
+     "keyword": "욕실환풍기",
+     "volume": 17490,
+     "comp": "중간",
+     "clicks": 344,
+     "depth": 8
+    },
+    {
+     "keyword": "개업선물",
+     "volume": 15870,
+     "comp": "높음",
+     "clicks": 111,
+     "depth": 10
+    },
+    {
+     "keyword": "생일선물",
+     "volume": 15710,
+     "comp": "높음",
+     "clicks": 47,
+     "depth": 10
+    },
+    {
+     "keyword": "전열교환기",
+     "volume": 14990,
+     "comp": "높음",
+     "clicks": 159,
+     "depth": 10
+    },
+    {
+     "keyword": "나노레시피",
+     "volume": 14930,
+     "comp": "중간",
+     "clicks": 306,
      "depth": 3
     },
     {
-     "keyword": "스마트카라PCS350필터",
-     "volume": 40,
+     "keyword": "냄새",
+     "volume": 13990,
      "comp": "높음",
-     "clicks": 0,
-     "depth": 3
+     "clicks": 11,
+     "depth": 10
     },
     {
-     "keyword": "음식물건조기필터",
-     "volume": 40,
+     "keyword": "고체방향제",
+     "volume": 13720,
+     "comp": "중간",
+     "clicks": 373,
+     "depth": 8
+    },
+    {
+     "keyword": "집진기",
+     "volume": 13450,
      "comp": "높음",
-     "clicks": 0,
+     "clicks": 147,
      "depth": 7
     },
     {
-     "keyword": "홈바이홈필터",
-     "volume": 30,
-     "comp": "높음",
-     "clicks": 0,
-     "depth": 3
+     "keyword": "필터",
+     "volume": 13160,
+     "comp": "중간",
+     "clicks": 27,
+     "depth": 8
     },
     {
-     "keyword": "음식물처리기탈취필터",
-     "volume": 20,
-     "comp": "높음",
-     "clicks": 0,
-     "depth": 3
+     "keyword": "실내방향제",
+     "volume": 13140,
+     "comp": "중간",
+     "clicks": 241,
+     "depth": 8
     },
     {
-     "keyword": "싱크리더필터",
-     "volume": 20,
-     "comp": "낮음",
-     "clicks": 0,
-     "depth": 0
+     "keyword": "임산부선물",
+     "volume": 12960,
+     "comp": "높음",
+     "clicks": 73,
+     "depth": 10
+    },
+    {
+     "keyword": "부직포",
+     "volume": 12790,
+     "comp": "중간",
+     "clicks": 136,
+     "depth": 8
+    },
+    {
+     "keyword": "섬유탈취제",
+     "volume": 12310,
+     "comp": "중간",
+     "clicks": 103,
+     "depth": 8
+    },
+    {
+     "keyword": "배수구트랩",
+     "volume": 12260,
+     "comp": "중간",
+     "clicks": 151,
+     "depth": 8
     }
    ]
   },
   {
    "key": "고효율가전",
    "name": "대기전력 차단 멀티탭",
-   "hint": "대기전력 차단 멀티탭",
+   "hint": [
+    "고효율가전",
+    "고효율",
+    "가전",
+    "에너지",
+    "캐시백"
+   ],
    "has_link": true,
    "rows": [
     {
-     "keyword": "큐브멀티탭",
-     "volume": 7240,
-     "comp": "중간",
-     "clicks": 147,
-     "depth": 8
-    },
-    {
-     "keyword": "고용량멀티탭3구",
-     "volume": 2050,
+     "keyword": "음력달력",
+     "volume": 595600,
      "comp": "높음",
-     "clicks": 12,
-     "depth": 9
-    },
-    {
-     "keyword": "USB멀티탭",
-     "volume": 1910,
-     "comp": "중간",
-     "clicks": 18,
-     "depth": 8
-    },
-    {
-     "keyword": "멀티탭추천",
-     "volume": 1360,
-     "comp": "중간",
-     "clicks": 14,
-     "depth": 8
-    },
-    {
-     "keyword": "국산멀티탭",
-     "volume": 1340,
-     "comp": "높음",
-     "clicks": 22,
-     "depth": 9
-    },
-    {
-     "keyword": "안전콘센트",
-     "volume": 280,
-     "comp": "높음",
-     "clicks": 6,
-     "depth": 8
-    },
-    {
-     "keyword": "써지오",
-     "volume": 250,
-     "comp": "높음",
-     "clicks": 0,
+     "clicks": 31,
      "depth": 3
     },
     {
-     "keyword": "멀티탭방수",
-     "volume": 100,
+     "keyword": "전기차",
+     "volume": 108200,
      "comp": "높음",
-     "clicks": 0,
-     "depth": 3
-    },
-    {
-     "keyword": "대기전력차단멀티탭",
-     "volume": 80,
-     "comp": "높음",
-     "clicks": 0,
-     "depth": 8
-    },
-    {
-     "keyword": "자동소화멀티콘센트",
-     "volume": 60,
-     "comp": "높음",
-     "clicks": 0,
+     "clicks": 269,
      "depth": 10
     },
     {
-     "keyword": "자동절전멀티탭",
-     "volume": 30,
+     "keyword": "초시계",
+     "volume": 88900,
+     "comp": "중간",
+     "clicks": 77,
+     "depth": 8
+    },
+    {
+     "keyword": "세탁기",
+     "volume": 87400,
      "comp": "높음",
-     "clicks": 0,
+     "clicks": 1523,
+     "depth": 8
+    },
+    {
+     "keyword": "ETF",
+     "volume": 77900,
+     "comp": "높음",
+     "clicks": 213,
+     "depth": 10
+    },
+    {
+     "keyword": "SCHD",
+     "volume": 57900,
+     "comp": "높음",
+     "clicks": 23,
+     "depth": 3
+    },
+    {
+     "keyword": "삼성페스티벌",
+     "volume": 53000,
+     "comp": "높음",
+     "clicks": 519,
+     "depth": 3
+    },
+    {
+     "keyword": "TV",
+     "volume": 40800,
+     "comp": "높음",
+     "clicks": 97,
+     "depth": 10
+    },
+    {
+     "keyword": "태블릿",
+     "volume": 39000,
+     "comp": "중간",
+     "clicks": 231,
+     "depth": 8
+    },
+    {
+     "keyword": "신용카드",
+     "volume": 35020,
+     "comp": "높음",
+     "clicks": 103,
+     "depth": 10
+    },
+    {
+     "keyword": "신용카드추천",
+     "volume": 28510,
+     "comp": "높음",
+     "clicks": 162,
+     "depth": 10
+    },
+    {
+     "keyword": "스케쳐스아치핏",
+     "volume": 25680,
+     "comp": "중간",
+     "clicks": 380,
+     "depth": 8
+    },
+    {
+     "keyword": "스케쳐스맥스쿠셔닝",
+     "volume": 23240,
+     "comp": "중간",
+     "clicks": 340,
+     "depth": 8
+    },
+    {
+     "keyword": "카드",
+     "volume": 21680,
+     "comp": "높음",
+     "clicks": 76,
+     "depth": 10
+    },
+    {
+     "keyword": "씽크대",
+     "volume": 19220,
+     "comp": "높음",
+     "clicks": 503,
+     "depth": 10
+    },
+    {
+     "keyword": "금ETF",
+     "volume": 18180,
+     "comp": "높음",
+     "clicks": 47,
+     "depth": 10
+    },
+    {
+     "keyword": "태양광",
+     "volume": 17100,
+     "comp": "높음",
+     "clicks": 169,
+     "depth": 10
+    },
+    {
+     "keyword": "로봇",
+     "volume": 16320,
+     "comp": "높음",
+     "clicks": 34,
+     "depth": 10
+    },
+    {
+     "keyword": "ESS",
+     "volume": 16270,
+     "comp": "높음",
+     "clicks": 40,
+     "depth": 10
+    },
+    {
+     "keyword": "태양광패널",
+     "volume": 16240,
+     "comp": "높음",
+     "clicks": 264,
+     "depth": 7
+    },
+    {
+     "keyword": "ESG",
+     "volume": 16030,
+     "comp": "높음",
+     "clicks": 16,
+     "depth": 10
+    },
+    {
+     "keyword": "모래시계",
+     "volume": 15160,
+     "comp": "높음",
+     "clicks": 62,
+     "depth": 7
+    },
+    {
+     "keyword": "사무용책상",
+     "volume": 14480,
+     "comp": "높음",
+     "clicks": 398,
+     "depth": 8
+    },
+    {
+     "keyword": "삼성케어플러스가입",
+     "volume": 13490,
+     "comp": "중간",
+     "clicks": 29,
+     "depth": 2
+    },
+    {
+     "keyword": "삼성서비스",
+     "volume": 11560,
+     "comp": "중간",
+     "clicks": 66,
      "depth": 3
     }
    ]
@@ -447,14 +1703,186 @@
   {
    "key": "제습기",
    "name": "제습기",
-   "hint": "제습기 20L",
+   "hint": [
+    "제습기",
+    "습기",
+    "제거"
+   ],
    "has_link": true,
    "rows": [
     {
-     "keyword": "제습기20L",
-     "volume": 430,
+     "keyword": "제습기",
+     "volume": 112900,
      "comp": "중간",
-     "clicks": 5,
+     "clicks": 755,
+     "depth": 8
+    },
+    {
+     "keyword": "실리카겔",
+     "volume": 52800,
+     "comp": "중간",
+     "clicks": 136,
+     "depth": 8
+    },
+    {
+     "keyword": "집들이선물",
+     "volume": 46300,
+     "comp": "높음",
+     "clicks": 93,
+     "depth": 10
+    },
+    {
+     "keyword": "빙수",
+     "volume": 43370,
+     "comp": "높음",
+     "clicks": 66,
+     "depth": 7
+    },
+    {
+     "keyword": "위닉스제습기",
+     "volume": 34750,
+     "comp": "중간",
+     "clicks": 574,
+     "depth": 8
+    },
+    {
+     "keyword": "집들이선물추천",
+     "volume": 31440,
+     "comp": "높음",
+     "clicks": 100,
+     "depth": 10
+    },
+    {
+     "keyword": "제습제",
+     "volume": 18900,
+     "comp": "중간",
+     "clicks": 34,
+     "depth": 7
+    },
+    {
+     "keyword": "삼성제습기",
+     "volume": 15540,
+     "comp": "높음",
+     "clicks": 123,
+     "depth": 8
+    },
+    {
+     "keyword": "벽지곰팡이제거",
+     "volume": 14230,
+     "comp": "높음",
+     "clicks": 348,
+     "depth": 10
+    },
+    {
+     "keyword": "엘지제습기",
+     "volume": 11430,
+     "comp": "중간",
+     "clicks": 204,
+     "depth": 8
+    },
+    {
+     "keyword": "산업용제습기",
+     "volume": 11420,
+     "comp": "높음",
+     "clicks": 143,
+     "depth": 8
+    },
+    {
+     "keyword": "미니제습기",
+     "volume": 9400,
+     "comp": "중간",
+     "clicks": 157,
+     "depth": 8
+    },
+    {
+     "keyword": "습기제거제",
+     "volume": 7190,
+     "comp": "높음",
+     "clicks": 89,
+     "depth": 8
+    },
+    {
+     "keyword": "실리카겔제습제",
+     "volume": 7100,
+     "comp": "높음",
+     "clicks": 12,
+     "depth": 10
+    },
+    {
+     "keyword": "화장실제습기",
+     "volume": 6960,
+     "comp": "중간",
+     "clicks": 191,
+     "depth": 8
+    },
+    {
+     "keyword": "부모님선물",
+     "volume": 6720,
+     "comp": "높음",
+     "clicks": 8,
+     "depth": 10
+    },
+    {
+     "keyword": "이사선물",
+     "volume": 6430,
+     "comp": "높음",
+     "clicks": 46,
+     "depth": 10
+    },
+    {
+     "keyword": "계면활성제없는치약",
+     "volume": 5730,
+     "comp": "중간",
+     "clicks": 108,
+     "depth": 8
+    },
+    {
+     "keyword": "위니아제습기",
+     "volume": 5690,
+     "comp": "중간",
+     "clicks": 141,
+     "depth": 8
+    },
+    {
+     "keyword": "그림액자",
+     "volume": 5220,
+     "comp": "높음",
+     "clicks": 198,
+     "depth": 10
+    },
+    {
+     "keyword": "제습기공기청정기",
+     "volume": 4920,
+     "comp": "중간",
+     "clicks": 142,
+     "depth": 8
+    },
+    {
+     "keyword": "산업용에어컨",
+     "volume": 4860,
+     "comp": "높음",
+     "clicks": 48,
+     "depth": 10
+    },
+    {
+     "keyword": "낚시파라솔",
+     "volume": 4470,
+     "comp": "높음",
+     "clicks": 174,
+     "depth": 8
+    },
+    {
+     "keyword": "의류관리기",
+     "volume": 4260,
+     "comp": "중간",
+     "clicks": 53,
+     "depth": 8
+    },
+    {
+     "keyword": "제습기추천",
+     "volume": 4080,
+     "comp": "중간",
+     "clicks": 39,
      "depth": 8
     }
    ]
