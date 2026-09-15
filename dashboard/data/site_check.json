@@ -1,6 +1,6 @@
 {
- "at": "2026-09-15T10:29:34",
- "n": 20,
+ "at": "2026-09-16T08:49:57",
+ "n": 21,
  "avg": 100,
  "fails": [],
  "auto_repair": true,
@@ -8,9 +8,13 @@
  "repair_fail": [],
  "defaults": [],
  "noimgv2": {
-  "n": 17,
-  "of": 20,
+  "n": 18,
+  "of": 21,
   "posts": [
+   {
+    "id": 248,
+    "title": "1인 가구 건조분쇄형 음식물처리기, 30dB대 소음과 50만 원대 가격 "
+   },
    {
     "id": 243,
     "title": "1인 가구 원룸 음식물처리기, 건조분쇄형 설치 전 꼭 확인할 3가지 주의"
@@ -86,9 +90,9 @@
   "posts": []
  },
  "link_coverage": {
-  "of": 20,
-  "matched": 14,
-  "linked": 14,
+  "of": 21,
+  "matched": 15,
+  "linked": 15,
   "unmatched": 6
  },
  "link_fill": {
@@ -106,6 +110,6 @@
   "no_kokpick": [],
   "few_images": [],
   "excerpt_filled": [],
-  "of": 20
+  "of": 21
  }
 }
