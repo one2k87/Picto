@@ -145,6 +145,40 @@ def _suggest_filter(cands, key):
     return keep, hits, len(cands) - len(keep)
 
 
+def keyword_rows(hint, cfg, limit=30):
+    """키워드도구 원자료를 그대로 돌려준다 — 검색량뿐 아니라 **경쟁정도·클릭수**까지 본다.
+    수익 관점에서는 검색량만으로 못 고른다: 많으면 경쟁이 세고, 없으면 클릭이 안 난다."""
+    c = (cfg or {}).get("demand") or {}
+    key = (c.get("api_key") or "").strip()
+    sec = (c.get("secret") or "").strip()
+    cid = str(c.get("customer_id") or "").strip()
+    if not (key and sec and cid):
+        return []
+    try:
+        ts = str(int(time.time() * 1000))
+        r = requests.get(BASE + PATH, params={"hintKeywords": _clean(hint)[:20], "showDetail": "1"},
+                         headers={"X-Timestamp": ts, "X-API-KEY": key, "X-Customer": cid,
+                                  "X-Signature": _sig(ts, "GET", PATH, sec)}, timeout=20)
+        if r.status_code != 200:
+            print(f"[demand] rows 실패 {r.status_code} — {_redact(r.text)}")
+            return []
+        out = []
+        for x in (r.json() or {}).get("keywordList") or []:
+            pc, mo = _num(x.get("monthlyPcQcCnt")), _num(x.get("monthlyMobileQcCnt"))
+            out.append({
+                "keyword": x.get("relKeyword", ""),
+                "volume": pc + mo,
+                "comp": x.get("compIdx", ""),                     # 낮음/중간/높음
+                "clicks": _num(x.get("monthlyAvePcClkCnt")) + _num(x.get("monthlyAveMobileClkCnt")),
+                "depth": _num(x.get("plAvgDepth")),               # 광고 노출 경쟁 깊이
+            })
+        out.sort(key=lambda d: -d["volume"])
+        return out[:limit]
+    except Exception as e:
+        print(f"[demand] rows 예외: {str(e)[:80]}")
+        return []
+
+
 def filter_by_demand(cands, cfg, key="keyword"):
     """검색량 기준 미달 후보를 버린다. 전부 미달이면 가장 큰 것 1건만 남긴다.
     반환: (남은 후보, 조회된 검색량 dict, 버린 수)"""
