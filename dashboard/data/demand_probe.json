@@ -1,5 +1,5 @@
 {
- "naver_key": false,
+ "naver_key": true,
  "min_volume": 100,
  "rows": [
   {
