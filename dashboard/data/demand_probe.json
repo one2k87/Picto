@@ -1,7 +1,7 @@
 {
  "naver_key": true,
  "min_volume": 100,
- "last_error": "HTTP 403 / urn:naver:api:problem:auth-failed | Auth Failed",
+ "last_error": "",
  "key_shape": {
   "api_key_len": 74,
   "secret_len": 52,
@@ -11,47 +11,47 @@
  "rows": [
   {
    "keyword": "제습기 20L",
-   "naver_monthly": null,
+   "naver_monthly": 430,
    "suggest": 10
   },
   {
    "keyword": "음식물처리기 탈취필터",
-   "naver_monthly": null,
+   "naver_monthly": 20,
    "suggest": 1
   },
   {
    "keyword": "비데 자가설치",
-   "naver_monthly": null,
+   "naver_monthly": 710,
    "suggest": 6
   },
   {
    "keyword": "창문 단열 뽁뽁이",
-   "naver_monthly": null,
+   "naver_monthly": 450,
    "suggest": 3
   },
   {
    "keyword": "현관문 문풍지",
-   "naver_monthly": null,
+   "naver_monthly": 1090,
    "suggest": 10
   },
   {
    "keyword": "정수기 필터 교체",
-   "naver_monthly": null,
+   "naver_monthly": 520,
    "suggest": 10
   },
   {
    "keyword": "포장이사 비용",
-   "naver_monthly": null,
+   "naver_monthly": 7720,
    "suggest": 10
   },
   {
    "keyword": "비데 분기밸브 설치 공구 세트",
-   "naver_monthly": null,
+   "naver_monthly": 20,
    "suggest": 0
   },
   {
    "keyword": "음식물처리기 렌탈 36개월 약정 위약금",
-   "naver_monthly": null,
+   "naver_monthly": 20,
    "suggest": 0
   }
  ]

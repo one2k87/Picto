@@ -11,9 +11,9 @@
  "results": [
   {
    "variant": "표준(digest→b64)",
-   "http": 403,
-   "err": "urn:naver:api:problem:auth-failed|Auth Failed",
-   "rows": null
+   "http": 200,
+   "err": "|",
+   "rows": 789
   },
   {
    "variant": "hexdigest→b64",
@@ -23,9 +23,9 @@
   },
   {
    "variant": "원본(strip 안 함)",
-   "http": 403,
-   "err": "urn:naver:api:problem:auth-failed|Auth Failed",
-   "rows": null
+   "http": 200,
+   "err": "|",
+   "rows": 789
   }
  ]
 }
