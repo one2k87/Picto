@@ -1,7 +1,7 @@
 {
  "naver_key": true,
  "min_volume": 100,
- "last_error": "HTTP 403: {\"status\":403,\"type\":\"urn:naver:api:problem:auth-failed\",\"title\":\"Auth Failed\",\"detail\":\"Auth failed with api-key: 0100000000c0e20e59a02f4c8e7b1d3a3381a0afc6a31246220323733be244aa598217e39b, customer-",
+ "last_error": "HTTP 403 / urn:naver:api:problem:auth-failed | Auth Failed  (자격증명 값은 제거함)",
  "key_shape": {
   "api_key_len": 74,
   "secret_len": 52,

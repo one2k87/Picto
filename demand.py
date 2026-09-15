@@ -33,6 +33,15 @@ _CACHE = {}
 LAST_ERR = ""      # 조회 실패 사유(진단용) — 액션 로그를 되읽기 어려워 파일로 남긴다
 
 
+def _redact(body):
+    """오류 본문에서 자격증명을 지우고 종류만 남긴다."""
+    try:
+        j = json.loads(body or "{}")
+        return f"{j.get('type','')} | {j.get('title','')}"[:120]
+    except Exception:
+        return re.sub(r"[0-9a-zA-Z+/=]{20,}", "<redacted>", (body or ""))[:120]
+
+
 def _sig(ts, method, path, secret):
     msg = f"{ts}.{method}.{path}"
     return base64.b64encode(hmac.new(secret.encode(), msg.encode(), hashlib.sha256).digest()).decode()
@@ -75,8 +84,11 @@ def monthly_volume(keywords, cfg):
                              timeout=15)
             if r.status_code != 200:
                 global LAST_ERR
-                LAST_ERR = f"HTTP {r.status_code}: {r.text[:200]}"
-                print(f"[demand] 조회 실패 {r.status_code} ({q[:14]}) — {r.text[:160]}")
+                # ⚠️ 응답 본문을 그대로 남기면 안 된다 — 네이버 403 본문에는
+                # **액세스라이선스 값이 그대로 들어온다**(2026-09-15 실측, 공개 레포에 커밋될 뻔했다).
+                # 진단에 필요한 건 상태코드와 오류 종류뿐이므로 그것만 남긴다.
+                LAST_ERR = f"HTTP {r.status_code} / {_redact(r.text)}"
+                print(f"[demand] 조회 실패 {r.status_code} ({q[:14]}) — {_redact(r.text)}")
                 continue
             rows = (r.json() or {}).get("keywordList") or []
             # 완전 일치가 있으면 그 값, 없으면 가장 비슷한 첫 줄
