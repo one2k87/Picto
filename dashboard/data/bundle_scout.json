@@ -1,0 +1,98 @@
+{
+ "at": "2026-09-15 13:07",
+ "floor": 300,
+ "ceil": 30000,
+ "block_comp": [
+  "높음"
+ ],
+ "rows": [
+  {
+   "candidate": "주방신기템",
+   "head": {
+    "keyword": "주방신기템",
+    "volume": 20,
+    "comp": "낮음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "주방용품추천",
+   "head": {
+    "keyword": "주방용품추천",
+    "volume": 80,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "자취필수템",
+   "head": null,
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "살림템",
+   "head": null,
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "주방꿀템",
+   "head": {
+    "keyword": "주방꿀템",
+    "volume": 170,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "생활꿀템",
+   "head": {
+    "keyword": "생활꿀템",
+    "volume": 100,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "자취방필수품",
+   "head": {
+    "keyword": "자취방필수품",
+    "volume": 20,
+    "comp": "중간"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "주방아이템",
+   "head": {
+    "keyword": "주방아이템",
+    "volume": 100,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "집들이선물",
+   "head": {
+    "keyword": "집들이선물",
+    "volume": 46300,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "주방정리용품",
+   "head": null,
+   "best": null,
+   "fit_n": 0
+  }
+ ]
+}
