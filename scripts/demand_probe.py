@@ -30,10 +30,16 @@ vol = demand.monthly_volume(SAMPLES, cfg) if naver else {}
 sug = {k: demand.suggest_hits(k) for k in SAMPLES}
 
 rows = [{"keyword": k, "naver_monthly": vol.get(k), "suggest": sug.get(k)} for k in SAMPLES]
-out = {"naver_key": naver, "min_volume": (cfg.get("demand") or {}).get("min_volume"), "rows": rows}
+cid = str((cfg.get("demand") or {}).get("customer_id", ""))
+out = {"naver_key": naver, "min_volume": (cfg.get("demand") or {}).get("min_volume"),
+       "last_error": demand.LAST_ERR,
+       "key_shape": {"api_key_len": len((cfg.get("demand") or {}).get("api_key", "")),
+                     "secret_len": len((cfg.get("demand") or {}).get("secret", "")),
+                     "customer_id_len": len(cid), "customer_id_digits": cid.isdigit()},
+       "rows": rows}
 os.makedirs("dashboard/data", exist_ok=True)
 json.dump(out, open("dashboard/data/demand_probe.json", "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)
-print(f"네이버 키 {'있음' if naver else '없음'}")
+print(f"네이버 키 {'있음' if naver else '없음'} · 마지막 오류: {demand.LAST_ERR[:200]}")
 for r in rows:
     print(f"  {r['keyword'][:28]:<30} 네이버={r['naver_monthly']} 자동완성={r['suggest']}")

@@ -30,6 +30,7 @@ import requests
 BASE = "https://api.searchad.naver.com"
 PATH = "/keywordstool"
 _CACHE = {}
+LAST_ERR = ""      # 조회 실패 사유(진단용) — 액션 로그를 되읽기 어려워 파일로 남긴다
 
 
 def _sig(ts, method, path, secret):
@@ -73,7 +74,9 @@ def monthly_volume(keywords, cfg):
                                       "X-Signature": _sig(ts, "GET", PATH, sec)},
                              timeout=15)
             if r.status_code != 200:
-                print(f"[demand] 조회 실패 {r.status_code} ({q[:14]}) — 이 키워드는 거르지 않음")
+                global LAST_ERR
+                LAST_ERR = f"HTTP {r.status_code}: {r.text[:200]}"
+                print(f"[demand] 조회 실패 {r.status_code} ({q[:14]}) — {r.text[:160]}")
                 continue
             rows = (r.json() or {}).get("keywordList") or []
             # 완전 일치가 있으면 그 값, 없으면 가장 비슷한 첫 줄
@@ -85,7 +88,8 @@ def monthly_volume(keywords, cfg):
             out[kw] = v
             time.sleep(0.3)                      # 초당 호출 제한 회피
         except Exception as e:
-            print(f"[demand] 조회 예외({q[:14]}): {str(e)[:60]} — 거르지 않음")
+            LAST_ERR = f"{type(e).__name__}: {e}"[:220]
+            print(f"[demand] 조회 예외({q[:14]}): {str(e)[:100]} — 거르지 않음")
     return out
 
 
