@@ -34,6 +34,11 @@ jobs:
         run: python build_config.py
       - name: 후보 발굴
         run: python scripts/product_scout.py
+      - name: 묶음 키워드 수요
+        env:
+          SCOUT_FILE: data/bundle_candidates.json
+          SCOUT_OUT: dashboard/data/bundle_scout.json
+        run: python scripts/product_scout.py || true
       - name: 캐스토 큐 교차 검증
         env:
           SCOUT_FILE: data/casto_queue_snapshot.json
@@ -44,7 +49,7 @@ jobs:
         run: |
           git config user.name "picto-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add dashboard/data/product_scout.json dashboard/data/casto_cross.json || true
+          git add dashboard/data/product_scout.json dashboard/data/casto_cross.json dashboard/data/bundle_scout.json || true
           git diff --cached --quiet || git commit -m "상품 후보 발굴 ($(date +%F\ %H:%M) KST)"
           git pull --rebase -q || true
           git push -q || true
