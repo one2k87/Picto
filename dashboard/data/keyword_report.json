@@ -1,0 +1,463 @@
+{
+ "at": "2026-09-15 11:14",
+ "products": [
+  {
+   "key": "문풍지",
+   "name": "문풍지 (문틈 바람막이)",
+   "hint": "현관문 문풍지 방풍",
+   "has_link": true,
+   "rows": [
+    {
+     "keyword": "현관문문풍지방풍",
+     "volume": 20,
+     "comp": "낮음",
+     "clicks": 0,
+     "depth": 0
+    }
+   ]
+  },
+  {
+   "key": "창문단열시트",
+   "name": "창문 단열 시트 (뽁뽁이·방풍비닐)",
+   "hint": "창문 단열 뽁뽁이 방풍비닐",
+   "has_link": true,
+   "rows": [
+    {
+     "keyword": "창문단열뽁뽁이방풍비닐",
+     "volume": 20,
+     "comp": "낮음",
+     "clicks": 0,
+     "depth": 0
+    }
+   ]
+  },
+  {
+   "key": "비데",
+   "name": "비데 본체",
+   "hint": "비데 자가설치형",
+   "has_link": true,
+   "rows": [
+    {
+     "keyword": "비데자가설치형",
+     "volume": 20,
+     "comp": "낮음",
+     "clicks": 0,
+     "depth": 0
+    }
+   ]
+  },
+  {
+   "key": "비데설치공구",
+   "name": "비데 설치 부자재 (분기밸브·테프론테이프)",
+   "hint": "비데 분기밸브 설치 공구 세트",
+   "has_link": true,
+   "rows": [
+    {
+     "keyword": "비데분기밸브설치공구세트",
+     "volume": 20,
+     "comp": "낮음",
+     "clicks": 0,
+     "depth": 0
+    }
+   ]
+  },
+  {
+   "key": "직수정수기",
+   "name": "직수 정수기 (자가관리형)",
+   "hint": "직수정수기 자가관리 무설치",
+   "has_link": true,
+   "rows": [
+    {
+     "keyword": "직수정수기자가관리무설치",
+     "volume": 20,
+     "comp": "낮음",
+     "clicks": 0,
+     "depth": 0
+    }
+   ]
+  },
+  {
+   "key": "정수기필터",
+   "name": "정수기 교체 필터",
+   "hint": "정수기 필터 교체",
+   "has_link": true,
+   "rows": [
+    {
+     "keyword": "정수기",
+     "volume": 77500,
+     "comp": "중간",
+     "clicks": 2140,
+     "depth": 8
+    },
+    {
+     "keyword": "싱크대수전",
+     "volume": 48900,
+     "comp": "중간",
+     "clicks": 274,
+     "depth": 8
+    },
+    {
+     "keyword": "SK매직정수기",
+     "volume": 19940,
+     "comp": "높음",
+     "clicks": 206,
+     "depth": 10
+    },
+    {
+     "keyword": "주방수전",
+     "volume": 17420,
+     "comp": "중간",
+     "clicks": 112,
+     "depth": 8
+    },
+    {
+     "keyword": "SK정수기",
+     "volume": 14710,
+     "comp": "높음",
+     "clicks": 166,
+     "depth": 10
+    },
+    {
+     "keyword": "정수",
+     "volume": 11020,
+     "comp": "높음",
+     "clicks": 6,
+     "depth": 7
+    },
+    {
+     "keyword": "씽크대수전",
+     "volume": 10520,
+     "comp": "중간",
+     "clicks": 91,
+     "depth": 8
+    },
+    {
+     "keyword": "정수기필터",
+     "volume": 8110,
+     "comp": "높음",
+     "clicks": 220,
+     "depth": 8
+    },
+    {
+     "keyword": "샤워필터",
+     "volume": 4750,
+     "comp": "중간",
+     "clicks": 162,
+     "depth": 8
+    },
+    {
+     "keyword": "SK정수기렌탈",
+     "volume": 4160,
+     "comp": "높음",
+     "clicks": 167,
+     "depth": 10
+    },
+    {
+     "keyword": "주방수전필터",
+     "volume": 2990,
+     "comp": "높음",
+     "clicks": 89,
+     "depth": 8
+    },
+    {
+     "keyword": "세면대수전필터",
+     "volume": 2880,
+     "comp": "중간",
+     "clicks": 69,
+     "depth": 8
+    },
+    {
+     "keyword": "정수기설치",
+     "volume": 2660,
+     "comp": "높음",
+     "clicks": 65,
+     "depth": 10
+    },
+    {
+     "keyword": "싱크대수전필터",
+     "volume": 2550,
+     "comp": "중간",
+     "clicks": 76,
+     "depth": 8
+    },
+    {
+     "keyword": "정수기구매",
+     "volume": 2400,
+     "comp": "높음",
+     "clicks": 46,
+     "depth": 8
+    },
+    {
+     "keyword": "수도꼭지필터",
+     "volume": 1930,
+     "comp": "중간",
+     "clicks": 19,
+     "depth": 8
+    },
+    {
+     "keyword": "정수필터",
+     "volume": 1840,
+     "comp": "중간",
+     "clicks": 14,
+     "depth": 8
+    },
+    {
+     "keyword": "파라곤필터",
+     "volume": 1510,
+     "comp": "중간",
+     "clicks": 15,
+     "depth": 7
+    },
+    {
+     "keyword": "수돗물",
+     "volume": 1430,
+     "comp": "높음",
+     "clicks": 1,
+     "depth": 9
+    },
+    {
+     "keyword": "직수형정수기",
+     "volume": 1400,
+     "comp": "중간",
+     "clicks": 13,
+     "depth": 8
+    },
+    {
+     "keyword": "SK렌탈",
+     "volume": 1240,
+     "comp": "높음",
+     "clicks": 9,
+     "depth": 10
+    },
+    {
+     "keyword": "필터교체",
+     "volume": 990,
+     "comp": "높음",
+     "clicks": 2,
+     "depth": 10
+    },
+    {
+     "keyword": "정수기필터교체주기",
+     "volume": 930,
+     "comp": "높음",
+     "clicks": 7,
+     "depth": 10
+    },
+    {
+     "keyword": "정수기필터교체방법",
+     "volume": 820,
+     "comp": "높음",
+     "clicks": 11,
+     "depth": 10
+    },
+    {
+     "keyword": "제빙기필터",
+     "volume": 700,
+     "comp": "중간",
+     "clicks": 8,
+     "depth": 8
+    }
+   ]
+  },
+  {
+   "key": "음식물처리기",
+   "name": "음식물처리기",
+   "hint": "음식물처리기 건조분쇄",
+   "has_link": true,
+   "rows": [
+    {
+     "keyword": "음식물처리기건조분쇄",
+     "volume": 350,
+     "comp": "높음",
+     "clicks": 4,
+     "depth": 8
+    }
+   ]
+  },
+  {
+   "key": "음식물처리기필터",
+   "name": "음식물처리기 탈취 필터",
+   "hint": "음식물처리기 탈취필터",
+   "has_link": true,
+   "rows": [
+    {
+     "keyword": "스마트카라블레이드X필터",
+     "volume": 320,
+     "comp": "높음",
+     "clicks": 0,
+     "depth": 3
+    },
+    {
+     "keyword": "스마트카라필터리필",
+     "volume": 230,
+     "comp": "높음",
+     "clicks": 8,
+     "depth": 7
+    },
+    {
+     "keyword": "스마트카라음식물처리기필터",
+     "volume": 170,
+     "comp": "높음",
+     "clicks": 10,
+     "depth": 8
+    },
+    {
+     "keyword": "스마트카라리필필터",
+     "volume": 90,
+     "comp": "높음",
+     "clicks": 0,
+     "depth": 3
+    },
+    {
+     "keyword": "루펜음식물처리기필터",
+     "volume": 80,
+     "comp": "중간",
+     "clicks": 1,
+     "depth": 8
+    },
+    {
+     "keyword": "스마트카라리필",
+     "volume": 60,
+     "comp": "높음",
+     "clicks": 0,
+     "depth": 3
+    },
+    {
+     "keyword": "스마트카라PCS350필터",
+     "volume": 40,
+     "comp": "높음",
+     "clicks": 0,
+     "depth": 3
+    },
+    {
+     "keyword": "음식물건조기필터",
+     "volume": 40,
+     "comp": "높음",
+     "clicks": 0,
+     "depth": 7
+    },
+    {
+     "keyword": "홈바이홈필터",
+     "volume": 30,
+     "comp": "높음",
+     "clicks": 0,
+     "depth": 3
+    },
+    {
+     "keyword": "음식물처리기탈취필터",
+     "volume": 20,
+     "comp": "높음",
+     "clicks": 0,
+     "depth": 3
+    },
+    {
+     "keyword": "싱크리더필터",
+     "volume": 20,
+     "comp": "낮음",
+     "clicks": 0,
+     "depth": 0
+    }
+   ]
+  },
+  {
+   "key": "고효율가전",
+   "name": "대기전력 차단 멀티탭",
+   "hint": "대기전력 차단 멀티탭",
+   "has_link": true,
+   "rows": [
+    {
+     "keyword": "큐브멀티탭",
+     "volume": 7240,
+     "comp": "중간",
+     "clicks": 147,
+     "depth": 8
+    },
+    {
+     "keyword": "고용량멀티탭3구",
+     "volume": 2050,
+     "comp": "높음",
+     "clicks": 12,
+     "depth": 9
+    },
+    {
+     "keyword": "USB멀티탭",
+     "volume": 1910,
+     "comp": "중간",
+     "clicks": 18,
+     "depth": 8
+    },
+    {
+     "keyword": "멀티탭추천",
+     "volume": 1360,
+     "comp": "중간",
+     "clicks": 14,
+     "depth": 8
+    },
+    {
+     "keyword": "국산멀티탭",
+     "volume": 1340,
+     "comp": "높음",
+     "clicks": 22,
+     "depth": 9
+    },
+    {
+     "keyword": "안전콘센트",
+     "volume": 280,
+     "comp": "높음",
+     "clicks": 6,
+     "depth": 8
+    },
+    {
+     "keyword": "써지오",
+     "volume": 250,
+     "comp": "높음",
+     "clicks": 0,
+     "depth": 3
+    },
+    {
+     "keyword": "멀티탭방수",
+     "volume": 100,
+     "comp": "높음",
+     "clicks": 0,
+     "depth": 3
+    },
+    {
+     "keyword": "대기전력차단멀티탭",
+     "volume": 80,
+     "comp": "높음",
+     "clicks": 0,
+     "depth": 8
+    },
+    {
+     "keyword": "자동소화멀티콘센트",
+     "volume": 60,
+     "comp": "높음",
+     "clicks": 0,
+     "depth": 10
+    },
+    {
+     "keyword": "자동절전멀티탭",
+     "volume": 30,
+     "comp": "높음",
+     "clicks": 0,
+     "depth": 3
+    }
+   ]
+  },
+  {
+   "key": "제습기",
+   "name": "제습기",
+   "hint": "제습기 20L",
+   "has_link": true,
+   "rows": [
+    {
+     "keyword": "제습기20L",
+     "volume": 430,
+     "comp": "중간",
+     "clicks": 5,
+     "depth": 8
+    }
+   ]
+  }
+ ]
+}
