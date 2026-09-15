@@ -156,7 +156,13 @@ def keyword_rows(hint, cfg, limit=30):
         return []
     try:
         ts = str(int(time.time() * 1000))
-        r = requests.get(BASE + PATH, params={"hintKeywords": _clean(hint)[:20], "showDetail": "1"},
+        # 힌트는 **짧은 낱말 여러 개**를 쉼표로 넘긴다(최대 5개).
+        # 실측(2026-09-15): '현관문 문풍지 방풍'처럼 긴 문장을 넘기면 공백이 제거돼
+        # '현관문문풍지방풍'이라는 **존재하지 않는 한 단어**로 조회돼 후보가 1개·월 20회로만 나온다.
+        # 반면 '정수기' 한 낱말은 25개 후보·월 77,500회가 잡힌다 — 길이가 결과를 통째로 바꾼다.
+        hints = hint if isinstance(hint, (list, tuple)) else [hint]
+        q = ",".join(dict.fromkeys(_clean(h)[:20] for h in hints if _clean(h)))[:100]
+        r = requests.get(BASE + PATH, params={"hintKeywords": q, "showDetail": "1"},
                          headers={"X-Timestamp": ts, "X-API-KEY": key, "X-Customer": cid,
                                   "X-Signature": _sig(ts, "GET", PATH, sec)}, timeout=20)
         if r.status_code != 200:

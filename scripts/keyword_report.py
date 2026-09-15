@@ -23,11 +23,20 @@ if not (cfg.get("demand") or {}).get("api_key"):
 
 out = []
 for p in products.all_products():
-    hint = p.get("search") or p.get("name") or p.get("key")
+    # 짧은 낱말 여러 개를 힌트로 준다 — 긴 문장은 '없는 한 단어'가 되어 조회가 죽는다.
+    cand = [p.get("key", "")] + [w for kw in (p.get("match") or []) for w in kw.split()] \
+        + [w for w in (p.get("name") or "").replace("(", " ").replace(")", " ").split()]
+    seen, hint = set(), []
+    for w in cand:
+        w = w.strip("·,()")
+        if 2 <= len(w) <= 10 and w not in seen:
+            seen.add(w); hint.append(w)
+        if len(hint) >= 5:
+            break
     rows = demand.keyword_rows(hint, cfg, limit=25)
     out.append({"key": p.get("key"), "name": p.get("name"), "hint": hint,
                 "has_link": bool((p.get("coupang_url") or "").strip()), "rows": rows})
-    print(f"{p.get('key'):<16} {hint[:20]:<22} 후보 {len(rows)}개")
+    print(f"{p.get('key'):<16} {'+'.join(hint)[:28]:<30} 후보 {len(rows)}개")
     time.sleep(0.4)
 
 os.makedirs("dashboard/data", exist_ok=True)
