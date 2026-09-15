@@ -1,0 +1,678 @@
+{
+ "at": "2026-09-15 11:25",
+ "floor": 300,
+ "ceil": 30000,
+ "block_comp": [
+  "높음"
+ ],
+ "rows": [
+  {
+   "candidate": "전기장판",
+   "head": {
+    "keyword": "전기장판",
+    "volume": 25940,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "전기장판",
+    "volume": 25940,
+    "comp": "중간",
+    "clicks": 592,
+    "depth": 8
+   },
+   "fit_n": 3
+  },
+  {
+   "candidate": "매트리스커버",
+   "head": {
+    "keyword": "슈퍼싱글매트리스",
+    "volume": 23710,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "슈퍼싱글매트리스",
+    "volume": 23710,
+    "comp": "중간",
+    "clicks": 561,
+    "depth": 8
+   },
+   "fit_n": 9
+  },
+  {
+   "candidate": "건조기",
+   "head": {
+    "keyword": "건조기",
+    "volume": 56400,
+    "comp": "높음"
+   },
+   "best": {
+    "keyword": "세탁기건조기일체형",
+    "volume": 21570,
+    "comp": "중간",
+    "clicks": 543,
+    "depth": 8
+   },
+   "fit_n": 3
+  },
+  {
+   "candidate": "욕실선반",
+   "head": {
+    "keyword": "욕실선반",
+    "volume": 22770,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "욕실선반",
+    "volume": 22770,
+    "comp": "중간",
+    "clicks": 492,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "냄비세트",
+   "head": {
+    "keyword": "냄비세트",
+    "volume": 15970,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "냄비세트",
+    "volume": 15970,
+    "comp": "중간",
+    "clicks": 479,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "블라인드",
+   "head": {
+    "keyword": "블라인드",
+    "volume": 182200,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "암막블라인드",
+    "volume": 20150,
+    "comp": "중간",
+    "clicks": 424,
+    "depth": 8
+   },
+   "fit_n": 6
+  },
+  {
+   "candidate": "전기밥솥",
+   "head": {
+    "keyword": "전기밥솥",
+    "volume": 21430,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "전기밥솥",
+    "volume": 21430,
+    "comp": "중간",
+    "clicks": 420,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "에어프라이어",
+   "head": {
+    "keyword": "에어프라이어",
+    "volume": 130700,
+    "comp": "높음"
+   },
+   "best": {
+    "keyword": "에어프라이어추천",
+    "volume": 19380,
+    "comp": "중간",
+    "clicks": 401,
+    "depth": 8
+   },
+   "fit_n": 3
+  },
+  {
+   "candidate": "커피머신",
+   "head": {
+    "keyword": "커피머신",
+    "volume": 62400,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "일리커피머신",
+    "volume": 19190,
+    "comp": "중간",
+    "clicks": 396,
+    "depth": 8
+   },
+   "fit_n": 4
+  },
+  {
+   "candidate": "미끄럼방지매트",
+   "head": {
+    "keyword": "미끄럼방지매트",
+    "volume": 18060,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "미끄럼방지매트",
+    "volume": 18060,
+    "comp": "중간",
+    "clicks": 386,
+    "depth": 8
+   },
+   "fit_n": 2
+  },
+  {
+   "candidate": "무선청소기",
+   "head": {
+    "keyword": "무선청소기",
+    "volume": 118800,
+    "comp": "높음"
+   },
+   "best": {
+    "keyword": "무선청소기추천",
+    "volume": 12470,
+    "comp": "중간",
+    "clicks": 368,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "인덕션",
+   "head": {
+    "keyword": "인덕션",
+    "volume": 85800,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "삼성인덕션3구",
+    "volume": 11450,
+    "comp": "중간",
+    "clicks": 353,
+    "depth": 8
+   },
+   "fit_n": 13
+  },
+  {
+   "candidate": "로봇청소기",
+   "head": {
+    "keyword": "로봇청소기",
+    "volume": 128800,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "LG로봇청소기",
+    "volume": 27330,
+    "comp": "중간",
+    "clicks": 349,
+    "depth": 8
+   },
+   "fit_n": 5
+  },
+  {
+   "candidate": "이불세트",
+   "head": {
+    "keyword": "이불세트",
+    "volume": 10690,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "이불세트",
+    "volume": 10690,
+    "comp": "중간",
+    "clicks": 343,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "베개",
+   "head": {
+    "keyword": "베개",
+    "volume": 160100,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "목디스크베개",
+    "volume": 9570,
+    "comp": "중간",
+    "clicks": 304,
+    "depth": 8
+   },
+   "fit_n": 11
+  },
+  {
+   "candidate": "옷걸이",
+   "head": {
+    "keyword": "옷걸이",
+    "volume": 37460,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "옷걸이행거",
+    "volume": 10320,
+    "comp": "중간",
+    "clicks": 289,
+    "depth": 8
+   },
+   "fit_n": 5
+  },
+  {
+   "candidate": "행거",
+   "head": {
+    "keyword": "행거",
+    "volume": 62300,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "옷걸이행거",
+    "volume": 10320,
+    "comp": "중간",
+    "clicks": 289,
+    "depth": 8
+   },
+   "fit_n": 6
+  },
+  {
+   "candidate": "러그",
+   "head": {
+    "keyword": "러그",
+    "volume": 36200,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "거실러그",
+    "volume": 10130,
+    "comp": "중간",
+    "clicks": 272,
+    "depth": 8
+   },
+   "fit_n": 3
+  },
+  {
+   "candidate": "도마",
+   "head": {
+    "keyword": "도마",
+    "volume": 44860,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "도마추천",
+    "volume": 9240,
+    "comp": "중간",
+    "clicks": 253,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "가습기",
+   "head": {
+    "keyword": "가습기",
+    "volume": 53000,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "조지루시가습기",
+    "volume": 11950,
+    "comp": "중간",
+    "clicks": 243,
+    "depth": 8
+   },
+   "fit_n": 7
+  },
+  {
+   "candidate": "스팀다리미",
+   "head": {
+    "keyword": "스팀다리미",
+    "volume": 49000,
+    "comp": "높음"
+   },
+   "best": {
+    "keyword": "필립스스팀다리미",
+    "volume": 10850,
+    "comp": "중간",
+    "clicks": 218,
+    "depth": 8
+   },
+   "fit_n": 7
+  },
+  {
+   "candidate": "방충망",
+   "head": {
+    "keyword": "방충망",
+    "volume": 23980,
+    "comp": "높음"
+   },
+   "best": {
+    "keyword": "현관방충망",
+    "volume": 9380,
+    "comp": "중간",
+    "clicks": 216,
+    "depth": 8
+   },
+   "fit_n": 2
+  },
+  {
+   "candidate": "토스터기",
+   "head": {
+    "keyword": "토스터기",
+    "volume": 17470,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "토스터기",
+    "volume": 17470,
+    "comp": "중간",
+    "clicks": 190,
+    "depth": 8
+   },
+   "fit_n": 2
+  },
+  {
+   "candidate": "신발장정리",
+   "head": {
+    "keyword": "신발장",
+    "volume": 23310,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "신발장",
+    "volume": 23310,
+    "comp": "중간",
+    "clicks": 187,
+    "depth": 8
+   },
+   "fit_n": 4
+  },
+  {
+   "candidate": "전기포트",
+   "head": {
+    "keyword": "전기포트",
+    "volume": 35500,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "여행용전기포트",
+    "volume": 7910,
+    "comp": "중간",
+    "clicks": 182,
+    "depth": 8
+   },
+   "fit_n": 2
+  },
+  {
+   "candidate": "도어스토퍼",
+   "head": {
+    "keyword": "도어스토퍼",
+    "volume": 25220,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "도어스토퍼",
+    "volume": 25220,
+    "comp": "중간",
+    "clicks": 175,
+    "depth": 8
+   },
+   "fit_n": 4
+  },
+  {
+   "candidate": "핸디청소기",
+   "head": {
+    "keyword": "핸디청소기",
+    "volume": 8830,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "핸디청소기",
+    "volume": 8830,
+    "comp": "중간",
+    "clicks": 159,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "온풍기",
+   "head": {
+    "keyword": "온풍기",
+    "volume": 7240,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "욕실온풍기",
+    "volume": 6040,
+    "comp": "중간",
+    "clicks": 151,
+    "depth": 8
+   },
+   "fit_n": 4
+  },
+  {
+   "candidate": "배수구트랩",
+   "head": {
+    "keyword": "배수구트랩",
+    "volume": 12260,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "배수구트랩",
+    "volume": 12260,
+    "comp": "중간",
+    "clicks": 151,
+    "depth": 8
+   },
+   "fit_n": 5
+  },
+  {
+   "candidate": "밀폐용기",
+   "head": {
+    "keyword": "밀폐용기",
+    "volume": 13770,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "밀폐용기",
+    "volume": 13770,
+    "comp": "중간",
+    "clicks": 147,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "전기요",
+   "head": {
+    "keyword": "전기요",
+    "volume": 7570,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "전기요",
+    "volume": 7570,
+    "comp": "중간",
+    "clicks": 136,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "식기건조대",
+   "head": {
+    "keyword": "식기건조대",
+    "volume": 47970,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "아이넥스식기건조대",
+    "volume": 5260,
+    "comp": "중간",
+    "clicks": 134,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "빨래건조대",
+   "head": {
+    "keyword": "빨래건조대",
+    "volume": 63200,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "천장빨래건조대",
+    "volume": 3790,
+    "comp": "중간",
+    "clicks": 130,
+    "depth": 8
+   },
+   "fit_n": 4
+  },
+  {
+   "candidate": "현관매트",
+   "head": {
+    "keyword": "현관매트",
+    "volume": 10580,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "현관매트",
+    "volume": 10580,
+    "comp": "중간",
+    "clicks": 129,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "공기청정기",
+   "head": {
+    "keyword": "공기청정기",
+    "volume": 64600,
+    "comp": "높음"
+   },
+   "best": {
+    "keyword": "위닉스공기청정기",
+    "volume": 10270,
+    "comp": "중간",
+    "clicks": 70,
+    "depth": 8
+   },
+   "fit_n": 4
+  },
+  {
+   "candidate": "전기히터",
+   "head": {
+    "keyword": "전기히터",
+    "volume": 7340,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "전기히터",
+    "volume": 7340,
+    "comp": "중간",
+    "clicks": 41,
+    "depth": 8
+   },
+   "fit_n": 1
+  },
+  {
+   "candidate": "진공압축팩",
+   "head": {
+    "keyword": "진공압축기",
+    "volume": 2580,
+    "comp": "중간"
+   },
+   "best": {
+    "keyword": "진공압축기",
+    "volume": 2580,
+    "comp": "중간",
+    "clicks": 20,
+    "depth": 8
+   },
+   "fit_n": 2
+  },
+  {
+   "candidate": "온수매트",
+   "head": {
+    "keyword": "온수매트",
+    "volume": 18620,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "프라이팬",
+   "head": {
+    "keyword": "프라이팬",
+    "volume": 50700,
+    "comp": "중간"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "주방칼",
+   "head": {
+    "keyword": "주방칼",
+    "volume": 4830,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "샤워헤드",
+   "head": {
+    "keyword": "샤워헤드",
+    "volume": 5320,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "변기커버",
+   "head": {
+    "keyword": "변기커버",
+    "volume": 23460,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "수전필터",
+   "head": null,
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "서랍정리함",
+   "head": {
+    "keyword": "서랍정리함",
+    "volume": 5530,
+    "comp": "높음"
+   },
+   "best": null,
+   "fit_n": 0
+  },
+  {
+   "candidate": "암막커튼",
+   "head": {
+    "keyword": "암막커튼",
+    "volume": 61300,
+    "comp": "중간"
+   },
+   "best": null,
+   "fit_n": 0
+  }
+ ]
+}
