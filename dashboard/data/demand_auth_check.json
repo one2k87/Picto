@@ -1,0 +1,31 @@
+{
+ "shape": {
+  "api_key_len": 74,
+  "api_key_stripped_len": 74,
+  "secret_len": 52,
+  "secret_stripped_len": 52,
+  "customer_id_len": 7,
+  "customer_id_digits": true,
+  "공백_딸려옴": false
+ },
+ "results": [
+  {
+   "variant": "표준(digest→b64)",
+   "http": 403,
+   "err": "urn:naver:api:problem:auth-failed|Auth Failed",
+   "rows": null
+  },
+  {
+   "variant": "hexdigest→b64",
+   "http": 403,
+   "err": "urn:naver:api:problem:invalid-signature|Invalid Signature",
+   "rows": null
+  },
+  {
+   "variant": "원본(strip 안 함)",
+   "http": 403,
+   "err": "urn:naver:api:problem:auth-failed|Auth Failed",
+   "rows": null
+  }
+ ]
+}
