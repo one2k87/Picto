@@ -58,6 +58,42 @@ def is_discard(reason_str):
     return bool((reason_str or "").strip())
 
 
+# ── 주제 중복(제목 핵심어 겹침) ────────────────────────────────────
+# 왜: 중복 방지는 지금까지 '과거 제목 목록을 프롬프트에 넣는다'가 전부였다.
+#     그건 모델에게 부탁하는 것이지 막는 게 아니다. 실측(2026-09-16): #243
+#     「1인 가구 원룸 음식물처리기, 건조분쇄형 설치 전…」 다음 날 #248
+#     「1인 가구 건조분쇄형 음식물처리기, 30dB대 소음과…」이 발행됐다.
+#     어미도 도입부도 다르니 기존 템플릿 검사는 전부 통과했다. 같은 제품·같은
+#     독자층이면 두 글은 서로의 검색 순위를 깎고 수수료는 한 몫으로 나뉜다.
+# 어떻게: 제목에서 날짜·상투어를 뺀 '핵심 낱말'만 남겨 교집합을 본다.
+#     실측 기준: 발행 21편 전 쌍을 돌렸을 때 겹침 4개 & 비율 0.40에서
+#     실제 중복 1쌍만 걸리고 의도된 시리즈(비데 #100·#211)는 걸리지 않았다.
+_TOPIC_STOP = set(
+    "이유 조건 기준 방법 경우 확인 주의 사항 무엇 위해 하는 해야 없이 사이 그리고 "
+    "또는 정말 진짜 우리 지금 이제 대비 전에 가지 관련 필요 추천 비교 정리 체크 안내".split())
+_TOPIC_DATE = re.compile(r"^(20\d\d년?|\d{1,2}월|\d+일)$")
+_TOPIC_JOSA = re.compile(r"(은|는|이|가|을|를|의|에|와|과|도|만|로|으로|부터|까지|라면|이라면|에서)$")
+
+
+def topic_tokens(title):
+    """제목의 '무엇에 대한 글인가'를 나타내는 낱말 집합."""
+    out = set()
+    for w in re.sub(r"[^0-9A-Za-z가-힣]+", " ", title or "").split():
+        w = _TOPIC_JOSA.sub("", w)
+        if len(w) >= 2 and w not in _TOPIC_STOP and not _TOPIC_DATE.match(w):
+            out.add(w)
+    return out
+
+
+def topic_overlap(t1, t2):
+    """두 제목의 주제 겹침 → (겹친 낱말 수, 비율). 비율은 짧은 쪽 기준."""
+    a, b = topic_tokens(t1), topic_tokens(t2)
+    if not a or not b:
+        return 0, 0.0
+    inter = a & b
+    return len(inter), len(inter) / min(len(a), len(b))
+
+
 _END_STRIP = re.compile(r"(?:입니다|합니다|됩니다|줍니다|집니다|합니까|입니까|하세요|보세요|마세요|세요|해요|어요|네요|을까요|일까요|까요|나요|는가|은가|죠)$")
 
 def title_ending(title):
@@ -195,6 +231,19 @@ def check(article, other_texts, safety, recent=None):
             dup = sum(1 for r in recent if title_ending(r.get("title", "")) == end)
             if dup >= int(safety.get("max_same_title_ending", 3)):  # 어간 기준이라 2는 과민(실측)
                 reasons.append(f"제목템플릿(어미'{end}' 최근 {dup}건)")
+
+        # 5) 최근 글과 주제 중복 — 어미·도입부가 달라도 '같은 글'인 경우를 잡는다
+        if safety.get("check_topic_dup", True):
+            _need = int(safety.get("topic_dup_words", 4))
+            _rate = float(safety.get("topic_dup_ratio", 0.40))
+            for r in recent:
+                rt = r.get("title") or ""
+                if not rt or rt == title:
+                    continue
+                n_, p_ = topic_overlap(title, rt)
+                if n_ >= _need and p_ >= _rate:
+                    reasons.append(f"기존글과유사(주제중복: 「{rt[:24]}…」 핵심어 {n_}개 겹침)")
+                    break
 
         # 3) 도입부 상투 구문
         opening = _first_sentence(_text(html))
