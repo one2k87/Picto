@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-16T09:28:48",
+ "updated_at": "2026-09-16T10:29:13",
  "site": "https://pickdam.com",
  "checked": 22,
  "indexed": 14,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-16T08:47:12\",\"link\":\"https:\\/\\/pickdam.com\\/one-person-food-waste-disposer-low-noise-tips\\/\"},{\"mo"
+  "body_head": "[{\"modified\":\"2026-09-16T10:20:47\",\"link\":\"https:\\/\\/pickdam.com\\/new-apartment-system-aircon-guide-2026\\/\"},{\"modified\""
  },
  "posts_n": 21,
  "results": [
@@ -17,6 +17,30 @@
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-03"
+  },
+  {
+   "url": "https://pickdam.com/new-apartment-system-aircon-guide-2026/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-11"
+  },
+  {
+   "url": "https://pickdam.com/food-waste-disposer-trade-in-vs-rental-2026/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/dehumidifier-20l-electricity-bill-30pyeong/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-11"
   },
   {
    "url": "https://pickdam.com/one-person-food-waste-disposer-low-noise-tips/",
@@ -33,7 +57,7 @@
   {
    "url": "https://pickdam.com/bidet-self-installation-guide-2026/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -44,12 +68,6 @@
   },
   {
    "url": "https://pickdam.com/new-appliance-installment-plan-comparison/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-11"
-  },
-  {
-   "url": "https://pickdam.com/new-apartment-system-aircon-guide-2026/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-11"
@@ -97,12 +115,6 @@
    "lastCrawl": ""
   },
   {
-   "url": "https://pickdam.com/dehumidifier-20l-electricity-bill-30pyeong/",
-   "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
-   "lastCrawl": ""
-  },
-  {
    "url": "https://pickdam.com/door-draft-stopper-guide-2026/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
@@ -115,12 +127,6 @@
    "lastCrawl": "2026-09-03"
   },
   {
-   "url": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-11"
-  },
-  {
    "url": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
@@ -131,12 +137,6 @@
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-11"
-  },
-  {
-   "url": "https://pickdam.com/food-waste-disposer-trade-in-vs-rental-2026/",
-   "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
-   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/water-purifier-filter-replacement-guide-2026/",
