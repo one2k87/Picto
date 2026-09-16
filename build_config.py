@@ -162,7 +162,7 @@ cfg = {
     # 키가 없으면 조회가 빈 결과를 주고 아무것도 거르지 않는다(발행은 절대 안 멈춘다).
     "demand": {
         "enabled": b("DEMAND_GATE", True),
-        "min_volume": int(envs("DEMAND_MIN_VOLUME", "300") or 300),
+        "min_volume": int(envs("DEMAND_MIN_VOLUME", "1500") or 1500),
         "max_volume": int(envs("DEMAND_MAX_VOLUME", "30000") or 30000),
         "block_comp": envj("DEMAND_BLOCK_COMP", ["높음"]),
         "api_key": envs("NAVER_AD_API_KEY", ""),

@@ -325,7 +325,7 @@ try:
         r = requests.get(f"{site}/wp-json/wp/v2/posts", headers=_H,
                          params={"per_page": 50, "page": _pg, "status": "publish",
                                  "context": "edit",
-                                 "_fields": "id,title,content,excerpt,featured_media,meta"},
+                                 "_fields": "id,title,content,excerpt,featured_media,meta,categories"},
                          timeout=30)
         if not r.ok:
             raise RuntimeError(f"HTTP {r.status_code}")
@@ -371,6 +371,106 @@ print(f"[check] 발행 위생 {hyg['of']}편 — 요약 채움 {len(hyg['excerpt
       f"이미지 {IMG_TARGET}장 미만 {len(hyg['few_images'])} · 콕픽 블록 없음 {len(hyg['no_kokpick'])}")
 
 
+# ── ⑤ 검색결과 노출 위생 (2026-09-16) ──────────────────────────
+# 왜: 2026-09-16 실측에서 발행 21편 중 **20편의 제목이 구글 검색결과에서 잘리고**
+#     있었다(평균 52자, 구글은 한국어 제목을 35자 부근에서 자른다 — 같은 날 SERP에서
+#     경쟁 글들이 35~36자에서 '...'로 끊기는 것을 확인). 잘리는 쪽에 우리가 공들인
+#     숫자가 있었다(#67 「…위약금 3」에서 절단). rank_math_title은 21편 전부 비어 있었다.
+#     또 21편이 전부 카테고리 하나(생활·주방)에 들어 있어 주제 허브가 없었고,
+#     브레드크럼 구조화 데이터가 아예 없었다.
+# 무엇을: (1) 하위 카테고리 자동 배정 (2) 브레드크럼(마이크로데이터) 주입
+#         (3) rank_math_title 비어 있으면 본문 제목에서 28자로 깎아 채움.
+# ⚠️ 함정: 이 호스트의 방화벽은 **요청 본문에 `<script`가 들어가면 연결을 끊는다**
+#     (2026-09-16 실측: 같은 본문에 `<script type="application/ld+json">`만 붙이면
+#     REST POST가 Failed to fetch). 그래서 브레드크럼은 JSON-LD가 아니라
+#     **마이크로데이터**로 넣는다 — 구글은 둘 다 읽는다.
+SEO_TITLE_MAX = 28
+PARENT_CAT_SLUG = "living-kitchen"
+SUB_RULES = [
+    (r"음식물\s*처리기|음식물처리|탈취필터", "food-waste-disposer"),
+    (r"비데|분기밸브|변기", "bidet-bath"),
+    (r"문풍지|뽁뽁이|방풍|외풍|단열|틈막이|난방비", "insulation-heating"),
+    (r"정수기|필터\s*교체", "water-purifier"),
+    (r"이사|포장이사|입주\s*청소|이사청소", "moving-cleaning"),
+]
+SUB_DEFAULT = "appliance-buying"
+seo = {"cat_set": [], "bc_added": [], "title_set": [], "err": []}
+
+
+def _short_title(long_title, keyword=""):
+    head = re.split(r"[,?·]", long_title or "")[0].strip()
+    if keyword and keyword not in head:
+        head = (keyword + ", " + head).strip(", ")
+    if len(head) > SEO_TITLE_MAX:
+        head = head[:SEO_TITLE_MAX].rstrip(" ,·-")
+    return head
+
+
+def _bc_html(site, sub_slug, sub_name, parent_name):
+    def it(pos, name, url, cur=False):
+        col = "#7c5cff" if cur else "#98a2b3"
+        return (f'<span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">'
+                f'<a itemprop="item" href="{url}" style="color:{col};text-decoration:none">'
+                f'<span itemprop="name">{name}</span></a>'
+                f'<meta itemprop="position" content="{pos}"></span>')
+    home = site.rstrip("/") + "/"
+    return ('<nav data-bc="1" itemscope itemtype="https://schema.org/BreadcrumbList" '
+            'style="font-size:13px;color:#98a2b3;margin:0 0 12px;line-height:1.7">'
+            + it(1, "픽담", home) + " › "
+            + it(2, parent_name, home + "category/" + PARENT_CAT_SLUG + "/") + " › "
+            + it(3, sub_name, home + "category/" + sub_slug + "/", True)
+            + "</nav>\n")
+
+
+try:
+    _cr = requests.get(f"{site}/wp-json/wp/v2/categories",
+                       params={"per_page": 100, "_fields": "id,name,slug,parent"}, timeout=30)
+    cats = {c["slug"]: c for c in (_cr.json() if _cr.ok else [])}
+    parent = cats.get(PARENT_CAT_SLUG)
+    if not parent:
+        raise RuntimeError(f"상위 카테고리 '{PARENT_CAT_SLUG}' 없음")
+    subs = {sl: cats[sl] for _rx, sl in SUB_RULES if sl in cats}
+    if SUB_DEFAULT in cats:
+        subs[SUB_DEFAULT] = cats[SUB_DEFAULT]
+    for it_ in _hp:                                   # ④에서 이미 받아둔 발행 글 목록
+        pid, ttl = it_["id"], _title_of(it_)
+        raw = (it_.get("content") or {}).get("raw") or ""
+        meta = it_.get("meta") or {}
+        body = {}
+        cur_cats = it_.get("categories") or []
+        sub = None
+        if not any(c in [v["id"] for v in subs.values()] for c in cur_cats):
+            slug = SUB_DEFAULT
+            for rx, sl in SUB_RULES:
+                if re.search(rx, ttl) and sl in subs:
+                    slug = sl
+                    break
+            if slug in subs:
+                sub = subs[slug]
+                body["categories"] = sorted(set(cur_cats + [parent["id"], sub["id"]]))
+                seo["cat_set"].append({"id": pid, "title": ttl, "cat": sub["name"]})
+        else:
+            sub = next(v for v in subs.values() if v["id"] in cur_cats)
+        if sub and 'data-bc="1"' not in raw:
+            body["content"] = _bc_html(site, sub["slug"], sub["name"], parent["name"]) + raw
+            seo["bc_added"].append({"id": pid, "title": ttl})
+        if not (meta.get("rank_math_title") or "").strip():
+            st = _short_title(ttl, meta.get("rank_math_focus_keyword") or "")
+            if st:
+                body["meta"] = {"rank_math_title": st}
+                seo["title_set"].append({"id": pid, "title": st})
+        if body:
+            rr = requests.post(f"{site}/wp-json/wp/v2/posts/{pid}", json=body,
+                               headers={**_H, "Content-Type": "application/json"}, timeout=30)
+            if rr.status_code not in (200, 201):
+                seo["err"].append({"id": pid, "status": rr.status_code})
+except Exception as e:
+    print(f"[check] 검색결과 노출 위생 건너뜀: {e}")
+    seo["err"].append({"reason": str(e)})
+print(f"[check] 노출 위생 — 카테고리 배정 {len(seo['cat_set'])} · "
+      f"브레드크럼 {len(seo['bc_added'])} · 검색제목 {len(seo['title_set'])} · 실패 {len(seo['err'])}")
+
+
 # ── 결과 저장 + 텔레그램 ───────────────────────────────────────
 out = {"at": datetime.datetime.now().isoformat()[:19], "n": len(scored), "avg": avg,
        "fails": [{k: x[k] for k in ("id", "title", "score", "issues")} for x in fails],
@@ -381,7 +481,7 @@ out = {"at": datetime.datetime.now().isoformat()[:19], "n": len(scored), "avg": 
        "link_coverage": link_cov, "link_fill": link_fill,
        "pending_products": pending_products,
        "line_leaks": {"n": len(line_leaks), "posts": line_leaks[:20]},
-       "hygiene": hyg}
+       "hygiene": hyg, "seo": seo}
 os.makedirs("dashboard/data", exist_ok=True)
 json.dump(out, open("dashboard/data/site_check.json", "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)

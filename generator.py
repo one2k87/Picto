@@ -123,6 +123,30 @@ def slugify(text, max_words=8):
 SLUG_TRANSLATOR = None
 
 
+# ── 검색용 짧은 제목 (2026-09-16) ─────────────────────────────────
+# 왜: 본문 제목은 길수록 정보가 많지만, 구글은 한국어 제목을 **35자 부근에서 자른다**
+#     (같은 날 SERP 실측: 경쟁 글 제목이 35~36자에서 '...'로 절단).
+#     픽담 발행 21편의 제목 평균이 52자였고 20편이 잘리고 있었다 — 그것도 숫자가 있는 쪽이
+#     잘렸다(#67 「…위약금 3」에서 끊김). 그래서 본문 제목(<h1>)은 그대로 두고
+#     **검색결과에 뜨는 제목(rank_math_title)만 따로 짧게** 만든다.
+# 규칙: 28자 이내 · 타깃 키워드로 시작 · 숫자 하나는 남긴다.
+SEO_TITLE_MAX = 28
+
+
+def _seo_title(cand, keyword, long_title):
+    """모델이 준 짧은 제목을 검증하고, 못 쓰면 본문 제목에서 깎아 만든다."""
+    cand = re.sub(r"\s+", " ", (cand or "")).strip(" -–—·|")
+    if cand and len(cand) <= SEO_TITLE_MAX:
+        return cand
+    # 폴백: 본문 제목의 첫 절(쉼표·물음표 앞)을 쓰되 키워드가 빠지면 앞에 붙인다
+    head = re.split(r"[,?·]", long_title or "")[0].strip()
+    if keyword and keyword not in head:
+        head = f"{keyword}, {head}".strip(", ")
+    if len(head) > SEO_TITLE_MAX:
+        head = head[:SEO_TITLE_MAX].rstrip(" ,·-")
+    return head or (keyword or "")[:SEO_TITLE_MAX]
+
+
 def make_slug(llm_slug="", title="", keyword="", when=None):
     """글 주소를 정한다. 앞에서부터 되는 것을 쓴다.
       ① LLM이 준 영문 슬러그 ② 제목 속 영문 ③ 키워드 속 영문
@@ -532,7 +556,7 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
 본문은 JSON이 아니라 그냥 HTML이므로 따옴표를 이스케이프하지 마세요.
 
 ===META===
-{{"title":"클릭 유도형 제목","meta":"120~155자 메타설명(키워드 포함)","slug":"english-hyphen-slug(소문자 영문 낱말 3~6개를 하이픈으로. 한글·숫자만·빈값 금지)","focus_keyword":"{keyword}","tags":["태그1","태그2","태그3","태그4","태그5"],"hook":"3초 후킹 첫 문장","gain":"{_gain_key}","tldr":[],"checklist":[],"summary_table":{{"headers":[],"rows":[]}},"faqs":[],"kokpick":{{"price_band":"","condition_branch":[],"size_install":"","maintenance":{{"cycle":"","cost_per_year":"","consumable_url":""}},"cautions":[],"alt_uses":[],"alt_uses_source":""}}}}
+{{"title":"클릭 유도형 제목","seo_title":"검색용 짧은 제목(28자 이내, 타깃 키워드로 시작, 숫자 1개 포함)","meta":"90~120자 메타설명(첫 70자 안에 답과 숫자를 넣을 것)","slug":"english-hyphen-slug(소문자 영문 낱말 3~6개를 하이픈으로. 한글·숫자만·빈값 금지)","focus_keyword":"{keyword}","tags":["태그1","태그2","태그3","태그4","태그5"],"hook":"3초 후킹 첫 문장","gain":"{_gain_key}","tldr":[],"checklist":[],"summary_table":{{"headers":[],"rows":[]}},"faqs":[],"kokpick":{{"price_band":"","condition_branch":[],"size_install":"","maintenance":{{"cycle":"","cost_per_year":"","consumable_url":""}},"cautions":[],"alt_uses":[],"alt_uses_source":""}}}}
 (위 tldr·checklist·summary_table·faqs는 '배정된 것만' 채우고, 배정되지 않은 항목은 위처럼 빈 채로 두세요)
 (kokpick = 유튜브 채널이 읽어갈 구조화 정보입니다. **본문에 실제로 쓴 내용만** 옮겨 담고,
  본문에 없는 값은 반드시 빈 채로 두세요 — 지어내면 영상과 글의 근거가 어긋납니다.
@@ -987,6 +1011,7 @@ def _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,
         "keyword": keyword, "kind": kind, "lang": "ko", "category": category,
         "title": data.get("title") or keyword,
         "meta": data.get("meta", ""), "slug": slug,
+        "seo_title": _seo_title(data.get("seo_title"), data.get("focus_keyword") or keyword, title),
         "focus_keyword": data.get("focus_keyword", keyword),
         "tags": data.get("tags", []), "faqs": data.get("faqs", []),
         "kokpick": data.get("kokpick") if isinstance(data.get("kokpick"), dict) else {},
