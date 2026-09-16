@@ -230,6 +230,11 @@ jobs:
 
       # 점검·수리의 서버 이전(v1): 대시보드 채점을 매일 서버에서 수행,
       # auto_repair 켜진 사이트는 미달 글을 자동 재작성(캡 5편) — 앱을 안 열어도 관리되는 상태
+      # 콕픽 교집합 판정 갱신 — 캐스토가 찍기 전에 CTA 목적지를 알 수 있게 한다.
+      - name: 콕픽 교집합 갱신
+        if: always()
+        run: python scripts/casto_sync.py || true
+
       - name: 사이트 점검·자동 수리
         if: always()
         run: python scripts/daily_check_fix.py || true

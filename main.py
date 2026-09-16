@@ -1024,6 +1024,21 @@ def run():
     # 링크는 있는데 글이 없는 제품을 주제 생성에 자동 주입한다(사람이 매번 지시하지 않게).
     try:
         cfg["_pending_products"] = products.pending(hist.get("articles"))
+        # 콕픽(캐스토)과 겹치는 제품을 **앞자리**에 올린다(2026-09-16).
+        # 근거: 캐스토 큐 36종 중 픽토 수요 기준 통과는 10종뿐이었다. 그 10종이
+        # 영상과 글이 같이 설 수 있는 유일한 자리라, 여기부터 쓰는 것이 시너지가 가장 크다.
+        # 나머지 26종은 검색 수요가 없어 글을 쓰지 않는다(캐스토는 쿠팡 직링크로 보낸다).
+        try:
+            import casto_link
+            _cx = casto_link.priority_topics(cfg, hist.get("articles"))
+            if _cx:
+                _have = {p.get("key") for p in cfg["_pending_products"]}
+                cfg["_pending_products"] = [x for x in _cx if x["key"] not in _have] \
+                    + cfg["_pending_products"]
+                print(f"[콕픽] 교집합 제품 {len(_cx)}종을 주제 앞자리에 배치: "
+                      + ", ".join(x["name"] for x in _cx[:4]))
+        except Exception as e:
+            print(f"[콕픽] 교집합 배치 건너뜀({str(e)[:70]})")
         if cfg["_pending_products"]:
             print("[상품] 링크 있는데 글 없는 제품 "
                   f"{len(cfg['_pending_products'])}종 → 주제 우선 배정: "
