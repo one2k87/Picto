@@ -287,19 +287,35 @@ print(f"[check] 상품 링크 미등록 {len(link_missing)}편 · "
 KOKPICK_RE = re.compile(r"<!--KOKPICK\s.*?KOKPICK-->", re.S)
 IMG_TARGET = 3
 hyg = {"no_excerpt": [], "no_featured": [], "no_kokpick": [], "few_images": [],
-       "excerpt_filled": [], "of": 0}
+       "excerpt_filled": [], "excerpt_bad": [], "of": 0}
+
+
+# 고지·면책 문구 판별 — '문장 시작'이 아니라 '문장 어디든' 걸리게 한다.
+#   2026-09-16: 요약 복구를 돌리면서 문장 '앞부분'만 걸러 「정확성을 위해 검증 과정을
+#   거치지만…」(고지 블록의 두 번째 문장)이 #222·#67·#61의 요약으로 그대로 들어갔다.
+#   요약은 검색결과·카드·마크토 핀 설명에 그대로 노출되므로 빈 요약보다 나쁘다.
+#   그래서 (1) 뽑을 때 걸러내고 (2) 이미 들어가 있으면 '빈 요약'으로 간주해 다시 채운다.
+DISCLAIMER_RE = re.compile(
+    r"편집부|최종 업데이트|본 콘텐츠|생성형 AI|검증 과정|공식 출처|쿠팡 파트너스|"
+    r"일정액의 수수료|법적 책임|정확성을 위해|참고용|이 포스팅은 쿠팡|이 글은 정보 제공")
 
 
 def _first_sentence(html, limit=150):
-    """카드에 쓸 한 문장. 고지문으로 시작하면 그 문장은 건너뛴다."""
-    txt = strip_tags(KOKPICK_RE.sub("", html or ""))
-    parts = [x for x in re.split(r"(?<=[.!?])\s+", txt) if x.strip()]
-    parts = [x for x in parts if not x.startswith(("이 포스팅은 쿠팡", "이 글은 정보 제공"))]
+    """카드에 쓸 한 문장. 고지 블록(본문 첫 <h2> 이전)은 통째로 버린다."""
+    raw = KOKPICK_RE.sub("", html or "")
+    m = re.search(r"<h2", raw, re.I)
+    if m:
+        raw = raw[m.start():]                      # 고지 블록은 첫 h2 앞에만 있다
+    raw = re.sub(r"<(table|ul|ol|script|style|figure|blockquote)[\s\S]*?</\1>", " ", raw, flags=re.I)
+    raw = re.sub(r"<h[1-6][^>]*>[\s\S]*?</h[1-6]>", " ", raw, flags=re.I)   # 제목이 문장에 붙는 것 방지
+    txt = strip_tags(raw)
+    parts = [x.strip() for x in re.split(r"(?<=[.!?])\s+", txt) if x.strip()]
+    parts = [x for x in parts if not DISCLAIMER_RE.search(x) and 25 <= len(x) <= limit]
     if not parts:
         return ""
-    out = parts[0].strip()
-    if len(out) < 30 and len(parts) > 1:
-        out = (out + " " + parts[1]).strip()
+    out = parts[0]
+    if len(out) < 40 and len(parts) > 1 and len(out) + len(parts[1]) + 1 <= limit:
+        out = out + " " + parts[1]
     return out[:limit].strip()
 
 
@@ -328,11 +344,13 @@ try:
             hyg["few_images"].append({"id": pid, "title": ttl, "n": figs})
         if not (KOKPICK_RE.search(raw) and ((it.get("meta") or {}).get("kokpick") or "").strip()):
             hyg["no_kokpick"].append({"id": pid, "title": ttl})
-        exc = ((it.get("excerpt") or {}).get("raw") or "").strip()
-        if exc:
+        exc = strip_tags((it.get("excerpt") or {}).get("raw") or "").strip()
+        if exc and not DISCLAIMER_RE.search(exc):
             continue
-        text = ((it.get("meta") or {}).get("rank_math_description") or "").strip() \
-            or _first_sentence(raw)
+        if exc:                                    # 고지문이 요약에 들어가 있던 글
+            hyg["excerpt_bad"].append({"id": pid, "title": ttl})
+        _rm = ((it.get("meta") or {}).get("rank_math_description") or "").strip()
+        text = ("" if DISCLAIMER_RE.search(_rm) else _rm) or _first_sentence(raw)
         if not text:
             hyg["no_excerpt"].append({"id": pid, "title": ttl})
             continue
@@ -349,7 +367,7 @@ try:
 except Exception as e:
     print(f"[check] 발행 위생 점검 건너뜀: {e}")
 print(f"[check] 발행 위생 {hyg['of']}편 — 요약 채움 {len(hyg['excerpt_filled'])} · "
-      f"요약 없음 {len(hyg['no_excerpt'])} · 대표이미지 없음 {len(hyg['no_featured'])} · "
+      f"요약 없음 {len(hyg['no_excerpt'])} · 고지문 요약 {len(hyg['excerpt_bad'])} · 대표이미지 없음 {len(hyg['no_featured'])} · "
       f"이미지 {IMG_TARGET}장 미만 {len(hyg['few_images'])} · 콕픽 블록 없음 {len(hyg['no_kokpick'])}")
 
 
