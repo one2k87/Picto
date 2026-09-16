@@ -413,12 +413,15 @@ def _bc_html(site, sub_slug, sub_name, parent_name):
                 f'<a itemprop="item" href="{url}" style="color:{col};text-decoration:none">'
                 f'<span itemprop="name">{name}</span></a>'
                 f'<meta itemprop="position" content="{pos}"></span>')
+    # 하위 카테고리 주소는 **중첩형**이 정규 주소다(실측 2026-09-16:
+    # /category/food-waste-disposer/ 도 200을 주지만 canonical은
+    # /category/living-kitchen/food-waste-disposer/ 를 가리킨다).
     home = site.rstrip("/") + "/"
     return ('<nav data-bc="1" itemscope itemtype="https://schema.org/BreadcrumbList" '
             'style="font-size:13px;color:#98a2b3;margin:0 0 12px;line-height:1.7">'
             + it(1, "픽담", home) + " › "
             + it(2, parent_name, home + "category/" + PARENT_CAT_SLUG + "/") + " › "
-            + it(3, sub_name, home + "category/" + sub_slug + "/", True)
+            + it(3, sub_name, home + "category/" + PARENT_CAT_SLUG + "/" + sub_slug + "/", True)
             + "</nav>\n")
 
 
