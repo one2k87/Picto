@@ -4,5 +4,21 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false
+ "file_enabled": false,
+ "apply_trace": [
+  {
+   "stage": "진입",
+   "title": "침실 무드등, 수면등과 수유등 중 우리 집에 맞는 ",
+   "enabled": false,
+   "widget_len": 211,
+   "h2": 4
+  },
+  {
+   "stage": "중단:enabled=False",
+   "title": "침실 무드등, 수면등과 수유등 중 우리 집에 맞는 ",
+   "enabled": false,
+   "widget_len": 211,
+   "h2": 4
+  }
+ ]
 }

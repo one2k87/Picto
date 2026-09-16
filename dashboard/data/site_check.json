@@ -1,6 +1,6 @@
 {
- "at": "2026-09-16T10:29:51",
- "n": 21,
+ "at": "2026-09-17T08:58:25",
+ "n": 22,
  "avg": 100,
  "fails": [],
  "auto_repair": true,
@@ -8,9 +8,13 @@
  "repair_fail": [],
  "defaults": [],
  "noimgv2": {
-  "n": 18,
-  "of": 21,
+  "n": 19,
+  "of": 22,
   "posts": [
+   {
+    "id": 319,
+    "title": "침실 무드등, 수면등과 수유등 중 우리 집에 맞는 조명은 따로 있습니다"
+   },
    {
     "id": 248,
     "title": "1인 가구 건조분쇄형 음식물처리기, 30dB대 소음과 50만 원대 가격 "
@@ -90,10 +94,10 @@
   "posts": []
  },
  "link_coverage": {
-  "of": 21,
+  "of": 22,
   "matched": 15,
   "linked": 15,
-  "unmatched": 6
+  "unmatched": 7
  },
  "link_fill": {
   "of": 10,
@@ -110,6 +114,24 @@
   "no_kokpick": [],
   "few_images": [],
   "excerpt_filled": [],
-  "of": 21
+  "excerpt_bad": [],
+  "of": 22
+ },
+ "seo": {
+  "cat_set": [
+   {
+    "id": 319,
+    "title": "침실 무드등, 수면등과 수유등 중 우리 집에 맞는 조명은 따로 있습니다",
+    "cat": "가전 구매·렌탈"
+   }
+  ],
+  "bc_added": [
+   {
+    "id": 319,
+    "title": "침실 무드등, 수면등과 수유등 중 우리 집에 맞는 조명은 따로 있습니다"
+   }
+  ],
+  "title_set": [],
+  "err": []
  }
 }

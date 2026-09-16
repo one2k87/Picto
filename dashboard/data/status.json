@@ -1,36 +1,36 @@
 {
-  "updated_at": "2026-09-16T08:47:14+09:00",
+  "updated_at": "2026-09-17T08:55:10+09:00",
   "last_run": {
-    "at": "2026-09-16T08:47:14+09:00",
+    "at": "2026-09-17T08:55:10+09:00",
     "ok": true,
     "articles": 1,
     "published": 1,
     "draft": 0,
     "held": 0,
     "failed": 0,
-    "duration_s": 139,
+    "duration_s": 115,
     "cost": {
       "month_krw": 0,
-      "llm_calls": 176
+      "llm_calls": 183
     },
     "health_bad": [],
     "image_errors": []
   },
   "health": {
     "gemini": {
-      "last_ok": "2026-09-16T08:47:03+09:00"
+      "last_ok": "2026-09-17T08:55:03+09:00"
     },
     "wordpress": {
-      "last_ok": "2026-09-16T08:47:10+09:00"
+      "last_ok": "2026-09-17T08:55:08+09:00"
     }
   },
   "usage": {
     "month": "2026-09",
-    "llm_calls": 176,
+    "llm_calls": 183,
     "image_paid": 0,
-    "image_free": 45,
+    "image_free": 48,
     "est_cost_krw": 0,
     "free_llm_daily": 1000,
-    "llm_today": 6
+    "llm_today": 7
   }
 }
