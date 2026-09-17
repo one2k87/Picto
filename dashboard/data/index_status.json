@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-17T08:57:46",
+ "updated_at": "2026-09-17T10:26:48",
  "site": "https://pickdam.com",
  "checked": 23,
  "indexed": 15,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-17T08:55:09\",\"link\":\"https:\\/\\/pickdam.com\\/bedroom-lamp-guide\\/\"},{\"modified\":\"2026-09-16T11:27:5"
+  "body_head": "[{\"modified\":\"2026-09-17T08:58:23\",\"link\":\"https:\\/\\/pickdam.com\\/bedroom-lamp-guide\\/\"},{\"modified\":\"2026-09-16T11:27:5"
  },
  "posts_n": 22,
  "results": [
@@ -21,7 +21,7 @@
   {
    "url": "https://pickdam.com/bedroom-lamp-guide/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -51,7 +51,7 @@
   {
    "url": "https://pickdam.com/one-person-food-waste-disposer-low-noise-tips/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
