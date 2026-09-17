@@ -1,22 +1,28 @@
 {
- "updated_at": "2026-09-17T10:26:48",
+ "updated_at": "2026-09-18T08:49:09",
  "site": "https://pickdam.com",
- "checked": 23,
+ "checked": 24,
  "indexed": 15,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-17T08:58:23\",\"link\":\"https:\\/\\/pickdam.com\\/bedroom-lamp-guide\\/\"},{\"modified\":\"2026-09-16T11:27:5"
+  "body_head": "[{\"modified\":\"2026-09-18T08:46:24\",\"link\":\"https:\\/\\/pickdam.com\\/in-gagu-minisetakgi-tongdoli-vs-sameum-gineung-setakjo"
  },
- "posts_n": 22,
+ "posts_n": 23,
  "results": [
   {
    "url": "https://pickdam.com/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-03"
+  },
+  {
+   "url": "https://pickdam.com/in-gagu-minisetakgi-tongdoli-vs-sameum-gineung-setakjo/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/bedroom-lamp-guide/",
@@ -27,7 +33,7 @@
   {
    "url": "https://pickdam.com/kitchen-ventilation-rental-vs-buy-2026-september/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -51,7 +57,7 @@
   {
    "url": "https://pickdam.com/one-person-food-waste-disposer-low-noise-tips/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -75,7 +81,7 @@
   {
    "url": "https://pickdam.com/food-waste-disposer-deodorizing-filter-replacement/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {

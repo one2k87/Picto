@@ -1,6 +1,6 @@
 {
- "at": "2026-09-17T10:27:33",
- "n": 22,
+ "at": "2026-09-18T08:50:06",
+ "n": 23,
  "avg": 100,
  "fails": [],
  "auto_repair": true,
@@ -8,9 +8,13 @@
  "repair_fail": [],
  "defaults": [],
  "noimgv2": {
-  "n": 19,
-  "of": 22,
+  "n": 20,
+  "of": 23,
   "posts": [
+   {
+    "id": 325,
+    "title": "1인 가구 미니세탁기 3kg vs 5kg, 삶음 기능 포기 시 배수 호스"
+   },
    {
     "id": 319,
     "title": "침실 무드등, 수면등과 수유등 중 우리 집에 맞는 조명은 따로 있습니다"
@@ -94,10 +98,10 @@
   "posts": []
  },
  "link_coverage": {
-  "of": 22,
+  "of": 23,
   "matched": 15,
   "linked": 15,
-  "unmatched": 7
+  "unmatched": 8
  },
  "link_fill": {
   "of": 10,
@@ -113,13 +117,29 @@
   "no_featured": [],
   "no_kokpick": [],
   "few_images": [],
-  "excerpt_filled": [],
+  "excerpt_filled": [
+   {
+    "id": 325,
+    "title": "1인 가구 미니세탁기 3kg vs 5kg, 삶음 기능 포기 시 배수 호스"
+   }
+  ],
   "excerpt_bad": [],
-  "of": 22
+  "of": 23
  },
  "seo": {
-  "cat_set": [],
-  "bc_added": [],
+  "cat_set": [
+   {
+    "id": 325,
+    "title": "1인 가구 미니세탁기 3kg vs 5kg, 삶음 기능 포기 시 배수 호스",
+    "cat": "가전 구매·렌탈"
+   }
+  ],
+  "bc_added": [
+   {
+    "id": 325,
+    "title": "1인 가구 미니세탁기 3kg vs 5kg, 삶음 기능 포기 시 배수 호스"
+   }
+  ],
   "title_set": [],
   "err": []
  }
