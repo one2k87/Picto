@@ -1,16 +1,16 @@
 {
- "updated_at": "2026-09-18T10:19:58",
+ "updated_at": "2026-09-19T08:42:19",
  "site": "https://pickdam.com",
- "checked": 24,
+ "checked": 25,
  "indexed": 15,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-18T08:50:06\",\"link\":\"https:\\/\\/pickdam.com\\/in-gagu-minisetakgi-tongdoli-vs-sameum-gineung-setakjo"
+  "body_head": "[{\"modified\":\"2026-09-19T08:39:29\",\"link\":\"https:\\/\\/pickdam.com\\/entrance\\/\"},{\"modified\":\"2026-09-18T08:50:06\",\"link\":"
  },
- "posts_n": 23,
+ "posts_n": 24,
  "results": [
   {
    "url": "https://pickdam.com/",
@@ -19,9 +19,15 @@
    "lastCrawl": "2026-09-03"
   },
   {
+   "url": "https://pickdam.com/entrance/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
+  },
+  {
    "url": "https://pickdam.com/in-gagu-minisetakgi-tongdoli-vs-sameum-gineung-setakjo/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -75,7 +81,7 @@
   {
    "url": "https://pickdam.com/dehumidifier-20l-electricity-bill-30pyeong/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
