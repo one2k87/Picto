@@ -4,21 +4,5 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false,
- "apply_trace": [
-  {
-   "stage": "진입",
-   "title": "현관 센서등, 24시간 작동 시 월 500원 전기료",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 5
-  },
-  {
-   "stage": "중단:enabled=False",
-   "title": "현관 센서등, 24시간 작동 시 월 500원 전기료",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 5
-  }
- ]
+ "file_enabled": false
 }

@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-19T08:42:19",
+ "updated_at": "2026-09-19T10:12:11",
  "site": "https://pickdam.com",
  "checked": 25,
  "indexed": 15,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-19T08:39:29\",\"link\":\"https:\\/\\/pickdam.com\\/entrance\\/\"},{\"modified\":\"2026-09-18T08:50:06\",\"link\":"
+  "body_head": "[{\"modified\":\"2026-09-19T08:43:11\",\"link\":\"https:\\/\\/pickdam.com\\/entrance\\/\"},{\"modified\":\"2026-09-18T08:50:06\",\"link\":"
  },
  "posts_n": 24,
  "results": [
