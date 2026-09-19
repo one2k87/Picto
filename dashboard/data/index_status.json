@@ -1,16 +1,16 @@
 {
- "updated_at": "2026-09-19T10:12:11",
+ "updated_at": "2026-09-20T08:42:01",
  "site": "https://pickdam.com",
- "checked": 25,
+ "checked": 26,
  "indexed": 15,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-19T08:43:11\",\"link\":\"https:\\/\\/pickdam.com\\/entrance\\/\"},{\"modified\":\"2026-09-18T08:50:06\",\"link\":"
+  "body_head": "[{\"modified\":\"2026-09-20T08:39:03\",\"link\":\"https:\\/\\/pickdam.com\\/car-air-purifier-choice\\/\"},{\"modified\":\"2026-09-19T08"
  },
- "posts_n": 24,
+ "posts_n": 25,
  "results": [
   {
    "url": "https://pickdam.com/",
@@ -19,15 +19,21 @@
    "lastCrawl": "2026-09-03"
   },
   {
-   "url": "https://pickdam.com/entrance/",
+   "url": "https://pickdam.com/car-air-purifier-choice/",
    "verdict": "NEUTRAL",
    "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
+   "url": "https://pickdam.com/entrance/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
    "url": "https://pickdam.com/in-gagu-minisetakgi-tongdoli-vs-sameum-gineung-setakjo/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {

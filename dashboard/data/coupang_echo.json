@@ -4,5 +4,21 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false
+ "file_enabled": false,
+ "apply_trace": [
+  {
+   "stage": "진입",
+   "title": "차량용 공기청정기, 필터 교체형과 반영구형 중 20",
+   "enabled": false,
+   "widget_len": 211,
+   "h2": 3
+  },
+  {
+   "stage": "중단:enabled=False",
+   "title": "차량용 공기청정기, 필터 교체형과 반영구형 중 20",
+   "enabled": false,
+   "widget_len": 211,
+   "h2": 3
+  }
+ ]
 }
