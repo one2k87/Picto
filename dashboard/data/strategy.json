@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-13 23:58",
-  "next_review": "2026-09-20",
+  "updated": "2026-09-20 23:58",
+  "next_review": "2026-09-27",
   "data_status": "no_data",
   "verdict": "아직 성과 데이터가 없어 기본 계획으로 운영합니다. 발행·색인이 쌓이면 자동으로 실측 기반으로 바뀝니다.",
   "matched_posts": 0,
@@ -52,7 +52,7 @@
     {
       "category": "생활·주방",
       "intent": "revenue",
-      "posts": 12,
+      "posts": 16,
       "clicks": 0,
       "impressions": 0,
       "scored": 0,
@@ -63,7 +63,7 @@
     {
       "category": "생활·주방",
       "intent": "evergreen",
-      "posts": 8,
+      "posts": 10,
       "clicks": 0,
       "impressions": 0,
       "scored": 0,
