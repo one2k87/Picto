@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-20T10:10:12",
+ "updated_at": "2026-09-21T08:39:53",
  "site": "https://pickdam.com",
  "checked": 26,
  "indexed": 15,
@@ -16,7 +16,7 @@
    "url": "https://pickdam.com/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-03"
+   "lastCrawl": "2026-09-20"
   },
   {
    "url": "https://pickdam.com/car-air-purifier-choice/",
@@ -33,7 +33,7 @@
   {
    "url": "https://pickdam.com/in-gagu-minisetakgi-tongdoli-vs-sameum-gineung-setakjo/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
