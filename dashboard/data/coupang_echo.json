@@ -4,21 +4,5 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false,
- "apply_trace": [
-  {
-   "stage": "진입",
-   "title": "자동회전냄비, 2026년 9월 구매 전 후회할 수 ",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 3
-  },
-  {
-   "stage": "중단:enabled=False",
-   "title": "자동회전냄비, 2026년 9월 구매 전 후회할 수 ",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 3
-  }
- ]
+ "file_enabled": false
 }
