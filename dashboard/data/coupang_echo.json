@@ -4,21 +4,5 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false,
- "apply_trace": [
-  {
-   "stage": "진입",
-   "title": "오일 스프레이, 유리 500ml vs 플라스틱 20",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 6
-  },
-  {
-   "stage": "중단:enabled=False",
-   "title": "오일 스프레이, 유리 500ml vs 플라스틱 20",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 6
-  }
- ]
+ "file_enabled": false
 }
