@@ -1,45 +1,51 @@
 {
- "updated_at": "2026-09-22T10:39:23",
+ "updated_at": "2026-09-23T08:58:40",
  "site": "https://pickdam.com",
- "checked": 27,
- "indexed": 15,
+ "checked": 28,
+ "indexed": 13,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-22T09:25:13\",\"link\":\"https:\\/\\/pickdam.com\\/oil-seupeurei-yuri-vs-peulraseutik-yongdoe-matneun-jae"
+  "body_head": "[{\"modified\":\"2026-09-23T08:54:15\",\"link\":\"https:\\/\\/pickdam.com\\/folding-bluetooth-keyboard-fix\\/\"},{\"modified\":\"2026-0"
  },
- "posts_n": 26,
+ "posts_n": 27,
  "results": [
   {
    "url": "https://pickdam.com/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-21"
+   "lastCrawl": "2026-09-22"
+  },
+  {
+   "url": "https://pickdam.com/folding-bluetooth-keyboard-fix/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/oil-seupeurei-yuri-vs-peulraseutik-yongdoe-matneun-jaejil/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/car-air-purifier-choice/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/entrance/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/in-gagu-minisetakgi-tongdoli-vs-sameum-gineung-setakjo/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -75,7 +81,7 @@
   {
    "url": "https://pickdam.com/one-person-food-waste-disposer-low-noise-tips/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -87,13 +93,13 @@
   {
    "url": "https://pickdam.com/food-waste-smell-filter-cleaning/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/dehumidifier-20l-electricity-bill-30pyeong/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -122,8 +128,8 @@
   },
   {
    "url": "https://pickdam.com/door-draft-stopper-guide-2026/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
+   "verdict": "NEUTRAL",
+   "state": "Crawled - currently not indexed",
    "lastCrawl": "2026-09-11"
   },
   {
@@ -140,8 +146,8 @@
   },
   {
    "url": "https://pickdam.com/new-apartment-system-aircon-guide-2026/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
+   "verdict": "NEUTRAL",
+   "state": "Crawled - currently not indexed",
    "lastCrawl": "2026-09-11"
   },
   {
