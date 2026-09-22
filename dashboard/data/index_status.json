@@ -1,27 +1,33 @@
 {
- "updated_at": "2026-09-21T10:06:37",
+ "updated_at": "2026-09-22T09:24:32",
  "site": "https://pickdam.com",
- "checked": 26,
+ "checked": 27,
  "indexed": 15,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-20T08:42:40\",\"link\":\"https:\\/\\/pickdam.com\\/car-air-purifier-choice\\/\"},{\"modified\":\"2026-09-19T08"
+  "body_head": "[{\"modified\":\"2026-09-22T09:21:28\",\"link\":\"https:\\/\\/pickdam.com\\/oil-seupeurei-yuri-vs-peulraseutik-yongdoe-matneun-jae"
  },
- "posts_n": 25,
+ "posts_n": 26,
  "results": [
   {
    "url": "https://pickdam.com/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-20"
+   "lastCrawl": "2026-09-21"
+  },
+  {
+   "url": "https://pickdam.com/oil-seupeurei-yuri-vs-peulraseutik-yongdoe-matneun-jaejil/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/car-air-purifier-choice/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -39,7 +45,7 @@
   {
    "url": "https://pickdam.com/bedroom-lamp-guide/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -69,7 +75,7 @@
   {
    "url": "https://pickdam.com/one-person-food-waste-disposer-low-noise-tips/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -81,7 +87,7 @@
   {
    "url": "https://pickdam.com/food-waste-smell-filter-cleaning/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -93,7 +99,7 @@
   {
    "url": "https://pickdam.com/food-waste-disposer-deodorizing-filter-replacement/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -111,7 +117,7 @@
   {
    "url": "https://pickdam.com/bidet-self-installation-guide-2026/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
