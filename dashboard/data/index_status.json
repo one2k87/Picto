@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-23T08:58:40",
+ "updated_at": "2026-09-23T10:34:03",
  "site": "https://pickdam.com",
  "checked": 28,
  "indexed": 13,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-23T08:54:15\",\"link\":\"https:\\/\\/pickdam.com\\/folding-bluetooth-keyboard-fix\\/\"},{\"modified\":\"2026-0"
+  "body_head": "[{\"modified\":\"2026-09-23T08:59:16\",\"link\":\"https:\\/\\/pickdam.com\\/folding-bluetooth-keyboard-fix\\/\"},{\"modified\":\"2026-0"
  },
  "posts_n": 27,
  "results": [
@@ -27,37 +27,37 @@
   {
    "url": "https://pickdam.com/oil-seupeurei-yuri-vs-peulraseutik-yongdoe-matneun-jaejil/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/car-air-purifier-choice/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/entrance/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/in-gagu-minisetakgi-tongdoli-vs-sameum-gineung-setakjo/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/bedroom-lamp-guide/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/kitchen-ventilation-rental-vs-buy-2026-september/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -81,7 +81,7 @@
   {
    "url": "https://pickdam.com/one-person-food-waste-disposer-low-noise-tips/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -99,13 +99,13 @@
   {
    "url": "https://pickdam.com/dehumidifier-20l-electricity-bill-30pyeong/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/food-waste-disposer-deodorizing-filter-replacement/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {

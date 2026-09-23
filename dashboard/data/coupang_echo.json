@@ -4,21 +4,5 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false,
- "apply_trace": [
-  {
-   "stage": "진입",
-   "title": "접이식 블루투스 키보드, 갑자기 고장 날 때 흔한 ",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 4
-  },
-  {
-   "stage": "중단:enabled=False",
-   "title": "접이식 블루투스 키보드, 갑자기 고장 날 때 흔한 ",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 4
-  }
- ]
+ "file_enabled": false
 }
