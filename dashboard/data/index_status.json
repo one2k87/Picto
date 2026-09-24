@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-24T09:05:36",
+ "updated_at": "2026-09-24T10:26:53",
  "site": "https://pickdam.com",
  "checked": 29,
  "indexed": 13,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-24T09:02:13\",\"link\":\"https:\\/\\/pickdam.com\\/kitchen-sliding-shelf-guide\\/\"},{\"modified\":\"2026-09-2"
+  "body_head": "[{\"modified\":\"2026-09-24T09:06:23\",\"link\":\"https:\\/\\/pickdam.com\\/kitchen-sliding-shelf-guide\\/\"},{\"modified\":\"2026-09-2"
  },
  "posts_n": 28,
  "results": [
@@ -33,7 +33,7 @@
   {
    "url": "https://pickdam.com/oil-seupeurei-yuri-vs-peulraseutik-yongdoe-matneun-jaejil/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -99,7 +99,7 @@
   {
    "url": "https://pickdam.com/food-waste-smell-filter-cleaning/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
