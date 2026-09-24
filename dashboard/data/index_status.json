@@ -1,16 +1,16 @@
 {
- "updated_at": "2026-09-23T10:34:03",
+ "updated_at": "2026-09-24T09:05:36",
  "site": "https://pickdam.com",
- "checked": 28,
+ "checked": 29,
  "indexed": 13,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-23T08:59:16\",\"link\":\"https:\\/\\/pickdam.com\\/folding-bluetooth-keyboard-fix\\/\"},{\"modified\":\"2026-0"
+  "body_head": "[{\"modified\":\"2026-09-24T09:02:13\",\"link\":\"https:\\/\\/pickdam.com\\/kitchen-sliding-shelf-guide\\/\"},{\"modified\":\"2026-09-2"
  },
- "posts_n": 27,
+ "posts_n": 28,
  "results": [
   {
    "url": "https://pickdam.com/",
@@ -19,15 +19,21 @@
    "lastCrawl": "2026-09-22"
   },
   {
-   "url": "https://pickdam.com/folding-bluetooth-keyboard-fix/",
+   "url": "https://pickdam.com/kitchen-sliding-shelf-guide/",
    "verdict": "NEUTRAL",
    "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
-   "url": "https://pickdam.com/oil-seupeurei-yuri-vs-peulraseutik-yongdoe-matneun-jaejil/",
+   "url": "https://pickdam.com/folding-bluetooth-keyboard-fix/",
    "verdict": "NEUTRAL",
    "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/oil-seupeurei-yuri-vs-peulraseutik-yongdoe-matneun-jaejil/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -57,7 +63,7 @@
   {
    "url": "https://pickdam.com/kitchen-ventilation-rental-vs-buy-2026-september/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -93,7 +99,7 @@
   {
    "url": "https://pickdam.com/food-waste-smell-filter-cleaning/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -166,7 +172,7 @@
    "url": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-11"
+   "lastCrawl": "2026-09-23"
   },
   {
    "url": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
@@ -178,7 +184,7 @@
    "url": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-03"
+   "lastCrawl": "2026-09-23"
   }
  ],
  "sitemaps_submitted": [
