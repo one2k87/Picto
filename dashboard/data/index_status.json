@@ -1,16 +1,16 @@
 {
- "updated_at": "2026-09-24T10:26:53",
+ "updated_at": "2026-09-25T09:10:12",
  "site": "https://pickdam.com",
- "checked": 29,
+ "checked": 30,
  "indexed": 13,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-24T09:06:23\",\"link\":\"https:\\/\\/pickdam.com\\/kitchen-sliding-shelf-guide\\/\"},{\"modified\":\"2026-09-2"
+  "body_head": "[{\"modified\":\"2026-09-25T09:06:25\",\"link\":\"https:\\/\\/pickdam.com\\/mini-dryer-electricity-cost-2026\\/\"},{\"modified\":\"2026"
  },
- "posts_n": 28,
+ "posts_n": 29,
  "results": [
   {
    "url": "https://pickdam.com/",
@@ -19,9 +19,15 @@
    "lastCrawl": "2026-09-22"
   },
   {
-   "url": "https://pickdam.com/kitchen-sliding-shelf-guide/",
+   "url": "https://pickdam.com/mini-dryer-electricity-cost-2026/",
    "verdict": "NEUTRAL",
    "state": "URL is unknown to Google",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/kitchen-sliding-shelf-guide/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -57,13 +63,13 @@
   {
    "url": "https://pickdam.com/bedroom-lamp-guide/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/kitchen-ventilation-rental-vs-buy-2026-september/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -99,13 +105,13 @@
   {
    "url": "https://pickdam.com/food-waste-smell-filter-cleaning/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/dehumidifier-20l-electricity-bill-30pyeong/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
