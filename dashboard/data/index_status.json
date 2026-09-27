@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-27T09:02:29",
+ "updated_at": "2026-09-27T10:29:09",
  "site": "https://pickdam.com",
  "checked": 30,
  "indexed": 12,
@@ -63,7 +63,7 @@
   {
    "url": "https://pickdam.com/bedroom-lamp-guide/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -135,7 +135,7 @@
   {
    "url": "https://pickdam.com/bidet-self-installation-guide-2026/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
