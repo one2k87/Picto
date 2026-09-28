@@ -4,5 +4,21 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false
+ "file_enabled": false,
+ "apply_trace": [
+  {
+   "stage": "진입",
+   "title": "세탁기 거름망 2개월 이상 방치 시 섬유 찌꺼기 1",
+   "enabled": false,
+   "widget_len": 211,
+   "h2": 5
+  },
+  {
+   "stage": "중단:enabled=False",
+   "title": "세탁기 거름망 2개월 이상 방치 시 섬유 찌꺼기 1",
+   "enabled": false,
+   "widget_len": 211,
+   "h2": 5
+  }
+ ]
 }

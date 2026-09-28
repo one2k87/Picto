@@ -1,22 +1,28 @@
 {
- "updated_at": "2026-09-27T10:29:09",
+ "updated_at": "2026-09-28T09:07:34",
  "site": "https://pickdam.com",
  "checked": 30,
- "indexed": 12,
+ "indexed": 11,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-25T09:10:50\",\"link\":\"https:\\/\\/pickdam.com\\/mini-dryer-electricity-cost-2026\\/\"},{\"modified\":\"2026"
+  "body_head": "[{\"modified\":\"2026-09-28T09:04:03\",\"link\":\"https:\\/\\/pickdam.com\\/washer-filter-cleaning-guide\\/\"},{\"modified\":\"2026-09-"
  },
- "posts_n": 29,
+ "posts_n": 30,
  "results": [
   {
    "url": "https://pickdam.com/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-25"
+  },
+  {
+   "url": "https://pickdam.com/washer-filter-cleaning-guide/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/mini-dryer-electricity-cost-2026/",
@@ -27,7 +33,7 @@
   {
    "url": "https://pickdam.com/kitchen-sliding-shelf-guide/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -45,13 +51,13 @@
   {
    "url": "https://pickdam.com/car-air-purifier-choice/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/entrance/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -63,7 +69,7 @@
   {
    "url": "https://pickdam.com/bedroom-lamp-guide/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -178,19 +184,13 @@
    "url": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-23"
+   "lastCrawl": "2026-09-27"
   },
   {
    "url": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-11"
-  },
-  {
-   "url": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-23"
   }
  ],
  "sitemaps_submitted": [
