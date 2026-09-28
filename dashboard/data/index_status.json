@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-28T09:07:34",
+ "updated_at": "2026-09-28T10:42:17",
  "site": "https://pickdam.com",
  "checked": 30,
  "indexed": 11,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-28T09:04:03\",\"link\":\"https:\\/\\/pickdam.com\\/washer-filter-cleaning-guide\\/\"},{\"modified\":\"2026-09-"
+  "body_head": "[{\"modified\":\"2026-09-28T09:08:13\",\"link\":\"https:\\/\\/pickdam.com\\/washer-filter-cleaning-guide\\/\"},{\"modified\":\"2026-09-"
  },
  "posts_n": 30,
  "results": [
@@ -16,12 +16,12 @@
    "url": "https://pickdam.com/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-25"
+   "lastCrawl": "2026-09-28"
   },
   {
    "url": "https://pickdam.com/washer-filter-cleaning-guide/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -39,7 +39,7 @@
   {
    "url": "https://pickdam.com/folding-bluetooth-keyboard-fix/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -51,13 +51,13 @@
   {
    "url": "https://pickdam.com/car-air-purifier-choice/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/entrance/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -99,13 +99,13 @@
   {
    "url": "https://pickdam.com/one-person-food-waste-disposer-low-noise-tips/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/one-person-food-disposer-install/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
