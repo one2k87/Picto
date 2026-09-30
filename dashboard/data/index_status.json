@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-30T09:53:09",
+ "updated_at": "2026-09-30T11:09:48",
  "site": "https://pickdam.com",
  "checked": 30,
  "indexed": 26,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-30T09:49:44\",\"link\":\"https:\\/\\/pickdam.com\\/in-gagu-mini-indeoksyeon-gumae-si-1gu-vs\\/\"},{\"modifie"
+  "body_head": "[{\"modified\":\"2026-09-30T09:54:04\",\"link\":\"https:\\/\\/pickdam.com\\/in-gagu-mini-indeoksyeon-gumae-si-1gu-vs\\/\"},{\"modifie"
  },
  "posts_n": 30,
  "results": [
@@ -21,7 +21,7 @@
   {
    "url": "https://pickdam.com/in-gagu-mini-indeoksyeon-gumae-si-1gu-vs/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -105,7 +105,7 @@
   {
    "url": "https://pickdam.com/one-person-food-waste-disposer-low-noise-tips/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -130,7 +130,7 @@
    "url": "https://pickdam.com/food-waste-disposer-deodorizing-filter-replacement/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
+   "lastCrawl": "2026-09-30"
   },
   {
    "url": "https://pickdam.com/bidet-self-installation-check-valve/",
