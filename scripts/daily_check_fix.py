@@ -325,7 +325,7 @@ try:
         r = requests.get(f"{site}/wp-json/wp/v2/posts", headers=_H,
                          params={"per_page": 50, "page": _pg, "status": "publish",
                                  "context": "edit",
-                                 "_fields": "id,title,content,excerpt,featured_media,meta,categories"},
+                                 "_fields": "id,title,content,excerpt,featured_media,meta,categories,slug"},
                          timeout=30)
         if not r.ok:
             raise RuntimeError(f"HTTP {r.status_code}")
@@ -394,7 +394,7 @@ SUB_RULES = [
     (r"이사|포장이사|입주\s*청소|이사청소", "moving-cleaning"),
 ]
 SUB_DEFAULT = "appliance-buying"
-seo = {"cat_set": [], "bc_added": [], "title_set": [], "err": []}
+seo = {"cat_set": [], "bc_added": [], "title_set": [], "desc_set": [], "romaja_slug": [], "err": []}
 
 
 def _short_title(long_title, keyword=""):
@@ -404,6 +404,48 @@ def _short_title(long_title, keyword=""):
     if len(head) > SEO_TITLE_MAX:
         head = head[:SEO_TITLE_MAX].rstrip(" ,·-")
     return head
+
+
+_ROMAJA_MARK = re.compile(r"(eo|eu|ae|oe|ui|yeo|neun|seu|deu|teu|peu|keu|geu|jeu|ss|jj|kk|tt|pp)")
+_EN_OK = set("guide build quick queue cost costs price prices people between clean cleaning "
+             "replace replacement review reviews season seasonal feature features "
+             "used user users value values level levels".split())
+
+
+def _looks_romanized(slug):
+    """영문처럼 보이지만 한국어를 소리 나는 대로 적은 주소인가(2026-09-30 실측 3편)."""
+    words = [w for w in (slug or "").split("-") if re.fullmatch(r"[a-z]{3,}", w)]
+    if len(words) < 2:
+        return False
+    return len([w for w in words if w not in _EN_OK and _ROMAJA_MARK.search(w)]) >= 2
+
+
+_META_SKIP = re.compile(r"편집부|최종 업데이트|본 콘텐츠|생성형 AI|검증 과정|공식 출처|"
+                        r"쿠팡 파트너스|일정액의 수수료|법적 책임|정확성을 위해|참고용")
+
+
+def _desc_from_html(html):
+    """검색결과 설명 한 문장. 숫자가 든 문장을 먼저 고른다(비면 랭크매스가
+    도입부를 그대로 써서 숫자도 답도 없는 설명이 나간다 — 2026-09-30 실측 4편)."""
+    raw = html or ""
+    m = re.search(r"<h2", raw, re.I)
+    if m:
+        raw = raw[m.start():]
+    raw = re.sub(r"<(table|ul|ol|script|style|figure|blockquote)[\s\S]*?</\1>", " ", raw, flags=re.I)
+    raw = re.sub(r"<h[1-6][^>]*>[\s\S]*?</h[1-6]>", " ", raw, flags=re.I)
+    txt = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", raw)).strip()
+    sents = [x.strip() for x in re.split(r"(?<=[.!?])\s+", txt) if x.strip()]
+    sents = [x for x in sents if not _META_SKIP.search(x) and 25 <= len(x) <= 120]
+    if not sents:
+        return ""
+    num = [x for x in sents if re.search(r"\d", x)]
+    order = num + [x for x in sents if x not in num]
+    out = order[0]
+    for nxt in order[1:]:
+        if len(out) >= 70 or len(out) + 1 + len(nxt) > 120:
+            break
+        out = out + " " + nxt
+    return out
 
 
 def _bc_html(site, sub_slug, sub_name, parent_name):
@@ -457,11 +499,22 @@ try:
         if sub and 'data-bc="1"' not in raw:
             body["content"] = _bc_html(site, sub["slug"], sub["name"], parent["name"]) + raw
             seo["bc_added"].append({"id": pid, "title": ttl})
+        _m = {}
         if not (meta.get("rank_math_title") or "").strip():
             st = _short_title(ttl, meta.get("rank_math_focus_keyword") or "")
             if st:
-                body["meta"] = {"rank_math_title": st}
+                _m["rank_math_title"] = st
                 seo["title_set"].append({"id": pid, "title": st})
+        if not (meta.get("rank_math_description") or "").strip():
+            dsc = _desc_from_html(raw)
+            if dsc:
+                _m["rank_math_description"] = dsc
+                seo["desc_set"].append({"id": pid, "title": ttl})
+        if _m:
+            body["meta"] = _m
+        if _looks_romanized(it_.get("slug") or ""):
+            # 주소를 자동으로 바꾸지는 않는다(301이 남긴 해도 사람이 볼 판단이다).
+            seo["romaja_slug"].append({"id": pid, "title": ttl, "slug": it_.get("slug")})
         if body:
             rr = requests.post(f"{site}/wp-json/wp/v2/posts/{pid}", json=body,
                                headers={**_H, "Content-Type": "application/json"}, timeout=30)
@@ -471,7 +524,8 @@ except Exception as e:
     print(f"[check] 검색결과 노출 위생 건너뜀: {e}")
     seo["err"].append({"reason": str(e)})
 print(f"[check] 노출 위생 — 카테고리 배정 {len(seo['cat_set'])} · "
-      f"브레드크럼 {len(seo['bc_added'])} · 검색제목 {len(seo['title_set'])} · 실패 {len(seo['err'])}")
+      f"브레드크럼 {len(seo['bc_added'])} · 검색제목 {len(seo['title_set'])} · "
+      f"검색설명 {len(seo['desc_set'])} · 로마자주소 {len(seo['romaja_slug'])} · 실패 {len(seo['err'])}")
 
 
 # ── 결과 저장 + 텔레그램 ───────────────────────────────────────

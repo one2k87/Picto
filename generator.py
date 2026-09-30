@@ -132,19 +132,167 @@ SLUG_TRANSLATOR = None
 # 규칙: 28자 이내 · 타깃 키워드로 시작 · 숫자 하나는 남긴다.
 SEO_TITLE_MAX = 28
 
+# ── 메타 설명 폴백 (2026-09-30) ───────────────────────────────────
+# 왜: 9/18·9/22·9/19·9/30 네 편의 rank_math_description이 **빈 값**이었다(실측).
+#     비면 랭크매스가 본문 첫 문장을 그대로 쓰는데, 그건 「…고민은 바로 …입니다」처럼
+#     숫자도 답도 없는 도입부라 검색결과에서 클릭을 만들지 못한다.
+#     같은 날 슬러그도 로마자였다 — 모델 응답 일부가 훼손된 날의 동반 증상이다.
+# 그래서 모델이 meta를 빠뜨리면 **본문에서 숫자가 든 문장**을 골라 채운다.
+# 한국어 문장은 짧다 — 하한을 60자로 두면 대부분의 실제 문장이 탈락한다(실측).
+META_MIN, META_MAX = 25, 120
+_META_SKIP = re.compile(
+    r"편집부|최종 업데이트|본 콘텐츠|생성형 AI|검증 과정|공식 출처|쿠팡 파트너스|"
+    r"일정액의 수수료|법적 책임|정확성을 위해|참고용")
+
+
+def _meta_from_html(html, title=""):
+    """본문에서 카드·검색결과에 쓸 설명 한 문장. 숫자가 든 문장을 먼저 고른다."""
+    raw = html or ""
+    m = re.search(r"<h2", raw, re.I)
+    if m:
+        raw = raw[m.start():]                                   # 고지 블록은 첫 h2 앞에만 있다
+    raw = re.sub(r"<(table|ul|ol|script|style|figure|blockquote)[\s\S]*?</\1>", " ", raw, flags=re.I)
+    raw = re.sub(r"<h[1-6][^>]*>[\s\S]*?</h[1-6]>", " ", raw, flags=re.I)
+    txt = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", raw)).strip()
+    sents = [x.strip() for x in re.split(r"(?<=[.!?])\s+", txt) if x.strip()]
+    sents = [x for x in sents if not _META_SKIP.search(x) and META_MIN <= len(x) <= META_MAX]
+    if not sents:
+        return ""
+    with_num = [x for x in sents if re.search(r"\d", x)]
+    order = with_num + [x for x in sents if x not in with_num]
+    out = order[0]
+    for nxt in order[1:]:                       # 너무 짧으면 한 문장 더 붙인다
+        if len(out) >= 70 or len(out) + 1 + len(nxt) > META_MAX:
+            break
+        out = out + " " + nxt
+    return out
+
+
+
+def _cut_words(text, limit):
+    """글자 수 상한에서 **낱말 경계로** 자른다.
+    2026-09-30 실측: 글자 단위로 자르는 바람에 「…세균 번식하는 3가」처럼
+    말이 중간에서 끊긴 제목이 검색결과에 나갔다."""
+    text = (text or "").strip()
+    if len(text) <= limit:
+        return text
+    out = []
+    n = 0
+    for w in text.split(" "):
+        if out and n + 1 + len(w) > limit:
+            break
+        n += (1 if out else 0) + len(w)
+        out.append(w)
+    return (" ".join(out) or text[:limit]).rstrip(" ,·-")
+
+
+def _restore_leading_number(cand, long_title):
+    """모델이 앞 숫자를 흘린 것을 원 제목에서 되살린다.
+    2026-09-30 실측: 「1인 가구 미니 인덕션…」이 검색 제목·포커스 키워드 모두에서
+    **「인 가구 미니 인덕션…」**으로 나갔다(#388·#325). 숫자 하나가 빠지면 말이 달라진다."""
+    cand = (cand or "").strip()
+    if not cand or not long_title or cand[0].isdigit():
+        return cand
+    head = cand.split(" ")[0]
+    m = re.search(r"(\d+)" + re.escape(head), long_title)
+    return (m.group(1) + cand) if m else cand
+
 
 def _seo_title(cand, keyword, long_title):
     """모델이 준 짧은 제목을 검증하고, 못 쓰면 본문 제목에서 깎아 만든다."""
     cand = re.sub(r"\s+", " ", (cand or "")).strip(" -–—·|")
+    cand = _restore_leading_number(cand, long_title)
     if cand and len(cand) <= SEO_TITLE_MAX:
         return cand
-    # 폴백: 본문 제목의 첫 절(쉼표·물음표 앞)을 쓰되 키워드가 빠지면 앞에 붙인다
+    if cand:                                  # 길기만 하면 낱말 경계로 깎아 쓴다
+        return _cut_words(cand, SEO_TITLE_MAX)
     head = re.split(r"[,?·]", long_title or "")[0].strip()
     if keyword and keyword not in head:
         head = f"{keyword}, {head}".strip(", ")
-    if len(head) > SEO_TITLE_MAX:
-        head = head[:SEO_TITLE_MAX].rstrip(" ,·-")
-    return head or (keyword or "")[:SEO_TITLE_MAX]
+    return _cut_words(head, SEO_TITLE_MAX) or _cut_words(keyword or "", SEO_TITLE_MAX)
+
+
+# ── 로마자 슬러그 차단 (2026-09-30) ────────────────────────────────
+# 왜: 2026-09-13에 SLUG_TRANSLATOR(영문 슬러그 재요청)를 넣어 막았다고 봤는데
+#     9/18·9/22·9/30에 다시 뚫렸다. 원인은 폴백이 아니라 **번역 자체**였다 —
+#     모델이 `in-gagu-mini-indeoksyeon-gumae-si-1gu-vs`처럼 한국어를 소리 나는 대로
+#     적어 보내면 그것도 ASCII라서 _slug_core를 그대로 통과해 버린다.
+#     같은 날 글들은 meta(설명)도 비어 있었다 — 응답 일부가 훼손된 날의 동반 증상이다.
+# 그래서: (1) 로마자로 보이면 거부하고 (2) 우리 주제어 사전으로 직접 만들고
+#         (3) 그래도 안 되면 날짜+해시를 쓴다. **로마자 주소는 더 이상 내보내지 않는다.**
+_ROMAJA_MARK = re.compile(r"(eo|eu|ae|oe|ui|yeo|neun|seu|deu|teu|peu|keu|geu|jeu|ss|jj|kk|tt|pp)")
+# 우리가 실제로 슬러그에 쓰는 영어 낱말 — 위 패턴에 걸려도 정상으로 본다.
+_EN_OK = set("""
+guide build quick queue cost costs price prices people between clean cleaning
+replace replacement review reviews season seasonal feature features
+used user users value values level levels
+""".split())
+
+
+def _looks_romanized(slug):
+    """영문처럼 보이지만 실은 한국어를 소리 나는 대로 적은 슬러그인가."""
+    words = [w for w in (slug or "").split("-") if re.fullmatch(r"[a-z]{3,}", w)]
+    if len(words) < 2:
+        return False
+    hits = [w for w in words if w not in _EN_OK and _ROMAJA_MARK.search(w)]
+    return len(hits) >= 2
+
+
+# 주제어 → 영문. 우리가 다루는 품목·상황만 담는다(새 품목이 생기면 여기 한 줄 추가).
+SLUG_TERMS = [
+    ("음식물처리기", "food-waste-disposer"), ("탈취필터", "odor-filter"),
+    ("비데", "bidet"), ("분기밸브", "check-valve"), ("변기", "toilet"),
+    ("정수기", "water-purifier"), ("제습기", "dehumidifier"), ("가습기", "humidifier"),
+    ("공기청정기", "air-purifier"), ("식기세척기", "dishwasher"), ("전자레인지", "microwave"),
+    ("인덕션", "induction"), ("전기레인지", "electric-range"), ("밥솥", "rice-cooker"),
+    ("커피머신", "coffee-maker"), ("오븐", "oven"), ("청소기", "vacuum"),
+    ("세탁기", "washer"), ("건조기", "dryer"), ("냉장고", "refrigerator"),
+    ("에어컨", "air-conditioner"), ("보일러", "boiler"), ("환기", "ventilation"),
+    ("거름망", "lint-filter"), ("필터", "filter"), ("선반", "shelf"), ("수납", "storage"),
+    ("문풍지", "draft-stopper"), ("뽁뽁이", "bubble-wrap"), ("방풍", "windproof"),
+    ("센서등", "sensor-light"), ("무드등", "mood-light"), ("키보드", "keyboard"),
+    ("스프레이", "sprayer"), ("통돌이", "top-load"), ("삶음", "boil-wash"),
+    ("1인 가구", "single-household"), ("원룸", "studio"), ("아파트", "apartment"),
+    ("주방", "kitchen"), ("욕실", "bathroom"), ("거실", "living-room"),
+    ("침실", "bedroom"), ("현관", "entryway"), ("차량용", "car"),
+    ("렌탈", "rental"), ("구독", "subscription"), ("할부", "installment"),
+    ("위약금", "penalty-fee"), ("환급", "rebate"), ("보조금", "subsidy"),
+    ("보상 판매", "trade-in"), ("약정", "contract"),
+    ("설치", "install"), ("교체", "replacement"), ("청소", "cleaning"),
+    ("고장", "repair"), ("소음", "noise"), ("전기료", "electricity-cost"),
+    ("전기요금", "electricity-cost"), ("비용", "cost"), ("가격", "price"),
+    ("절약", "saving"), ("비교", "comparison"), ("기준", "criteria"),
+    ("주기", "cycle"), ("유리", "glass"), ("플라스틱", "plastic"),
+    ("단열", "insulation"), ("난방", "heating"), ("이사", "moving"),
+    ("미니", "mini"), ("소형", "compact"),
+]
+
+
+def _slug_from_terms(text, max_words=6):
+    """제목에 등장하는 주제어만 골라 영문 슬러그를 만든다(등장 순서 유지)."""
+    t = text or ""
+    found, seen = [], set()
+
+    def _hit(ko):
+        """짧은 말(2자 이하)은 뒤에 한글이 이어지면 다른 낱말이다 —
+        「유리할까」의 '유리'를 glass로 읽던 실측 오탐(2026-09-30)을 막는다."""
+        start = 0
+        while True:
+            i = t.find(ko, start)
+            if i < 0:
+                return -1
+            nxt = t[i + len(ko):i + len(ko) + 1]
+            if len(ko) > 2 or not ("\uac00" <= nxt <= "\ud7a3"):
+                return i
+            start = i + 1
+
+    for ko, en in sorted(SLUG_TERMS, key=lambda x: -len(x[0])):   # 긴 말 먼저(미니세탁기→세탁기)
+        i = _hit(ko)
+        if i >= 0 and en not in seen:
+            seen.add(en)
+            found.append((i, en))
+    found.sort()
+    return "-".join(en for _i, en in found[:max_words])
 
 
 def make_slug(llm_slug="", title="", keyword="", when=None):
@@ -154,20 +302,31 @@ def make_slug(llm_slug="", title="", keyword="", when=None):
     어느 경우에도 'post'·'3-2' 같은 값은 나오지 않는다."""
     import hashlib
     from datetime import datetime
+
+    def _ok(v):
+        v = _slug_core(v)
+        if len(v) < 6 or len([w for w in v.split("-") if w]) < 2:
+            return ""
+        if _looks_romanized(v):
+            print(f"[slug] 로마자 슬러그 거부: {v}")
+            return ""
+        return v
+
     for cand in (llm_slug, title, keyword):
-        s = _slug_core(cand)
-        if len(s) >= 6:
+        s = _ok(cand)
+        if s:
             return s
     if SLUG_TRANSLATOR:                      # 갈고리가 없으면(테스트 등) 조용히 건너뛴다
         try:
-            s = _slug_core(SLUG_TRANSLATOR(title or keyword) or "")
-            if len(s) >= 6:
+            s = _ok(SLUG_TRANSLATOR(title or keyword) or "")
+            if s:
                 return s
         except Exception as e:
-            print(f"[slug] 영문 슬러그 재요청 실패(로마자로 진행): {str(e)[:80]}")
-    s = _slug_core(romanize_ko(title) or romanize_ko(keyword))
-    if len(s) >= 6:
+            print(f"[slug] 영문 슬러그 재요청 실패: {str(e)[:80]}")
+    s = _ok(_slug_from_terms(title) or _slug_from_terms(keyword))
+    if s:
         return s
+    # 로마자 표기는 쓰지 않는다 — 사람이 못 읽고 검색에도 도움이 되지 않는다.
     seed = (title or keyword or "").encode("utf-8")
     d = (when or datetime.now()).strftime("%Y%m%d")
     return f"post-{d}-{hashlib.sha1(seed).hexdigest()[:6]}"
@@ -1010,7 +1169,8 @@ def _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,
     return {
         "keyword": keyword, "kind": kind, "lang": "ko", "category": category,
         "title": data.get("title") or keyword,
-        "meta": data.get("meta", ""), "slug": slug,
+        "meta": (data.get("meta") or "").strip() or _meta_from_html(full_html, title),
+        "slug": slug,
         "seo_title": _seo_title(data.get("seo_title"), data.get("focus_keyword") or keyword, title),
         "focus_keyword": data.get("focus_keyword", keyword),
         "tags": data.get("tags", []), "faqs": data.get("faqs", []),
