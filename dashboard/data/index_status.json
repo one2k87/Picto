@@ -1,14 +1,14 @@
 {
- "updated_at": "2026-09-29T11:37:51",
+ "updated_at": "2026-09-30T09:53:09",
  "site": "https://pickdam.com",
  "checked": 30,
- "indexed": 27,
+ "indexed": 26,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-09-28T09:08:13\",\"link\":\"https:\\/\\/pickdam.com\\/washer-filter-cleaning-guide\\/\"},{\"modified\":\"2026-09-"
+  "body_head": "[{\"modified\":\"2026-09-30T09:49:44\",\"link\":\"https:\\/\\/pickdam.com\\/in-gagu-mini-indeoksyeon-gumae-si-1gu-vs\\/\"},{\"modifie"
  },
  "posts_n": 30,
  "results": [
@@ -17,6 +17,12 @@
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/in-gagu-mini-indeoksyeon-gumae-si-1gu-vs/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/washer-filter-cleaning-guide/",
@@ -182,12 +188,6 @@
   },
   {
    "url": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-28"
