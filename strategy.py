@@ -89,7 +89,10 @@ def score_articles(hist, sc):
         b = buckets.setdefault(key, {"category": cat, "intent": intent,
                                      "posts": 0, "clicks": 0, "impressions": 0, "scored": 0})
         b["posts"] += 1
-        pg = pages.get(_slug_of(a.get("post_url")))
+        # history.json의 주소 필드는 'url'이다. 'post_url'은 **항상 None**이라
+        # matched가 영원히 0이었고(2026-09-30 실측: 42편 전부 post_url=None),
+        # 그래서 strategy.json이 처음부터 지금까지 data_status=no_data로 멈춰 있었다.
+        pg = pages.get(_slug_of(a.get("post_url") or a.get("url") or a.get("slug")))
         if pg:
             matched += 1
             b["scored"] += 1
@@ -176,8 +179,12 @@ def build(cfg=None, per_day=5):
                key=lambda x: -x.get("clicks", 0))[:10] if q.get("clicks", 0) > 0]
 
     # 노출은 되는데 클릭이 없는 검색어 = 제목이 약한 것 → 제목 재작성 후보
+    # 문턱은 사이트 규모에 맞춘다. 50회 고정이면 3개월 총노출이 313인 지금은
+    # 영원히 0건이다(2026-09-30 실측). 전체 노출의 1% 또는 최소 2회를 기준으로 한다.
+    _tot = sum(q.get("impressions", 0) for q in sc.get("queries", [])) or 0
+    _floor = max(2, int(_tot * 0.01))
     weak = [q["query"] for q in sc.get("queries", [])
-            if q.get("impressions", 0) >= 50 and q.get("clicks", 0) == 0][:10]
+            if q.get("impressions", 0) >= _floor and q.get("clicks", 0) == 0][:10]
 
     actions = []
     if status == "no_data":
