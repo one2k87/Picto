@@ -76,6 +76,8 @@ def _sc_forms(site):
 def search_console(cfg, creds, days=28, top=10):
     site = cfg.get("sc_site_url")
     if not site:
+        print("[insights] Search Console 건너뜀: sc_site_url 이 비어 있다"
+              " (SC_SITE_URL / GSC_SITE_URL / WP_SITE 중 하나가 워크플로에 전달돼야 한다)")
         return {}
     svc = None
     end = date.today() - timedelta(days=2)     # 데이터 지연 반영

@@ -251,7 +251,10 @@ cfg = {
     },
     "insights": {                                          # 성과·수익 실측(무료 API)
         "service_account_json": envs("GOOGLE_SERVICE_ACCOUNT_JSON", ""),
-        "sc_site_url": envs("SC_SITE_URL", envs("WP_SITE", "")),
+        # 시크릿 이름이 워크플로마다 달랐다(daily=SC_SITE_URL, weekly=GSC_SITE_URL).
+        # 2026-09-30 실측: 주간 워크플로가 WP_SITE조차 넘기지 않아 이 값이 빈 문자열이 됐고,
+        # search_console()이 첫 줄에서 조용히 {}를 돌려주며 28일간 성과 피드백이 0이었다.
+        "sc_site_url": envs("SC_SITE_URL", envs("GSC_SITE_URL", envs("WP_SITE", envs("BLOG_URL", "")))),
         "ga4_property_id": envs("GA4_PROPERTY_ID", ""),
         "adsense_account": envs("ADSENSE_ACCOUNT", ""),
         "adsense_refresh_token": envs("ADSENSE_REFRESH_TOKEN", ""),  # 애드센스는 OAuth

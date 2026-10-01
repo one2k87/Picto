@@ -25,7 +25,9 @@ jobs:
       - name: config.json 생성
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SC_SITE_URL: ${{ secrets.SC_SITE_URL }}
           GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
+          WP_SITE: ${{ secrets.WP_SITE }}
           GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
           ADSENSE_ACCOUNT: ${{ secrets.ADSENSE_ACCOUNT }}
           ADSENSE_REFRESH_TOKEN: ${{ secrets.ADSENSE_REFRESH_TOKEN }}
