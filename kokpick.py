@@ -76,6 +76,42 @@ def _clean(v):
     return v
 
 
+# ── 품목명 정규화 (2026-10-01, 캐스토 요청) ──────────────────────
+# 왜: 대장에 없는 품목이면 `product`에 focus_keyword가 **문장 그대로** 들어갔다.
+#     실측: "인 가구 미니 인덕션 구매 시 1…", "차량용 공기청정기,", "오일 스프레이 유리 vs…".
+#     캐스토는 `product` 또는 제목에 상품명이 들어 있어야 같은 물건으로 보고 영상 설명란에
+#     픽담 줄을 넣는다. 문장이 들어가면 매칭이 깨져 **영상→글 CTA가 끊긴다.**
+# 어떻게: 제목·키워드에서 품목 명사만 뽑는다. 긴 말 먼저 보고, 2자 이하 말은 뒤에 한글이
+#     이어지면 건너뛴다(「유리할까」의 '유리'를 유리병으로 읽던 오탐과 같은 함정).
+KOKPICK_NOUNS = [
+    "음식물처리기", "탈취필터", "정수기필터", "세탁조클리너", "세탁조", "거름망",
+    "비데", "분기밸브", "정수기", "제습기", "가습기", "공기청정기", "식기세척기",
+    "전자레인지", "인덕션", "전기레인지", "밥솥", "커피머신", "오븐", "청소기",
+    "세탁기", "건조기", "냉장고", "에어컨", "온풍기", "히터", "전기장판", "보일러",
+    "공기청정", "선반", "키보드", "마우스", "모니터",   # '수납장'은 가구 맥락이라 뺀다(팔 물건은 선반)
+    "스프레이", "센서등", "무드등", "수면등", "조명", "김치통", "매트리스",
+    "문풍지", "뽁뽁이", "단열시트", "방풍비닐", "필터",
+]
+
+
+def _product_name(article, fallback=""):
+    """글에서 품목명 한 낱말을 뽑는다. 못 뽑으면 빈 문자열(문장은 넣지 않는다)."""
+    import re as _re
+    text = f"{article.get('title','')} {article.get('focus_keyword','')} {article.get('keyword','')}"
+    for ko in sorted(KOKPICK_NOUNS, key=lambda x: -len(x)):
+        start = 0
+        while True:
+            i = text.find(ko, start)
+            if i < 0:
+                break
+            nxt = text[i + len(ko):i + len(ko) + 1]
+            if len(ko) > 2 or not ("\uac00" <= nxt <= "\ud7a3"):
+                return ko
+            start = i + 1
+    # 대장에도 없고 명사도 못 찾으면 **비워 둔다** — 문장을 넣으면 캐스토 매칭이 깨진다.
+    return (fallback or "").strip() if len(_re.sub(r"\s", "", fallback or "")) <= 12 else ""
+
+
 def build(article, product=None, coupang_url=""):
     """글(+매칭된 제품)에서 콕픽 블록 dict를 만든다. 없는 값은 빈 채로 남긴다."""
     raw = article.get("kokpick") or {}
@@ -101,7 +137,7 @@ def build(article, product=None, coupang_url=""):
         if product.get("price_band"):
             data["price_band"] = product["price_band"]
     if not data["product"]:
-        data["product"] = (article.get("focus_keyword") or "").strip()
+        data["product"] = _product_name(article, article.get("focus_keyword") or "")
     if coupang_url:
         data["coupang_url"] = coupang_url
 
