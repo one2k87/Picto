@@ -1,9 +1,9 @@
 {
-  "updated": "2026-10-01 00:19",
+  "updated": "2026-10-01 00:21",
   "next_review": "2026-10-08",
-  "data_status": "no_data",
-  "verdict": "아직 성과 데이터가 없어 기본 계획으로 운영합니다. 발행·색인이 쌓이면 자동으로 실측 기반으로 바뀝니다.",
-  "matched_posts": 0,
+  "data_status": "partial",
+  "verdict": "실적이 붙은 글이 8편뿐이라 판단을 보류하고 기본 계획을 유지합니다.",
+  "matched_posts": 8,
   "intent_ratio": {
     "revenue": 0.6,
     "evergreen": 0.4
@@ -47,33 +47,39 @@
     }
   },
   "winners": [],
-  "weak_queries": [],
+  "weak_queries": [
+    "200만원 12개월 할부",
+    "냉장고 구독과 카드 무이자 할부 중 어떤 게 유리한가요?",
+    "비데 설치비용",
+    "비데설치비용",
+    "세탁기 구독 vs 무이자 할부 어떤 게 유리한가요?"
+  ],
   "buckets": [
     {
       "category": "생활·주방",
       "intent": "revenue",
       "posts": 16,
-      "clicks": 0,
-      "impressions": 0,
-      "scored": 0,
-      "est_value": 0.0,
-      "value_per_post": 0.0,
-      "ctr": 0.0
+      "clicks": 6,
+      "impressions": 210,
+      "scored": 5,
+      "est_value": 6.0,
+      "value_per_post": 0.38,
+      "ctr": 2.86
     },
     {
       "category": "생활·주방",
       "intent": "evergreen",
       "posts": 16,
       "clicks": 0,
-      "impressions": 0,
-      "scored": 0,
+      "impressions": 25,
+      "scored": 3,
       "est_value": 0.0,
       "value_per_post": 0.0,
       "ctr": 0.0
     }
   ],
   "actions": [
-    "애드센스 승인 후 발행을 시작하면 다음 주부터 실측 학습이 시작됩니다."
+    "노출은 있는데 클릭이 0인 검색어 5건 — 해당 글 제목을 다시 쓰세요."
   ],
   "note": "글별 수익은 애드센스 API로 조회할 수 없어 '클릭 × 의도별 RPM 배수'로 추정한 값입니다."
 }
