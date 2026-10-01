@@ -1044,7 +1044,18 @@ def run():
                   f"{len(cfg['_pending_products'])}종 → 주제 우선 배정: "
                   + ", ".join((p.get("name") or p.get("key") or "") for p in cfg["_pending_products"][:6]))
         else:
-            print("[상품] 링크 등록된 제품은 모두 글이 있다.")
+            # 대기 목록이 비었다고 대장 밖으로 나가면 수수료가 0원인 글이 쌓인다
+            # (2026-09-30 실측: 최근 10편 전부 링크 없음). 각도를 바꿔 같은 대장에서 쓴다.
+            _lk = products.linked()
+            if _lk:
+                import random as _rnd
+                _rnd.shuffle(_lk)
+                cfg["_pending_products"] = _lk[:6]
+                print(f"[상품] 링크 등록 제품은 모두 글이 있다 → 대장 {len(_lk)}종에서 "
+                      "**다른 각도**로 재배정: "
+                      + ", ".join((p.get("name") or p.get("key") or "") for p in cfg["_pending_products"]))
+            else:
+                print("[상품] 링크 등록된 제품이 없다.")
     except Exception as e:
         cfg["_pending_products"] = []
         print(f"[상품] 대기 제품 계산 실패(무시): {e}")

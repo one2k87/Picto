@@ -287,7 +287,7 @@ print(f"[check] 상품 링크 미등록 {len(link_missing)}편 · "
 KOKPICK_RE = re.compile(r"<!--KOKPICK\s.*?KOKPICK-->", re.S)
 IMG_TARGET = 3
 hyg = {"no_excerpt": [], "no_featured": [], "no_kokpick": [], "few_images": [],
-       "excerpt_filled": [], "excerpt_bad": [], "of": 0}
+       "excerpt_filled": [], "excerpt_bad": [], "no_product_link": [], "of": 0}
 
 
 # 고지·면책 문구 판별 — '문장 시작'이 아니라 '문장 어디든' 걸리게 한다.
@@ -344,6 +344,11 @@ try:
             hyg["few_images"].append({"id": pid, "title": ttl, "n": figs})
         if not (KOKPICK_RE.search(raw) and ((it.get("meta") or {}).get("kokpick") or "").strip()):
             hyg["no_kokpick"].append({"id": pid, "title": ttl})
+        # 제휴 링크가 없는 글 = 수수료 구조상 0원. 2026-09-30 실측에서 32편 중 17편이 그랬고
+        # 9/17 이후 새 글 10편은 전부였다. 고치려면 사람이 쿠팡에서 링크를 만들어야 하므로
+        # 자동으로 못 붙인다 — 대신 매일 세어서 '무엇의 링크가 없는지' 알린다.
+        if "link.coupang.com" not in raw:
+            hyg["no_product_link"].append({"id": pid, "title": ttl})
         exc = strip_tags((it.get("excerpt") or {}).get("raw") or "").strip()
         if exc and not DISCLAIMER_RE.search(exc):
             continue
@@ -368,7 +373,7 @@ except Exception as e:
     print(f"[check] 발행 위생 점검 건너뜀: {e}")
 print(f"[check] 발행 위생 {hyg['of']}편 — 요약 채움 {len(hyg['excerpt_filled'])} · "
       f"요약 없음 {len(hyg['no_excerpt'])} · 고지문 요약 {len(hyg['excerpt_bad'])} · 대표이미지 없음 {len(hyg['no_featured'])} · "
-      f"이미지 {IMG_TARGET}장 미만 {len(hyg['few_images'])} · 콕픽 블록 없음 {len(hyg['no_kokpick'])}")
+      f"이미지 {IMG_TARGET}장 미만 {len(hyg['few_images'])} · 콕픽 블록 없음 {len(hyg['no_kokpick'])} · 제휴링크 없음 {len(hyg['no_product_link'])}")
 
 
 # ── ⑤ 검색결과 노출 위생 (2026-09-16) ──────────────────────────
