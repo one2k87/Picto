@@ -148,6 +148,215 @@
       "price_band": "",
       "note": "",
       "updated": "2026-09-08"
+    },
+    {
+      "key": "세탁조클리너",
+      "name": "세탁조 클리너",
+      "search": "세탁조 클리너",
+      "match": [
+        "세탁조",
+        "거름망",
+        "세탁기 청소",
+        "섬유 찌꺼기"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hvvRaulIIu",
+      "price_band": "",
+      "band_tier": "low",
+      "note": "",
+      "updated": "2026-10-01"
+    },
+    {
+      "key": "오일스프레이",
+      "name": "오일 스프레이",
+      "search": "오일 스프레이 유리",
+      "match": [
+        "오일 스프레이",
+        "오일스프레이",
+        "분무기"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hvvZ4iZSeW",
+      "price_band": "",
+      "band_tier": "low",
+      "note": "",
+      "updated": "2026-10-01"
+    },
+    {
+      "key": "현관센서등",
+      "name": "현관 센서등",
+      "search": "현관 센서등 무선",
+      "match": [
+        "센서등",
+        "현관 조명",
+        "무선 조명"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hvv4kXwwHk",
+      "price_band": "",
+      "band_tier": "low",
+      "note": "",
+      "updated": "2026-10-01"
+    },
+    {
+      "key": "침실무드등",
+      "name": "침실 무드등",
+      "search": "침실 무드등 수면등",
+      "match": [
+        "무드등",
+        "수면등",
+        "수유등"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hvv6MHfBoi",
+      "price_band": "",
+      "band_tier": "low",
+      "note": "",
+      "updated": "2026-10-01"
+    },
+    {
+      "key": "슬라이딩선반",
+      "name": "주방 슬라이딩 선반",
+      "search": "싱크대 슬라이딩 선반",
+      "match": [
+        "슬라이딩 선반",
+        "싱크대 선반",
+        "수납 선반"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hvv8OXlixw",
+      "price_band": "",
+      "band_tier": "low",
+      "note": "",
+      "updated": "2026-10-01"
+    },
+    {
+      "key": "미니인덕션",
+      "name": "미니 인덕션",
+      "search": "1구 인덕션",
+      "match": [
+        "인덕션",
+        "하이라이트",
+        "1구 인덕션"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hvwaK6uQlU",
+      "price_band": "",
+      "band_tier": "mid",
+      "note": "",
+      "updated": "2026-10-01"
+    },
+    {
+      "key": "접이식키보드",
+      "name": "접이식 블루투스 키보드",
+      "search": "접이식 블루투스 키보드",
+      "match": [
+        "접이식 키보드",
+        "블루투스 키보드",
+        "폴딩 키보드"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hvwcURxuyO",
+      "price_band": "",
+      "band_tier": "mid",
+      "note": "",
+      "updated": "2026-10-01"
+    },
+    {
+      "key": "차량용공기청정기",
+      "name": "차량용 공기청정기",
+      "search": "차량용 공기청정기",
+      "match": [
+        "차량용 공기청정기",
+        "차량 공기청정"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hvwes6GYW4",
+      "price_band": "",
+      "band_tier": "mid",
+      "note": "",
+      "updated": "2026-10-01"
+    },
+    {
+      "key": "미니세탁기",
+      "name": "미니 세탁기",
+      "search": "미니 세탁기 3kg",
+      "match": [
+        "미니세탁기",
+        "미니 세탁기",
+        "소형 세탁기"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hvwgFeciXY",
+      "price_band": "",
+      "band_tier": "high",
+      "note": "",
+      "updated": "2026-10-01"
+    },
+    {
+      "key": "미니건조기",
+      "name": "미니 건조기",
+      "search": "미니 건조기 히트펌프",
+      "match": [
+        "미니 건조기",
+        "소형 건조기",
+        "히트펌프"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hvwiAW6vls",
+      "price_band": "",
+      "band_tier": "high",
+      "note": "",
+      "updated": "2026-10-01"
+    },
+    {
+      "key": "전기장판",
+      "name": "전기장판",
+      "search": "전기장판 싱글",
+      "match": [
+        "전기장판",
+        "전기요",
+        "온수매트"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hvwkAU64t2",
+      "price_band": "",
+      "band_tier": "mid",
+      "note": "",
+      "updated": "2026-10-01"
+    },
+    {
+      "key": "미니온풍기",
+      "name": "미니 온풍기",
+      "search": "미니 온풍기 욕실",
+      "match": [
+        "온풍기",
+        "욕실 히터",
+        "미니 히터"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hvwmaMKyU8",
+      "price_band": "",
+      "band_tier": "mid",
+      "note": "",
+      "updated": "2026-10-01"
+    },
+    {
+      "key": "가습기",
+      "name": "가습기",
+      "search": "가습기 초음파",
+      "match": [
+        "가습기",
+        "초음파 가습"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hvwnD1eYQ8",
+      "price_band": "",
+      "band_tier": "mid",
+      "note": "",
+      "updated": "2026-10-01"
+    },
+    {
+      "key": "김치통",
+      "name": "김치통",
+      "search": "김치통 4L",
+      "match": [
+        "김치통",
+        "김치 용기",
+        "김장 용기"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hvwu1GNZ6a",
+      "price_band": "",
+      "band_tier": "low",
+      "note": "",
+      "updated": "2026-10-01"
     }
   ],
   "_note_주의": "note는 상품 카드에 독자에게 그대로 보이는 문구다. 내부 메모는 절대 여기 쓰지 말고 _memo에 쓸 것(2026-09-08 사고).",
