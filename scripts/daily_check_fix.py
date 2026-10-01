@@ -394,6 +394,8 @@ SUB_RULES = [
     (r"이사|포장이사|입주\s*청소|이사청소", "moving-cleaning"),
 ]
 SUB_DEFAULT = "appliance-buying"
+# 허브 글은 특정 주제에 속하지 않는다 — 하위 카테고리를 억지로 붙이지 않는다.
+HUB_SLUGS = {"guides"}
 seo = {"cat_set": [], "bc_added": [], "title_set": [], "desc_set": [], "romaja_slug": [], "err": []}
 
 
@@ -479,6 +481,8 @@ try:
         subs[SUB_DEFAULT] = cats[SUB_DEFAULT]
     for it_ in _hp:                                   # ④에서 이미 받아둔 발행 글 목록
         pid, ttl = it_["id"], _title_of(it_)
+        if (it_.get("slug") or "") in HUB_SLUGS:
+            continue
         raw = (it_.get("content") or {}).get("raw") or ""
         meta = it_.get("meta") or {}
         body = {}
