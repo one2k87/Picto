@@ -1128,13 +1128,30 @@ def _assemble(data, related, blog_url, insert_ads, resolver=None, series_nav="",
     review = _review_slot_html(data.get("review_note", ""))
     verified = _verified_html(data.get("sources"))
 
-    head = f"{hook_html}{byline}{ai_notice}{review}"
+    # 쿠팡 고지는 **가장 앞**에 둔다(가이드: 제목 또는 첫 부분).
+    head = f"{_coupang_notice_html()}{hook_html}{byline}{ai_notice}{review}"
     if v % 2 == 0:                        # 요약을 목차 앞/뒤로 번갈아
         mid = f"{tldr}{series_nav}{toc}{summary}"
     else:
         mid = f"{series_nav}{toc}{tldr}{summary}"
     tail = f"{checklist}{faq_html}{verified}{freshness}{invest_risk}{disclaimer}{series_nav}{internal}{jsonld}"
     return head + mid + body + tail
+
+
+# ── 쿠팡 파트너스 고지 (2026-10-01) ───────────────────────────────
+# 공식 가이드(9/17판) 기준: 「경제적 이해관계 미표시」가 **반려 1위 사유**이고
+# 위치 요건은 **제목 또는 첫 부분**이다. 실측(2026-10-01): 발행 32편 중
+# 첫 부분에 고지가 있는 글이 **0편**이었다 — 17편은 아예 없었고 15편은
+# 쿠팡 블록 안(본문 31~66% 지점)에만 있었다. 최종 승인(누적 판매 15만) 심사에서
+# 바로 걸리는 항목이라 **모든 글 맨 앞**에 넣는다(기존 블록 옆 고지는 그대로 둔다).
+# 문구는 가이드 권장문을 그대로 쓴다 — 바꾸지 말 것.
+COUPANG_NOTICE_TEXT = "이 게시물은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
+
+
+def _coupang_notice_html():
+    return ('<p data-cp-notice="top" style="margin:0 0 14px;padding:9px 12px;'
+            'border-left:3px solid #ff6b35;background:#fff6f2;color:#5b5563;'
+            'font-size:13px;line-height:1.6">' + COUPANG_NOTICE_TEXT + '</p>')
 
 
 def _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,

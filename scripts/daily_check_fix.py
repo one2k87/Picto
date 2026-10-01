@@ -401,7 +401,8 @@ SUB_RULES = [
 SUB_DEFAULT = "appliance-buying"
 # 허브 글은 특정 주제에 속하지 않는다 — 하위 카테고리를 억지로 붙이지 않는다.
 HUB_SLUGS = {"guides"}
-seo = {"cat_set": [], "bc_added": [], "title_set": [], "desc_set": [], "romaja_slug": [], "err": []}
+seo = {"cat_set": [], "bc_added": [], "title_set": [], "desc_set": [], "romaja_slug": [],
+       "cp_notice_added": [], "err": []}
 
 
 def _short_title(long_title, keyword=""):
@@ -455,6 +456,15 @@ def _desc_from_html(html):
     return out
 
 
+# 쿠팡 파트너스 고지 — 「경제적 이해관계 미표시」는 반려 1위 사유이고 위치 요건이
+# **제목 또는 첫 부분**이다(공식 가이드 9/17판). 2026-10-01 실측에서 32편 중
+# 첫 부분에 있는 글이 0편이었다. 새 글이 빠뜨리면 다음 날 스스로 메꾼다.
+CP_NOTICE_TEXT = "이 게시물은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
+CP_NOTICE_HTML = ('<p data-cp-notice="top" style="margin:0 0 14px;padding:9px 12px;'
+                  'border-left:3px solid #ff6b35;background:#fff6f2;color:#5b5563;'
+                  'font-size:13px;line-height:1.6">' + CP_NOTICE_TEXT + '</p>\n')
+
+
 def _bc_html(site, sub_slug, sub_name, parent_name):
     def it(pos, name, url, cur=False):
         col = "#7c5cff" if cur else "#98a2b3"
@@ -505,9 +515,16 @@ try:
                 seo["cat_set"].append({"id": pid, "title": ttl, "cat": sub["name"]})
         else:
             sub = next(v for v in subs.values() if v["id"] in cur_cats)
-        if sub and 'data-bc="1"' not in raw:
-            body["content"] = _bc_html(site, sub["slug"], sub["name"], parent["name"]) + raw
+        _new = raw
+        if sub and 'data-bc="1"' not in _new:
+            _new = _bc_html(site, sub["slug"], sub["name"], parent["name"]) + _new
             seo["bc_added"].append({"id": pid, "title": ttl})
+        if 'data-cp-notice="top"' not in _new:
+            m_ = re.match(r"([\s\S]*?</nav>\s*)", _new)      # 브레드크럼 바로 다음
+            _new = (m_.group(1) + CP_NOTICE_HTML + _new[len(m_.group(1)):]) if m_ else CP_NOTICE_HTML + _new
+            seo["cp_notice_added"].append({"id": pid, "title": ttl})
+        if _new != raw:
+            body["content"] = _new
         _m = {}
         if not (meta.get("rank_math_title") or "").strip():
             st = _short_title(ttl, meta.get("rank_math_focus_keyword") or "")
@@ -534,7 +551,8 @@ except Exception as e:
     seo["err"].append({"reason": str(e)})
 print(f"[check] 노출 위생 — 카테고리 배정 {len(seo['cat_set'])} · "
       f"브레드크럼 {len(seo['bc_added'])} · 검색제목 {len(seo['title_set'])} · "
-      f"검색설명 {len(seo['desc_set'])} · 로마자주소 {len(seo['romaja_slug'])} · 실패 {len(seo['err'])}")
+      f"검색설명 {len(seo['desc_set'])} · 로마자주소 {len(seo['romaja_slug'])} · "
+      f"쿠팡고지 보충 {len(seo['cp_notice_added'])} · 실패 {len(seo['err'])}")
 
 
 # ── 결과 저장 + 텔레그램 ───────────────────────────────────────
