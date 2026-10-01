@@ -49,28 +49,58 @@ def _build(api, version, creds):
     return build(api, version, credentials=creds, cache_discovery=False)
 
 
+def _sc_forms(site):
+    """속성 주소 후보. 도메인 속성은 `sc-domain:` 형식만 받는다.
+
+    2026-09-30 실측: 기본값이 WP_SITE(=https://pickdam.com)라 **403 'You do not own
+    this site'**로 조용히 실패하고 있었다. 그 결과 insights.json이 28일 넘게 `{}`였고,
+    strategy.json은 `no_data`로 멈춰 있었으며, 주제 프롬프트의 '성과 피드백(winners)'도
+    빈 채로 돌았다. URL 검사 쪽(scripts/inspect_recent.py)은 이미 같은 자동 판별을
+    하고 있었는데 이쪽만 빠져 있었다 — 같은 함정을 두 번 밟았다.
+    """
+    import re as _re
+    site = (site or "").strip()
+    out = []
+    if site:
+        out.append(site)
+    host = site[len("sc-domain:"):] if site.startswith("sc-domain:") else site
+    host = _re.sub(r"^https?://", "", host).strip("/").split("/")[0]
+    host = _re.sub(r"^www\.", "", host)
+    if host:
+        for f in (f"sc-domain:{host}", f"https://{host}/", f"https://www.{host}/"):
+            if f not in out:
+                out.append(f)
+    return out
+
+
 def search_console(cfg, creds, days=28, top=10):
     site = cfg.get("sc_site_url")
     if not site:
         return {}
-    try:
-        svc = _build("searchconsole", "v1", creds)
-        end = date.today() - timedelta(days=2)     # 데이터 지연 반영
-        start = end - timedelta(days=days)
-        body = {"startDate": start.isoformat(), "endDate": end.isoformat(),
-                "dimensions": ["query"], "rowLimit": top}
-        q = svc.searchanalytics().query(siteUrl=site, body=body).execute()
-        queries = [{"query": r["keys"][0], "clicks": r.get("clicks", 0),
-                    "impressions": r.get("impressions", 0)} for r in q.get("rows", [])]
-        body["dimensions"] = ["page"]
-        p = svc.searchanalytics().query(siteUrl=site, body=body).execute()
-        pages = [{"page": r["keys"][0], "clicks": r.get("clicks", 0),
-                  "impressions": r.get("impressions", 0)} for r in p.get("rows", [])]
-        print(f"[insights] Search Console: 검색어 {len(queries)} · 페이지 {len(pages)}")
-        return {"queries": queries, "pages": pages}
-    except Exception as e:
-        print(f"[insights] Search Console 실패: {e}")
-        return {}
+    svc = None
+    end = date.today() - timedelta(days=2)     # 데이터 지연 반영
+    start = end - timedelta(days=days)
+    last = ""
+    for form in _sc_forms(site):
+        try:
+            if svc is None:
+                svc = _build("searchconsole", "v1", creds)
+            body = {"startDate": start.isoformat(), "endDate": end.isoformat(),
+                    "dimensions": ["query"], "rowLimit": top}
+            q = svc.searchanalytics().query(siteUrl=form, body=body).execute()
+            queries = [{"query": r["keys"][0], "clicks": r.get("clicks", 0),
+                        "impressions": r.get("impressions", 0)} for r in q.get("rows", [])]
+            body["dimensions"] = ["page"]
+            p = svc.searchanalytics().query(siteUrl=form, body=body).execute()
+            pages = [{"page": r["keys"][0], "clicks": r.get("clicks", 0),
+                      "impressions": r.get("impressions", 0)} for r in p.get("rows", [])]
+            print(f"[insights] Search Console({form}): 검색어 {len(queries)} · 페이지 {len(pages)}")
+            return {"queries": queries, "pages": pages, "site_form": form}
+        except Exception as e:
+            last = f"{form} → {str(e)[:110]}"
+            continue
+    print(f"[insights] Search Console 실패(후보 전부): {last}")
+    return {}
 
 
 def ga4(cfg, creds, days=28, top=10):
