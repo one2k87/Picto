@@ -1,24 +1,10 @@
 {
- "at": "2026-10-01T09:56:42",
+ "at": "2026-10-01T11:11:18",
  "n": 32,
- "avg": 98,
- "fails": [
-  {
-   "id": 394,
-   "title": "픽담 주제별 가이드",
-   "score": 47,
-   "issues": [
-    "실전 신호 약함",
-    "본문 667자 — 너무 짧음",
-    "구체 수치 부족",
-    "본문 이미지 없음"
-   ]
-  }
- ],
+ "avg": 100,
+ "fails": [],
  "auto_repair": true,
- "repaired": [
-  "픽담 주제별 가이드 47→92점"
- ],
+ "repaired": [],
  "repair_fail": [],
  "defaults": [],
  "noimgv2": {
@@ -152,12 +138,7 @@
     "n": 1
    }
   ],
-  "excerpt_filled": [
-   {
-    "id": 394,
-    "title": "픽담 주제별 가이드"
-   }
-  ],
+  "excerpt_filled": [],
   "excerpt_bad": [],
   "no_product_link": [
    {

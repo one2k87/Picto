@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-01T09:55:02",
+ "updated_at": "2026-10-01T11:10:25",
  "site": "https://pickdam.com",
  "checked": 13,
  "indexed": 8,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-01T09:13:25\",\"link\":\"https:\\/\\/pickdam.com\\/bidet-self-installation-cost-saving-tips\\/\"},{\"modifie"
+  "body_head": "[{\"modified\":\"2026-10-01T09:56:39\",\"link\":\"https:\\/\\/pickdam.com\\/guides\\/\"},{\"modified\":\"2026-10-01T09:13:25\",\"link\":\"h"
  },
  "posts_n": 30,
  "results": [
@@ -19,22 +19,22 @@
    "lastCrawl": "2026-09-28"
   },
   {
+   "url": "https://pickdam.com/guides/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
    "url": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-23"
   },
   {
-   "url": "https://pickdam.com/guides/",
-   "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
-   "lastCrawl": ""
-  },
-  {
    "url": "https://pickdam.com/single-household-mini-induction-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
-   "lastCrawl": ""
+   "state": "Crawled - currently not indexed",
+   "lastCrawl": "2026-10-01"
   },
   {
    "url": "https://pickdam.com/washer-filter-cleaning-guide/",
@@ -45,13 +45,13 @@
   {
    "url": "https://pickdam.com/sprayer-glass-plastic-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
