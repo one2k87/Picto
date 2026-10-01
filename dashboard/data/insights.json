@@ -1,1 +1,100 @@
-{}
+{
+  "updated_at": "2026-10-01",
+  "search_console": {
+    "queries": [
+      {
+        "query": "200만원 12개월 할부",
+        "clicks": 0,
+        "impressions": 3
+      },
+      {
+        "query": "200만원 24개월 할부",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
+        "query": "냉장고 구독과 카드 무이자 할부 중 어떤 게 유리한가요?",
+        "clicks": 0,
+        "impressions": 3
+      },
+      {
+        "query": "냉장고 브랜드별로 as나 보증 조건 기준으로 어떤 브랜드가 유리한지랑 추천 제품도 같이 알려줘",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
+        "query": "비데 설치 비용",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
+        "query": "비데 설치비용",
+        "clicks": 0,
+        "impressions": 4
+      },
+      {
+        "query": "비데설치비용",
+        "clicks": 0,
+        "impressions": 2
+      },
+      {
+        "query": "세탁기 구독 vs 무이자 할부 어떤 게 유리한가요?",
+        "clicks": 0,
+        "impressions": 2
+      }
+    ],
+    "pages": [
+      {
+        "page": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
+        "clicks": 4,
+        "impressions": 134
+      },
+      {
+        "page": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
+        "clicks": 1,
+        "impressions": 18
+      },
+      {
+        "page": "https://pickdam.com/door-draft-stopper-guide-2026/",
+        "clicks": 1,
+        "impressions": 38
+      },
+      {
+        "page": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+        "clicks": 1,
+        "impressions": 46
+      },
+      {
+        "page": "https://pickdam.com/sample-page/",
+        "clicks": 1,
+        "impressions": 8
+      },
+      {
+        "page": "https://pickdam.com/",
+        "clicks": 0,
+        "impressions": 4
+      },
+      {
+        "page": "https://pickdam.com/bidet-self-installation-check-valve/",
+        "clicks": 0,
+        "impressions": 18
+      },
+      {
+        "page": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
+        "clicks": 0,
+        "impressions": 8
+      },
+      {
+        "page": "https://pickdam.com/food-waste-disposer-rental-cancellation-fee/",
+        "clicks": 0,
+        "impressions": 3
+      },
+      {
+        "page": "https://pickdam.com/hello-world/",
+        "clicks": 0,
+        "impressions": 8
+      }
+    ],
+    "site_form": "sc-domain:pickdam.com"
+  }
+}
