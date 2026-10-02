@@ -578,9 +578,15 @@ try:
         _lms = re.findall(r"<lastmod>(.*?)</lastmod>", _r.text)
         _sm_slugs = {u.rstrip("/").rsplit("/", 1)[-1] for u in _locs}
         _missing = []
+        # 방금 발행한 글은 사이트맵이 아직 못 따라잡은 게 정상이라 뺀다
+        # (10/2 실측: 발행 2분 뒤 점검이 돌아 1편을 '누락'으로 잡았다 — 오탐).
+        _fresh_cut = (datetime.datetime.utcnow()
+                      - datetime.timedelta(hours=3)).strftime("%Y-%m-%dT%H:%M:%S")
         for _p in posts:
             _lnk = _p.get("link") or ""
             if not _lnk:
+                continue
+            if (_p.get("modified_gmt") or "") > _fresh_cut:
                 continue
             if _lnk.rstrip("/").rsplit("/", 1)[-1] not in _sm_slugs:
                 _missing.append({"id": _p["id"], "title": _title_of(_p)})
@@ -593,7 +599,9 @@ try:
         _mod_max = max([(p.get("modified_gmt") or "") for p in posts] or [""])
         _sm_max = max(_lms) if _lms else ""
         _stale = bool(_sm_max and _mod_max and _sm_max[:19] < _mod_max[:19])
-        _cached = bool(_ghost) or (len(_missing) > 0 and _stale)
+        # 한두 편 어긋나는 건 크롤 타이밍이다. 캐시본 서빙은 '유령 URL' 또는
+        # '여러 편이 한꺼번에 빠지고 lastmod 까지 과거'일 때만 의심한다.
+        _cached = bool(_ghost) or (len(_missing) >= 3 and _stale)
         sitemap = {"checked": True, "urls": len(_locs), "posts": len(posts),
                    "missing_n": len(_missing), "missing": _missing[:20],
                    "ghost_urls": _ghost[:10], "cached_suspect": _cached,
