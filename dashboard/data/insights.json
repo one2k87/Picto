@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-01",
+  "updated_at": "2026-10-02",
   "search_console": {
     "queries": [
       {
@@ -23,9 +23,14 @@
         "impressions": 1
       },
       {
-        "query": "비데 설치 비용",
+        "query": "네",
         "clicks": 0,
         "impressions": 1
+      },
+      {
+        "query": "비데 설치 비용",
+        "clicks": 0,
+        "impressions": 2
       },
       {
         "query": "비데 설치비용",
@@ -52,7 +57,7 @@
       {
         "page": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
         "clicks": 1,
-        "impressions": 18
+        "impressions": 20
       },
       {
         "page": "https://pickdam.com/door-draft-stopper-guide-2026/",
@@ -62,7 +67,7 @@
       {
         "page": "https://pickdam.com/new-appliance-installment-plan-comparison/",
         "clicks": 1,
-        "impressions": 46
+        "impressions": 47
       },
       {
         "page": "https://pickdam.com/sample-page/",
@@ -75,9 +80,14 @@
         "impressions": 4
       },
       {
+        "page": "https://pickdam.com/bedroom-lamp-guide/",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
         "page": "https://pickdam.com/bidet-self-installation-check-valve/",
         "clicks": 0,
-        "impressions": 18
+        "impressions": 19
       },
       {
         "page": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
@@ -85,14 +95,9 @@
         "impressions": 8
       },
       {
-        "page": "https://pickdam.com/food-waste-disposer-rental-cancellation-fee/",
+        "page": "https://pickdam.com/entrance/",
         "clicks": 0,
-        "impressions": 3
-      },
-      {
-        "page": "https://pickdam.com/hello-world/",
-        "clicks": 0,
-        "impressions": 8
+        "impressions": 1
       }
     ],
     "site_form": "sc-domain:pickdam.com"
