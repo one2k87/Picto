@@ -556,6 +556,41 @@ print(f"[check] 노출 위생 — 카테고리 배정 {len(seo['cat_set'])} · "
 
 
 # ── 결과 저장 + 텔레그램 ───────────────────────────────────────
+# ── ⑥ 사이트맵 누락 검사 (2026-10-02 신설) ───────────────────────
+# 실측 계기: post-sitemap.xml 의 모든 <lastmod> 가 2026-09-09T12:39:35+00:00 로 같았다.
+#   = 그날 한 번 만들어진 캐시본이 23일간 그대로 서빙되고 있었다는 뜻이고,
+#   그 사이 발행한 18편이 사이트맵에 아예 없었다(구글이 #325를 'URL is unknown'으로 본 이유).
+# 색인은 우리 수익의 입구인데 이게 23일간 아무 신호 없이 조용했다. 그래서 매일 센다.
+# 조치는 사람만 할 수 있다(Rank Math 캐시·고유주소 저장) — 그래서 감지만 하고 알린다.
+sitemap = {"checked": False}
+try:
+    _sm_url = f"{site}/post-sitemap.xml"
+    _r = requests.get(_sm_url, headers=_H, timeout=20)
+    if _r.ok and "<urlset" in _r.text:
+        _locs = re.findall(r"<loc>(.*?)</loc>", _r.text)
+        _lms = re.findall(r"<lastmod>(.*?)</lastmod>", _r.text)
+        _sm_slugs = {u.rstrip("/").rsplit("/", 1)[-1] for u in _locs}
+        _missing = []
+        for _p in posts:
+            _lnk = _p.get("link") or ""
+            if not _lnk:
+                continue
+            if _lnk.rstrip("/").rsplit("/", 1)[-1] not in _sm_slugs:
+                _missing.append({"id": _p["id"], "title": _title_of(_p)})
+        _frozen = bool(_lms) and len(set(_lms)) == 1
+        sitemap = {"checked": True, "urls": len(_locs), "posts": len(posts),
+                   "missing_n": len(_missing), "missing": _missing[:20],
+                   "frozen": _frozen, "lastmod_uniq": len(set(_lms)),
+                   "lastmod_max": max(_lms) if _lms else ""}
+        print(f"[sitemap] URL {len(_locs)}개 · 발행 {len(posts)}편 · 누락 {len(_missing)}편"
+              f"{' · 캐시 고정 의심(lastmod 전부 동일)' if _frozen else ''}")
+    else:
+        sitemap = {"checked": False, "err": f"HTTP {_r.status_code}"}
+        print(f"[sitemap] 조회 실패 HTTP {_r.status_code}")
+except Exception as e:
+    sitemap = {"checked": False, "err": str(e)[:80]}
+    print(f"[sitemap] 건너뜀: {e}")
+
 out = {"at": datetime.datetime.now().isoformat()[:19], "n": len(scored), "avg": avg,
        "fails": [{k: x[k] for k in ("id", "title", "score", "issues")} for x in fails],
        "auto_repair": AUTO_REPAIR, "repaired": repaired, "repair_fail": repair_fail,
@@ -565,7 +600,7 @@ out = {"at": datetime.datetime.now().isoformat()[:19], "n": len(scored), "avg": 
        "link_coverage": link_cov, "link_fill": link_fill,
        "pending_products": pending_products,
        "line_leaks": {"n": len(line_leaks), "posts": line_leaks[:20]},
-       "hygiene": hyg, "seo": seo}
+       "hygiene": hyg, "seo": seo, "sitemap": sitemap}
 os.makedirs("dashboard/data", exist_ok=True)
 json.dump(out, open("dashboard/data/site_check.json", "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)
@@ -596,6 +631,12 @@ try:
         _ps = " · ".join(sorted({x["product"] for x in link_missing})[:3])
         msg += (f"\n🔗 쿠팡 링크 없는 글 {len(link_missing)}편 ({_ps}) — 이 글들은 수익 0원입니다. "
                 f"앱 픽 탭 > 상품에서 등록하세요")
+    if sitemap.get("checked") and sitemap.get("missing_n"):
+        msg += (f"\n🗺️ <b>사이트맵에 빠진 글 {sitemap['missing_n']}편</b>"
+                f"(사이트맵 {sitemap['urls']}개 / 발행 {sitemap['posts']}편)"
+                + (" · lastmod가 전부 같습니다 → 캐시 고정" if sitemap.get("frozen") else "")
+                + " — 색인이 안 되는 직접 원인입니다. 워드프레스 ①설정 > 고유주소에서 "
+                  "[변경사항 저장] 클릭 ②Rank Math SEO > Sitemap Settings에서 캐시 삭제")
     if line_leaks:
         _kinds = sorted({k for x in line_leaks for k in x["kinds"]})
         msg += (f"\n🚨 라인 격리 위반 {len(line_leaks)}편 ({' · '.join(_kinds)}) — "
@@ -603,7 +644,8 @@ try:
     if repaired: msg += "\n🔧 자동 수리: " + " / ".join(repaired[:3])
     if repair_fail: msg += "\n⚠️ 수리 실패: " + " / ".join(repair_fail[:3])
     if fails and not AUTO_REPAIR: msg += "\n앱에서 '한 번에 고치기'를 실행하세요 (또는 자동 수리를 켜세요)"
-    if not (fails or repaired or repair_fail or defaults_found or noimgv2 or link_missing):
+    if not (fails or repaired or repair_fail or defaults_found or noimgv2
+            or link_missing or sitemap.get("missing_n")):
         msg += "\n✅ 이상 없음"
     notify.send(cfg, msg)
 except Exception as e:
