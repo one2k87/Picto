@@ -97,7 +97,8 @@ posts = []
 for pg in (1, 2):
     try:
         r = requests.get(f"{site}/wp-json/wp/v2/posts",
-                         params={"per_page": 50, "page": pg, "_fields": "id,title,content,link"},
+                         params={"per_page": 50, "page": pg,
+                                 "_fields": "id,title,content,link,modified_gmt"},
                          headers={"User-Agent": "Mozilla/5.0 (PickdamBot)"}, timeout=30)
         if not r.ok: break
         chunk = r.json(); posts += chunk
@@ -556,12 +557,18 @@ print(f"[check] 노출 위생 — 카테고리 배정 {len(seo['cat_set'])} · "
 
 
 # ── 결과 저장 + 텔레그램 ───────────────────────────────────────
-# ── ⑥ 사이트맵 누락 검사 (2026-10-02 신설) ───────────────────────
-# 실측 계기: post-sitemap.xml 의 모든 <lastmod> 가 2026-09-09T12:39:35+00:00 로 같았다.
-#   = 그날 한 번 만들어진 캐시본이 23일간 그대로 서빙되고 있었다는 뜻이고,
-#   그 사이 발행한 18편이 사이트맵에 아예 없었다(구글이 #325를 'URL is unknown'으로 본 이유).
-# 색인은 우리 수익의 입구인데 이게 23일간 아무 신호 없이 조용했다. 그래서 매일 센다.
-# 조치는 사람만 할 수 있다(Rank Math 캐시·고유주소 저장) — 그래서 감지만 하고 알린다.
+# ── ⑥ 사이트맵 누락 검사 (2026-10-02 신설, 같은 날 판정 기준 정정) ──
+# 실측 계기: post-sitemap.xml 이 16 URL 에서 23일간 멈춰 있었고, 9/10 이후 발행한 18편이
+#   사이트맵에 아예 없었다(구글이 #325를 'URL is unknown'으로 본 이유).
+# ⚠️ 첫 진단에서 "lastmod 가 전부 동일하다 → 캐시본"이라고 썼는데 틀렸다. 2건만 보고
+#   단정한 것이고, 실제로는 15가지 값으로 제각각이었다. 캐시라는 결론 자체는 맞았지만
+#   근거가 틀렸으므로 판정 기준을 바꾼다. 실제 결정적 증거는 두 가지였다:
+#     ① 발행 글 수와 사이트맵 URL 수가 어긋난다
+#     ② 사이트맵에 이미 비공개/404 가 된 URL(#164)이 남아 있다 ← 라이브 생성이면 불가능
+#   ③ 보조 신호: 글을 방금 수정했는데 사이트맵 최대 lastmod 가 그보다 과거다
+# 조치는 사람만 할 수 있다 — Rank Math 사이트맵 설정의 '값을 실제로 바꿔서' 저장해야
+#   캐시가 무효화된다(값 변경 없는 저장·transients 제거·고유주소 저장·슈퍼캐시 삭제는
+#   2026-10-02 실측에서 전부 효과가 없었다).
 sitemap = {"checked": False}
 try:
     _sm_url = f"{site}/post-sitemap.xml"
@@ -577,13 +584,23 @@ try:
                 continue
             if _lnk.rstrip("/").rsplit("/", 1)[-1] not in _sm_slugs:
                 _missing.append({"id": _p["id"], "title": _title_of(_p)})
-        _frozen = bool(_lms) and len(set(_lms)) == 1
+        # 유령 URL: 사이트맵에 있는데 공개 글 목록에 없는 주소(비공개·삭제된 글).
+        # 라이브 생성이면 나올 수 없으므로 '캐시본 서빙'의 결정적 증거다.
+        _live = {(p.get("link") or "").rstrip("/") for p in posts}
+        _ghost = [u for u in _locs
+                  if u.rstrip("/") not in _live and u.rstrip("/") != site.rstrip("/")]
+        # 보조 신호: 방금 고친 글보다 사이트맵이 과거를 가리키는가
+        _mod_max = max([(p.get("modified_gmt") or "") for p in posts] or [""])
+        _sm_max = max(_lms) if _lms else ""
+        _stale = bool(_sm_max and _mod_max and _sm_max[:19] < _mod_max[:19])
+        _cached = bool(_ghost) or (len(_missing) > 0 and _stale)
         sitemap = {"checked": True, "urls": len(_locs), "posts": len(posts),
                    "missing_n": len(_missing), "missing": _missing[:20],
-                   "frozen": _frozen, "lastmod_uniq": len(set(_lms)),
-                   "lastmod_max": max(_lms) if _lms else ""}
+                   "ghost_urls": _ghost[:10], "cached_suspect": _cached,
+                   "lastmod_max": _sm_max, "post_modified_max": _mod_max}
         print(f"[sitemap] URL {len(_locs)}개 · 발행 {len(posts)}편 · 누락 {len(_missing)}편"
-              f"{' · 캐시 고정 의심(lastmod 전부 동일)' if _frozen else ''}")
+              f" · 유령 {len(_ghost)}건"
+              f"{' · 캐시본 서빙 의심' if _cached else ''}")
     else:
         sitemap = {"checked": False, "err": f"HTTP {_r.status_code}"}
         print(f"[sitemap] 조회 실패 HTTP {_r.status_code}")
@@ -631,12 +648,18 @@ try:
         _ps = " · ".join(sorted({x["product"] for x in link_missing})[:3])
         msg += (f"\n🔗 쿠팡 링크 없는 글 {len(link_missing)}편 ({_ps}) — 이 글들은 수익 0원입니다. "
                 f"앱 픽 탭 > 상품에서 등록하세요")
-    if sitemap.get("checked") and sitemap.get("missing_n"):
-        msg += (f"\n🗺️ <b>사이트맵에 빠진 글 {sitemap['missing_n']}편</b>"
-                f"(사이트맵 {sitemap['urls']}개 / 발행 {sitemap['posts']}편)"
-                + (" · lastmod가 전부 같습니다 → 캐시 고정" if sitemap.get("frozen") else "")
-                + " — 색인이 안 되는 직접 원인입니다. 워드프레스 ①설정 > 고유주소에서 "
-                  "[변경사항 저장] 클릭 ②Rank Math SEO > Sitemap Settings에서 캐시 삭제")
+    if sitemap.get("checked") and (sitemap.get("missing_n") or sitemap.get("ghost_urls")):
+        msg += (f"\n🗺️ <b>사이트맵에 빠진 글 {sitemap.get('missing_n', 0)}편</b>"
+                f"(사이트맵 {sitemap['urls']}개 / 발행 {sitemap['posts']}편)")
+        if sitemap.get("ghost_urls"):
+            msg += f" · 이미 내린 글 {len(sitemap['ghost_urls'])}건이 아직 남아 있습니다"
+        if sitemap.get("cached_suspect"):
+            msg += ("\n→ 캐시본이 서빙되는 상태입니다. Rank Math SEO > 사이트맵 설정에서 "
+                    "<b>값을 실제로 하나 바꿔</b> [변경사항 저장] 하세요. 값 변경 없는 저장·"
+                    "transients 제거·고유주소 저장·슈퍼캐시 삭제는 2026-10-02 실측에서 "
+                    "효과가 없었습니다.")
+        else:
+            msg += " — 색인이 안 되는 직접 원인입니다."
     if line_leaks:
         _kinds = sorted({k for x in line_leaks for k in x["kinds"]})
         msg += (f"\n🚨 라인 격리 위반 {len(line_leaks)}편 ({' · '.join(_kinds)}) — "
@@ -645,7 +668,7 @@ try:
     if repair_fail: msg += "\n⚠️ 수리 실패: " + " / ".join(repair_fail[:3])
     if fails and not AUTO_REPAIR: msg += "\n앱에서 '한 번에 고치기'를 실행하세요 (또는 자동 수리를 켜세요)"
     if not (fails or repaired or repair_fail or defaults_found or noimgv2
-            or link_missing or sitemap.get("missing_n")):
+            or link_missing or sitemap.get("missing_n") or sitemap.get("ghost_urls")):
         msg += "\n✅ 이상 없음"
     notify.send(cfg, msg)
 except Exception as e:
