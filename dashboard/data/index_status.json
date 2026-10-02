@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-02T10:12:16",
+ "updated_at": "2026-10-02T11:17:41",
  "site": "https://pickdam.com",
  "checked": 30,
  "indexed": 24,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-02T10:08:37\",\"link\":\"https:\\/\\/pickdam.com\\/bathroom-mini\\/\"},{\"modified\":\"2026-10-02T09:33:30\",\"l"
+  "body_head": "[{\"modified\":\"2026-10-02T10:13:23\",\"link\":\"https:\\/\\/pickdam.com\\/bathroom-mini\\/\"},{\"modified\":\"2026-10-02T09:33:30\",\"l"
  },
  "posts_n": 30,
  "results": [
@@ -21,7 +21,7 @@
   {
    "url": "https://pickdam.com/bathroom-mini/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -39,7 +39,7 @@
   {
    "url": "https://pickdam.com/single-household-mini-washer-boil-wash/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -57,7 +57,7 @@
   {
    "url": "https://pickdam.com/sprayer-glass-plastic-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
