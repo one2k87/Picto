@@ -13,6 +13,7 @@
        "position": {"before_nth_h2": 2},               # 또는 {"append": true}
        "html": "<h2>…</h2><p>…</p>",
        "byline_date": "2026년 10월 2일"                  # 선택: 최종 업데이트 날짜 교체
+       "meta": {"rank_math_title": "...", "rank_math_description": "..."}  # 선택
      }
   2) 워크플로 '글 섹션 소급 삽입'을 수동 실행한다(dry_run=true로 먼저 확인).
 
@@ -81,6 +82,24 @@ def main():
             if not raw:
                 failed.append(f"{name}(본문 비어 있음 — context=edit 권한 확인)")
                 continue
+            # SEO 메타(rank_math_*)도 같은 패치로 고친다. 섹션을 넣어 글이 답하는 질문이
+            # 달라졌는데 검색결과에 보이는 제목·설명이 그대로면 클릭이 늘지 않는다.
+            meta = p.get("meta") or {}
+            if meta and not dry:
+                rm = requests.post(f"{base}/wp-json/wp/v2/posts/{pid}", headers=headers,
+                                   json={"meta": meta}, timeout=30)
+                if rm.status_code in (200, 201):
+                    got = (rm.json().get("meta") or {})
+                    bad = [k for k, v in meta.items() if (got.get(k) or "") != v]
+                    print(f"    메타 {len(meta)}건 저장" + (f" · 반영 안 됨: {bad}" if bad else " · 전부 반영 확인"))
+                    if bad:
+                        failed.append(f"{name}(메타 미반영 {bad})")
+                else:
+                    print(f"    메타 저장 실패 HTTP {rm.status_code}")
+                    failed.append(f"{name}(메타 HTTP {rm.status_code})")
+            elif meta:
+                print(f"    메타 {len(meta)}건 (dry_run — 저장 안 함): {list(meta)}")
+
             if mark in raw:
                 skipped.append(f"{name}(이미 적용됨)")
                 continue
