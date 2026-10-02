@@ -83,7 +83,37 @@ def get_categories(cfg):
              "wp_category": site.get("category", ""), "wp_slug": ""}]
 
 
-def collect_lane(cfg, cat, lane, n_slots, exclude):
+def _split_dup_topics(cands, ref):
+    """기존 글과 '주제'가 겹치는 후보를 글을 쓰기 전에 골라낸다.
+
+    품질 게이트(quality.topic_overlap)가 '기존글과유사'로 잡아내던 판정을 주제 선정
+    단계로 끌어온 것이다. 그 판정은 discard — 구제도 재생성도 하지 않으므로, 하나만
+    걸려도 그날 새 글이 0편이 된다.
+      실측 계기(2026-10-01): 아침 주제가 '음식물처리기 탈취필터 교체주기'로 나와
+      #216·#228과 핵심어 4개가 겹쳐 폐기됐고, 그날 발행이 0편이었다.
+    기준은 자사 32편 전수로 보정(2026-10-02, 오탐 0 · 10/1 폐기 건은 정탐):
+      · 핵심어 4개 이상 겹치고 비율 0.60 이상, 또는
+      · 핵심어 3개 이상 겹치고 비율 0.75 이상(짧은 키워드가 통째로 포함된 경우)
+    반환: (남길 후보, [(후보, 겹친수, 비율, 겹친 제목)])
+    """
+    kept, hits = [], []
+    for c in cands:
+        kw = (c.get("keyword") or "").strip()
+        hit = None
+        if kw:
+            for t in ref:
+                n, r = quality.topic_overlap(kw, t)
+                if (n >= 4 and r >= 0.60) or (n >= 3 and r >= 0.75):
+                    hit = (n, r, t)
+                    break
+        if hit:
+            hits.append((c, hit[0], hit[1], hit[2]))
+        else:
+            kept.append(c)
+    return kept, hits
+
+
+def collect_lane(cfg, cat, lane, n_slots, exclude, dup_ref=None, _depth=0):
     """
     한 카테고리(cat) 안에서 한 갈래(lane)의 주제를 n_slots개 확보한다.
       1) 후보 생성 → 2) 저경쟁/시즌 지속 판별 → 3) long은 네이버 실측 선별
@@ -117,6 +147,29 @@ def collect_lane(cfg, cat, lane, n_slots, exclude):
         cand = [c for c in cand if not topics.is_non_commerce(c["keyword"])]
         if len(cand) < before:
             print(f"  · 살 물건 없는 주제 {before - len(cand)}개 제외(커머스 전용)")
+
+    # 주제 중복 사전 차단(2026-10-02) — 품질 게이트의 discard를 생성 전으로 끌어온다.
+    # 후보가 전부 중복으로 판정되면 아무것도 거르지 않는다(발행이 멈추면 안 된다).
+    if dup_ref:
+        kept, dup_hits = _split_dup_topics(cand, dup_ref)
+        if dup_hits and kept:
+            cand = kept
+            print("  · 주제 중복 사전 제외 %d개: %s" % (
+                len(dup_hits),
+                " / ".join("%s↔%s(%d개)" % (c.get("keyword", "")[:18], t[:18], n)
+                           for c, n, r, t in dup_hits[:3])))
+        elif dup_hits:
+            print("  · 주제 중복 사전 제외 보류 — 후보 %d개가 전부 중복 판정이라 그대로 씁니다"
+                  % len(dup_hits))
+            dup_hits = []
+        # 걸러서 슬롯보다 적어졌으면 한 번만 다시 받아 보충한다.
+        if dup_hits and len(cand) < n_slots and _depth == 0:
+            more_ex = list(exclude) + [c.get("keyword", "") for c, _n, _r, _t in dup_hits]
+            print("  · 후보 부족(%d/%d) → 주제 재요청" % (len(cand), n_slots))
+            extra = collect_lane(cfg, cat, lane, n_slots - len(cand), more_ex,
+                                 dup_ref=dup_ref, _depth=1)
+            have = {c.get("keyword", "") for c in cand}
+            cand += [e for e in extra if e.get("keyword", "") not in have]
 
     # 검색 수요 게이트(2026-09-15) — 실제로 찾는 말인지 보고 나서 쓴다.
     # 도입 근거: 3개월 누적 노출 51·클릭 3인데 평균 게재순위는 7위였다.
@@ -424,6 +477,11 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
             print(f"  · 형제 사이트 중복 회피: 제목 {len(_st)}건 제외 목록에 추가")
     except Exception:
         pass
+    # 주제 중복 판정용 기준 — '자사 글만'. exclude에는 형제 사이트 제목 900여 건이
+    # 섞여 있어 그걸 기준으로 삼으면 거의 모든 후보가 중복으로 걸린다.
+    dup_ref = [t for t in ([a.get("title", "") for a in cat_hist]
+                           + [a.get("keyword", "") for a in cat_hist]) if t]
+
     related_pool = list(reversed(cat_hist))[:6]
 
     print(f"\n########## [{name}] ##########")
@@ -436,7 +494,7 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
             continue
         label = "저경쟁 롱테일" if lane == "long" else "시즌 선점"
         print(f"[{label}] 슬롯 {need[lane]}개용 주제 확보…")
-        got = collect_lane(cfg, cat, lane, need[lane], exclude)
+        got = collect_lane(cfg, cat, lane, need[lane], exclude, dup_ref=dup_ref)
         topic_q[lane] = got
         print(f"  · 주제:", [t["keyword"] for t in got])
         exclude += [t["keyword"] for t in got]
