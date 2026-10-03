@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-02T11:17:41",
+ "updated_at": "2026-10-03T09:51:30",
  "site": "https://pickdam.com",
  "checked": 30,
  "indexed": 24,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-02T10:13:23\",\"link\":\"https:\\/\\/pickdam.com\\/bathroom-mini\\/\"},{\"modified\":\"2026-10-02T09:33:30\",\"l"
+  "body_head": "[{\"modified\":\"2026-10-03T09:48:07\",\"link\":\"https:\\/\\/pickdam.com\\/sink-door-hinge-replace-cost\\/\"},{\"modified\":\"2026-10-"
  },
  "posts_n": 30,
  "results": [
@@ -17,6 +17,12 @@
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/sink-door-hinge-replace-cost/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/bathroom-mini/",
@@ -185,12 +191,6 @@
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-30"
-  },
-  {
-   "url": "https://pickdam.com/dehumidifier-20l-electricity-bill-30pyeong/",
-   "verdict": "NEUTRAL",
-   "state": "Crawled - currently not indexed",
-   "lastCrawl": "2026-09-28"
   }
  ],
  "sitemaps_submitted": [
