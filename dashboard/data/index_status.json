@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-03T09:51:30",
+ "updated_at": "2026-10-03T10:59:35",
  "site": "https://pickdam.com",
  "checked": 30,
  "indexed": 24,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-03T09:48:07\",\"link\":\"https:\\/\\/pickdam.com\\/sink-door-hinge-replace-cost\\/\"},{\"modified\":\"2026-10-"
+  "body_head": "[{\"modified\":\"2026-10-03T09:52:23\",\"link\":\"https:\\/\\/pickdam.com\\/sink-door-hinge-replace-cost\\/\"},{\"modified\":\"2026-10-"
  },
  "posts_n": 30,
  "results": [
@@ -21,13 +21,13 @@
   {
    "url": "https://pickdam.com/sink-door-hinge-replace-cost/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/bathroom-mini/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
