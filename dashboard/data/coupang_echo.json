@@ -4,5 +4,21 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false
+ "file_enabled": false,
+ "apply_trace": [
+  {
+   "stage": "진입",
+   "title": "다이소 품절대란템 중 쿠팡에서 파는 살림 필수템 3",
+   "enabled": false,
+   "widget_len": 211,
+   "h2": 1
+  },
+  {
+   "stage": "중단:enabled=False",
+   "title": "다이소 품절대란템 중 쿠팡에서 파는 살림 필수템 3",
+   "enabled": false,
+   "widget_len": 211,
+   "h2": 1
+  }
+ ]
 }
