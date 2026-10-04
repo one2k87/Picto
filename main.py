@@ -729,7 +729,11 @@ def _apply_product_link(a, cfg):
         a.get("slug") or "", a.get("wp_id"), a.get("focus_keyword") or ""))
     if not card:
         return False                     # 링크 미등록 — 조용히 건너뛴다
-    a["html"] = _insert_mid_body(a.get("html", "") or "", card, nth_h2=2)
+    # 소급 삽입(scripts/backfill_product_links)과 같은 마커로 감싼다.
+    # 2026-10-04 실측: 여기서 마커 없이 넣는 바람에 backfill 이 force 로 돌아도
+    # 낡은 카드를 못 지워 한 글에 카드가 둘 남았다(#100).
+    a["html"] = _insert_mid_body(a.get("html", "") or "",
+                                 "<!--picklink-->" + card + "<!--/picklink-->", nth_h2=2)
     a["_product_key"] = prod.get("key", "")
     print(f"[product] '{prod.get('key')}' 링크 삽입 · subid={a.get('slug','')[:40]}")
     return True
