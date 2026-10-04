@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-04T09:12:56",
+ "updated_at": "2026-10-04T11:40:05",
  "site": "https://pickdam.com",
  "checked": 30,
  "indexed": 25,
@@ -63,7 +63,7 @@
   {
    "url": "https://pickdam.com/sprayer-glass-plastic-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
