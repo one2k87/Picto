@@ -1,0 +1,9 @@
+{
+  "_why": "#53 는 쿠팡에서 살 물건이 특정되지 않는 글(시공·서비스·제도)이라 상품 링크 대신 간편 링크를 건다. 배너는 간편 링크에서 제공되지 않아 텍스트 버튼으로 간다(사용자 확인).",
+  "post_id": 53,
+  "marker": "<!--patch:simplelink-53-2026-10-04-->",
+  "position": {
+    "before_nth_h2": 2
+  },
+  "html": "<p style=\"margin:0 0 10px;font-size:12px;color:#98a2b3;border-left:3px solid #e5e7eb;padding-left:10px\">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다</p><div class=\"pick-product\" style=\"margin:22px 0;padding:14px 16px;border:1px solid #e5e7eb;border-radius:12px;background:#fafbfc\"><div style=\"font-weight:700;font-size:15px;margin-bottom:4px\">청소 비용을 줄이는 쪽</div><div style=\"font-size:13px;color:#667085;margin-bottom:10px\">업체에 맡길 범위를 좁히면 견적이 내려갑니다. 직접 할 부분의 준비물입니다.</div><a href=\"https://link.coupang.com/a/hzMtCWXS4i\" target=\"_blank\" rel=\"sponsored nofollow noopener\" referrerpolicy=\"unsafe-url\" style=\"display:inline-block;padding:9px 16px;border-radius:9px;background:#2e9e6b;color:#fff;font-size:14px;font-weight:600;text-decoration:none\">입주청소 용품 보기</a><div style=\"font-size:12px;color:#98a2b3;margin-top:8px\">가격·재고는 수시로 바뀌므로 구매 전 상세페이지에서 확인하세요.</div></div>"
+}

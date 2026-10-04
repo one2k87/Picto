@@ -101,6 +101,36 @@ def card_html(product, subid, with_notice=True):
     name = product.get("name") or product.get("key") or "추천 상품"
     band = product.get("price_band") or ""
     note = product.get("note") or "가격·재고는 수시로 바뀌므로 구매 전 상세페이지에서 확인하세요."
+    img = (product.get("banner_img") or "").strip()
+    alt = (product.get("banner_alt") or name).replace('"', "&quot;")
+    # 배너(쿠팡이 준 상품 이미지)가 있으면 그림을 함께 건다.
+    # 근거: 그림 없는 텍스트 버튼은 누를 이유가 약하다(사용자 지적, 2026-10-04).
+    # 이미지는 반드시 쿠팡이 발급한 배너 주소만 쓴다 — 남의 이미지 무단 사용은 계정 정지 사유다.
+    if img:
+        banner = (
+            f'<a href="{url}" target="_blank" rel="sponsored nofollow noopener" '
+            'referrerpolicy="unsafe-url" style="flex:0 0 auto">'
+            f'<img src="{img}" alt="{alt}" width="120" height="240" loading="lazy" '
+            'style="display:block;border-radius:8px;max-width:100%;height:auto"></a>'
+        )
+        card = (
+            '<div class="pick-product" style="margin:22px 0;padding:14px 16px;border:1px solid #e5e7eb;'
+            'border-radius:12px;background:#fafbfc">'
+            '<div style="font-size:12px;color:#98a2b3;margin-bottom:10px">이 글에서 다룬 제품</div>'
+            '<div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">'
+            + banner +
+            '<div style="flex:1 1 220px;min-width:200px">'
+            f'<div style="font-weight:700;font-size:15px;margin-bottom:2px">{name}</div>'
+            + (f'<div style="font-size:13px;color:#667085;margin-bottom:8px">{band}</div>' if band else '')
+            + f'<div style="font-size:13px;color:#667085;margin:6px 0 10px">{note}</div>'
+            + f'<a href="{url}" target="_blank" rel="sponsored nofollow noopener" '
+              'referrerpolicy="unsafe-url" '
+              'style="display:inline-block;padding:9px 16px;border-radius:9px;background:#2e9e6b;'
+              'color:#fff;font-size:14px;font-weight:600;text-decoration:none">쿠팡에서 가격 확인</a>'
+            '</div></div></div>'
+        )
+        return (NOTICE + card) if with_notice else card
+
     card = (
         '<div class="pick-product" style="margin:22px 0;padding:14px 16px;border:1px solid #e5e7eb;'
         'border-radius:12px;background:#fafbfc">'
