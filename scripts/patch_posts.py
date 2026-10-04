@@ -14,6 +14,7 @@
        "html": "<h2>…</h2><p>…</p>",
        "byline_date": "2026년 10월 2일"                  # 선택: 최종 업데이트 날짜 교체
        "meta": {"rank_math_title": "...", "rank_math_description": "..."}  # 선택
+       "replace": [{"old": "낡은문자열", "new": "새문자열"}]            # 선택
      }
   2) 워크플로 '글 섹션 소급 삽입'을 수동 실행한다(dry_run=true로 먼저 확인).
 
@@ -99,6 +100,27 @@ def main():
                     failed.append(f"{name}(메타 HTTP {rm.status_code})")
             elif meta:
                 print(f"    메타 {len(meta)}건 (dry_run — 저장 안 함): {list(meta)}")
+
+            # 본문 안의 낡은 문자열 치환(깨진 링크 교체 등). marker 와 독립적으로 돌고,
+            # 바꿀 게 없으면 조용히 지나간다.
+            rep = p.get("replace") or []
+            if rep:
+                neo_r, hits = raw, 0
+                for r in rep:
+                    old, new = r.get("old") or "", r.get("new") or ""
+                    if old and old in neo_r:
+                        hits += neo_r.count(old)
+                        neo_r = neo_r.replace(old, new)
+                if hits and not dry:
+                    if update_post_content(wp, pid, neo_r):
+                        raw = neo_r
+                        print(f"    치환 {hits}곳 적용")
+                    else:
+                        failed.append(f"{name}(치환 업로드 실패)")
+                elif hits:
+                    print(f"    치환 {hits}곳 (dry_run — 저장 안 함)")
+                else:
+                    print("    치환 대상 없음")
 
             if mark in raw:
                 skipped.append(f"{name}(이미 적용됨)")

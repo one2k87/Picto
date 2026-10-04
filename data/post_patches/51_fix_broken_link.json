@@ -1,0 +1,15 @@
+{
+  "_why": "#51 본문에 남은 깨진 딥링크(gSKBVSP25c) 2곳을 살아 있는 새 링크로 교체. 치환만 하고 삽입은 하지 않는다.",
+  "post_id": 51,
+  "marker": "<!--patch:noop-51-replace-->",
+  "position": {
+    "append": true
+  },
+  "html": "<!-- -->",
+  "replace": [
+    {
+      "old": "gSKBVSP25c",
+      "new": "hzJtVDnNgO"
+    }
+  ]
+}
