@@ -1,0 +1,15 @@
+{
+  "_why": "#51 에 손으로 넣었던 배너 블록을 제거한다. 이제 상품 대장(products.json)의 배너가 backfill 로 모든 글에 자동 삽입되므로, 손으로 넣은 것이 남으면 같은 배너가 두 번 나온다.",
+  "post_id": 51,
+  "marker": "<!--patch:cleanup-51-manual-banner-->",
+  "position": {
+    "append": true
+  },
+  "html": "<!-- -->",
+  "replace": [
+    {
+      "old": "<!--patch:banner-multitap-2026-10-04--><div class=\"pick-banner\" style=\"margin:22px 0;padding:16px 18px;border:1px solid #e3e0d9;border-radius:12px;background:#fbfaf8\"><p style=\"margin:0 0 10px;font-size:13px;color:#6f6a60\">이 글에서 다룬 제품</p><div style=\"display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap\"><a href=\"https://link.coupang.com/a/hzJtVDnNgO\" target=\"_blank\" rel=\"nofollow sponsored noopener\" referrerpolicy=\"unsafe-url\"><img src=\"https://image5.coupangcdn.com/image/affiliate/banner/eada4ef5c24930556e98fd3ad4baf02c@2x.jpg\" alt=\"현대일렉트릭 국산 개별스위치 절전 멀티탭 4구 과부하차단 16A, 화이트, 1개, 1.5m\" width=\"120\" height=\"240\" loading=\"lazy\"></a><div style=\"flex:1;min-width:200px\"><p style=\"margin:0 0 6px;font-weight:600\">대기전력 차단 멀티탭</p><p style=\"margin:0;font-size:13px;color:#6f6a60\">개별 스위치로 쓰지 않는 기기만 꺼 두면 대기전력이 줄어듭니다. 과부하 차단이 있는지, 길이가 콘센트까지 닿는지를 먼저 보세요.</p></div></div><p style=\"margin:12px 0 0;font-size:12px;color:#98a2b3\">가격·재고는 수시로 바뀌므로 구매 전 상세페이지에서 확인하세요.</p></div>",
+      "new": ""
+    }
+  ]
+}
