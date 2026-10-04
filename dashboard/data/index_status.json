@@ -1,14 +1,14 @@
 {
- "updated_at": "2026-10-02T10:12:16",
+ "updated_at": "2026-10-04T11:40:05",
  "site": "https://pickdam.com",
  "checked": 30,
- "indexed": 24,
+ "indexed": 25,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-02T10:08:37\",\"link\":\"https:\\/\\/pickdam.com\\/bathroom-mini\\/\"},{\"modified\":\"2026-10-02T09:33:30\",\"l"
+  "body_head": "[{\"modified\":\"2026-10-03T09:52:23\",\"link\":\"https:\\/\\/pickdam.com\\/sink-door-hinge-replace-cost\\/\"},{\"modified\":\"2026-10-"
  },
  "posts_n": 30,
  "results": [
@@ -19,9 +19,15 @@
    "lastCrawl": "2026-09-28"
   },
   {
+   "url": "https://pickdam.com/sink-door-hinge-replace-cost/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-10-03"
+  },
+  {
    "url": "https://pickdam.com/bathroom-mini/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -39,14 +45,14 @@
   {
    "url": "https://pickdam.com/single-household-mini-washer-boil-wash/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
    "verdict": "NEUTRAL",
    "state": "Crawled - currently not indexed",
-   "lastCrawl": "2026-10-01"
+   "lastCrawl": "2026-10-03"
   },
   {
    "url": "https://pickdam.com/car-air-purifier-choice/",
@@ -57,7 +63,7 @@
   {
    "url": "https://pickdam.com/sprayer-glass-plastic-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -185,12 +191,6 @@
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-30"
-  },
-  {
-   "url": "https://pickdam.com/dehumidifier-20l-electricity-bill-30pyeong/",
-   "verdict": "NEUTRAL",
-   "state": "Crawled - currently not indexed",
-   "lastCrawl": "2026-09-28"
   }
  ],
  "sitemaps_submitted": [
