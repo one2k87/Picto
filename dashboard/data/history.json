@@ -597,6 +597,19 @@
       "intent": "evergreen",
       "date": "2026-10-04",
       "series_id": ""
+    },
+    {
+      "title": "주방용품 소재, 스텐만 고집하다 생기는 문제 3가지: 실리콘·나무 조리도구 비교 (2026년 10월)",
+      "slug": "kitchen-tools-material-guide",
+      "url": "https://pickdam.com/kitchen-tools-material-guide/",
+      "post_id": 555,
+      "status": "게시됨",
+      "kind": "long",
+      "keyword": "주방용품 소재별 장단점 비교: 스텐, 실리콘, 나무 중 우리 집에 맞는 선택",
+      "category": "생활·주방",
+      "intent": "revenue",
+      "date": "2026-10-05",
+      "series_id": ""
     }
   ],
   "_정리": "2026-09-07: 픽토 저장소가 스크립토에서 포크될 때 원더랜드 글 기록이 통째로 딸려왔다. 이 기록이 ①픽담 글 본문의 '함께 보면 좋은 글' 내부링크를 원더랜드로 보내고 ②주제 중복 판정에 쓰여 픽담이 쓸 수 있는 주제를 914편만큼 막고 있었다. 픽담(구 도메인 one2k.mycafe24.com 포함) 기록만 남기고 정리했다."

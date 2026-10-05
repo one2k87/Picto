@@ -1,14 +1,14 @@
 {
- "updated_at": "2026-10-04T11:40:05",
+ "updated_at": "2026-10-05T09:18:07",
  "site": "https://pickdam.com",
  "checked": 30,
- "indexed": 25,
+ "indexed": 22,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-03T09:52:23\",\"link\":\"https:\\/\\/pickdam.com\\/sink-door-hinge-replace-cost\\/\"},{\"modified\":\"2026-10-"
+  "body_head": "[{\"modified\":\"2026-10-05T09:14:36\",\"link\":\"https:\\/\\/pickdam.com\\/kitchen-tools-material-guide\\/\"},{\"modified\":\"2026-10-"
  },
  "posts_n": 30,
  "results": [
@@ -19,22 +19,64 @@
    "lastCrawl": "2026-09-28"
   },
   {
-   "url": "https://pickdam.com/sink-door-hinge-replace-cost/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-03"
-  },
-  {
-   "url": "https://pickdam.com/bathroom-mini/",
+   "url": "https://pickdam.com/kitchen-tools-material-guide/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
-   "url": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "url": "https://pickdam.com/door-draft-stopper-guide-2026/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-10-01"
+  },
+  {
+   "url": "https://pickdam.com/bidet-self-installation-guide-2026/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/bidet-self-installation-check-valve/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/food-waste-disposer-deodorizing-filter-replacement/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-30"
+  },
+  {
+   "url": "https://pickdam.com/dehumidifier-20l-electricity-bill-30pyeong/",
+   "verdict": "NEUTRAL",
+   "state": "Crawled - currently not indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/food-waste-smell-filter-cleaning/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/one-person-food-disposer-install/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/one-person-food-waste-disposer-low-noise-tips/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/bedroom-lamp-guide/",
@@ -52,7 +94,7 @@
    "url": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
    "verdict": "NEUTRAL",
    "state": "Crawled - currently not indexed",
-   "lastCrawl": "2026-10-03"
+   "lastCrawl": "2026-10-01"
   },
   {
    "url": "https://pickdam.com/car-air-purifier-choice/",
@@ -95,6 +137,12 @@
    "verdict": "NEUTRAL",
    "state": "Crawled - currently not indexed",
    "lastCrawl": "2026-10-01"
+  },
+  {
+   "url": "https://pickdam.com/bathroom-mini/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
@@ -143,54 +191,6 @@
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-10-01"
-  },
-  {
-   "url": "https://pickdam.com/kitchen-ventilation-rental-vs-buy-2026-september/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/food-waste-disposer-trade-in-vs-rental-2026/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/water-purifier-filter-replacement-guide-2026/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/door-draft-stopper-guide-2026/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-01"
-  },
-  {
-   "url": "https://pickdam.com/bidet-self-installation-guide-2026/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/bidet-self-installation-check-valve/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/food-waste-disposer-deodorizing-filter-replacement/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-30"
   }
  ],
  "sitemaps_submitted": [

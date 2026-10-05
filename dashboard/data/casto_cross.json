@@ -17,7 +17,7 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "자동회전냄비",
-    "volume": 5580,
+    "volume": 5410,
     "comp": "중간",
     "clicks": 158,
     "depth": 8
@@ -47,7 +47,7 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "미니세탁기",
-    "volume": 24120,
+    "volume": 24000,
     "comp": "중간",
     "clicks": 510,
     "depth": 8
@@ -59,7 +59,7 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "무드등",
-    "volume": 23120,
+    "volume": 23080,
     "comp": "중간",
     "clicks": 227,
     "depth": 8
@@ -119,7 +119,7 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "음식물분쇄기",
-    "volume": 17810,
+    "volume": 17790,
     "comp": "중간",
     "clicks": 370,
     "depth": 8
@@ -137,7 +137,7 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "차량용공기청정기",
-    "volume": 8590,
+    "volume": 8900,
     "comp": "중간",
     "clicks": 40,
     "depth": 8
@@ -185,7 +185,7 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "오일스프레이",
-    "volume": 5110,
+    "volume": 5050,
     "comp": "중간",
     "clicks": 75,
     "depth": 8
@@ -203,7 +203,7 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "현관센서등",
-    "volume": 15520,
+    "volume": 15180,
     "comp": "중간",
     "clicks": 436,
     "depth": 8
@@ -269,7 +269,7 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "주방슬라이딩선반",
-    "volume": 2350,
+    "volume": 2320,
     "comp": "중간",
     "clicks": 60,
     "depth": 8
@@ -287,7 +287,7 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "주방용품",
-    "volume": 8580,
+    "volume": 8440,
     "comp": "중간",
     "clicks": 208,
     "depth": 8
@@ -305,7 +305,7 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "살림",
-    "volume": 2650,
+    "volume": 2660,
     "comp": "중간",
     "clicks": 14,
     "depth": 3
@@ -341,7 +341,7 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "다이소추천템",
-    "volume": 13930,
+    "volume": 14050,
     "comp": "중간",
     "clicks": 1,
     "depth": 2
@@ -359,7 +359,7 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "다이소꿀템",
-    "volume": 9800,
+    "volume": 9820,
     "comp": "중간",
     "clicks": 34,
     "depth": 1
@@ -385,6 +385,78 @@
   },
   {
    "product": "생활용품",
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
+  },
+  {
+   "product": "양념통",
+   "tier": "교집합",
+   "cta": "픽담 개별 글",
+   "best": {
+    "keyword": "양념통",
+    "volume": 8540,
+    "comp": "중간",
+    "clicks": 238,
+    "depth": 8
+   }
+  },
+  {
+   "product": "소시지 칼집",
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
+  },
+  {
+   "product": "캔 따개",
+   "tier": "교집합",
+   "cta": "픽담 개별 글",
+   "best": {
+    "keyword": "캔따개",
+    "volume": 3560,
+    "comp": "중간",
+    "clicks": 58,
+    "depth": 8
+   }
+  },
+  {
+   "product": "자동 머그컵",
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
+  },
+  {
+   "product": "자동 병따개",
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
+  },
+  {
+   "product": "전동 마늘박피",
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
+  },
+  {
+   "product": "전동 채칼",
+   "tier": "교집합",
+   "cta": "픽담 개별 글",
+   "best": {
+    "keyword": "전동채칼",
+    "volume": 4170,
+    "comp": "중간",
+    "clicks": 134,
+    "depth": 8
+   }
+  },
+  {
+   "product": "야채 탈수기",
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
+  },
+  {
+   "product": "따뜻한 도시락",
    "tier": "영상전용",
    "cta": "쿠팡 직링크",
    "best": null

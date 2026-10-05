@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-04",
+  "updated_at": "2026-10-05",
   "search_console": {
     "queries": [
       {
@@ -45,7 +45,12 @@
       {
         "query": "세탁기 구독 vs 무이자 할부 어떤 게 유리한가요?",
         "clicks": 0,
-        "impressions": 2
+        "impressions": 3
+      },
+      {
+        "query": "원룸 비데 설치",
+        "clicks": 0,
+        "impressions": 1
       }
     ],
     "pages": [
@@ -55,6 +60,11 @@
         "impressions": 134
       },
       {
+        "page": "https://pickdam.com/",
+        "clicks": 1,
+        "impressions": 4
+      },
+      {
         "page": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
         "clicks": 1,
         "impressions": 20
@@ -62,32 +72,27 @@
       {
         "page": "https://pickdam.com/door-draft-stopper-guide-2026/",
         "clicks": 1,
-        "impressions": 38
+        "impressions": 41
       },
       {
         "page": "https://pickdam.com/new-appliance-installment-plan-comparison/",
         "clicks": 1,
-        "impressions": 47
+        "impressions": 53
       },
       {
         "page": "https://pickdam.com/sample-page/",
         "clicks": 1,
-        "impressions": 8
-      },
-      {
-        "page": "https://pickdam.com/",
-        "clicks": 0,
-        "impressions": 4
+        "impressions": 7
       },
       {
         "page": "https://pickdam.com/bedroom-lamp-guide/",
         "clicks": 0,
-        "impressions": 1
+        "impressions": 7
       },
       {
         "page": "https://pickdam.com/bidet-self-installation-check-valve/",
         "clicks": 0,
-        "impressions": 19
+        "impressions": 20
       },
       {
         "page": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
@@ -97,7 +102,7 @@
       {
         "page": "https://pickdam.com/entrance/",
         "clicks": 0,
-        "impressions": 1
+        "impressions": 2
       }
     ],
     "site_form": "sc-domain:pickdam.com"
