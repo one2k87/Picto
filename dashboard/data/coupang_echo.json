@@ -4,5 +4,21 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false
+ "file_enabled": false,
+ "apply_trace": [
+  {
+   "stage": "진입",
+   "title": "전동 채칼 10만 원대 구매 시, 얇게 썰기 기능이",
+   "enabled": false,
+   "widget_len": 211,
+   "h2": 5
+  },
+  {
+   "stage": "중단:enabled=False",
+   "title": "전동 채칼 10만 원대 구매 시, 얇게 썰기 기능이",
+   "enabled": false,
+   "widget_len": 211,
+   "h2": 5
+  }
+ ]
 }

@@ -1,14 +1,14 @@
 {
- "updated_at": "2026-10-05T11:03:07",
+ "updated_at": "2026-10-06T11:02:33",
  "site": "https://pickdam.com",
  "checked": 30,
- "indexed": 22,
+ "indexed": 21,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-05T09:19:18\",\"link\":\"https:\\/\\/pickdam.com\\/kitchen-tools-material-guide\\/\"},{\"modified\":\"2026-10-"
+  "body_head": "[{\"modified\":\"2026-10-06T10:59:11\",\"link\":\"https:\\/\\/pickdam.com\\/post-20261006-b61562\\/\"},{\"modified\":\"2026-10-05T09:19"
  },
  "posts_n": 30,
  "results": [
@@ -19,9 +19,15 @@
    "lastCrawl": "2026-09-28"
   },
   {
-   "url": "https://pickdam.com/kitchen-tools-material-guide/",
+   "url": "https://pickdam.com/post-20261006-b61562/",
    "verdict": "NEUTRAL",
    "state": "URL is unknown to Google",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/kitchen-tools-material-guide/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -94,7 +100,7 @@
    "url": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
    "verdict": "NEUTRAL",
    "state": "Crawled - currently not indexed",
-   "lastCrawl": "2026-10-01"
+   "lastCrawl": "2026-10-03"
   },
   {
    "url": "https://pickdam.com/car-air-purifier-choice/",
@@ -185,12 +191,6 @@
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/new-apartment-system-aircon-guide-2026/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-01"
   }
  ],
  "sitemaps_submitted": [
