@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-06T11:02:33",
+ "updated_at": "2026-10-06T12:01:09",
  "site": "https://pickdam.com",
  "checked": 30,
  "indexed": 21,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-06T10:59:11\",\"link\":\"https:\\/\\/pickdam.com\\/post-20261006-b61562\\/\"},{\"modified\":\"2026-10-05T09:19"
+  "body_head": "[{\"modified\":\"2026-10-06T11:03:54\",\"link\":\"https:\\/\\/pickdam.com\\/post-20261006-b61562\\/\"},{\"modified\":\"2026-10-05T09:19"
  },
  "posts_n": 30,
  "results": [
@@ -21,7 +21,7 @@
   {
    "url": "https://pickdam.com/post-20261006-b61562/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -111,7 +111,7 @@
   {
    "url": "https://pickdam.com/sprayer-glass-plastic-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -147,7 +147,7 @@
   {
    "url": "https://pickdam.com/bathroom-mini/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {

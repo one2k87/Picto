@@ -1,5 +1,5 @@
 {
- "at": "2026-10-06T11:03:56",
+ "at": "2026-10-06T12:02:49",
  "n": 36,
  "avg": 100,
  "fails": [],
@@ -144,12 +144,7 @@
     "n": 1
    }
   ],
-  "excerpt_filled": [
-   {
-    "id": 561,
-    "title": "전동 채칼 10만 원대 구매 시, 얇게 썰기 기능이 잦은 고장을 유발하는"
-   }
-  ],
+  "excerpt_filled": [],
   "excerpt_bad": [],
   "no_product_link": [
    {
@@ -172,26 +167,10 @@
   "of": 36
  },
  "seo": {
-  "cat_set": [
-   {
-    "id": 561,
-    "title": "전동 채칼 10만 원대 구매 시, 얇게 썰기 기능이 잦은 고장을 유발하는",
-    "cat": "가전 구매·렌탈"
-   }
-  ],
-  "bc_added": [
-   {
-    "id": 561,
-    "title": "전동 채칼 10만 원대 구매 시, 얇게 썰기 기능이 잦은 고장을 유발하는"
-   }
-  ],
+  "cat_set": [],
+  "bc_added": [],
   "title_set": [],
-  "desc_set": [
-   {
-    "id": 561,
-    "title": "전동 채칼 10만 원대 구매 시, 얇게 썰기 기능이 잦은 고장을 유발하는"
-   }
-  ],
+  "desc_set": [],
   "romaja_slug": [],
   "cp_notice_added": [],
   "err": []
@@ -210,6 +189,6 @@
   "ghost_urls": [],
   "cached_suspect": true,
   "lastmod_max": "2026-10-03T00:52:23+00:00",
-  "post_modified_max": "2026-10-06T01:59:11"
+  "post_modified_max": "2026-10-06T02:03:54"
  }
 }
