@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-07T10:07:53",
+ "updated_at": "2026-10-07T11:26:13",
  "site": "https://pickdam.com",
  "checked": 30,
  "indexed": 22,
@@ -147,7 +147,7 @@
   {
    "url": "https://pickdam.com/bathroom-mini/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
