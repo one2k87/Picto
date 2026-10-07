@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-06",
+  "updated_at": "2026-10-07",
   "search_console": {
     "queries": [
       {
@@ -33,6 +33,11 @@
         "impressions": 1
       },
       {
+        "query": "무드등과 스탠드 조명의 분위기 차이를 비교하고, 아늑한 거실이나 침실에 적합한 제품을 추천해줘",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
         "query": "비데 설치 비용",
         "clicks": 0,
         "impressions": 3
@@ -40,17 +45,12 @@
       {
         "query": "비데 설치비용",
         "clicks": 0,
-        "impressions": 5
+        "impressions": 6
       },
       {
         "query": "비데설치비용",
         "clicks": 0,
-        "impressions": 3
-      },
-      {
-        "query": "세탁기 구독 vs 무이자 할부 어떤 게 유리한가요?",
-        "clicks": 0,
-        "impressions": 3
+        "impressions": 4
       }
     ],
     "pages": [
@@ -67,12 +67,12 @@
       {
         "page": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
         "clicks": 1,
-        "impressions": 23
+        "impressions": 25
       },
       {
         "page": "https://pickdam.com/door-draft-stopper-guide-2026/",
         "clicks": 1,
-        "impressions": 42
+        "impressions": 46
       },
       {
         "page": "https://pickdam.com/kitchen-sliding-shelf-guide/",
@@ -82,7 +82,7 @@
       {
         "page": "https://pickdam.com/new-appliance-installment-plan-comparison/",
         "clicks": 1,
-        "impressions": 58
+        "impressions": 61
       },
       {
         "page": "https://pickdam.com/sample-page/",
@@ -92,7 +92,7 @@
       {
         "page": "https://pickdam.com/bedroom-lamp-guide/",
         "clicks": 0,
-        "impressions": 8
+        "impressions": 10
       },
       {
         "page": "https://pickdam.com/bidet-self-installation-check-valve/",
