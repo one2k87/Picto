@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>픽담 통계</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#f7f6f3; --surface:#fff; --line:#e3e0d9; --fg:#1d1b17; --muted:#6f6a60; --faint:#9a9488;
+  --brand:#2e9e6b; --brand-soft:#e8f4ee; --up:#15803d; --down:#b91c1c;
+  --grid:#ece9e3;
+  --fs:"IBM Plex Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --fm:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#171614; --surface:#201e1b; --line:#343129; --fg:#f0ede6; --muted:#a39d91; --faint:#7d7668;
+  --brand:#4ec08c; --brand-soft:#15271e; --up:#6ee7a0; --down:#fca5a5; --grid:#2b2823; color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--fs);line-height:1.6}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px 64px}
+header{padding:22px 0 10px;border-bottom:1px solid var(--line);margin-bottom:22px}
+h1{font-size:20px;font-weight:700;margin:0 0 3px;letter-spacing:-.01em}
+.sub{font-size:13px;color:var(--muted);margin:0}
+h2{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:34px 0 12px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.tile .lab{font-size:12px;color:var(--muted);margin-bottom:4px}
+.tile .val{font-family:var(--fm);font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1.15}
+.tile .d{font-size:12px;margin-top:3px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tile .d.up{color:var(--up)} .tile .d.down{color:var(--down)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 16px 8px;margin-bottom:12px}
+.card h3{font-size:14px;font-weight:600;margin:0 0 2px}
+.card .cap{font-size:12px;color:var(--muted);margin:0 0 10px}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.gl{stroke:var(--grid);stroke-width:1}
+.ax{font-family:var(--fm);font-size:10px;fill:var(--faint)}
+.ln{fill:none;stroke:var(--brand);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.ar{fill:var(--brand);opacity:.10}
+.dot{fill:var(--brand);stroke:var(--surface);stroke-width:2}
+.hit{fill:transparent;cursor:crosshair}
+.cross{stroke:var(--faint);stroke-width:1;stroke-dasharray:3 3}
+.tip{position:fixed;pointer-events:none;background:var(--surface);border:1px solid var(--line);
+  border-radius:8px;padding:7px 10px;font-size:12px;box-shadow:0 4px 14px rgba(0,0,0,.1);z-index:9;
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+td.n,th.n{text-align:right;font-family:var(--fm);font-variant-numeric:tabular-nums;white-space:nowrap}
+td a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+td a:hover{border-color:var(--brand);color:var(--brand)}
+.bar{height:4px;border-radius:99px;background:var(--brand);opacity:.35;margin-top:5px}
+.note{font-size:12.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);
+  border-left:3px solid var(--brand);border-radius:8px;padding:11px 13px;margin:14px 0 0}
+.note b{color:var(--fg)}
+.foot{margin-top:30px;font-size:12px;color:var(--faint)}
+.err{color:var(--down);font-size:13px}
+@media (max-width:520px){.tile .val{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>픽담 통계</h1>
+    <p class="sub" id="asof">불러오는 중…</p>
+  </header>
+
+  <h2>검색 유입 — 최근 28일</h2>
+  <div class="tiles" id="tiles"></div>
+
+  <h2>추이 — 최근 90일</h2>
+  <div id="charts"></div>
+
+  <h2>글별 성과</h2>
+  <div class="card" style="padding-bottom:16px"><div id="pages"></div></div>
+
+  <h2>들어온 검색어</h2>
+  <div class="card" style="padding-bottom:16px"><div id="queries"></div></div>
+
+  <h2>사이트 상태</h2>
+  <div class="tiles" id="health"></div>
+
+  <p class="note"><b>이 숫자는 구글 검색에서 들어온 것만</b>입니다. 워드프레스 자체에는 통계 기능이 없고,
+  픽담에는 방문자 분석 도구를 붙이지 않았습니다. 그래서 네이버·다음·직접 방문·유튜브 유입은 여기 안 잡힙니다.
+  전체 방문자 수가 필요하면 말씀해 주세요 — 붙이는 방법을 정리해 드리겠습니다.</p>
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const num = n => (n==null?"–":Number(n).toLocaleString("ko-KR"));
+const slug = u => { try{ return decodeURIComponent(new URL(u).pathname.replace(/^\/|\/$/g,"")) || "홈"; }catch(e){ return u; } };
+
+async function jget(p){ try{ const r=await fetch(p+"?t="+Date.now()); return r.ok? await r.json():null; }catch(e){ return null; } }
+
+function tile(lab,val,delta,unit){
+  let d="";
+  if(delta!=null && isFinite(delta)){
+    const cls = delta>0?"up":(delta<0?"down":"");
+    const sign = delta>0?"▲":(delta<0?"▼":"–");
+    d = `<div class="d ${cls}">${sign} ${Math.abs(delta).toLocaleString("ko-KR")} <span style="color:var(--faint)">직전 28일 대비</span></div>`;
+  }
+  return `<div class="tile"><div class="lab">${lab}</div><div class="val">${val}${unit||""}</div>${d}</div>`;
+}
+
+// 선 그래프 하나 = 계열 하나. 축이 다른 두 수치를 한 그림에 겹치지 않는다.
+function lineChart(el, rows, key, title, cap){
+  if(!rows || rows.length<2){ el.insertAdjacentHTML("beforeend",
+    `<div class="card"><h3>${title}</h3><p class="cap">데이터가 아직 쌓이지 않았습니다.</p></div>`); return; }
+  const W=820,H=170,PL=40,PR=12,PT=14,PB=24;
+  const xs=rows.map((_,i)=>i), ys=rows.map(r=>r[key]||0);
+  const ymax=Math.max(3,...ys), yNice=Math.ceil(ymax/3)*3||3;
+  const X=i=>PL+(W-PL-PR)*(rows.length<2?0:i/(rows.length-1));
+  const Y=v=>PT+(H-PT-PB)*(1-(v/yNice));
+  const d=rows.map((r,i)=>`${i?"L":"M"}${X(i).toFixed(1)},${Y(r[key]||0).toFixed(1)}`).join("");
+  const area=`${d}L${X(rows.length-1).toFixed(1)},${Y(0)}L${X(0).toFixed(1)},${Y(0)}Z`;
+  const ticks=[0,yNice/3,yNice*2/3,yNice].map(v=>Math.round(v));
+  const xi=[0,Math.floor(rows.length/2),rows.length-1];
+  const grid=ticks.map(v=>`<line class="gl" x1="${PL}" y1="${Y(v)}" x2="${W-PR}" y2="${Y(v)}"/>
+      <text class="ax" x="${PL-7}" y="${Y(v)+3}" text-anchor="end">${v}</text>`).join("");
+  const xlab=xi.map(i=>`<text class="ax" x="${X(i)}" y="${H-6}" text-anchor="${i===0?'start':(i===rows.length-1?'end':'middle')}">${(rows[i].date||"").slice(5)}</text>`).join("");
+  el.insertAdjacentHTML("beforeend",
+   `<div class="card"><h3>${title}</h3><p class="cap">${cap}</p>
+     <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title} 추이">
+      ${grid}<path class="ar" d="${area}"/><path class="ln" d="${d}"/>
+      <line class="cross" id="cx_${key}" x1="0" y1="${PT}" x2="0" y2="${H-PB}" style="display:none"/>
+      <circle class="dot" id="dt_${key}" r="4" style="display:none"/>
+      <rect class="hit" id="ht_${key}" x="${PL}" y="${PT}" width="${W-PL-PR}" height="${H-PT-PB}"/>
+      ${xlab}
+     </svg></div>`);
+  const hit=document.getElementById("ht_"+key), cx=document.getElementById("cx_"+key), dt=document.getElementById("dt_"+key);
+  let tip=null;
+  const move=ev=>{
+    const r=hit.getBoundingClientRect();
+    const t=Math.min(1,Math.max(0,(ev.clientX-r.left)/r.width));
+    const i=Math.round(t*(rows.length-1)), row=rows[i];
+    cx.style.display=dt.style.display="";
+    cx.setAttribute("x1",X(i)); cx.setAttribute("x2",X(i));
+    dt.setAttribute("cx",X(i)); dt.setAttribute("cy",Y(row[key]||0));
+    if(!tip){ tip=document.createElement("div"); tip.className="tip"; document.body.appendChild(tip); }
+    tip.textContent=`${row.date} · ${num(row[key])}`;
+    tip.style.left=Math.min(window.innerWidth-140,ev.clientX+12)+"px";
+    tip.style.top=(ev.clientY-34)+"px";
+  };
+  const out=()=>{ cx.style.display=dt.style.display="none"; if(tip){tip.remove();tip=null;} };
+  hit.addEventListener("mousemove",move); hit.addEventListener("mouseleave",out);
+  hit.addEventListener("touchmove",e=>{ if(e.touches[0]) move(e.touches[0]); },{passive:true});
+  hit.addEventListener("touchend",out);
+}
+
+function table(el, rows, cols){
+  if(!rows.length){ el.innerHTML='<p class="cap">아직 데이터가 없습니다.</p>'; return; }
+  const max=Math.max(...rows.map(r=>r.impressions||0),1);
+  el.innerHTML = `<table><thead><tr>${cols.map(c=>`<th class="${c.n?'n':''}">${c.h}</th>`).join("")}</tr></thead>
+    <tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td class="${c.n?'n':''}">${c.f(r,max)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+
+(async ()=>{
+  const [ins,idx,chk,st] = await Promise.all([
+    jget("data/insights.json"), jget("data/index_status.json"),
+    jget("data/site_check.json"), jget("data/status.json")]);
+  const sc = (ins||{}).search_console || {};
+  const T = sc.totals || {}, d28 = T.d28 || {}, prev = T.prev28 || {};
+  $("#asof").textContent = `구글 서치콘솔 기준 · ${(ins||{}).updated_at || "-"} 갱신`
+    + (sc.range ? ` · 집계 ${sc.range.start} ~ ${sc.range.end}` : "");
+
+  const have = d28.impressions != null;
+  const sumP = (k)=> (sc.pages||[]).reduce((a,b)=>a+(b[k]||0),0);
+  const clicks = have ? d28.clicks : sumP("clicks");
+  const imps   = have ? d28.impressions : sumP("impressions");
+  const dC = have && prev.clicks!=null ? clicks-prev.clicks : null;
+  const dI = have && prev.impressions!=null ? imps-prev.impressions : null;
+  $("#tiles").innerHTML =
+      tile("클릭", num(clicks), dC)
+    + tile("노출", num(imps), dI)
+    + tile("클릭률", have? d28.ctr : (imps? Math.round(clicks/imps*1000)/10 : 0), null, "%")
+    + tile("평균 순위", have? d28.position : "–", null, have?"위":"");
+  if(!have) $("#tiles").insertAdjacentHTML("beforeend",
+    '<div class="tile" style="grid-column:1/-1"><div class="lab">알림</div>'
+    + '<div style="font-size:13px">합계·추이는 다음 아침 점검부터 쌓입니다. 지금 보이는 숫자는 상위 글들의 합입니다.</div></div>');
+
+  const daily = sc.daily || [];
+  lineChart($("#charts"), daily, "impressions", "노출", "검색결과에 우리 글이 보인 횟수");
+  lineChart($("#charts"), daily, "clicks", "클릭", "실제로 눌러서 들어온 횟수");
+
+  const pages = (sc.pages||[]).slice().sort((a,b)=>b.impressions-a.impressions);
+  table($("#pages"), pages, [
+    {h:"글", f:r=>`<a href="${r.page}" target="_blank" rel="noopener">${slug(r.page)}</a>`},
+    {h:"클릭", n:1, f:r=>num(r.clicks)},
+    {h:"노출", n:1, f:(r,m)=>`${num(r.impressions)}<div class="bar" style="width:${Math.round(r.impressions/m*100)}%"></div>`},
+    {h:"순위", n:1, f:r=>r.position!=null? r.position : "–"},
+  ]);
+  const qs = (sc.queries||[]).slice().sort((a,b)=>b.impressions-a.impressions);
+  table($("#queries"), qs, [
+    {h:"검색어", f:r=>r.query},
+    {h:"클릭", n:1, f:r=>num(r.clicks)},
+    {h:"노출", n:1, f:(r,m)=>`${num(r.impressions)}<div class="bar" style="width:${Math.round(r.impressions/Math.max(...qs.map(x=>x.impressions),1)*100)}%"></div>`},
+  ]);
+
+  const sm = (chk||{}).sitemap || {}, lc = (chk||{}).link_coverage || {};
+  $("#health").innerHTML =
+      tile("발행 글", num((chk||{}).n))
+    + tile("구글 색인", `${num((idx||{}).indexed)} / ${num((idx||{}).checked)}`)
+    + tile("사이트맵", sm.urls!=null? `${num(sm.urls)} / ${num((sm.posts||0)+1)}` : "–")
+    + tile("쿠팡 링크", lc.of? `${num(lc.linked)} / ${num(lc.of)}` : "–");
+  const lr = (st||{}).last_run || {};
+  $("#foot").textContent = `아침 점검 ${(chk||{}).at||"-"} · 마지막 발행 실행 ${lr.at||"-"}`
+    + (lr.published!=null? ` (발행 ${lr.published} · 폐기 ${lr.held||0})` : "");
+})();
+</script>
+</body>
+</html>

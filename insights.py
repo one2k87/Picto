@@ -73,7 +73,7 @@ def _sc_forms(site):
     return out
 
 
-def search_console(cfg, creds, days=28, top=10):
+def search_console(cfg, creds, days=28, top=25):
     site = cfg.get("sc_site_url")
     if not site:
         print("[insights] Search Console 건너뜀: sc_site_url 이 비어 있다"
@@ -95,9 +95,50 @@ def search_console(cfg, creds, days=28, top=10):
             body["dimensions"] = ["page"]
             p = svc.searchanalytics().query(siteUrl=form, body=body).execute()
             pages = [{"page": r["keys"][0], "clicks": r.get("clicks", 0),
-                      "impressions": r.get("impressions", 0)} for r in p.get("rows", [])]
-            print(f"[insights] Search Console({form}): 검색어 {len(queries)} · 페이지 {len(pages)}")
-            return {"queries": queries, "pages": pages, "site_form": form}
+                      "impressions": r.get("impressions", 0),
+                      "ctr": round(r.get("ctr", 0) * 100, 2),
+                      "position": round(r.get("position", 0), 1)} for r in p.get("rows", [])]
+
+            # 합계와 일자별 추이 (2026-10-07 추가).
+            # 왜: 지금까지 상위 10줄만 저장해서 '사이트 전체가 늘고 있나'를 볼 수가 없었다.
+            # 사용자가 워드프레스에서 통계를 찾다가 못 찾은 것도 같은 구멍이다.
+            def _tot(d0, d1):
+                try:
+                    r = svc.searchanalytics().query(siteUrl=form, body={
+                        "startDate": d0.isoformat(), "endDate": d1.isoformat(),
+                        "dimensions": []}).execute()
+                    rows = r.get("rows", [])
+                    if not rows:
+                        return {"clicks": 0, "impressions": 0, "ctr": 0, "position": 0}
+                    x = rows[0]
+                    return {"clicks": int(x.get("clicks", 0)),
+                            "impressions": int(x.get("impressions", 0)),
+                            "ctr": round(x.get("ctr", 0) * 100, 2),
+                            "position": round(x.get("position", 0), 1)}
+                except Exception:
+                    return {}
+
+            daily = []
+            try:
+                d90 = end - timedelta(days=90)
+                r = svc.searchanalytics().query(siteUrl=form, body={
+                    "startDate": d90.isoformat(), "endDate": end.isoformat(),
+                    "dimensions": ["date"], "rowLimit": 200}).execute()
+                daily = [{"date": x["keys"][0], "clicks": int(x.get("clicks", 0)),
+                          "impressions": int(x.get("impressions", 0))}
+                         for x in r.get("rows", [])]
+            except Exception as e:
+                print(f"[insights] 일자별 추이 건너뜀: {str(e)[:60]}")
+
+            totals = {"d28": _tot(start, end),
+                      "d90": _tot(end - timedelta(days=90), end),
+                      "prev28": _tot(start - timedelta(days=days), start - timedelta(days=1))}
+            print(f"[insights] Search Console({form}): 검색어 {len(queries)} · 페이지 {len(pages)}"
+                  f" · 28일 클릭 {totals['d28'].get('clicks')} 노출 {totals['d28'].get('impressions')}"
+                  f" · 일자 {len(daily)}일")
+            return {"queries": queries, "pages": pages, "site_form": form,
+                    "totals": totals, "daily": daily,
+                    "range": {"start": start.isoformat(), "end": end.isoformat(), "days": days}}
         except Exception as e:
             last = f"{form} → {str(e)[:110]}"
             continue
