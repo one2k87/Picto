@@ -51,60 +51,393 @@
         "query": "비데설치비용",
         "clicks": 0,
         "impressions": 4
+      },
+      {
+        "query": "세탁기 구독 vs 무이자 할부 어떤 게 유리한가요?",
+        "clicks": 0,
+        "impressions": 3
+      },
+      {
+        "query": "원룸 비데 설치",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
+        "query": "이 원고에 사용할 실제 이미지들을 10장 이상 찾아서 가져와 보여주세요",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
+        "query": "침실 무드등 추천해줘",
+        "clicks": 0,
+        "impressions": 1
       }
     ],
     "pages": [
       {
         "page": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
         "clicks": 4,
-        "impressions": 134
+        "impressions": 134,
+        "ctr": 2.99,
+        "position": 6.2
       },
       {
         "page": "https://pickdam.com/",
         "clicks": 1,
-        "impressions": 4
+        "impressions": 4,
+        "ctr": 25.0,
+        "position": 1
       },
       {
         "page": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
         "clicks": 1,
-        "impressions": 25
+        "impressions": 25,
+        "ctr": 4.0,
+        "position": 19.4
       },
       {
         "page": "https://pickdam.com/door-draft-stopper-guide-2026/",
         "clicks": 1,
-        "impressions": 46
+        "impressions": 46,
+        "ctr": 2.17,
+        "position": 5.9
       },
       {
         "page": "https://pickdam.com/kitchen-sliding-shelf-guide/",
         "clicks": 1,
-        "impressions": 9
+        "impressions": 9,
+        "ctr": 11.11,
+        "position": 7.2
       },
       {
         "page": "https://pickdam.com/new-appliance-installment-plan-comparison/",
         "clicks": 1,
-        "impressions": 61
+        "impressions": 61,
+        "ctr": 1.64,
+        "position": 11.2
       },
       {
         "page": "https://pickdam.com/sample-page/",
         "clicks": 1,
-        "impressions": 7
+        "impressions": 7,
+        "ctr": 14.29,
+        "position": 17.1
       },
       {
         "page": "https://pickdam.com/bedroom-lamp-guide/",
         "clicks": 0,
-        "impressions": 10
+        "impressions": 10,
+        "ctr": 0,
+        "position": 36.3
       },
       {
         "page": "https://pickdam.com/bidet-self-installation-check-valve/",
         "clicks": 0,
-        "impressions": 20
+        "impressions": 20,
+        "ctr": 0,
+        "position": 7.5
       },
       {
         "page": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
         "clicks": 0,
-        "impressions": 8
+        "impressions": 8,
+        "ctr": 0,
+        "position": 12.5
+      },
+      {
+        "page": "https://pickdam.com/car-air-purifier-choice/",
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 2
+      },
+      {
+        "page": "https://pickdam.com/entrance/",
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 6.7
+      },
+      {
+        "page": "https://pickdam.com/folding-bluetooth-keyboard-fix/",
+        "clicks": 0,
+        "impressions": 5,
+        "ctr": 0,
+        "position": 7.8
+      },
+      {
+        "page": "https://pickdam.com/food-waste-disposer-rental-cancellation-fee/",
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 7.3
+      },
+      {
+        "page": "https://pickdam.com/hello-world/",
+        "clicks": 0,
+        "impressions": 7,
+        "ctr": 0,
+        "position": 7
+      },
+      {
+        "page": "https://pickdam.com/moving-cleaning-quote-cost-comparison-2026/",
+        "clicks": 0,
+        "impressions": 8,
+        "ctr": 0,
+        "position": 5.2
+      },
+      {
+        "page": "https://pickdam.com/moving-packing-cost-conditions/",
+        "clicks": 0,
+        "impressions": 2,
+        "ctr": 0,
+        "position": 5
+      },
+      {
+        "page": "https://pickdam.com/new-apartment-system-aircon-guide-2026/",
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 6.7
+      },
+      {
+        "page": "https://pickdam.com/new-apartment-system-appliance-guide-2026-september/",
+        "clicks": 0,
+        "impressions": 10,
+        "ctr": 0,
+        "position": 7.3
+      },
+      {
+        "page": "https://pickdam.com/one-person-food-disposer-install/",
+        "clicks": 0,
+        "impressions": 3,
+        "ctr": 0,
+        "position": 6.3
+      },
+      {
+        "page": "https://pickdam.com/washer-filter-cleaning-guide/",
+        "clicks": 0,
+        "impressions": 15,
+        "ctr": 0,
+        "position": 8.1
+      },
+      {
+        "page": "https://pickdam.com/water-purifier-filter-replacement-guide-2026/",
+        "clicks": 0,
+        "impressions": 20,
+        "ctr": 0,
+        "position": 6.8
+      },
+      {
+        "page": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
+        "clicks": 0,
+        "impressions": 17,
+        "ctr": 0,
+        "position": 5.4
       }
     ],
-    "site_form": "sc-domain:pickdam.com"
+    "site_form": "sc-domain:pickdam.com",
+    "totals": {
+      "d28": {
+        "clicks": 10,
+        "impressions": 403,
+        "ctr": 2.48,
+        "position": 9.0
+      },
+      "d90": {
+        "clicks": 10,
+        "impressions": 404,
+        "ctr": 2.48,
+        "position": 9
+      },
+      "prev28": {
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
+      }
+    },
+    "daily": [
+      {
+        "date": "2026-08-31",
+        "clicks": 0,
+        "impressions": 0
+      },
+      {
+        "date": "2026-09-01",
+        "clicks": 0,
+        "impressions": 0
+      },
+      {
+        "date": "2026-09-02",
+        "clicks": 0,
+        "impressions": 0
+      },
+      {
+        "date": "2026-09-03",
+        "clicks": 0,
+        "impressions": 0
+      },
+      {
+        "date": "2026-09-04",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
+        "date": "2026-09-05",
+        "clicks": 0,
+        "impressions": 0
+      },
+      {
+        "date": "2026-09-06",
+        "clicks": 0,
+        "impressions": 0
+      },
+      {
+        "date": "2026-09-07",
+        "clicks": 0,
+        "impressions": 0
+      },
+      {
+        "date": "2026-09-08",
+        "clicks": 0,
+        "impressions": 0
+      },
+      {
+        "date": "2026-09-09",
+        "clicks": 1,
+        "impressions": 6
+      },
+      {
+        "date": "2026-09-10",
+        "clicks": 0,
+        "impressions": 2
+      },
+      {
+        "date": "2026-09-11",
+        "clicks": 0,
+        "impressions": 17
+      },
+      {
+        "date": "2026-09-12",
+        "clicks": 2,
+        "impressions": 25
+      },
+      {
+        "date": "2026-09-13",
+        "clicks": 1,
+        "impressions": 41
+      },
+      {
+        "date": "2026-09-14",
+        "clicks": 0,
+        "impressions": 33
+      },
+      {
+        "date": "2026-09-15",
+        "clicks": 0,
+        "impressions": 33
+      },
+      {
+        "date": "2026-09-16",
+        "clicks": 1,
+        "impressions": 20
+      },
+      {
+        "date": "2026-09-17",
+        "clicks": 2,
+        "impressions": 11
+      },
+      {
+        "date": "2026-09-18",
+        "clicks": 0,
+        "impressions": 13
+      },
+      {
+        "date": "2026-09-19",
+        "clicks": 0,
+        "impressions": 12
+      },
+      {
+        "date": "2026-09-20",
+        "clicks": 0,
+        "impressions": 28
+      },
+      {
+        "date": "2026-09-21",
+        "clicks": 0,
+        "impressions": 25
+      },
+      {
+        "date": "2026-09-22",
+        "clicks": 1,
+        "impressions": 18
+      },
+      {
+        "date": "2026-09-23",
+        "clicks": 0,
+        "impressions": 7
+      },
+      {
+        "date": "2026-09-24",
+        "clicks": 0,
+        "impressions": 5
+      },
+      {
+        "date": "2026-09-25",
+        "clicks": 0,
+        "impressions": 3
+      },
+      {
+        "date": "2026-09-26",
+        "clicks": 0,
+        "impressions": 3
+      },
+      {
+        "date": "2026-09-27",
+        "clicks": 0,
+        "impressions": 7
+      },
+      {
+        "date": "2026-09-28",
+        "clicks": 0,
+        "impressions": 3
+      },
+      {
+        "date": "2026-09-29",
+        "clicks": 0,
+        "impressions": 15
+      },
+      {
+        "date": "2026-09-30",
+        "clicks": 1,
+        "impressions": 11
+      },
+      {
+        "date": "2026-10-01",
+        "clicks": 0,
+        "impressions": 12
+      },
+      {
+        "date": "2026-10-02",
+        "clicks": 0,
+        "impressions": 8
+      },
+      {
+        "date": "2026-10-03",
+        "clicks": 1,
+        "impressions": 23
+      },
+      {
+        "date": "2026-10-04",
+        "clicks": 0,
+        "impressions": 22
+      }
+    ],
+    "range": {
+      "start": "2026-09-07",
+      "end": "2026-10-05",
+      "days": 28
+    }
   }
 }

@@ -1,14 +1,16 @@
 {
-  "updated": "2026-10-05 00:35",
-  "next_review": "2026-10-12",
-  "data_status": "partial",
-  "verdict": "실적이 붙은 글이 9편뿐이라 판단을 보류하고 기본 계획을 유지합니다.",
-  "matched_posts": 9,
+  "updated": "2026-10-07 06:18",
+  "next_review": "2026-10-14",
+  "data_status": "ok",
+  "verdict": "실측 데이터로 조정했습니다. revenue 80% · evergreen 20%",
+  "matched_posts": 20,
   "intent_ratio": {
-    "revenue": 0.6,
-    "evergreen": 0.4
+    "revenue": 0.8,
+    "evergreen": 0.2
   },
-  "category_weights": {},
+  "category_weights": {
+    "생활·주방": 1.0
+  },
   "weekday_plan": {
     "0": {
       "label": "월",
@@ -17,18 +19,18 @@
     },
     "1": {
       "label": "화",
-      "revenue": 2,
-      "evergreen": 3
-    },
-    "2": {
-      "label": "수",
       "revenue": 3,
       "evergreen": 2
     },
+    "2": {
+      "label": "수",
+      "revenue": 4,
+      "evergreen": 1
+    },
     "3": {
       "label": "목",
-      "revenue": 2,
-      "evergreen": 3
+      "revenue": 3,
+      "evergreen": 2
     },
     "4": {
       "label": "금",
@@ -61,26 +63,27 @@
       "intent": "revenue",
       "posts": 17,
       "clicks": 7,
-      "impressions": 221,
-      "scored": 6,
+      "impressions": 265,
+      "scored": 10,
       "est_value": 7.0,
       "value_per_post": 0.41,
-      "ctr": 3.17
+      "ctr": 2.64
     },
     {
       "category": "생활·주방",
       "intent": "evergreen",
-      "posts": 18,
-      "clicks": 1,
-      "impressions": 31,
-      "scored": 3,
-      "est_value": 0.6,
-      "value_per_post": 0.03,
-      "ctr": 3.23
+      "posts": 19,
+      "clicks": 2,
+      "impressions": 97,
+      "scored": 10,
+      "est_value": 1.1,
+      "value_per_post": 0.06,
+      "ctr": 2.06
     }
   ],
   "actions": [
-    "노출은 있는데 클릭이 0인 검색어 6건 — 해당 글 제목을 다시 쓰세요."
+    "노출은 있는데 클릭이 0인 검색어 6건 — 해당 글 제목을 다시 쓰세요.",
+    "수익형 비중이 높습니다. 누적형을 최소 20%는 유지해 트래픽 기반을 지키세요."
   ],
   "note": "글별 수익은 애드센스 API로 조회할 수 없어 '클릭 × 의도별 RPM 배수'로 추정한 값입니다."
 }
