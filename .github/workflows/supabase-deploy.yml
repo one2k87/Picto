@@ -20,7 +20,10 @@ on:
     paths:
       - "supabase/migrations/**"
       - "supabase/config.toml"
-      - ".github/workflows/supabase-deploy.yml"
+      # 이 워크플로 파일 자신은 트리거에서 뺐다(2026-10-08).
+      # 잡에 timeout-minutes 를 추가한 것만으로 '스키마 배포'가 돌았고,
+      # 픽담은 Supabase 시크릿을 등록한 적이 없어 바로 실패 메일이 나갔다.
+      # 배포는 '마이그레이션이 실제로 바뀌었을 때'만 돌아야 한다.
   workflow_dispatch: {}
 
 jobs:
