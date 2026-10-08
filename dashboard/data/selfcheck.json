@@ -1,6 +1,6 @@
 {
- "at": "2026-10-08T10:38:52",
- "posts": 36,
+ "at": "2026-10-08T11:06:58",
+ "posts": 38,
  "pass": 9,
  "fail": 2,
  "checks": [
@@ -8,7 +8,7 @@
    "key": "sitemap",
    "title": "사이트맵이 모든 글을 담고 있는가",
    "ok": true,
-   "evidence": "사이트맵 37개 · 발행 36편 · 누락 0",
+   "evidence": "사이트맵 39개 · 발행 38편 · 누락 0",
    "fix": "",
    "fix_by": "user"
   },
@@ -32,7 +32,7 @@
    "key": "cards",
    "title": "상품 카드가 글마다 하나인가",
    "ok": true,
-   "evidence": "36편 전부 카드 1개 이하",
+   "evidence": "38편 전부 카드 1개 이하",
    "fix": "",
    "fix_by": "auto"
   },
@@ -40,8 +40,8 @@
    "key": "index",
    "title": "색인 검사가 모든 글을 보고 있는가",
    "ok": false,
-   "evidence": "발행 36편 중 30편만 검사됐습니다 (색인 22) — 상한에 걸렸습니다",
-   "fix": "inspect_recent 의 하루 상한을 올리거나 이틀에 나눠 검사",
+   "evidence": "색인 28/38 (74%)",
+   "fix": "미색인 글에 내부링크 보강 + 사이트맵 확인",
    "fix_by": "auto"
   },
   {
@@ -72,7 +72,7 @@
    "key": "disclosure",
    "title": "대가성 고지가 모든 글에 있는가",
    "ok": true,
-   "evidence": "36편 전부 보유",
+   "evidence": "38편 전부 보유",
    "fix": "",
    "fix_by": "auto"
   },
@@ -88,7 +88,7 @@
    "key": "silent_errors",
    "title": "매일 실행에 조용히 죽은 단계가 없는가",
    "ok": true,
-   "evidence": "로그를 못 받았습니다 (HTTP 404) — 권한 actions:read 확인",
+   "evidence": "마지막 실행(2026-10-08T11:04) 로그 115줄에 예외 흔적 없음",
    "fix": "",
    "fix_by": "me"
   }
