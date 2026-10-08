@@ -62,16 +62,31 @@ def main():
         return 0
     print(f"패치 파일 {len(files)}개 · dry_run={dry}")
 
-    done, skipped, failed = [], [], []
+    # 한 파일에 패치를 여러 개 담을 수 있다(배열). 같은 성격의 수정 10여 건을
+    # 파일 10여 개로 쪼개지 않기 위해 2026-10-08 추가.
+    jobs = []
     for path in files:
-        name = os.path.basename(path)
         try:
-            p = json.load(open(path, encoding="utf-8"))
+            doc = json.load(open(path, encoding="utf-8"))
+        except Exception as e:
+            print(f"  실패: {os.path.basename(path)}({str(e)[:60]})")
+            continue
+        items = doc if isinstance(doc, list) else [doc]
+        for i, it in enumerate(items):
+            label = os.path.basename(path) + (f"[{i}]" if len(items) > 1 else "")
+            jobs.append((label, it))
+
+    done, skipped, failed = [], [], []
+    for name, p in jobs:
+        try:
             pid = int(p["post_id"])
             mark = (p.get("marker") or "").strip()
             block = p.get("html") or ""
-            if not mark or not block:
-                failed.append(f"{name}(marker/html 누락)")
+            if block and not mark:
+                failed.append(f"{name}(html 이 있는데 marker 가 없음 — 재실행 안전장치 필수)")
+                continue
+            if not block and not (p.get("meta") or p.get("replace") or p.get("title")):
+                failed.append(f"{name}(고칠 내용이 없음)")
                 continue
 
             r = requests.get(f"{base}/wp-json/wp/v2/posts/{pid}", headers=headers,
@@ -101,6 +116,24 @@ def main():
             elif meta:
                 print(f"    메타 {len(meta)}건 (dry_run — 저장 안 함): {list(meta)}")
 
+            # 글 제목(H1) 교체. 주소(slug)는 건드리지 않는다 — 색인된 주소가 바뀌면
+            # 그동안 쌓인 신호가 날아간다. 제목에 박힌 연·월처럼 시간이 지나면
+            # 역효과가 되는 표현을 걷어내는 용도다.
+            new_title = (p.get("title") or "").strip()
+            if new_title:
+                cur_title = (r.json().get("title") or {}).get("raw") or ""
+                if cur_title.strip() == new_title:
+                    print("    제목 이미 동일")
+                elif dry:
+                    print(f"    제목 (dry_run): {cur_title[:30]} → {new_title[:30]}")
+                else:
+                    rt = requests.post(f"{base}/wp-json/wp/v2/posts/{pid}", headers=headers,
+                                       json={"title": new_title}, timeout=30)
+                    if rt.status_code in (200, 201):
+                        print(f"    제목 교체: {cur_title[:26]} → {new_title[:26]}")
+                    else:
+                        failed.append(f"{name}(제목 HTTP {rt.status_code})")
+
             # 본문 안의 낡은 문자열 치환(깨진 링크 교체 등). marker 와 독립적으로 돌고,
             # 바꿀 게 없으면 조용히 지나간다.
             rep = p.get("replace") or []
@@ -122,6 +155,9 @@ def main():
                 else:
                     print("    치환 대상 없음")
 
+            if not block:
+                done.append(f"#{pid} {name}(메타·제목·치환만)")
+                continue
             if mark in raw:
                 skipped.append(f"{name}(이미 적용됨)")
                 continue
