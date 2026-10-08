@@ -359,8 +359,14 @@ def _silent(ctx):
         if not runs:
             return True, "최근 완료된 자동 생성 실행이 없습니다", ""
         run = runs[0]
-        z = requests.get(f"https://api.github.com/repos/{repo}/actions/runs/{run['id']}/logs",
-                         headers=h, timeout=60)
+        # 로그는 서명된 외부 주소로 리다이렉트된다. Authorization 헤더를 그대로
+        # 따라 보내면 그쪽이 거부한다(실측 404) — 주소만 받아서 헤더 없이 받는다.
+        z0 = requests.get(f"https://api.github.com/repos/{repo}/actions/runs/{run['id']}/logs",
+                          headers=h, timeout=30, allow_redirects=False)
+        if z0.status_code in (301, 302, 307, 308) and z0.headers.get("Location"):
+            z = requests.get(z0.headers["Location"], timeout=60)
+        else:
+            z = z0
         if not z.ok:
             return True, f"로그를 못 받았습니다 (HTTP {z.status_code}) — 권한 actions:read 확인", ""
         import io as _io
