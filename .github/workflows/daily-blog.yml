@@ -77,6 +77,9 @@ permissions:
 jobs:
   generate:
     runs-on: ubuntu-latest
+    # 한 단계가 멈추면 잡이 기본 6시간까지 매달려 있고, 그날 발행은 조용히 0편이 된다.
+    # 2026-10-08 실측: 보통 14초 걸리는 폰트 설치가 11분 넘게 멈췄다(apt 미러 지연).
+    timeout-minutes: 40
     # 러너 기본 시간대는 UTC다. 그런데 이 블로그는 '한국 하루 1편'으로 운영되고
     # 발행은 06:47 KST = 전날 21:47 UTC에 일어난다. 아래 '중복 실행 가드'가
     # UTC 날짜로 비교하던 탓에, 한국 낮에 수동 실행하면 그 다음 날 아침 자동
@@ -91,7 +94,11 @@ jobs:
         with:
           python-version: "3.11"
 
+      # 코드 썸네일에만 쓰는 폰트다. 설치가 늦거나 실패해도 발행을 막아선 안 된다.
+      # (2026-10-08: apt 미러가 멈춰 이 단계에서 실행 전체가 잠겼다)
       - name: 한글 폰트 설치 (코드 썸네일용)
+        timeout-minutes: 3
+        continue-on-error: true
         run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
 
       - name: 의존성 설치
