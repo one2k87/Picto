@@ -198,6 +198,42 @@ def _restore_leading_number(cand, long_title):
     return (m.group(1) + cand) if m else cand
 
 
+# ── 연·월 도장 제거 (2026-10-08) ─────────────────────────────────
+# 왜: 발행 36편 중 11편의 메타 설명이 「2026년 9월 기준,」으로 시작했고, 제목에
+#     연·월이 박힌 글도 3편 있었다(실측). 한국어 검색결과 설명은 앞 80자 정도만
+#     보이는데 그 앞 10여 자를 날짜가 먹는다. 게다가 달이 바뀌면 '지난달 기준'으로
+#     읽혀 오히려 신선도를 깎는다. 신선도는 본문의 「최종 업데이트」가 맡는다.
+# 프롬프트로 부탁하는 건 샌다 — 내보내기 직전에 기계적으로 걷어낸다.
+_STAMP_RE = re.compile(r"^\s*20\d\d\s*년\s*\d{1,2}\s*월(?:\s*\d{1,2}\s*일)?"
+                       r"(?:\s*기준)?\s*[,·:\-–—]?\s*")
+# 날짜가 장식이 아니라 사실의 일부인 말들 — 이 뒤에 오면 날짜를 남긴다.
+# (「2026년 10월 시행 전기요금 개편」에서 날짜를 떼면 글이 거짓이 된다)
+_STAMP_KEEP = ("시행", "개정", "신설", "폐지", "출시", "인상", "인하", "종료",
+               "마감", "적용", "발표", "개편", "변경", "도입")
+# 문중 도장은 '시간 틀'로 쓰인 것만 지운다 — 「2026년 9월에는」·「2026년 9월 기준」.
+# 「2026년 9월 시행」처럼 날짜가 사실의 일부인 경우는 남긴다.
+_STAMP_MID = re.compile(r"\s*20\d\d\s*년\s*\d{1,2}\s*월\s*(?:에는|에|의|기준)\s*")
+
+
+def _destale(text, keep_mid=False):
+    """앞머리의 '2026년 9월 기준,' 류를 지운다. keep_mid=False 면 문중의
+    '… 중 2026년 9월에는 …' 같은 도장도 지운다(제목·검색제목용)."""
+    t = (text or "").strip()
+    if not t:
+        return t
+    m = _STAMP_RE.match(t)
+    if m:
+        rest = t[m.end():].lstrip()
+        if not rest.startswith(_STAMP_KEEP):
+            t = rest
+    if not keep_mid:
+        t = _STAMP_MID.sub(" ", t).strip()
+    t = re.sub(r"\s{2,}", " ", t)
+    t = re.sub(r"^[,·:\-–—]\s*", "", t)
+    t = re.sub(r"[,·]\s*$", "", t)
+    return t.strip()
+
+
 def _seo_title(cand, keyword, long_title):
     """모델이 준 짧은 제목을 검증하고, 못 쓰면 본문 제목에서 깎아 만든다."""
     cand = re.sub(r"\s+", " ", (cand or "")).strip(" -–—·|")
@@ -1177,6 +1213,7 @@ def _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,
     if _bad:
         # 폴백 제목도 상투어를 쓰지 않는다(품질 게이트가 잡는 표현이므로)
         title = f"{keyword}, 신청 전에 확인해야 할 조건"
+    title = _destale(title) or title
     data["title"] = title
     slug = make_slug((data.get("slug") or "").strip(), title,
                      data.get("focus_keyword") or keyword)
@@ -1186,9 +1223,11 @@ def _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,
     return {
         "keyword": keyword, "kind": kind, "lang": "ko", "category": category,
         "title": data.get("title") or keyword,
-        "meta": (data.get("meta") or "").strip() or _meta_from_html(full_html, title),
+        "meta": _destale((data.get("meta") or "").strip() or _meta_from_html(full_html, title),
+                         keep_mid=True),
         "slug": slug,
-        "seo_title": _seo_title(data.get("seo_title"), data.get("focus_keyword") or keyword, title),
+        "seo_title": _destale(_seo_title(data.get("seo_title"),
+                                         data.get("focus_keyword") or keyword, title)),
         "focus_keyword": data.get("focus_keyword", keyword),
         "tags": data.get("tags", []), "faqs": data.get("faqs", []),
         "kokpick": data.get("kokpick") if isinstance(data.get("kokpick"), dict) else {},
