@@ -118,19 +118,27 @@ def _links(ctx):
                     for m in re.findall(r"link\.coupang\.com/a/(\w+)", p["content"]["rendered"])})
     if not codes:
         return False, "본문에 쿠팡 링크가 하나도 없습니다", ""
-    bad = []
+    # 간편 링크(검색결과·기획전)는 /vp/products/ 로 가지 않는 게 정상이다.
+    # 2026-10-08 첫 가동에서 간편 링크 6개를 '깨짐'으로 잘못 잡았다 — 쿠팡 안으로
+    # 가기만 하면 통과로 본다. 진짜 고장은 리다이렉트가 없거나 쿠팡 밖으로 나가는 것.
+    bad, kinds = [], {"상품": 0, "검색·기획전": 0}
     for c in codes:
         try:
             r = requests.get(f"https://link.coupang.com/a/{c}", headers=UA,
                              allow_redirects=False, timeout=20)
-            if "/vp/products/" not in (r.headers.get("Location") or ""):
+            loc = r.headers.get("Location") or ""
+            if "/vp/products/" in loc:
+                kinds["상품"] += 1
+            elif "coupang.com" in loc:
+                kinds["검색·기획전"] += 1
+            else:
                 bad.append(c)
         except Exception:
             bad.append(c)
     if bad:
-        return False, f"{len(bad)}/{len(codes)}개가 상품으로 안 갑니다: {', '.join(bad[:4])}", \
-               "해당 상품 배너를 다시 만들어 작업대에 붙여넣기"
-    return True, f"{len(codes)}개 전부 상품 페이지로 연결", ""
+        return False, f"{len(bad)}/{len(codes)}개가 쿠팡으로 안 갑니다: {', '.join(bad[:4])}", \
+               "해당 배너·링크를 다시 만들어 작업대에 붙여넣기"
+    return True, f"{len(codes)}개 전부 연결 (상품 {kinds['상품']} · 검색·기획전 {kinds['검색·기획전']})", ""
 
 
 # ── 4. 한 글에 카드가 두 개 박혀 있지 않은가 ──────────────────────────

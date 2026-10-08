@@ -42,11 +42,13 @@ except Exception as e:
     print(f"[inspect] 인증 실패: {e}")
     raise SystemExit(0)
 
-# 최근 14일 내 수정된 공개 글 (검사 우선순위 = 최근 손본 순, 최대 30개/일)
+# 최근 14일 내 수정된 공개 글 (검사 우선순위 = 최근 손본 순, 최대 60개/일)
+# 2026-10-08: 30 → 60. 발행 36편인데 30편만 검사돼 6편이 사각지대였다.
+# URL 검사 API 일일 한도는 2,000 이라 60은 여유가 많다.
 diag = {}
 try:
     r = requests.get(f"{site}/wp-json/wp/v2/posts",
-                     params={"per_page": 30, "orderby": "modified", "_fields": "link,modified"},
+                     params={"per_page": 100, "orderby": "modified", "_fields": "link,modified"},
                      headers={"User-Agent": "Mozilla/5.0 (PickdamBot)"}, timeout=20)
     diag = {"http": r.status_code, "body_head": r.text[:120]}
     posts = r.json() if r.ok else []
@@ -85,7 +87,7 @@ else:
 sc_site = site_form
 
 results, ok_n = [], 0
-for u in urls[:30]:
+for u in urls[:60]:
     try:
         res = svc.urlInspection().index().inspect(
             body={"inspectionUrl": u, "siteUrl": sc_site}).execute()

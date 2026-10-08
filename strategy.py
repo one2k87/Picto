@@ -175,8 +175,19 @@ def build(cfg=None, per_day=5):
                    if status == "no_data" else
                    f"실적이 붙은 글이 {matched}편뿐이라 판단을 보류하고 기본 계획을 유지합니다.")
 
-    winners = [q["query"] for q in sorted(sc.get("queries", []),
-               key=lambda x: -x.get("clicks", 0))[:10] if q.get("clicks", 0) > 0]
+    # 클릭이 붙은 검색어를 먼저 쓰고, 모자라면 노출 상위로 채운다.
+    # 2026-10-08 실측: 검색어 14건이 전부 클릭 0이라 winners 가 늘 빈 배열이었고,
+    # 그래서 '잘 되는 각도'가 다음 주제에 한 번도 반영되지 않았다.
+    # 이 규모(28일 노출 400대)에서는 노출도 충분히 유효한 신호다.
+    _qs = sc.get("queries", [])
+    winners = [q["query"] for q in sorted(_qs, key=lambda x: -x.get("clicks", 0))[:10]
+               if q.get("clicks", 0) > 0]
+    if len(winners) < 5:
+        for q in sorted(_qs, key=lambda x: -x.get("impressions", 0)):
+            if q.get("query") and q["query"] not in winners and q.get("impressions", 0) >= 2:
+                winners.append(q["query"])
+            if len(winners) >= 8:
+                break
 
     # 노출은 되는데 클릭이 없는 검색어 = 제목이 약한 것 → 제목 재작성 후보
     # 문턱은 사이트 규모에 맞춘다. 50회 고정이면 3개월 총노출이 313인 지금은
