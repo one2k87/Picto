@@ -57,6 +57,19 @@ td a:hover{border-color:var(--brand);color:var(--brand)}
 .note b{color:var(--fg)}
 .foot{margin-top:30px;font-size:12px;color:var(--faint)}
 .err{color:var(--down);font-size:13px}
+.chk{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:12px}
+.chk .row{display:grid;grid-template-columns:22px 1fr;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line);align-items:start}
+.chk .row:last-child{border-bottom:0}
+.chk .row.bad{background:var(--bad-soft)}
+.chk .ic{font-size:14px;line-height:1.5}
+.chk .t{font-size:13.5px;font-weight:600}
+.chk .e{font-size:12.5px;color:var(--muted);margin-top:2px}
+.chk .f{font-size:12.5px;color:var(--down);margin-top:4px}
+.chk .f b{color:var(--down)}
+.who{display:inline-block;font-size:11px;font-weight:600;padding:1px 7px;border-radius:99px;border:1px solid var(--line);color:var(--muted);margin-left:6px;vertical-align:1px}
+.who.user{border-color:var(--down);color:var(--down)}
+:root{--bad-soft:#fdf2f2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bad-soft:#2a1818}}
 @media (max-width:520px){.tile .val{font-size:22px}}
 </style>
 </head>
@@ -66,6 +79,9 @@ td a:hover{border-color:var(--brand);color:var(--brand)}
     <h1>픽담 통계</h1>
     <p class="sub" id="asof">불러오는 중…</p>
   </header>
+
+  <h2>작동 점검 <span id="chkcount" style="font-weight:400;text-transform:none;letter-spacing:0"></span></h2>
+  <div id="checks"></div>
 
   <h2>검색 유입 — 최근 28일</h2>
   <div class="tiles" id="tiles"></div>
@@ -158,9 +174,27 @@ function table(el, rows, cols){
 }
 
 (async ()=>{
-  const [ins,idx,chk,st] = await Promise.all([
+  const [ins,idx,chk,st,sck] = await Promise.all([
     jget("data/insights.json"), jget("data/index_status.json"),
-    jget("data/site_check.json"), jget("data/status.json")]);
+    jget("data/site_check.json"), jget("data/status.json"), jget("data/selfcheck.json")]);
+
+  // 작동 점검 — 실패를 맨 위에, 사람이 해야 할 것은 빨갛게
+  if (sck && sck.checks) {
+    const bad = sck.checks.filter(c=>!c.ok), ok = sck.checks.filter(c=>c.ok);
+    const who = c => c.fix_by==="user" ? '<span class="who user">사용자</span>'
+                   : c.fix_by==="me" ? '<span class="who">클로드</span>' : '<span class="who">자동</span>';
+    const row = c => `<div class="row ${c.ok?"":"bad"}"><div class="ic">${c.ok?"✅":"❌"}</div>
+        <div><div class="t">${c.title}${c.ok?"":who(c)}</div>
+        <div class="e">${c.evidence||""}</div>
+        ${(!c.ok&&c.fix)?`<div class="f">→ ${c.fix}</div>`:""}</div></div>`;
+    document.getElementById("checks").innerHTML =
+      '<div class="chk">' + bad.map(row).join("") + ok.map(row).join("") + '</div>';
+    document.getElementById("chkcount").textContent =
+      `· ${sck.pass}/${sck.checks.length} 통과 · ${(sck.at||"").replace("T"," ").slice(0,16)}`;
+  } else {
+    document.getElementById("checks").innerHTML =
+      '<p class="cap" style="color:var(--muted);font-size:13px">아직 점검 결과가 없습니다. 내일 아침부터 쌓입니다.</p>';
+  }
   const sc = (ins||{}).search_console || {};
   const T = sc.totals || {}, d28 = T.d28 || {}, prev = T.prev28 || {};
   $("#asof").textContent = `구글 서치콘솔 기준 · ${(ins||{}).updated_at || "-"} 갱신`
