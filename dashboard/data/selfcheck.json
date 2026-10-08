@@ -1,8 +1,8 @@
 {
- "at": "2026-10-08T09:43:00",
+ "at": "2026-10-08T10:04:50",
  "posts": 36,
- "pass": 4,
- "fail": 5,
+ "pass": 5,
+ "fail": 6,
  "checks": [
   {
    "key": "sitemap",
@@ -18,7 +18,8 @@
    "ok": false,
    "evidence": "글 주소 제출이 거부됐습니다 (HTTP 422) — 네이버·빙 통지가 안 되고 있습니다",
    "fix": "키 파일이 하위 폴더에 있습니다 (https://pickdam.com/wp-content/uploads/2026/09/3073d0f9a62c8f5aa955b604ff3ed520.txt). IndexNow 는 그 폴더 아래 주소만 승인하므로 글 주소는 전부 거부됩니다. 키 파일을 사이트 최상위(https://pickdam.com/3073d0f9a62c8f5aa955b604ff3ed520.txt)로 옮기세요",
-   "fix_by": "user"
+   "fix_by": "user",
+   "repair": "루트 키 파일이 아직 없습니다 (HTTP 404) — 고정장치 설치 전"
   },
   {
    "key": "coupang_links",
@@ -48,7 +49,7 @@
    "key": "publish",
    "title": "최근 7일 발행이 되고 있는가",
    "ok": false,
-   "evidence": "최근 6일 중 발행 4 · 폐기 2 — 발행률 67%",
+   "evidence": "최근 7일 중 발행 4 · 폐기 2 — 발행률 57%",
    "fix": "폐기 사유를 보고 생성 프롬프트를 고칠 것",
    "fix_by": "auto"
   },
@@ -75,8 +76,25 @@
    "evidence": "36편 전부 보유",
    "fix": "",
    "fix_by": "auto"
+  },
+  {
+   "key": "guards",
+   "title": "운영 고정장치가 설치돼 있는가",
+   "ok": false,
+   "evidence": "IndexNow 키 최상위 응답 없음 (HTTP 404) / 사이트맵이 2026-10-03 에 멈춤 (최신 글 2026-10-06) — 캐시가 켜져 있음",
+   "fix": "wp-content/mu-plugins/pickdam-core.php 를 올리세요 (저장소의 wordpress_mu-plugin_pickdam-core.php). 이 파일 하나가 사이트맵 캐시와 IndexNow 키 위치를 영구히 해결합니다",
+   "fix_by": "user"
+  },
+  {
+   "key": "silent_errors",
+   "title": "매일 실행에 조용히 죽은 단계가 없는가",
+   "ok": true,
+   "evidence": "로그를 못 받았습니다 (HTTP 404) — 권한 actions:read 확인",
+   "fix": "",
+   "fix_by": "me"
   }
  ],
+ "repaired": [],
  "user_todo": [
   {
    "key": "sitemap",
@@ -92,6 +110,15 @@
    "ok": false,
    "evidence": "글 주소 제출이 거부됐습니다 (HTTP 422) — 네이버·빙 통지가 안 되고 있습니다",
    "fix": "키 파일이 하위 폴더에 있습니다 (https://pickdam.com/wp-content/uploads/2026/09/3073d0f9a62c8f5aa955b604ff3ed520.txt). IndexNow 는 그 폴더 아래 주소만 승인하므로 글 주소는 전부 거부됩니다. 키 파일을 사이트 최상위(https://pickdam.com/3073d0f9a62c8f5aa955b604ff3ed520.txt)로 옮기세요",
+   "fix_by": "user",
+   "repair": "루트 키 파일이 아직 없습니다 (HTTP 404) — 고정장치 설치 전"
+  },
+  {
+   "key": "guards",
+   "title": "운영 고정장치가 설치돼 있는가",
+   "ok": false,
+   "evidence": "IndexNow 키 최상위 응답 없음 (HTTP 404) / 사이트맵이 2026-10-03 에 멈춤 (최신 글 2026-10-06) — 캐시가 켜져 있음",
+   "fix": "wp-content/mu-plugins/pickdam-core.php 를 올리세요 (저장소의 wordpress_mu-plugin_pickdam-core.php). 이 파일 하나가 사이트맵 캐시와 IndexNow 키 위치를 영구히 해결합니다",
    "fix_by": "user"
   }
  ]
