@@ -10,6 +10,7 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -29,6 +30,13 @@ jobs:
         run: |
           python -m py_compile $(git ls-files '*.py')
           echo "✅ 파이썬 문법 OK"
+
+      # 워크플로도 코드다. 2026-10-08: run 블록 안의 여러 줄 파이썬이 YAML 을 깨서
+      # daily-blog.yml 전체가 파싱 불가가 됐고, 푸시 5건이 실패 메일로 나갔다.
+      - name: 워크플로 YAML 검사
+        run: |
+          pip install PyYAML >/dev/null
+          python scripts/check_workflows.py
 
       - name: config.json JSON 유효성
         run: python -c "import json; json.load(open('config.json', encoding='utf-8')); print('✅ config.json JSON OK')"
