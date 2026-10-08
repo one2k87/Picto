@@ -1,0 +1,53 @@
+name: 작동 증명 점검
+
+# 매일 아침, 각 경로가 '실제로 동작했다'는 증거를 새로 만든다.
+# 기존 아침 점검(daily_check_fix)은 결함이 보이면 잡지만, 이건 반대로
+# 증거를 못 만들면 실패로 친다. 신설 계기는 2026-10-08 — 한 세션에서
+# '설정은 됐는데 작동은 안 하던' 사고가 7건 나왔다(사이트맵 23일 고정,
+# IndexNow 전량 거부, 금지어가 1위 주제 차단 등).
+on:
+  schedule:
+    - cron: "5 0 * * *"      # 09:05 KST (아침 점검 뒤)
+  workflow_dispatch:
+    inputs:
+      write:
+        description: "false면 외부에 쓰는 검사(IndexNow 제출)를 건너뜀"
+        default: "true"
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  selfcheck:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: 의존성
+        run: pip install requests
+      - name: 설정 생성
+        env:
+          BLOG_URL: ${{ secrets.BLOG_URL }}
+          WP_ENABLED: ${{ secrets.WP_ENABLED }}
+          WP_SITE: ${{ secrets.WP_SITE }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: python build_config.py
+      - name: 점검
+        continue-on-error: true
+        env:
+          SELFCHECK_WRITE: ${{ github.event.inputs.write }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python scripts/selfcheck.py
+      - name: 결과 커밋
+        run: |
+          git config user.name "picto-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add dashboard/data/selfcheck.json || true
+          git diff --cached --quiet || git commit -m "작동 점검: $(date +%Y-%m-%d\ %H:%M) KST"
+          git push || true
