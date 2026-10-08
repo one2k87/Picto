@@ -3,7 +3,14 @@
 ② WebSub: 구글이 지원하는 RSS 푸시 알림(즉시 발견 신호)
 예약 발행(WP 크론)은 파이프라인이 모르는 사이에 공개되므로,
 매일 실행 때 최근 36시간 공개 글을 조회해 통지한다(재통지는 무해)."""
-import json, datetime
+import json, datetime, os, sys
+
+# 저장소 루트를 경로에 넣는다. 없어서 2026-10-08까지 매 실행이
+# ModuleNotFoundError: No module named 'publisher' 로 조용히 죽었다
+# (워크플로가 '|| true' 로 감싸 성공처럼 보였다). 즉 IndexNow·WebSub
+# 통지는 설정만 돼 있고 한 번도 실행된 적이 없다.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import requests
 from publisher import submit_indexnow, websub_ping
 

@@ -30,12 +30,27 @@ UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit
                     "(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
 DATA = os.path.join("dashboard", "data")
 CHECKS = []
+REPAIRS = {}
 
 
 def check(key, title, fix_by):
     """fix_by: 'auto'(코드가 고친다) / 'me'(세션이 고친다) / 'user'(사람만 가능)"""
     def deco(fn):
         CHECKS.append((key, title, fix_by, fn))
+        return fn
+    return deco
+
+
+def repair(key):
+    """실패했을 때 그 자리에서 되돌릴 수 있는 검사에 복구기를 붙인다.
+
+    왜 — 점검만 하면 '실패했다'는 사실이 매일 쌓일 뿐이다. 되돌릴 수 있는 건
+    사람을 거치지 않고 그 자리에서 되돌리고, 되돌린 다음 **다시 검사해서**
+    통과 증거를 새로 만든다. 복구기는 (고쳤나:bool, 한 줄 기록:str) 을 돌려준다.
+    환경 SELFCHECK_REPAIR=false 면 복구를 건너뛴다(관찰 전용).
+    """
+    def deco(fn):
+        REPAIRS[key] = fn
         return fn
     return deco
 
@@ -111,6 +126,40 @@ def _indexnow(ctx):
     return False, f"글 주소 제출이 거부됐습니다 (HTTP {r.status_code}) — 네이버·빙 통지가 안 되고 있습니다", hint
 
 
+@repair("indexnow")
+def _fix_indexnow(ctx):
+    """고정장치(mu-plugin)가 키를 사이트 최상위에서 응답하기 시작하면,
+    설정의 key_location 을 루트로 스스로 바꾼다. 사람이 다시 손댈 일을 없앤다."""
+    path = os.path.join("data", "site_categories.json")
+    try:
+        cat = json.load(open(path, encoding="utf-8"))
+    except Exception as e:
+        return False, f"설정을 못 읽었습니다: {str(e)[:50]}"
+    inx = cat.get("indexnow") or {}
+    key = inx.get("key")
+    if not key:
+        return False, "키가 없어 고칠 것이 없습니다"
+    root = f"https://{ctx['host']}/{key}.txt"
+    if (inx.get("key_location") or "") == root:
+        return False, "이미 루트를 가리키고 있습니다 (키 파일이 응답하지 않는 상태)"
+    try:
+        r = requests.get(root, headers=UA, timeout=20)
+    except Exception as e:
+        return False, f"루트 키 확인 실패: {str(e)[:50]}"
+    if not (r.ok and r.text.strip() == key):
+        return False, f"루트 키 파일이 아직 없습니다 (HTTP {r.status_code}) — 고정장치 설치 전"
+    inx["key_location"] = root
+    cat["indexnow"] = inx
+    json.dump(cat, open(path, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    try:
+        cfg = json.load(open("config.json", encoding="utf-8"))
+        cfg.setdefault("wordpress", {})["indexnow_key_location"] = root
+        json.dump(cfg, open("config.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+    return True, f"key_location 을 루트로 교정했습니다 → {root}"
+
+
 # ── 3. 쿠팡 링크가 전부 살아 있는가 ─────────────────────────────────
 @check("coupang_links", "쿠팡 링크가 상품으로 연결되는가", "me")
 def _links(ctx):
@@ -151,6 +200,24 @@ def _cards(ctx):
     return True, f"{len(ctx['posts'])}편 전부 카드 1개 이하", ""
 
 
+@repair("cards")
+def _fix_cards(ctx):
+    """마커 밖 중복 카드를 그 자리에서 지운다 (검증된 dedupe 스크립트 재사용)."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, here)
+    try:
+        import dedupe_product_cards as dd
+    except Exception as e:
+        return False, f"정리 스크립트를 못 불렀습니다: {str(e)[:50]}"
+    os.environ.setdefault("DEDUPE_LIMIT", "100")
+    os.environ["DEDUPE_DRY"] = "false"
+    try:
+        rc = dd.main()
+    except Exception as e:
+        return False, f"정리 중 오류: {str(e)[:60]}"
+    return rc == 0, "중복 카드 정리를 실행했습니다" if rc == 0 else f"정리가 코드 {rc} 로 끝났습니다"
+
+
 # ── 5. 색인 검사가 전부를 보고 있는가 ───────────────────────────────
 @check("index", "색인 검사가 모든 글을 보고 있는가", "auto")
 def _index(ctx):
@@ -172,11 +239,11 @@ def _publish(ctx):
     pub = dis = days = 0
     for i in range(1, 8):
         d = (datetime.date.today() - datetime.timedelta(days=i)).isoformat()
-        j = _json(f"{d}.json", {})
+        j = _json(f"{d}.json", None)
+        if j is None:
+            continue                      # 그날 파일 자체가 없으면 운영 전이거나 수집 실패
         arts = j.get("articles") or []
-        if not arts:
-            continue
-        days += 1
+        days += 1                         # 0편으로 끝난 날도 '하루'로 센다 (2026-10-07 누락 사고)
         pub += sum(1 for a in arts if a.get("status") == "게시됨")
         dis += sum(1 for a in arts if a.get("status") == "폐기")
     if days and pub / days < 0.7:
@@ -237,6 +304,90 @@ def _disclosure(ctx):
     return True, f"{len(ctx['posts'])}편 전부 보유", ""
 
 
+# ── 10. 고정장치(mu-plugin)가 살아 있는가 ───────────────────────────
+@check("guards", "운영 고정장치가 설치돼 있는가", "user")
+def _guards(ctx):
+    """pickdam-core.php 두 가지를 바깥에서 확인한다.
+      ① IndexNow 키가 사이트 최상위에서 응답하는가 (키 파일을 따로 안 올려도 되게 한 장치)
+      ② 사이트맵 캐시가 꺼져 있는가 — 간접 증거로 '사이트맵 최신 lastmod 가 최근 글을 따라오는가'
+    둘 중 하나라도 아니면, 파일이 지워졌거나 아직 안 올라간 것이다."""
+    cat = _json("../../data/site_categories.json")
+    key = ((cat or {}).get("indexnow") or {}).get("key") or ""
+    missing = []
+    if key:
+        try:
+            r = requests.get(f"https://{ctx['host']}/{key}.txt", headers=UA, timeout=20)
+            if not (r.ok and r.text.strip() == key):
+                missing.append(f"IndexNow 키 최상위 응답 없음 (HTTP {r.status_code})")
+        except Exception as e:
+            missing.append(f"키 확인 실패: {str(e)[:40]}")
+    else:
+        missing.append("IndexNow 키가 설정에 없음")
+    try:
+        sm = requests.get(f"{ctx['site']}/post-sitemap.xml", headers=UA, timeout=25)
+        lms = re.findall(r"<lastmod>(.*?)</lastmod>", sm.text)
+        newest_post = max((p.get("modified_gmt") or "") for p in ctx["posts"]) if ctx["posts"] else ""
+        if lms and newest_post and max(lms)[:10] < newest_post[:10]:
+            missing.append(f"사이트맵이 {max(lms)[:10]} 에 멈춤 (최신 글 {newest_post[:10]}) — 캐시가 켜져 있음")
+    except Exception as e:
+        missing.append(f"사이트맵 확인 실패: {str(e)[:40]}")
+    if missing:
+        return False, " / ".join(missing), \
+               ("wp-content/mu-plugins/pickdam-core.php 를 올리세요 "
+                "(저장소의 wordpress_mu-plugin_pickdam-core.php). 이 파일 하나가 "
+                "사이트맵 캐시와 IndexNow 키 위치를 영구히 해결합니다")
+    return True, "고정장치 작동 중 — IndexNow 키 루트 응답 · 사이트맵 캐시 꺼짐", ""
+
+
+# ── 11. 매일 실행 안에서 조용히 죽은 단계가 없는가 ────────────────────
+@check("silent_errors", "매일 실행에 조용히 죽은 단계가 없는가", "me")
+def _silent(ctx):
+    """워크플로의 많은 단계가 '|| true' 로 감싸여 있다. 그 덕에 한 단계가 죽어도
+    실행은 초록색으로 끝난다 — 2026-10-08 실측: scripts/ping_new_posts.py 가
+    sys.path 누락으로 **매일** ModuleNotFoundError 로 죽고 있었는데 한 번도 안 보였다.
+    그래서 마지막 자동 생성 실행의 로그를 직접 읽어 흔적을 찾는다."""
+    tok = os.getenv("GITHUB_TOKEN")
+    repo = os.getenv("GITHUB_REPOSITORY")
+    if not (tok and repo):
+        return True, "실행 로그를 읽을 수 없는 환경 — 건너뜀", ""
+    h = dict(UA); h["Authorization"] = f"Bearer {tok}"
+    try:
+        r = requests.get(f"https://api.github.com/repos/{repo}/actions/workflows/"
+                         "daily-blog.yml/runs", headers=h, timeout=25,
+                         params={"per_page": 1, "status": "completed"})
+        runs = (r.json() or {}).get("workflow_runs") or []
+        if not runs:
+            return True, "최근 완료된 자동 생성 실행이 없습니다", ""
+        run = runs[0]
+        z = requests.get(f"https://api.github.com/repos/{repo}/actions/runs/{run['id']}/logs",
+                         headers=h, timeout=60)
+        if not z.ok:
+            return True, f"로그를 못 받았습니다 (HTTP {z.status_code}) — 권한 actions:read 확인", ""
+        import io as _io
+        import zipfile
+        text = []
+        with zipfile.ZipFile(_io.BytesIO(z.content)) as zf:
+            for n in zf.namelist():
+                if n.endswith(".txt"):
+                    text.append(zf.read(n).decode("utf-8", "replace"))
+        blob = "\n".join(text)
+    except Exception as e:
+        return True, f"로그 점검 생략: {str(e)[:60]}", ""
+    hits = []
+    for line in blob.splitlines():
+        body = re.sub(r"^[0-9T:.Z-]+\s+", "", line).strip()
+        if ("Traceback (most recent call last)" in body or body.startswith("::error")
+                or "ModuleNotFoundError" in body or "ImportError" in body
+                or re.match(r"^\w*Error: ", body)):
+            if body not in hits:
+                hits.append(body[:110])
+    if hits:
+        return False, (f"마지막 실행({run['created_at'][:16]})에서 {len(hits)}건이 조용히 죽었습니다 — "
+                       + " / ".join(hits[:3])), \
+               "해당 스크립트를 고치고, 그 단계의 '|| true' 를 걷어낼지 판단할 것"
+    return True, f"마지막 실행({run['created_at'][:16]}) 로그에 예외 흔적 없음", ""
+
+
 def main():
     cfg = json.load(open("config.json", encoding="utf-8"))
     wp = cfg.get("wordpress", {}) or {}
@@ -250,20 +401,42 @@ def main():
                         - datetime.timedelta(hours=3)).strftime("%Y-%m-%dT%H:%M:%S")
     print(f"[selfcheck] 발행 {len(ctx['posts'])}편 기준\n")
 
-    out, fails = [], 0
-    for key, title, fix_by, fn in CHECKS:
+    do_repair = os.getenv("SELFCHECK_REPAIR", "true").lower() != "false"
+    out, fails, repaired = [], 0, []
+
+    def run(fn):
         try:
-            ok, ev, fix = fn(ctx)
+            return fn(ctx)
         except Exception as e:
-            ok, ev, fix = False, f"검사 자체가 실패: {str(e)[:70]}", ""
-        out.append({"key": key, "title": title, "ok": bool(ok),
-                    "evidence": ev, "fix": fix, "fix_by": fix_by})
+            return False, f"검사 자체가 실패: {str(e)[:70]}", ""
+
+    for key, title, fix_by, fn in CHECKS:
+        ok, ev, fix = run(fn)
+        rep = ""
+        if not ok and do_repair and key in REPAIRS:
+            try:
+                did, note = REPAIRS[key](ctx)
+            except Exception as e:
+                did, note = False, f"복구 중 오류: {str(e)[:60]}"
+            rep = note
+            print(f"  🔧 {title} — {note}")
+            if did:
+                ok2, ev2, fix2 = run(fn)      # 고친 다음 '통과 증거'를 새로 만든다
+                if ok2:
+                    repaired.append(f"{title}: {note}")
+                ok, ev, fix = ok2, ev2, fix2
+        row = {"key": key, "title": title, "ok": bool(ok),
+               "evidence": ev, "fix": fix, "fix_by": fix_by}
+        if rep:
+            row["repair"] = rep
+        out.append(row)
         if not ok:
             fails += 1
         print(f"  {'✅' if ok else '❌'} {title}\n       {ev}" + (f"\n       → {fix}" if fix and not ok else ""))
 
     res = {"at": datetime.datetime.now().isoformat()[:19], "posts": len(ctx["posts"]),
            "pass": len(out) - fails, "fail": fails, "checks": out,
+           "repaired": repaired,
            "user_todo": [c for c in out if not c["ok"] and c["fix_by"] == "user"]}
     os.makedirs(DATA, exist_ok=True)
     json.dump(res, open(os.path.join(DATA, "selfcheck.json"), "w", encoding="utf-8"),
@@ -274,6 +447,8 @@ def main():
         import notify
         if fails:
             lines = [f"🧪 <b>픽담 작동 점검</b> — {len(out)-fails}/{len(out)} 통과"]
+            for r in repaired:
+                lines.append(f"🔧 자동복구 {r}")
             for c in out:
                 if not c["ok"]:
                     lines.append(f"❌ {c['title']}\n   {c['evidence']}")

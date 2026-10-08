@@ -199,10 +199,22 @@ jobs:
         if: github.event_name == 'schedule'
         run: |
           today=$(date +%F)          # KST (잡 env TZ=Asia/Seoul)
-          gen=$(python3 -c "import json;print(json.load(open('dashboard/data/latest.json')).get('generated_at','')[:10])" 2>/dev/null || echo "")
-          if [ "$gen" = "$today" ]; then
+          # 날짜만 보고 건너뛰면, 아침 실행이 0편으로 끝난 날엔 백업 실행까지 막힌다.
+          # 2026-10-07 실측: 1차 실행이 articles=[] 로 끝났는데 2차가 '이미 생성 완료'로
+          # 건너뛰어 그날 발행이 0편이 됐다. 그래서 '생성한 글이 1편 이상'일 때만 건너뛴다.
+          read gen n <<<"$(python3 -c "
+import json
+try:
+    d = json.load(open('dashboard/data/latest.json'))
+    print((d.get('generated_at') or '')[:10], len(d.get('articles') or []))
+except Exception:
+    print(' 0')
+" 2>/dev/null || echo " 0")"
+          if [ "$gen" = "$today" ] && [ "${n:-0}" -gt 0 ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "오늘($today) 이미 생성 완료 — 생성 단계 건너뜀(백업 크론). 점검·색인은 계속 진행"
+            echo "오늘($today) 이미 ${n}편 생성 완료 — 생성 단계 건너뜀(백업 크론). 점검·색인은 계속 진행"
+          else
+            echo "오늘($today) 생성 결과 ${n:-0}편 — 생성 단계를 진행한다(백업 실행이 비는 날을 메운다)"
           fi
 
       # 형제 사이트(원더랜드) 제목을 받아 중복 회피 목록을 갱신한다.
