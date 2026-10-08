@@ -345,53 +345,23 @@ def _silent(ctx):
     """워크플로의 많은 단계가 '|| true' 로 감싸여 있다. 그 덕에 한 단계가 죽어도
     실행은 초록색으로 끝난다 — 2026-10-08 실측: scripts/ping_new_posts.py 가
     sys.path 누락으로 **매일** ModuleNotFoundError 로 죽고 있었는데 한 번도 안 보였다.
-    그래서 마지막 자동 생성 실행의 로그를 직접 읽어 흔적을 찾는다."""
-    tok = os.getenv("GITHUB_TOKEN")
-    repo = os.getenv("GITHUB_REPOSITORY")
-    if not (tok and repo):
-        return True, "실행 로그를 읽을 수 없는 환경 — 건너뜀", ""
-    h = dict(UA); h["Authorization"] = f"Bearer {tok}"
-    try:
-        r = requests.get(f"https://api.github.com/repos/{repo}/actions/workflows/"
-                         "daily-blog.yml/runs", headers=h, timeout=25,
-                         params={"per_page": 1, "status": "completed"})
-        runs = (r.json() or {}).get("workflow_runs") or []
-        if not runs:
-            return True, "최근 완료된 자동 생성 실행이 없습니다", ""
-        run = runs[0]
-        # 로그는 서명된 외부 주소로 리다이렉트된다. Authorization 헤더를 그대로
-        # 따라 보내면 그쪽이 거부한다(실측 404) — 주소만 받아서 헤더 없이 받는다.
-        z0 = requests.get(f"https://api.github.com/repos/{repo}/actions/runs/{run['id']}/logs",
-                          headers=h, timeout=30, allow_redirects=False)
-        if z0.status_code in (301, 302, 307, 308) and z0.headers.get("Location"):
-            z = requests.get(z0.headers["Location"], timeout=60)
-        else:
-            z = z0
-        if not z.ok:
-            return True, f"로그를 못 받았습니다 (HTTP {z.status_code}) — 권한 actions:read 확인", ""
-        import io as _io
-        import zipfile
-        text = []
-        with zipfile.ZipFile(_io.BytesIO(z.content)) as zf:
-            for n in zf.namelist():
-                if n.endswith(".txt"):
-                    text.append(zf.read(n).decode("utf-8", "replace"))
-        blob = "\n".join(text)
-    except Exception as e:
-        return True, f"로그 점검 생략: {str(e)[:60]}", ""
-    hits = []
-    for line in blob.splitlines():
-        body = re.sub(r"^[0-9T:.Z-]+\s+", "", line).strip()
-        if ("Traceback (most recent call last)" in body or body.startswith("::error")
-                or "ModuleNotFoundError" in body or "ImportError" in body
-                or re.match(r"^\w*Error: ", body)):
-            if body not in hits:
-                hits.append(body[:110])
-    if hits:
-        return False, (f"마지막 실행({run['created_at'][:16]})에서 {len(hits)}건이 조용히 죽었습니다 — "
-                       + " / ".join(hits[:3])), \
+
+    처음에는 GitHub 로그 API 로 실행 로그를 내려받아 검사하려 했지만, 워크플로
+    토큰으로는 막힌다(actions:read 를 줘도 404 — 실측 2회). 그래서 파이프라인이
+    스스로 증거를 남기게 했다: run_step.sh 가 단계별 출력을 한 로그에 모으고,
+    scan_run_log.py 가 그 자리에서 흔적을 뽑아 run_errors.json 에 적는다.
+    이 검사는 그 파일만 읽는다 — 외부 권한에 기대지 않는다."""
+    re_ = _json("run_errors.json", None)
+    if re_ is None:
+        return False, "run_errors.json 이 없습니다 — 자동 생성 실행이 아직 이 기록을 남기지 않았습니다", \
+               "daily-blog 가 한 번 돌면 생깁니다. 이틀이 지나도 없으면 '무음 예외 기록' 단계를 확인할 것"
+    errs = re_.get("errors") or []
+    when = (re_.get("at") or "")[:16]
+    if errs:
+        head = " / ".join(f"[{e.get('step')}] {e.get('line','')[:70]}" for e in errs[:3])
+        return False, f"마지막 실행({when})에서 {len(errs)}건이 조용히 죽었습니다 — {head}", \
                "해당 스크립트를 고치고, 그 단계의 '|| true' 를 걷어낼지 판단할 것"
-    return True, f"마지막 실행({run['created_at'][:16]}) 로그에 예외 흔적 없음", ""
+    return True, f"마지막 실행({when}) 로그 {re_.get('log_lines', 0)}줄에 예외 흔적 없음", ""
 
 
 def main():
