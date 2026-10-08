@@ -1,25 +1,24 @@
 {
- "at": "2026-10-08T10:04:50",
+ "at": "2026-10-08T10:38:52",
  "posts": 36,
- "pass": 5,
- "fail": 6,
+ "pass": 9,
+ "fail": 2,
  "checks": [
   {
    "key": "sitemap",
    "title": "사이트맵이 모든 글을 담고 있는가",
-   "ok": false,
-   "evidence": "2편이 사이트맵에 없습니다 (사이트맵 35 / 발행 36, 최신 2026-10-03) — 전동 채칼 10만 원대 구매 시, / 주방용품 소재, 스텐만 고집하다 ",
-   "fix": "Rank Math SEO → 사이트맵 설정에서 값을 하나 바꿔 [변경사항 저장]. 값이 그대로면 캐시가 안 풀립니다",
+   "ok": true,
+   "evidence": "사이트맵 37개 · 발행 36편 · 누락 0",
+   "fix": "",
    "fix_by": "user"
   },
   {
    "key": "indexnow",
    "title": "IndexNow 가 글 주소를 받아주는가",
-   "ok": false,
-   "evidence": "글 주소 제출이 거부됐습니다 (HTTP 422) — 네이버·빙 통지가 안 되고 있습니다",
-   "fix": "키 파일이 하위 폴더에 있습니다 (https://pickdam.com/wp-content/uploads/2026/09/3073d0f9a62c8f5aa955b604ff3ed520.txt). IndexNow 는 그 폴더 아래 주소만 승인하므로 글 주소는 전부 거부됩니다. 키 파일을 사이트 최상위(https://pickdam.com/3073d0f9a62c8f5aa955b604ff3ed520.txt)로 옮기세요",
-   "fix_by": "user",
-   "repair": "루트 키 파일이 아직 없습니다 (HTTP 404) — 고정장치 설치 전"
+   "ok": true,
+   "evidence": "글 주소 제출 200 — 네이버·빙에 즉시 통지됩니다",
+   "fix": "",
+   "fix_by": "user"
   },
   {
    "key": "coupang_links",
@@ -56,9 +55,9 @@
   {
    "key": "strategy",
    "title": "전략 피드백이 주제에 반영되는가",
-   "ok": false,
-   "evidence": "winners 가 비었습니다 (상태 ok, matched 20) — 잘 된 글의 각도가 다음 주제에 반영되지 않습니다",
-   "fix": "strategy.py 의 winners 산출 기준을 실적 규모에 맞게 낮출 것",
+   "ok": true,
+   "evidence": "winners 6건 반영 중",
+   "fix": "",
    "fix_by": "auto"
   },
   {
@@ -80,9 +79,9 @@
   {
    "key": "guards",
    "title": "운영 고정장치가 설치돼 있는가",
-   "ok": false,
-   "evidence": "IndexNow 키 최상위 응답 없음 (HTTP 404) / 사이트맵이 2026-10-03 에 멈춤 (최신 글 2026-10-06) — 캐시가 켜져 있음",
-   "fix": "wp-content/mu-plugins/pickdam-core.php 를 올리세요 (저장소의 wordpress_mu-plugin_pickdam-core.php). 이 파일 하나가 사이트맵 캐시와 IndexNow 키 위치를 영구히 해결합니다",
+   "ok": true,
+   "evidence": "고정장치 작동 중 — IndexNow 키 루트 응답 · 사이트맵 캐시 꺼짐",
+   "fix": "",
    "fix_by": "user"
   },
   {
@@ -95,31 +94,5 @@
   }
  ],
  "repaired": [],
- "user_todo": [
-  {
-   "key": "sitemap",
-   "title": "사이트맵이 모든 글을 담고 있는가",
-   "ok": false,
-   "evidence": "2편이 사이트맵에 없습니다 (사이트맵 35 / 발행 36, 최신 2026-10-03) — 전동 채칼 10만 원대 구매 시, / 주방용품 소재, 스텐만 고집하다 ",
-   "fix": "Rank Math SEO → 사이트맵 설정에서 값을 하나 바꿔 [변경사항 저장]. 값이 그대로면 캐시가 안 풀립니다",
-   "fix_by": "user"
-  },
-  {
-   "key": "indexnow",
-   "title": "IndexNow 가 글 주소를 받아주는가",
-   "ok": false,
-   "evidence": "글 주소 제출이 거부됐습니다 (HTTP 422) — 네이버·빙 통지가 안 되고 있습니다",
-   "fix": "키 파일이 하위 폴더에 있습니다 (https://pickdam.com/wp-content/uploads/2026/09/3073d0f9a62c8f5aa955b604ff3ed520.txt). IndexNow 는 그 폴더 아래 주소만 승인하므로 글 주소는 전부 거부됩니다. 키 파일을 사이트 최상위(https://pickdam.com/3073d0f9a62c8f5aa955b604ff3ed520.txt)로 옮기세요",
-   "fix_by": "user",
-   "repair": "루트 키 파일이 아직 없습니다 (HTTP 404) — 고정장치 설치 전"
-  },
-  {
-   "key": "guards",
-   "title": "운영 고정장치가 설치돼 있는가",
-   "ok": false,
-   "evidence": "IndexNow 키 최상위 응답 없음 (HTTP 404) / 사이트맵이 2026-10-03 에 멈춤 (최신 글 2026-10-06) — 캐시가 켜져 있음",
-   "fix": "wp-content/mu-plugins/pickdam-core.php 를 올리세요 (저장소의 wordpress_mu-plugin_pickdam-core.php). 이 파일 하나가 사이트맵 캐시와 IndexNow 키 위치를 영구히 해결합니다",
-   "fix_by": "user"
-  }
- ]
+ "user_todo": []
 }
