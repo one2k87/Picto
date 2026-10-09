@@ -1,22 +1,28 @@
 {
- "updated_at": "2026-10-09T10:34:29",
+ "updated_at": "2026-10-09T12:03:45",
  "site": "https://pickdam.com",
- "checked": 39,
+ "checked": 40,
  "indexed": 28,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-08T11:04:40\",\"link\":\"https:\\/\\/pickdam.com\\/spice-jar-material-guide\\/\"},{\"modified\":\"2026-10-08T1"
+  "body_head": "[{\"modified\":\"2026-10-09T11:59:15\",\"link\":\"https:\\/\\/pickdam.com\\/can-opener-comparison-types\\/\"},{\"modified\":\"2026-10-0"
  },
- "posts_n": 38,
+ "posts_n": 39,
  "results": [
   {
    "url": "https://pickdam.com/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/can-opener-comparison-types/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/spice-jar-material-guide/",
@@ -27,7 +33,7 @@
   {
    "url": "https://pickdam.com/one-person-seasoning-storage/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -57,7 +63,7 @@
   {
    "url": "https://pickdam.com/one-person-food-waste-disposer-low-noise-tips/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -147,7 +153,7 @@
   {
    "url": "https://pickdam.com/sprayer-glass-plastic-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -165,7 +171,7 @@
   {
    "url": "https://pickdam.com/bathroom-mini/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
