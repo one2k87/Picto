@@ -1,16 +1,16 @@
 {
- "updated_at": "2026-10-08T11:03:27",
+ "updated_at": "2026-10-09T10:34:29",
  "site": "https://pickdam.com",
- "checked": 38,
+ "checked": 39,
  "indexed": 28,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-08T10:59:10\",\"link\":\"https:\\/\\/pickdam.com\\/spice-jar-material-guide\\/\"},{\"modified\":\"2026-10-08T1"
+  "body_head": "[{\"modified\":\"2026-10-08T11:04:40\",\"link\":\"https:\\/\\/pickdam.com\\/spice-jar-material-guide\\/\"},{\"modified\":\"2026-10-08T1"
  },
- "posts_n": 37,
+ "posts_n": 38,
  "results": [
   {
    "url": "https://pickdam.com/",
@@ -21,7 +21,13 @@
   {
    "url": "https://pickdam.com/spice-jar-material-guide/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/one-person-seasoning-storage/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -129,7 +135,7 @@
   {
    "url": "https://pickdam.com/single-household-mini-washer-boil-wash/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -141,7 +147,7 @@
   {
    "url": "https://pickdam.com/sprayer-glass-plastic-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -237,7 +243,7 @@
   {
    "url": "https://pickdam.com/guides/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   }
  ],
