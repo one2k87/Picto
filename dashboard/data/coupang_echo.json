@@ -8,17 +8,17 @@
  "apply_trace": [
   {
    "stage": "진입",
-   "title": "캔 따개 2가지 유형, 손목 통증 줄이려면 월 10",
+   "title": "1인 가구 초음파 가습기, 물 보충 귀찮아도 3L ",
    "enabled": false,
    "widget_len": 211,
-   "h2": 7
+   "h2": 4
   },
   {
    "stage": "중단:enabled=False",
-   "title": "캔 따개 2가지 유형, 손목 통증 줄이려면 월 10",
+   "title": "1인 가구 초음파 가습기, 물 보충 귀찮아도 3L ",
    "enabled": false,
    "widget_len": 211,
-   "h2": 7
+   "h2": 4
   }
  ]
 }
