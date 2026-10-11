@@ -336,8 +336,17 @@ def parse_topics(text, count):
     out = []
     seen = set()
     for line in (text or "").splitlines():
-        line = re.sub(r"^[\-\*\d\.\)\s\"'·•]+", "", line.strip()).strip().strip('"').strip()
+        # 2026-10-11: 옛 정규식 ^[-*\d.)\s"'·•]+ 은 **맨 앞 숫자를 무조건** 먹었다.
+        # 그래서 「1인 가구 …」가 「인 가구 …」로 바뀌어 7건 생성됐고(9/16·9/18·9/25·
+        # 9/26·9/29·9/30·10/10 실측), 「1」 한 줄은 키워드가 통째로 「인」이 되어
+        # 키워드과다반복(50회)으로 폐기됐다. 목록 기호는 **구분자가 붙은 것만** 떼어낸다.
+        line = re.sub(r"^\s*(?:[-*·•]\s*|\d{1,2}\s*[.)]\s*)+", "", line.strip())
+        line = line.strip().strip('"').strip("'").strip()
         key = re.sub(r"\s+", "", line)
+        # 너무 짧은 줄은 주제가 아니다(번호만 남은 줄 등). 9/29 에 키워드가 「인」
+        # 한 글자가 되어 그대로 글이 생성됐고 키워드과다반복으로 폐기됐다.
+        if len(key) < 4:
+            continue
         if line and key not in seen:
             seen.add(key)
             out.append({"keyword": line, "news": []})
