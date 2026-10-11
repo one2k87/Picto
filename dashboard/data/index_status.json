@@ -1,27 +1,33 @@
 {
- "updated_at": "2026-10-11T10:56:19",
+ "updated_at": "2026-10-12T08:24:50",
  "site": "https://pickdam.com",
- "checked": 40,
+ "checked": 41,
  "indexed": 28,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-09T12:04:57\",\"link\":\"https:\\/\\/pickdam.com\\/can-opener-comparison-types\\/\"},{\"modified\":\"2026-10-0"
+  "body_head": "[{\"modified\":\"2026-10-12T08:20:14\",\"link\":\"https:\\/\\/pickdam.com\\/single-household-bidet-choice\\/\"},{\"modified\":\"2026-10"
  },
- "posts_n": 39,
+ "posts_n": 40,
  "results": [
   {
    "url": "https://pickdam.com/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
+   "lastCrawl": "2026-10-11"
+  },
+  {
+   "url": "https://pickdam.com/single-household-bidet-choice/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/can-opener-comparison-types/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -33,7 +39,7 @@
   {
    "url": "https://pickdam.com/one-person-seasoning-storage/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -249,7 +255,7 @@
   {
    "url": "https://pickdam.com/guides/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   }
  ],

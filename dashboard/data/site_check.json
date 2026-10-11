@@ -1,6 +1,6 @@
 {
- "at": "2026-10-11T10:57:34",
- "n": 39,
+ "at": "2026-10-12T08:26:09",
+ "n": 40,
  "avg": 100,
  "fails": [],
  "auto_repair": true,
@@ -8,9 +8,13 @@
  "repair_fail": [],
  "defaults": [],
  "noimgv2": {
-  "n": 36,
-  "of": 39,
+  "n": 37,
+  "of": 40,
   "posts": [
+   {
+    "id": 603,
+    "title": "1인 가구 비데, 자가설치형과 일반형 중 어떤 것이 더 쉬운 선택일까요?"
+   },
    {
     "id": 591,
     "title": "캔 따개 2가지 유형, 손목 통증 줄이려면 월 10회 미만 사용자는 1만"
@@ -86,10 +90,6 @@
    {
     "id": 248,
     "title": "1인 가구 건조분쇄형 음식물처리기, 30dB대 소음과 50만 원대 가격 "
-   },
-   {
-    "id": 243,
-    "title": "1인 가구 원룸 음식물처리기, 건조분쇄형 설치 전 꼭 확인할 3가지 주의"
    }
   ]
  },
@@ -98,9 +98,9 @@
   "posts": []
  },
  "link_coverage": {
-  "of": 39,
-  "matched": 26,
-  "linked": 26,
+  "of": 40,
+  "matched": 27,
+  "linked": 27,
   "unmatched": 13
  },
  "link_fill": {
@@ -176,11 +176,22 @@
     "title": "픽담 주제별 가이드"
    }
   ],
-  "of": 39
+  "of": 40
  },
  "seo": {
-  "cat_set": [],
-  "bc_added": [],
+  "cat_set": [
+   {
+    "id": 603,
+    "title": "1인 가구 비데, 자가설치형과 일반형 중 어떤 것이 더 쉬운 선택일까요?",
+    "cat": "비데·욕실"
+   }
+  ],
+  "bc_added": [
+   {
+    "id": 603,
+    "title": "1인 가구 비데, 자가설치형과 일반형 중 어떤 것이 더 쉬운 선택일까요?"
+   }
+  ],
   "title_set": [],
   "desc_set": [],
   "romaja_slug": [],
@@ -189,13 +200,13 @@
  },
  "sitemap": {
   "checked": true,
-  "urls": 40,
-  "posts": 39,
+  "urls": 41,
+  "posts": 40,
   "missing_n": 0,
   "missing": [],
   "ghost_urls": [],
   "cached_suspect": false,
-  "lastmod_max": "2026-10-09T03:04:57+00:00",
-  "post_modified_max": "2026-10-09T03:04:57"
+  "lastmod_max": "2026-10-11T23:26:05+00:00",
+  "post_modified_max": "2026-10-11T23:20:14"
  }
 }
