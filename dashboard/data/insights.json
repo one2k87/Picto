@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-10",
+  "updated_at": "2026-10-11",
   "search_console": {
     "queries": [
       {
@@ -92,9 +92,9 @@
       {
         "page": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
         "clicks": 4,
-        "impressions": 134,
-        "ctr": 2.99,
-        "position": 6.2
+        "impressions": 132,
+        "ctr": 3.03,
+        "position": 6.3
       },
       {
         "page": "https://pickdam.com/",
@@ -262,8 +262,8 @@
     "totals": {
       "d28": {
         "clicks": 10,
-        "impressions": 433,
-        "ctr": 2.31,
+        "impressions": 431,
+        "ctr": 2.32,
         "position": 9.2
       },
       "d90": {
@@ -274,9 +274,9 @@
       },
       "prev28": {
         "clicks": 1,
-        "impressions": 7,
-        "ctr": 14.29,
-        "position": 18.4
+        "impressions": 9,
+        "ctr": 11.11,
+        "position": 14.6
       }
     },
     "daily": [
@@ -467,8 +467,8 @@
       }
     ],
     "range": {
-      "start": "2026-09-10",
-      "end": "2026-10-08",
+      "start": "2026-09-11",
+      "end": "2026-10-09",
       "days": 28
     }
   }
