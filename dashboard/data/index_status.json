@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-11T09:40:26",
+ "updated_at": "2026-10-11T10:56:19",
  "site": "https://pickdam.com",
  "checked": 40,
  "indexed": 28,
@@ -21,7 +21,7 @@
   {
    "url": "https://pickdam.com/can-opener-comparison-types/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -111,7 +111,7 @@
   {
    "url": "https://pickdam.com/kitchen-tools-material-guide/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -249,7 +249,7 @@
   {
    "url": "https://pickdam.com/guides/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   }
  ],
