@@ -567,6 +567,11 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
         others = [b["html"] for j, b in enumerate(generated) if j != i]
         peers = recent_ref + [{"title": b.get("title", ""), "html": b.get("html", "")}
                               for j, b in enumerate(generated) if j < i]
+        # 기계적으로 고칠 수 있는 상투 표현은 판정 전에 치환한다(2026-10-11).
+        # 한 단어 때문에 글 한 편을 버리는 일을 없앤다 — 10/10·10/11 연속 폐기의 직접 원인.
+        _nfix, _fixed = quality.autofix(a)
+        if _nfix:
+            print(f"  · 상투 표현 자동 치환 {_nfix}곳({', '.join(_fixed)}): {a.get('keyword','')[:28]}")
         ok, reason = quality.check(a, others, safety, recent=peers)
         a["quality"] = "통과" if ok else "보류"
         a["quality_reason"] = reason
@@ -606,9 +611,16 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
             continue
         try:
             import re as _re
-            fix_prompt = (
+            # 2026-10-11: 구제가 1회뿐이라, 재작성이 원래 사유를 고치면서 **새 결함**을
+            # 만들면 그대로 폐기됐다(10/11 실측: '살펴보겠습니다' → 고쳤지만 H2 3개 미만).
+            # 그래서 2회까지 돌리고, 2회차에는 직전 실패 사유를 앞세운다.
+            _prev_fail = ""
+            for _round in (1, 2):
+                fix_prompt = (
                 "아래 한국어 블로그 글 HTML을 같은 주제로 다시 쓰세요. 반드시 고칠 것:\n"
-                f"- 현재 감점 사유: {a.get('quality_reason','')}\n"
+                + (f"- ⚠️ 직전 재작성은 이것 때문에 또 걸렸습니다. 이번엔 반드시 피하세요: {_prev_fail}\n"
+                   if _prev_fail else "")
+                + f"- 현재 감점 사유: {a.get('quality_reason','')}\n"
                 "- 출력 맨 첫 줄에 <!--TITLE: 새 제목--> 주석으로 제목도 새로 지을 것. 제목에 다음 표현 금지: "
                 "'알아야 할', '알아보기', '총정리', '완벽 정리', '하는 방법', '확인하기', '핵심 정보', '한 번에', '활용법'. "
                 "구체 조건이나 수치가 든 문장형 제목으로(예: '원룸 세탁기 15kg vs 21kg, 배수구 위치부터 재야 하는 이유')\n"
@@ -619,28 +631,31 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
                 "- 실측형 수치 4개 이상(규격·가격대·시간·개수). 원문에 없는 수치는 범위로\n"
                 "- 분량 절대 기준: 본문 텍스트 1,800자 이상(원문이 짧아도 반드시 늘릴 것), H2 소제목 4개 이상\n"
                 "- 소제목(h2/h3)·이미지·광고 자리(<div class=\"ad-slot\">)는 그대로 유지\n"
-                "[출력] 순수 HTML 본문만. 코드블록 금지. <p>로 시작.\n\n[원문]\n" + a.get("html", ""))
-            neo = chat(fix_prompt, cfg["llm"], max_tokens=16000, temperature=0.7)
-            neo = _re.sub(r"^```html?\s*|\s*```$", "", (neo or "").strip())
-            # 새 제목 파싱(<!--TITLE: ...-->) — 제목 감점(제목템플릿·어미중복)은 본문만 고쳐선 못 벗어난다
-            new_title = ""
-            mt = _re.match(r"\s*<!--\s*TITLE:\s*(.+?)\s*-->\s*", neo or "")
-            if mt:
-                new_title = mt.group(1).strip()
-                neo = neo[mt.end():]
-            if neo and neo.lstrip().startswith("<"):
+                + "[출력] 순수 HTML 본문만. 코드블록 금지. <p>로 시작.\n\n[원문]\n" + a.get("html", ""))
+                neo = chat(fix_prompt, cfg["llm"], max_tokens=16000, temperature=0.7)
+                neo = _re.sub(r"^```html?\s*|\s*```$", "", (neo or "").strip())
+                # 새 제목 파싱(<!--TITLE: ...-->) — 제목 감점(제목템플릿·어미중복)은 본문만 고쳐선 못 벗어난다
+                new_title = ""
+                mt = _re.match(r"\s*<!--\s*TITLE:\s*(.+?)\s*-->\s*", neo or "")
+                if mt:
+                    new_title = mt.group(1).strip()
+                    neo = neo[mt.end():]
+                if not (neo and neo.lstrip().startswith("<")):
+                    break
                 trial = dict(a); trial["html"] = neo
                 if new_title:
                     trial["title"] = new_title
+                quality.autofix(trial)          # 재작성본도 상투 표현부터 기계로 고친다
                 ok3, reason3 = quality.check(trial, [b["html"] for b in generated if b is not a], safety)
                 if ok3:
-                    a["html"] = neo
+                    a["html"] = trial["html"]
                     if new_title:
                         a["title"] = new_title
                     a["quality"], a["quality_reason"] = "통과", ""
-                    print(f"  · 폐기 구제(보강 재작성 1회): {a['keyword']}")
-                else:
-                    print(f"  · 구제 실패(여전히 보류: {reason3}): {a['keyword']}")
+                    print(f"  · 폐기 구제(보강 재작성 {_round}회): {a['keyword']}")
+                    break
+                print(f"  · 구제 {_round}회 실패(여전히 보류: {reason3}): {a['keyword']}")
+                _prev_fail = reason3
         except Exception as e:
             print(f"  · 구제 재작성 건너뜀: {e}")
 

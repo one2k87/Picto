@@ -182,6 +182,45 @@ def check_requirements(html, text=None):
     return missing, checked - len(missing), checked
 
 
+# ── 기계적으로 고칠 수 있는 결함은 폐기 사유가 되기 전에 고친다 (2026-10-11) ──
+# 왜: 10/11 글이 본문에 '살펴보겠습니다' **한 단어**가 있다는 이유로 폐기됐다.
+#     구제 재작성(LLM)은 그 단어를 고치면서 소제목을 3개 미만으로 줄여 더 큰 결함을
+#     만들었고, 결국 글 한 편이 통째로 버려졌다(10/10도 같은 모양, 2일 연속 0편).
+#     한 단어짜리 결함에 글 전체를 다시 쓰게 하는 건 설계가 틀린 것이다.
+# 원칙: 뜻이 바뀌지 않는 1:1 치환만 한다. 문장 삭제·요약은 하지 않는다.
+_AUTOFIX = [
+    ("알아보겠습니다", "정리했습니다"),
+    ("살펴보겠습니다", "정리했습니다"),
+    ("알아보도록 하겠습니다", "정리했습니다"),
+    ("살펴보도록 하겠습니다", "정리했습니다"),
+    ("이번 글에서는", "여기서는"),
+    ("마무리하겠습니다", "정리합니다"),
+    ("함께 알아봐요", "하나씩 봅니다"),
+    ("참고하시기 바랍니다", "참고하세요"),
+    ("도움이 되셨기를", "참고가 되길"),
+]
+
+
+def autofix(article):
+    """본문 상투 표현을 치환한다. (바꾼 건수, 바꾼 표현 목록) 을 돌려준다.
+
+    품질 검사 **전에** 부른다. 이걸 통과시키려고 글을 다시 쓰게 하지 않는다.
+    """
+    html = article.get("html") or ""
+    if not html:
+        return 0, []
+    hit, n = [], 0
+    for old, new in _AUTOFIX:
+        c = html.count(old)
+        if c:
+            html = html.replace(old, new)
+            hit.append(old)
+            n += c
+    if n:
+        article["html"] = html
+    return n, hit
+
+
 def check(article, other_texts, safety, recent=None):
     """(ok: bool, reason: str) 반환.
 
