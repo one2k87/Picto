@@ -91,7 +91,19 @@ def pick(posts, index_state, want):
 def enrich(p, pf, cfg, dry):
     title = re.sub("<[^>]+>", "", (p.get("title") or {}).get("rendered", ""))
     raw = (p.get("content") or {}).get("raw") or ""
-    refs = [r for r in find_reference_links(title, max_results=4) if _alive(r["url"])][:2]
+    # 검색이 간헐적으로 끊긴다(실측: duckduckgo Connection reset). 한 번 더,
+    # 그리고 제목 전체 대신 앞 낱말만으로 줄여서 다시 시도한다.
+    import time as _t
+    cands, short = [], " ".join(re.sub(r"[,?!]", " ", title).split()[:4])
+    for q in (title, title, short):
+        try:
+            cands = find_reference_links(q, max_results=4)
+        except Exception:
+            cands = []
+        if cands:
+            break
+        _t.sleep(3)
+    refs = [r for r in cands if _alive(r["url"])][:2]
     ref_text = ("\n".join(f"- {r['title'][:60]} : {r['url']}" for r in refs)
                 if refs else "(검색으로 쓸 만한 출처를 못 찾았습니다 — 외부 링크는 넣지 마세요)")
     prompt = (
