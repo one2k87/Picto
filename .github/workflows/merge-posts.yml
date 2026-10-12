@@ -1,0 +1,59 @@
+name: 중복 글 통합
+
+# 수동 전용. data/merge_plan.json 의 매핑대로 중복 주제 글을 기둥글로 합친다.
+# 사용자 승인 2026-10-12. 근거: 40편 중 서로 다른 제품군 24개(음식물처리기 6·비데 4·양념통 2),
+# 구글 커뮤니티 가이드가 Discovered-not-indexed 의 첫 처방으로 중복 통합을 든다.
+# ⚠️ 반드시 content → (리다이렉트 설치) → retire 순서로 실행할 것.
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: "content(내용 이전) 또는 retire(원문 휴지통)"
+        default: "content"
+        required: true
+      dry_run:
+        description: "true면 계획만 출력"
+        default: "true"
+        required: false
+      only:
+        description: "원문 ID만 골라서 (쉼표 구분)"
+        default: ""
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: 의존성
+        run: pip install requests
+      - name: 설정 생성
+        env:
+          BLOG_URL: ${{ secrets.BLOG_URL }}
+          WP_ENABLED: ${{ secrets.WP_ENABLED }}
+          WP_SITE: ${{ secrets.WP_SITE }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: python build_config.py
+      - name: 통합
+        env:
+          MERGE_PHASE: ${{ github.event.inputs.phase }}
+          MERGE_DRY: ${{ github.event.inputs.dry_run }}
+          MERGE_ONLY: ${{ github.event.inputs.only }}
+        run: python scripts/merge_posts.py
+      - name: 결과 커밋
+        if: always()
+        run: |
+          git config user.name "picto-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add dashboard/data/merge_log.json || true
+          git diff --cached --quiet || git commit -m "글 통합($(date +%Y-%m-%d\ %H:%M) KST)"
+          git push || true
