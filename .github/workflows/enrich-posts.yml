@@ -1,0 +1,69 @@
+name: 기존 글 보강
+
+# 새 글을 늘리는 대신 있는 글을 끌어올린다 (2026-10-12 신설).
+# 근거: 40편 전수 비교에서 색인/미색인을 가른 것은 분량·H2·내부링크가 아니라
+#       **외부 1차 출처 인용(0.9 vs 0.2)** 과 **목록(4.5 vs 1.6)** 이었다.
+#       구글 커뮤니티 가이드도 Discovered-not-indexed 는 그 페이지가 아니라
+#       '기존 콘텐츠가 더 크롤할 이유를 주지 못하는 것'이라고 설명한다.
+# 사용자 결정(2026-10-12): 주 3편 신규 + 주 2편 보강.
+on:
+  schedule:
+    - cron: "47 21 * * 1"    # 화 06:47 KST
+    - cron: "47 21 * * 3"    # 목 06:47 KST
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true면 계획만 출력(수정 없음)"
+        default: "true"
+        required: false
+      n:
+        description: "보강할 글 수 (기본 2)"
+        default: "2"
+        required: false
+      ids:
+        description: "특정 글 ID만 (쉼표 구분, 비우면 자동 선정)"
+        default: ""
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  enrich:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: 의존성
+        run: pip install -r requirements.txt
+      - name: 설정 생성
+        env:
+          BLOG_URL: ${{ secrets.BLOG_URL }}
+          WP_ENABLED: ${{ secrets.WP_ENABLED }}
+          WP_SITE: ${{ secrets.WP_SITE }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python build_config.py
+      - name: 보강
+        continue-on-error: true
+        env:
+          ENRICH_DRY: ${{ github.event.inputs.dry_run }}
+          ENRICH_N: ${{ github.event.inputs.n }}
+          ENRICH_IDS: ${{ github.event.inputs.ids }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scripts/enrich_posts.py
+      - name: 결과 커밋
+        if: always()
+        run: |
+          git config user.name "picto-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add dashboard/data/enrich_log.json || true
+          git diff --cached --quiet || git commit -m "글 보강: $(date +%Y-%m-%d\ %H:%M) KST"
+          git push || true
