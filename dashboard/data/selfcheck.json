@@ -1,6 +1,6 @@
 {
- "at": "2026-10-11T14:37:21",
- "posts": 39,
+ "at": "2026-10-12T10:01:07",
+ "posts": 34,
  "pass": 9,
  "fail": 2,
  "checks": [
@@ -8,7 +8,7 @@
    "key": "sitemap",
    "title": "사이트맵이 모든 글을 담고 있는가",
    "ok": true,
-   "evidence": "사이트맵 40개 · 발행 39편 · 누락 0",
+   "evidence": "사이트맵 35개 · 발행 34편 · 누락 0",
    "fix": "",
    "fix_by": "user"
   },
@@ -32,7 +32,7 @@
    "key": "cards",
    "title": "상품 카드가 글마다 하나인가",
    "ok": true,
-   "evidence": "39편 전부 카드 1개 이하",
+   "evidence": "34편 전부 카드 1개 이하",
    "fix": "",
    "fix_by": "auto"
   },
@@ -40,7 +40,7 @@
    "key": "index",
    "title": "색인 검사가 모든 글을 보고 있는가",
    "ok": false,
-   "evidence": "색인 28/40 (70%)",
+   "evidence": "색인 28/41 (68%)",
    "fix": "미색인 글에 내부링크 보강 + 사이트맵 확인",
    "fix_by": "auto"
   },
@@ -72,7 +72,7 @@
    "key": "disclosure",
    "title": "대가성 고지가 모든 글에 있는가",
    "ok": true,
-   "evidence": "39편 전부 보유",
+   "evidence": "34편 전부 보유",
    "fix": "",
    "fix_by": "auto"
   },
@@ -88,7 +88,7 @@
    "key": "silent_errors",
    "title": "매일 실행에 조용히 죽은 단계가 없는가",
    "ok": true,
-   "evidence": "마지막 실행(2026-10-11T10:57) 로그 66줄에 예외 흔적 없음",
+   "evidence": "마지막 실행(2026-10-12T08:26) 로그 117줄에 예외 흔적 없음",
    "fix": "",
    "fix_by": "me"
   }
