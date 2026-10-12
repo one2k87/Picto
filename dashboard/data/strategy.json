@@ -1,9 +1,9 @@
 {
-  "updated": "2026-10-08 01:06",
-  "next_review": "2026-10-15",
+  "updated": "2026-10-12 01:05",
+  "next_review": "2026-10-19",
   "data_status": "ok",
   "verdict": "실측 데이터로 조정했습니다. revenue 80% · evergreen 20%",
-  "matched_posts": 20,
+  "matched_posts": 21,
   "intent_ratio": {
     "revenue": 0.8,
     "evergreen": 0.2
@@ -51,45 +51,49 @@
   "winners": [
     "비데 설치비용",
     "비데설치비용",
+    "세탁기 구독 vs 무이자 할부 어떤 게 유리한가요?",
     "200만원 12개월 할부",
     "냉장고 구독과 카드 무이자 할부 중 어떤 게 유리한가요?",
     "비데 설치 비용",
-    "세탁기 구독 vs 무이자 할부 어떤 게 유리한가요?"
+    "정수기 필터 교체",
+    "가전 구독과 카드 무이자 할부의 차이점은?"
   ],
   "weak_queries": [
     "200만원 12개월 할부",
+    "가전 구독과 카드 무이자 할부의 차이점은?",
     "냉장고 구독과 카드 무이자 할부 중 어떤 게 유리한가요?",
     "비데 설치 비용",
     "비데 설치비용",
     "비데설치비용",
-    "세탁기 구독 vs 무이자 할부 어떤 게 유리한가요?"
+    "세탁기 구독 vs 무이자 할부 어떤 게 유리한가요?",
+    "정수기 필터 교체"
   ],
   "buckets": [
     {
       "category": "생활·주방",
       "intent": "revenue",
-      "posts": 17,
-      "clicks": 7,
-      "impressions": 265,
+      "posts": 19,
+      "clicks": 11,
+      "impressions": 270,
       "scored": 10,
-      "est_value": 7.0,
-      "value_per_post": 0.41,
-      "ctr": 2.64
+      "est_value": 11.0,
+      "value_per_post": 0.58,
+      "ctr": 4.07
     },
     {
       "category": "생활·주방",
       "intent": "evergreen",
-      "posts": 19,
-      "clicks": 2,
-      "impressions": 97,
-      "scored": 10,
-      "est_value": 1.1,
-      "value_per_post": 0.06,
-      "ctr": 2.06
+      "posts": 20,
+      "clicks": 5,
+      "impressions": 115,
+      "scored": 11,
+      "est_value": 2.8,
+      "value_per_post": 0.14,
+      "ctr": 4.35
     }
   ],
   "actions": [
-    "노출은 있는데 클릭이 0인 검색어 6건 — 해당 글 제목을 다시 쓰세요.",
+    "노출은 있는데 클릭이 0인 검색어 8건 — 해당 글 제목을 다시 쓰세요.",
     "수익형 비중이 높습니다. 누적형을 최소 20%는 유지해 트래픽 기반을 지키세요."
   ],
   "note": "글별 수익은 애드센스 API로 조회할 수 없어 '클릭 × 의도별 RPM 배수'로 추정한 값입니다."
