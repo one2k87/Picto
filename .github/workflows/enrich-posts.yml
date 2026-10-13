@@ -24,6 +24,10 @@ on:
         description: "특정 글 ID만 (쉼표 구분, 비우면 자동 선정)"
         default: ""
         required: false
+      clean_only:
+        description: "true면 비권위 외부 링크만 정리하고 보강은 건너뜀"
+        default: "false"
+        required: false
 
 permissions:
   contents: write
@@ -57,6 +61,7 @@ jobs:
           ENRICH_DRY: ${{ github.event.inputs.dry_run }}
           ENRICH_N: ${{ github.event.inputs.n }}
           ENRICH_IDS: ${{ github.event.inputs.ids }}
+          ENRICH_CLEAN_ONLY: ${{ github.event.inputs.clean_only }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
         run: bash scripts/run_step.sh "글 보강" python scripts/enrich_posts.py
       # '|| true'·continue-on-error 뒤에서 죽는 걸 막는다(2026-10-13 실측:

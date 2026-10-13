@@ -154,6 +154,12 @@ def enrich(p, pf, cfg, dry):
         print("      비권위 외부 링크 정리")
         raw = cleaned
         pf = _profile(raw)
+    # 정리만 하고 끝내는 모드. 보강(LLM)이 반려로 끝나면 비권위 링크가 글에 그대로
+    # 남는다(2026-10-13 #332 실측) — 링크 제거는 결정적인 작업이니 따로 떼어 둔다.
+    if (os.getenv("ENRICH_CLEAN_ONLY") or "").lower() == "true":
+        if cleaned == (p.get("content") or {}).get("raw"):
+            return None, "정리할 비권위 링크 없음"
+        return raw, "비권위 외부 링크만 정리(LLM 미사용)"
     # 검색이 간헐적으로 끊긴다(실측: duckduckgo Connection reset). 한 번 더,
     # 그리고 제목 전체 대신 앞 낱말만으로 줄여서 다시 시도한다.
     import time as _t
