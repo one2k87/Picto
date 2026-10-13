@@ -184,10 +184,23 @@ def enrich(p, pf, cfg, dry):
             last = "응답이 HTML 이 아님"
             prev = last
             continue
+        # 2026-10-13 2차 실측: 출처를 못 찾아 '외부 링크 금지'라고 했는데도 모델이
+        # 블로그 주소를 **지어내서** 넣었다. 지시는 샌다 — 출력에서도 기계로 걷어내고,
+        # 남은 외부 링크는 내가 건넨 주소이거나 원문에 이미 있던 권위 출처여야만 한다.
+        neo = strip_denied_links(neo)
         quality.autofix({"html": neo})
         np = _profile(neo)
+        allowed = {r["url"] for r in refs} | {
+            u for u in re.findall(r'href="(https?://[^"]+)"', raw)
+            if "pickdam.com" not in u and "coupang" not in u and authoritative(u)}
+        stray = [u for u in re.findall(r'href="(https?://[^"]+)"', neo)
+                 if "pickdam.com" not in u and "coupang" not in u and u not in allowed]
         why = ""
-        if np["picklink"] != pf["picklink"]:
+        if stray:
+            why = f"건네지 않은 외부 링크를 넣었습니다({len(stray)}건: {stray[0][:46]})"
+        if why:
+            pass
+        elif np["picklink"] != pf["picklink"]:
             why = f"상품 카드 마커 손상({pf['picklink']}→{np['picklink']})"
         elif (NOTICE in raw) and (NOTICE not in neo):
             why = "고지 문구 소실"
