@@ -60,3 +60,22 @@ add_action('init', function () {
         ));
     }
 });
+
+/* ── 4) 피드는 색인 대상이 아니다 (2026-10-13) ────────────────────────
+ * 마크토 실측: 구글 서치콘솔 미색인 목록에 글별 RSS 피드와 댓글 피드가 잡혀
+ * 숫자만 부풀리고 있다(/…/feed/ 와 /comments/feed/ 둘 다 HTTP 200).
+ * robots.txt 로 막으려 했으나 서버에 실제 robots.txt 파일이 있어 Rank Math
+ * 편집기가 잠겨 있다(실측: "robots.txt 파일을 쓸 수 없습니다").
+ * 그래서 헤더로 처리한다 — Disallow 는 '차단됨'으로 남지만 noindex 는 색인에서
+ * 실제로 빠진다. 사이트 전체 /feed/ 는 WebSub 통지에 쓰므로 그대로 둔다.
+ */
+add_action('template_redirect', function () {
+    if (!is_feed()) {
+        return;
+    }
+    $path = parse_url(isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '', PHP_URL_PATH);
+    if ($path === '/feed/' || $path === '/feed') {
+        return;   // 사이트 전체 피드는 유지
+    }
+    header('X-Robots-Tag: noindex, follow', true);
+}, 1);
