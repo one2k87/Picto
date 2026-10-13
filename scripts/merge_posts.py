@@ -140,6 +140,18 @@ def main():
                 continue
             r = requests.delete(f"{base}/wp-json/wp/v2/posts/{sid}", headers=headers, timeout=40)
             if r.status_code == 200:
+                # 없앤 주소를 기록해 둔다 — 작동 점검이 매일 301 인지 확인한다.
+                # 휴지통 글은 나중에 REST 로 주소를 되찾을 수 없으므로 지금 적어야 한다.
+                mu = os.path.join(DATA, "merge_urls.json")
+                try:
+                    cur = json.load(open(mu, encoding="utf-8"))
+                except Exception:
+                    cur = {"_doc": "중복 통합으로 없앤 주소. 작동 점검이 301 을 확인한다.",
+                           "retired": []}
+                if s.get("link") and s["link"] not in cur.get("retired", []):
+                    cur.setdefault("retired", []).append(s["link"])
+                os.makedirs(DATA, exist_ok=True)
+                json.dump(cur, open(mu, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
                 ok += 1
                 log.append({"phase": phase, "source": sid, "target": tid, "ok": True})
             else:

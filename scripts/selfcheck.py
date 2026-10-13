@@ -228,6 +228,29 @@ def _index(ctx):
         return False, f"발행 {n}편 중 {checked}편만 검사됐습니다 (색인 {indexed}) — 상한에 걸렸습니다", \
                "inspect_recent 의 하루 상한을 올리거나 이틀에 나눠 검사"
     ratio = round(indexed / max(checked, 1) * 100)
+    # 전체 공지(2026-10-10) ③: 색인 N/M 과 **7일 정체 경보**를 브리핑에 노출한다.
+    # 숫자가 멈춰 있는 것 자체가 신호다 — 10/8~10/11 에 색인이 28 에서 1도 안 움직였다.
+    trend_path = os.path.join(DATA, "index_trend.json")
+    try:
+        tr = json.load(open(trend_path, encoding="utf-8"))
+    except Exception:
+        tr = {"rows": []}
+    today = datetime.date.today().isoformat()
+    rows = [r for r in tr.get("rows", []) if r.get("date") != today]
+    rows.append({"date": today, "indexed": indexed, "checked": checked})
+    rows = rows[-60:]
+    tr["rows"] = rows
+    try:
+        json.dump(tr, open(trend_path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    except Exception:
+        pass
+    week = [r for r in rows
+            if r["date"] >= (datetime.date.today() - datetime.timedelta(days=7)).isoformat()]
+    stalled = len(week) >= 4 and len({r["indexed"] for r in week}) == 1
+    if stalled:
+        return False, (f"색인 {indexed}/{checked} ({ratio}%) — 최근 {len(week)}회 측정 내내 "
+                       f"{indexed}에서 멈춰 있습니다"), \
+               "새 글을 늘리기 전에 기존 글 보강·중복 정리로 크롤 이유를 만들 것"
     if ratio < 80:
         return False, f"색인 {indexed}/{checked} ({ratio}%)", "미색인 글에 내부링크 보강 + 사이트맵 확인"
     return True, f"색인 {indexed}/{checked} ({ratio}%)", ""
@@ -337,6 +360,38 @@ def _guards(ctx):
                 "(저장소의 wordpress_mu-plugin_pickdam-core.php). 이 파일 하나가 "
                 "사이트맵 캐시와 IndexNow 키 위치를 영구히 해결합니다")
     return True, "고정장치 작동 중 — IndexNow 키 루트 응답 · 사이트맵 캐시 꺼짐", ""
+
+
+# ── 12. 없앤 주소가 404 가 아니라 301 로 살아 있는가 ──────────────────
+@check("redirects", "없앤 주소가 301 로 이어지는가", "me")
+def _redirects(ctx):
+    """전체 공지(2026-10-10): 주제 전환·대량 삭제·슬러그 변경은 **반드시 301**.
+    2026-09-16 에 글을 지우고 301 을 안 걸어 신호를 통째로 버린 전례가 있다.
+    말로 된 규약은 또 샌다 — 없앤 주소를 매일 실제로 두드려 확인한다."""
+    # 휴지통으로 보낸 글은 REST 로 주소를 되찾을 수 없으므로, retire 단계가
+    # dashboard/data/merge_urls.json 에 남긴 목록과 removed_urls.json 을 본다.
+    urls = []
+    try:
+        rm = _json("../../data/removed_urls.json", {})
+        urls += [u for u in (rm.get("urls") or []) if isinstance(u, str) and u.startswith("http")]
+    except Exception:
+        pass
+    urls += [u for u in (_json("merge_urls.json", {}) or {}).get("retired", []) if u]
+    urls = sorted(set(urls))
+    if not urls:
+        return True, "확인할 '없앤 주소'가 없습니다", ""
+    bad = []
+    for u in urls[:30]:
+        try:
+            r = requests.get(u, headers=UA, timeout=20, allow_redirects=False)
+            if r.status_code not in (301, 308):
+                bad.append(f"{u.rsplit('/', 2)[-2]}({r.status_code})")
+        except Exception as e:
+            bad.append(f"{u.rsplit('/', 2)[-2]}({str(e)[:20]})")
+    if bad:
+        return False, f"{len(bad)}/{len(urls)}개가 301 이 아닙니다: " + " / ".join(bad[:4]), \
+               "Rank Math → 리디렉션에서 해당 주소를 기둥글로 301 등록"
+    return True, f"없앤 주소 {len(urls)}개 전부 301", ""
 
 
 # ── 11. 매일 실행 안에서 조용히 죽은 단계가 없는가 ────────────────────

@@ -98,6 +98,10 @@ def build_prompt(desc, category, style=None):
 
 
 # 검수 실패 시 재생성에 덧붙이는 무텍스트 강제문
+# 2회차 재생성용 — 같은 구도로 다시 그리면 같은 자리에 같은 글자가 또 들어간다.
+REFRAME_RETRY = (" Also change the composition entirely: different camera angle, "
+                 "different crop and arrangement from the previous attempt. "
+                 "No signage, no labels, no packaging text, no UI text.")
 NO_TEXT_RETRY = (" STRICT OVERRIDE: render absolutely NO written characters of any kind — "
                  "no text, letters, numbers, labels, signs, or handwriting; use blank surfaces instead.")
 
@@ -168,14 +172,36 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category=""):
     elif provider in ("gemini", "imagen", "google"):
         data = _gemini(build_prompt(desc, category, style), cfg_images)
         if data: LAST_KIND = "ai"
-    # 자동 확대검수: AI 생성 이미지 속 글자가 깨졌으면 무텍스트로 1회 재생성
+    # 자동 확대검수: AI 생성 이미지 속 글자가 깨졌으면 다시 만든다.
+    #
+    # 2026-10-13 수정 (스크립토 2026-09-16 제보, 커밋 3ef1dd6 패턴).
+    # 옛 코드에는 구멍이 둘 있었다 — 같은 계보라 픽토에도 그대로 있었다:
+    #   ① 재생성 결과를 **다시 검수하지 않고** 바로 채택했다. 두 번째도 깨져 있으면
+    #      깨진 채로 발행된다.
+    #   ② 재생성 자체가 실패하면(d2 falsy) else 가 없어 **깨진 원본을 그대로** 썼다.
+    # 그래서: 통과할 때까지 최대 2회 대체하고 매번 재검수한다. 2회차는 구도 자체를
+    # 바꾸게 한다. 끝내 깨지면 **이미지를 넣지 않는다** — 깨진 글자가 박힌 그림은
+    # 없는 것만 못하고, 호출부는 None 을 이미 정상 경로로 처리한다.
     if data and LAST_KIND == "ai":
         v = _check_text(data, cfg_images)
+        for _try in (1, 2):
+            if v != "broken":
+                break
+            extra = NO_TEXT_RETRY if _try == 1 else (NO_TEXT_RETRY + REFRAME_RETRY)
+            print(f"[images] 🔍 글자 깨짐 감지 → 재생성 {_try}/2"
+                  + (" (구도 변경)" if _try == 2 else ""))
+            d2 = _gemini(build_prompt(desc, category, style) + extra, cfg_images)
+            if not d2:
+                print("[images]    재생성 실패 — 다음 시도")
+                continue
+            v2 = _check_text(d2, cfg_images)      # 재생성본도 반드시 다시 검수한다
+            if v2 != "broken":
+                data, v = d2, v2
+                break
+            v = "broken"
         if v == "broken":
-            print("[images] 🔍 글자 깨짐 감지 → 무텍스트로 재생성")
-            d2 = _gemini(build_prompt(desc, category, style) + NO_TEXT_RETRY, cfg_images)
-            if d2:
-                data = d2
+            print("[images] ✖ 2회 재생성 뒤에도 글자가 깨짐 — 이미지를 넣지 않습니다")
+            data = None
 
     if not data:
         globals()["LAST_ERR"] = globals().get("LAST_ERR") or f"provider '{provider}' 결과 없음(스톡 키·Pillow 확인)"
