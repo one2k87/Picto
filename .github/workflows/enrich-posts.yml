@@ -47,8 +47,9 @@ jobs:
           WP_SITE: ${{ secrets.WP_SITE }}
           WP_USER: ${{ secrets.WP_USER }}
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_PROVIDER: ${{ secrets.LLM_PROVIDER }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
         run: python build_config.py
       - name: 보강
         continue-on-error: true
@@ -56,14 +57,19 @@ jobs:
           ENRICH_DRY: ${{ github.event.inputs.dry_run }}
           ENRICH_N: ${{ github.event.inputs.n }}
           ENRICH_IDS: ${{ github.event.inputs.ids }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python scripts/enrich_posts.py
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+        run: bash scripts/run_step.sh "글 보강" python scripts/enrich_posts.py
+      # '|| true'·continue-on-error 뒤에서 죽는 걸 막는다(2026-10-13 실측:
+      # LLM 키 이름이 틀려 보강이 통째로 죽었는데 실행은 초록색이었다).
+      - name: 무음 예외 기록
+        if: always()
+        run: python scripts/scan_run_log.py "$HOME/picto-run.log" || true
+
       - name: 결과 커밋
         if: always()
         run: |
           git config user.name "picto-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add dashboard/data/enrich_log.json || true
+          git add dashboard/data/enrich_log.json dashboard/data/run_errors.json || true
           git diff --cached --quiet || git commit -m "글 보강: $(date +%Y-%m-%d\ %H:%M) KST"
           git push || true
