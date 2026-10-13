@@ -54,6 +54,41 @@ def _profile(html):
     }
 
 
+# 어떤 출처를 '1차 출처'로 볼 것인가 (2026-10-13).
+# 첫 실전에서 모델이 가져온 출처가 네이버 블로그·티스토리·팁 모음 사이트였다.
+# 색인/미색인을 가른 지표는 '외부 링크 수'가 아니라 **권위 있는 출처를 인용했는가**다.
+# 블로그를 걸면 숫자만 늘고 신뢰 신호는 안 생긴다 — 그래서 도메인으로 거른다.
+_DENY = ("blog.naver.com", "cafe.naver.com", "tistory.com", "brunch.co.kr", "velog.io",
+         "medium.com", "wordpress.com", "blogspot.", "post.naver.com", "in.naver.com",
+         "namu.wiki", "pinterest.", "youtube.com", "facebook.com", "instagram.com",
+         "coupang.com", "11st.co.kr", "gmarket.co.kr", "auction.co.kr", "smartstore.naver.com")
+_ALLOW_SUFFIX = (".go.kr", ".or.kr", ".re.kr", ".ac.kr", ".gov", ".edu")
+_ALLOW_HOST = ("kepco.co.kr", "energy.or.kr", "kemco.or.kr", "kca.go.kr", "ftc.go.kr",
+               "kats.go.kr", "standard.go.kr", "data.go.kr", "law.go.kr", "nts.go.kr",
+               "samsung.com", "lge.co.kr", "coway.com", "cuckoo.co.kr", "winix.com",
+               "wikipedia.org", "who.int", "iso.org")
+
+
+def authoritative(url):
+    """공공기관·법령·표준·제조사 공식·백과만 1차 출처로 본다. 블로그·쇼핑몰은 거른다."""
+    u = (url or "").lower()
+    host = u.split("//", 1)[-1].split("/", 1)[0]
+    if any(d in host for d in _DENY):
+        return False
+    return host.endswith(_ALLOW_SUFFIX) or any(h in host for h in _ALLOW_HOST)
+
+
+def strip_denied_links(html):
+    """블로그·쇼핑몰로 걸린 외부 링크는 글자만 남기고 걷어낸다(재보강 때 자가 정리)."""
+    def un(m):
+        return m.group(2)
+    return re.sub(r'<a[^>]+href="(https?://[^"]+)"[^>]*>(.*?)</a>',
+                  lambda m: un(m) if (("pickdam.com" not in m.group(1))
+                                      and ("coupang" not in m.group(1))
+                                      and not authoritative(m.group(1))) else m.group(0),
+                  html, flags=re.S)
+
+
 def _alive(url):
     """실제로 살아 있는 주소만 인용한다. 죽은 링크는 보강이 아니라 흠이다."""
     try:
@@ -114,6 +149,11 @@ def _prompt(title, raw, pf, ref_text, prev_fail=""):
 def enrich(p, pf, cfg, dry):
     title = re.sub("<[^>]+>", "", (p.get("title") or {}).get("rendered", ""))
     raw = (p.get("content") or {}).get("raw") or ""
+    cleaned = strip_denied_links(raw)
+    if cleaned != raw:
+        print("      비권위 외부 링크 정리")
+        raw = cleaned
+        pf = _profile(raw)
     # 검색이 간헐적으로 끊긴다(실측: duckduckgo Connection reset). 한 번 더,
     # 그리고 제목 전체 대신 앞 낱말만으로 줄여서 다시 시도한다.
     import time as _t
@@ -126,9 +166,10 @@ def enrich(p, pf, cfg, dry):
         if cands:
             break
         _t.sleep(3)
-    refs = [r for r in cands if _alive(r["url"])][:2]
+    refs = [r for r in cands if authoritative(r["url"]) and _alive(r["url"])][:2]
     ref_text = ("\n".join(f"- {r['title'][:60]} : {r['url']}" for r in refs)
-                if refs else "(검색으로 쓸 만한 출처를 못 찾았습니다 — 외부 링크는 넣지 마세요)")
+                if refs else "(공공기관·표준·제조사 공식 같은 1차 출처를 못 찾았습니다 — "
+                             "외부 링크는 **넣지 마세요**. 블로그·쇼핑몰 링크는 금지입니다)")
     if dry:
         return None, f"출처 {len(refs)}건 · (dry_run)"
 
