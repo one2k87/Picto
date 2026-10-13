@@ -88,6 +88,29 @@ def pick(posts, index_state, want):
     return [r for r in rows if r[0] > 0][:want]
 
 
+def _prompt(title, raw, pf, ref_text, prev_fail=""):
+    nimg = pf["img"]
+    return (
+        "아래 한국어 블로그 글 HTML을 **보강**하세요. 새로 쓰는 게 아니라 있는 글을 끌어올리는 작업입니다.\n\n"
+        + (f"[⚠️ 직전 시도는 이것 때문에 반려됐습니다. 이번엔 반드시 피하세요]\n{prev_fail}\n\n"
+           if prev_fail else "")
+        + "[반드시 지킬 것 — 하나라도 어기면 반영하지 않습니다]\n"
+        f"- 원문에 <img> 태그가 {nimg}개 있습니다. **{nimg}개를 하나도 빠짐없이** src·alt까지 "
+        "그대로 옮기세요. 설명을 늘리더라도 이미지는 지우거나 합치지 마세요.\n"
+        "- <!--picklink--> … <!--/picklink--> 블록과 쿠팡 파트너스 고지 문단은 위치·내용 그대로.\n"
+        "- 기존 소제목(h2/h3)은 유지하고 추가만 하세요. 분량은 줄이지 마세요.\n\n"
+        "[보강할 것]\n"
+        "1. 아래 출처를 본문에 인용하세요. 주소는 **한 글자도 바꾸지 말고 그대로 복사**해 "
+        '<a href="주소" target="_blank" rel="noopener">제목</a> 형태로 넣고, 그 출처가 말하는 '
+        f"내용을 한두 문장으로 요약해 붙이세요. 없는 주소를 지어내지 마세요.\n{ref_text}\n"
+        "2. 비교·기준·체크리스트를 <ul> 또는 <table>로 최소 2개 추가하세요(줄글을 목록으로 바꿔도 됩니다).\n"
+        "3. 조건 분기를 최소 2개 넣으세요 (예: '벽이 석고보드라면 A, 콘크리트라면 B').\n"
+        "4. 흔한 실수 또는 사기 전 후회 포인트를 한 소제목으로 넣으세요.\n"
+        "5. 규격·가격대·시간·주기 같은 실측형 수치를 4개 이상 유지하거나 늘리세요. 모르면 범위로.\n"
+        "6. 다음 상투 표현 금지: 알아보겠습니다, 살펴보겠습니다, 이번 글에서는, 도움이 되셨기를.\n\n"
+        "[출력] 순수 HTML 본문만. 코드블록·설명 금지.\n\n[원문]\n" + raw)
+
+
 def enrich(p, pf, cfg, dry):
     title = re.sub("<[^>]+>", "", (p.get("title") or {}).get("rendered", ""))
     raw = (p.get("content") or {}).get("raw") or ""
@@ -106,47 +129,45 @@ def enrich(p, pf, cfg, dry):
     refs = [r for r in cands if _alive(r["url"])][:2]
     ref_text = ("\n".join(f"- {r['title'][:60]} : {r['url']}" for r in refs)
                 if refs else "(검색으로 쓸 만한 출처를 못 찾았습니다 — 외부 링크는 넣지 마세요)")
-    prompt = (
-        "아래 한국어 블로그 글 HTML을 **보강**하세요. 새로 쓰는 게 아니라 있는 글을 끌어올리는 작업입니다.\n\n"
-        "[반드시 지킬 것 — 어기면 반영하지 않습니다]\n"
-        "- 기존 <img> 태그, <!--picklink--> … <!--/picklink--> 블록, 쿠팡 파트너스 고지 문단은 "
-        "위치와 내용 그대로 둘 것. 지우거나 옮기지 마세요.\n"
-        "- 기존 소제목(h2/h3)은 유지하고, 필요하면 추가만 하세요.\n"
-        "- 분량은 줄이지 말 것.\n\n"
-        "[보강할 것]\n"
-        f"1. 아래 출처를 본문 안 적절한 자리에 <a href=\"...\" target=\"_blank\" rel=\"noopener\">제목</a> 으로 "
-        f"인용하고, 그 출처가 말하는 내용을 한두 문장으로 요약해 붙이세요. 없는 주소를 지어내지 마세요.\n{ref_text}\n"
-        "2. 비교·기준·체크리스트를 <ul> 또는 <table> 로 최소 2개 추가하세요(줄글을 목록으로 바꿔도 됩니다).\n"
-        "3. 조건 분기를 최소 2개 넣으세요 (예: '벽이 석고보드라면 A, 콘크리트라면 B').\n"
-        "4. 흔한 실수 또는 사기 전 후회 포인트를 한 소제목으로 넣으세요.\n"
-        "5. 규격·가격대·시간·주기 같은 실측형 수치를 4개 이상 유지하거나 늘리세요. 모르면 범위로 쓰세요.\n"
-        "6. 다음 상투 표현 금지: 알아보겠습니다, 살펴보겠습니다, 이번 글에서는, 도움이 되셨기를.\n\n"
-        "[출력] 순수 HTML 본문만. 코드블록·설명 금지.\n\n[원문]\n" + raw)
     if dry:
         return None, f"출처 {len(refs)}건 · (dry_run)"
-    neo = chat(prompt, cfg.get("llm", {}), max_tokens=16000, temperature=0.6)
-    neo = re.sub(r"^```html?\s*|\s*```$", "", (neo or "").strip())
-    if not (neo and neo.lstrip().startswith("<")):
-        return None, "응답이 HTML 이 아님"
-    quality.autofix({"html": neo})
-    np = _profile(neo)
-    # 보존 검증 — 하나라도 깨지면 반영하지 않는다
-    if np["picklink"] != pf["picklink"]:
-        return None, f"상품 카드 마커 손상({pf['picklink']}→{np['picklink']})"
-    if (NOTICE in raw) and (NOTICE not in neo):
-        return None, "고지 문구 소실"
-    if np["img"] < pf["img"]:
-        return None, f"이미지 소실({pf['img']}→{np['img']})"
-    if np["chars"] < pf["chars"]:
-        return None, f"분량 감소({pf['chars']}→{np['chars']})"
-    if np["external"] <= pf["external"] and refs:
-        return None, "외부 인용이 늘지 않음"
-    for r in refs:
-        if r["url"] not in neo:
-            return None, "제시한 출처가 본문에 없음"
-    stamp = MARK + datetime.date.today().isoformat() + "-->"
-    return neo + "\n" + stamp, (f"{pf['chars']}→{np['chars']}자 · 목록 {pf['lists']}→{np['lists']} · "
-                                f"외부인용 {pf['external']}→{np['external']}")
+
+    # 2026-10-13: 첫 실전에서 2편 모두 보존 검증에 걸렸다(이미지 1장 소실 / 출처 누락).
+    # 검증을 느슨하게 푸는 건 답이 아니다 — 반려 사유를 그대로 돌려주고 한 번 더 시킨다.
+    prev, last = "", ""
+    for _round in (1, 2):
+        neo = chat(_prompt(title, raw, pf, ref_text, prev), cfg.get("llm", {}),
+                   max_tokens=16000, temperature=0.6)
+        neo = re.sub(r"^```html?\s*|\s*```$", "", (neo or "").strip())
+        if not (neo and neo.lstrip().startswith("<")):
+            last = "응답이 HTML 이 아님"
+            prev = last
+            continue
+        quality.autofix({"html": neo})
+        np = _profile(neo)
+        why = ""
+        if np["picklink"] != pf["picklink"]:
+            why = f"상품 카드 마커 손상({pf['picklink']}→{np['picklink']})"
+        elif (NOTICE in raw) and (NOTICE not in neo):
+            why = "고지 문구 소실"
+        elif np["img"] < pf["img"]:
+            why = f"이미지 소실({pf['img']}→{np['img']})"
+        elif np["chars"] < pf["chars"]:
+            why = f"분량 감소({pf['chars']}→{np['chars']})"
+        elif refs and np["external"] <= pf["external"]:
+            why = "외부 인용이 늘지 않음"
+        else:
+            missing = [r["url"] for r in refs if r["url"] not in neo]
+            if missing:
+                why = f"제시한 출처가 본문에 없음({len(missing)}건)"
+        if not why:
+            stamp = MARK + datetime.date.today().isoformat() + "-->"
+            return neo + "\n" + stamp, (f"{_round}회차 · {pf['chars']}→{np['chars']}자 · "
+                                         f"목록 {pf['lists']}→{np['lists']} · "
+                                         f"외부인용 {pf['external']}→{np['external']}")
+        print(f"      {_round}회차 반려: {why}")
+        prev, last = why, why
+    return None, last
 
 
 def main():
