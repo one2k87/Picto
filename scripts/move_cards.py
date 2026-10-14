@@ -23,24 +23,52 @@ from publisher import _auth_header, update_post_content
 
 DATA = os.path.join("dashboard", "data")
 BLOCK = re.compile(r"\s*<!--picklink-->.*?<!--/picklink-->\s*", re.S)
+OPEN = '<div class="pick-product"'
+
+
+def _span(html):
+    """마커 없이 들어간 카드의 (시작, 끝). 중첩 div 를 세어 닫는 곳을 정확히 찾는다.
+    2026-10-14: 마커 블록만 옮겼더니 35편 중 12편이 남았다 — 옛 삽입 경로로 들어가
+    마커가 없는 카드들이다(노출 2위 '무이자 할부' 글 포함). 그 글들도 옮겨야 한다."""
+    s = html.find(OPEN)
+    if s < 0:
+        return None
+    depth, j = 0, s
+    while j < len(html):
+        if html.startswith("<div", j):
+            depth += 1
+        elif html.startswith("</div>", j):
+            depth -= 1
+            if depth == 0:
+                return (s, j + 6)
+        j += 1
+    return None
 
 
 def move(html):
     """(새 본문, 사유). 이미 첫 h2 앞이면 그대로 둔다."""
     m = BLOCK.search(html)
-    if not m:
-        return None, "마커로 감싼 카드가 없음"
-    block = m.group(0).strip()
-    rest = html[:m.start()] + html[m.end():]
+    if m:
+        block = m.group(0).strip()
+        start, end = m.start(), m.end()
+    else:
+        sp = _span(html)
+        if not sp:
+            return None, "카드가 없음"
+        start, end = sp
+        block = html[start:end].strip()
+    rest = html[:start] + html[end:]
     idxs = [x.start() for x in re.finditer(r"<h2\b", rest)]
     if not idxs:
         return None, "h2 가 없음"
     first = idxs[0]
     # 원래 위치가 첫 h2 앞이었으면 옮길 필요가 없다
-    if m.start() <= first:
+    if start <= first:
         return None, "이미 첫 h2 앞"
     neo = rest[:first] + "\n" + block + "\n" + rest[first:]
-    return neo, f"{len([i for i in re.finditer(r'<h2', html[:m.start()])])}번째 h2 뒤 → 첫 h2 앞"
+    nth = len(re.findall(r"<h2", html[:start]))
+    mark = "" if m else " (마커 없는 옛 카드)"
+    return neo, f"{nth}번째 h2 뒤 → 첫 h2 앞{mark}"
 
 
 def main():
