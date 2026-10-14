@@ -747,8 +747,13 @@ def _apply_product_link(a, cfg):
     # 소급 삽입(scripts/backfill_product_links)과 같은 마커로 감싼다.
     # 2026-10-04 실측: 여기서 마커 없이 넣는 바람에 backfill 이 force 로 돌아도
     # 낡은 카드를 못 지워 한 글에 카드가 둘 남았다(#100).
+    # 2026-10-14 실측(아이폰 390×844, Playwright): 쿠팡 카드가 모든 글에서
+    # **2~3화면 아래**에 있었다 — 환급 2,388px(2.8화면)·할부 1,989(2.4)·
+    # 문풍지 1,778(2.1)·비데 2,577(3.1). GSC 클릭은 월 10~15회인데 파트너스
+    # 클릭이 0인 이유가 이것이다. 들어온 사람이 카드를 보지도 못한다.
+    # 첫 h2 앞(도입부 직후)으로 올리면 1.3~1.6화면이 된다 — 거의 절반.
     a["html"] = _insert_mid_body(a.get("html", "") or "",
-                                 "<!--picklink-->" + card + "<!--/picklink-->", nth_h2=2)
+                                 "<!--picklink-->" + card + "<!--/picklink-->", nth_h2=1)
     a["_product_key"] = prod.get("key", "")
     print(f"[product] '{prod.get('key')}' 링크 삽입 · subid={a.get('slug','')[:40]}")
     return True

@@ -81,7 +81,7 @@ def main():
         if MARK in content:                  # force: 기존 카드 제거 후 재삽입
             content = re.sub(r"<!--picklink-->[\s\S]*?<!--/picklink-->", "", content)
         block = MARK + card + "<!--/picklink-->"
-        neo = insert_mid(content, block, nth_h2=2)
+        neo = insert_mid(content, block, nth_h2=1)   # 2026-10-14: 첫 h2 앞(실측 근거는 main.py 주석)
         print(f"[{pid}] {title[:40]} ← {prod.get('key')}")
         if dry:
             done += 1

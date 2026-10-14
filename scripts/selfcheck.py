@@ -257,22 +257,35 @@ def _index(ctx):
 
 
 # ── 6. 발행이 실제로 되고 있는가 ────────────────────────────────────
-@check("publish", "최근 7일 발행이 되고 있는가", "auto")
+# 발행일은 월·수·금이다(2026-10-12 사용자 결정: 주 3편 신규 + 주 2편 보강).
+# 그 전에는 '파일이 있는 날'을 분모로 삼았는데, 주 3편으로 바꾼 뒤에는 7일 중 3편이
+# 정상인데도 43%로 계속 실패가 떴다 — 기준이 틀린 경보는 결국 안 보게 된다.
+# 그래서 **예정된 발행일 수**를 분모로 쓴다.
+PUBLISH_WEEKDAYS = {0, 2, 4}      # 월·수·금 (KST)
+
+
+@check("publish", "예정된 발행일에 글이 나갔는가", "auto")
 def _publish(ctx):
-    pub = dis = days = 0
+    pub = dis = 0
+    planned, missed = [], []
     for i in range(1, 8):
-        d = (datetime.date.today() - datetime.timedelta(days=i)).isoformat()
-        j = _json(f"{d}.json", None)
-        if j is None:
-            continue                      # 그날 파일 자체가 없으면 운영 전이거나 수집 실패
-        arts = j.get("articles") or []
-        days += 1                         # 0편으로 끝난 날도 '하루'로 센다 (2026-10-07 누락 사고)
-        pub += sum(1 for a in arts if a.get("status") == "게시됨")
+        day = datetime.date.today() - datetime.timedelta(days=i)
+        j = _json(f"{day.isoformat()}.json", None)
+        arts = (j or {}).get("articles") or []
+        p = sum(1 for a in arts if a.get("status") == "게시됨")
+        pub += p
         dis += sum(1 for a in arts if a.get("status") == "폐기")
-    if days and pub / days < 0.7:
-        return False, f"최근 {days}일 중 발행 {pub} · 폐기 {dis} — 발행률 {round(pub/days*100)}%", \
+        if day.weekday() in PUBLISH_WEEKDAYS:
+            planned.append(day)
+            if p == 0:
+                missed.append(day.isoformat()[5:])
+    n = len(planned)
+    if n and len(missed) > max(1, n // 3):       # 예정일의 1/3 넘게 비면 실패
+        return False, (f"예정 발행일 {n}일 중 {len(missed)}일이 비었습니다 "
+                       f"({', '.join(missed)}) · 게시 {pub} · 폐기 {dis}"), \
                "폐기 사유를 보고 생성 프롬프트를 고칠 것"
-    return True, f"최근 {days}일 발행 {pub} · 폐기 {dis}", ""
+    tail = f" · 빈 날 {', '.join(missed)}" if missed else ""
+    return True, f"예정 발행일 {n}일 · 게시 {pub} · 폐기 {dis}{tail}", ""
 
 
 # ── 7. 전략 피드백이 비어 있지 않은가 ───────────────────────────────

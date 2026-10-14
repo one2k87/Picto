@@ -1,0 +1,55 @@
+name: 쿠팡 카드 위로 올리기
+
+# 수동 전용. 기발행 글의 <!--picklink--> 블록을 첫 h2 앞으로 옮긴다.
+# 근거(2026-10-14 실측, iPhone 390×844 Playwright): 카드가 모든 글에서 2~3화면
+# 아래에 있었다 — 환급 2,388px(2.8화면)·할부 1,989(2.4)·문풍지 1,778(2.1)·
+# 비데 2,577(3.1). GSC 클릭 월 10~15회인데 파트너스 클릭 0. 들어온 사람이
+# 카드를 보지도 못한다. 첫 h2 앞이면 1.3~1.6화면.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true면 계획만 출력"
+        default: "true"
+        required: false
+      limit:
+        description: "최대 글 수"
+        default: "100"
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  move:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: 의존성
+        run: pip install requests
+      - name: 설정 생성
+        env:
+          BLOG_URL: ${{ secrets.BLOG_URL }}
+          WP_ENABLED: ${{ secrets.WP_ENABLED }}
+          WP_SITE: ${{ secrets.WP_SITE }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: python build_config.py
+      - name: 이동
+        env:
+          MOVE_DRY: ${{ github.event.inputs.dry_run }}
+          MOVE_LIMIT: ${{ github.event.inputs.limit }}
+        run: python scripts/move_cards.py
+      - name: 결과 커밋
+        if: always()
+        run: |
+          git config user.name "picto-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add dashboard/data/move_cards.json || true
+          git diff --cached --quiet || git commit -m "카드 위치 이동: $(date +%Y-%m-%d\ %H:%M) KST"
+          git push || true
