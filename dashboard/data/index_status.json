@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-14T09:44:49",
+ "updated_at": "2026-10-14T10:58:47",
  "site": "https://pickdam.com",
  "checked": 36,
  "indexed": 31,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-14T09:40:35\",\"link\":\"https:\\/\\/pickdam.com\\/direct-water-purifier-guide\\/\"},{\"modified\":\"2026-10-1"
+  "body_head": "[{\"modified\":\"2026-10-14T09:46:05\",\"link\":\"https:\\/\\/pickdam.com\\/direct-water-purifier-guide\\/\"},{\"modified\":\"2026-10-1"
  },
  "posts_n": 35,
  "results": [
