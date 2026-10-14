@@ -79,3 +79,50 @@ add_action('template_redirect', function () {
     }
     header('X-Robots-Tag: noindex, follow', true);
 }, 1);
+
+/* ── 5) 쿠팡 카드 클릭·노출을 GA4 이벤트로 기록 (2026-10-14) ──────────
+ * 왜: 파트너스 클릭이 0인데 원인이 '안 보여서'인지 '보고도 안 눌러서'인지
+ *     구분할 수가 없었다. 2026-10-14 에 카드를 2~3화면 아래에서 1.4~1.8화면으로
+ *     올렸는데, 그 효과를 숫자로 보려면 **본 사람**과 **누른 사람**을 따로 세야 한다.
+ * 본문에 <script> 를 넣는 길은 막혀 있다 — 호스트 WAF(NinjaFirewall)가 REST 본문에
+ * '<script' 가 있으면 요청을 통째로 버린다(2026-10-04 실측). 그래서 플러그인이
+ * 서버에서 직접 출력한다.
+ * 보내는 이벤트: coupang_click(placement=card|inline) · coupang_card_view(글당 1회)
+ */
+add_action('wp_footer', function () {
+    if (is_admin() || is_feed()) {
+        return;
+    }
+    ?>
+<script id="pickdam-coupang-track">
+(function () {
+  function send(name, params) {
+    if (typeof window.gtag === 'function') { window.gtag('event', name, params); }
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t || !t.closest) { return; }
+    var a = t.closest('a[href*="coupang"]');
+    if (!a) { return; }
+    send('coupang_click', {
+      placement: a.closest('.pick-product') ? 'card' : 'inline',
+      link_text: (a.textContent || '').trim().slice(0, 60),
+      page_path: location.pathname
+    });
+  }, true);
+  if (!('IntersectionObserver' in window)) { return; }
+  var fired = false;
+  var io = new IntersectionObserver(function (entries) {
+    for (var i = 0; i < entries.length; i++) {
+      if (!entries[i].isIntersecting || fired) { continue; }
+      fired = true;
+      send('coupang_card_view', { page_path: location.pathname });
+      io.disconnect();
+    }
+  }, { threshold: 0.5 });
+  var cards = document.querySelectorAll('.pick-product');
+  for (var i = 0; i < cards.length; i++) { io.observe(cards[i]); }
+})();
+</script>
+    <?php
+});

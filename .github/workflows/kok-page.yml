@@ -1,0 +1,53 @@
+name: 콕픽 모아보기 페이지
+
+# famto 2026-10-13 지시 ①. 쇼츠 설명란 URL 은 유튜브 정책상 클릭이 안 되므로
+# 영상에서 나온 사람이 모일 짧은 주소 한 장(pickdam.com/kok)이 필요하다.
+# products.json 이 바뀌면 다시 돌려 갱신한다.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true면 HTML 만 출력(저장 안 함)"
+        default: "true"
+        required: false
+      slug:
+        description: "페이지 주소 (기본 kok)"
+        default: "kok"
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  kok:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: 의존성
+        run: pip install requests
+      - name: 설정 생성
+        env:
+          BLOG_URL: ${{ secrets.BLOG_URL }}
+          WP_ENABLED: ${{ secrets.WP_ENABLED }}
+          WP_SITE: ${{ secrets.WP_SITE }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: python build_config.py
+      - name: 페이지 생성·갱신
+        env:
+          KOK_DRY: ${{ github.event.inputs.dry_run }}
+          KOK_SLUG: ${{ github.event.inputs.slug }}
+        run: python scripts/build_kok_page.py
+      - name: 결과 커밋
+        if: always()
+        run: |
+          git config user.name "picto-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add dashboard/data/kok_page.json || true
+          git diff --cached --quiet || git commit -m "콕픽 모아보기 갱신: $(date +%Y-%m-%d\ %H:%M) KST"
+          git push || true

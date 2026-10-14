@@ -238,9 +238,12 @@ jobs:
         run: bash scripts/run_step.sh "새 글 색인 통지" python scripts/ping_new_posts.py
 
       # URL Inspection API(하루 2,000회, insights 서비스 계정 재사용):
-      # 최근 수정 글을 검사해 ①구글 fetch 유발(재크롤 넛지) ②색인 신호등 기록
-      # → 수동 '색인 생성 요청'의 API판. 결과는 dashboard/data/index_status.json
-      - name: 색인 검사·넛지 (Inspection API)
+      # 최근 수정 글의 **색인 상태를 읽기만** 한다. 결과는 dashboard/data/index_status.json.
+      # ⚠️ 2026-10-14 현행 확인(규칙 10): 옛 주석에 "수동 '색인 생성 요청'의 API판"이라고
+      #    적혀 있었는데 **틀렸다**. URL Inspection API 에는 색인을 요청하는 기능이 없고
+      #    (조회 전용), 구글 Indexing API 는 JobPosting·BroadcastEvent 전용이라 일반 글에
+      #    쓸 수 없다. 즉 구글에는 자동 색인 요청 수단이 없다 — 사이트맵·내부링크가 공식 경로다.
+      - name: 색인 상태 조회 (Inspection API)
         if: always()
         run: bash scripts/run_step.sh "색인 검사" python scripts/inspect_recent.py
 
