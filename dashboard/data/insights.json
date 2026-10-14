@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-12",
+  "updated_at": "2026-10-14",
   "search_console": {
     "queries": [
       {
@@ -38,6 +38,11 @@
         "impressions": 1
       },
       {
+        "query": "대형 가구 구매 장기 무이자 카드 순위",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
         "query": "무드등과 스탠드 조명의 분위기 차이를 비교하고, 아늑한 거실이나 침실에 적합한 제품을 추천해줘",
         "clicks": 0,
         "impressions": 1
@@ -68,6 +73,11 @@
         "impressions": 1
       },
       {
+        "query": "응",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
         "query": "이 원고에 사용할 실제 이미지들을 10장 이상 찾아서 가져와 보여주세요",
         "clicks": 0,
         "impressions": 1
@@ -90,18 +100,11 @@
     ],
     "pages": [
       {
-        "page": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
-        "clicks": 4,
-        "impressions": 120,
-        "ctr": 3.33,
-        "position": 6.3
-      },
-      {
         "page": "https://pickdam.com/new-appliance-installment-plan-comparison/",
         "clicks": 3,
-        "impressions": 71,
-        "ctr": 4.23,
-        "position": 12.8
+        "impressions": 69,
+        "ctr": 4.35,
+        "position": 13.3
       },
       {
         "page": "https://pickdam.com/",
@@ -120,72 +123,86 @@
       {
         "page": "https://pickdam.com/door-draft-stopper-guide-2026/",
         "clicks": 1,
-        "impressions": 51,
-        "ctr": 1.96,
-        "position": 6.7
+        "impressions": 53,
+        "ctr": 1.89,
+        "position": 6.9
       },
       {
         "page": "https://pickdam.com/folding-bluetooth-keyboard-fix/",
         "clicks": 1,
-        "impressions": 16,
-        "ctr": 6.25,
-        "position": 7.8
+        "impressions": 17,
+        "ctr": 5.88,
+        "position": 7.4
       },
       {
         "page": "https://pickdam.com/food-waste-smell-filter-cleaning/",
         "clicks": 1,
-        "impressions": 3,
-        "ctr": 33.33,
-        "position": 9.7
+        "impressions": 5,
+        "ctr": 20.0,
+        "position": 9
+      },
+      {
+        "page": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
+        "clicks": 1,
+        "impressions": 70,
+        "ctr": 1.43,
+        "position": 6.7
       },
       {
         "page": "https://pickdam.com/kitchen-sliding-shelf-guide/",
         "clicks": 1,
-        "impressions": 16,
-        "ctr": 6.25,
+        "impressions": 22,
+        "ctr": 4.55,
+        "position": 7.0
+      },
+      {
+        "page": "https://pickdam.com/washer-filter-cleaning-guide/",
+        "clicks": 1,
+        "impressions": 29,
+        "ctr": 3.45,
         "position": 7.4
       },
       {
         "page": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
         "clicks": 1,
-        "impressions": 23,
-        "ctr": 4.35,
+        "impressions": 24,
+        "ctr": 4.17,
         "position": 5.2
       },
       {
         "page": "https://pickdam.com/bedroom-lamp-guide/",
         "clicks": 0,
-        "impressions": 14,
+        "impressions": 16,
         "ctr": 0,
-        "position": 27.1
+        "position": 24.4
       },
       {
         "page": "https://pickdam.com/bidet-self-installation-check-valve/",
         "clicks": 0,
-        "impressions": 26,
+        "impressions": 25,
         "ctr": 0,
-        "position": 6.9
+        "position": 6.7
       },
       {
         "page": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
         "clicks": 0,
-        "impressions": 8,
+        "impressions": 7,
         "ctr": 0,
-        "position": 15.2
+        "position": 15.9
       },
       {
         "page": "https://pickdam.com/car-air-purifier-choice/",
         "clicks": 0,
-        "impressions": 1,
+        "impressions": 4,
         "ctr": 0,
-        "position": 2
+        "position": 14
       },
       {
         "page": "https://pickdam.com/entrance/",
         "clicks": 0,
-        "impressions": 6,
+        "impressions": 7,
         "ctr": 0,
-        "position": 9.8
+        "position": 8.6
       },
       {
         "page": "https://pickdam.com/food-waste-disposer-rental-cancellation-fee/",
@@ -211,16 +228,16 @@
       {
         "page": "https://pickdam.com/mini-dryer-electricity-cost-2026/",
         "clicks": 0,
-        "impressions": 1,
+        "impressions": 4,
         "ctr": 0,
-        "position": 3
+        "position": 7.5
       },
       {
         "page": "https://pickdam.com/moving-cleaning-quote-cost-comparison-2026/",
         "clicks": 0,
-        "impressions": 8,
+        "impressions": 7,
         "ctr": 0,
-        "position": 5.2
+        "position": 5
       },
       {
         "page": "https://pickdam.com/moving-packing-cost-conditions/",
@@ -256,34 +273,27 @@
         "impressions": 3,
         "ctr": 0,
         "position": 4.7
-      },
-      {
-        "page": "https://pickdam.com/washer-filter-cleaning-guide/",
-        "clicks": 0,
-        "impressions": 22,
-        "ctr": 0,
-        "position": 7.8
       }
     ],
     "site_form": "sc-domain:pickdam.com",
     "totals": {
       "d28": {
-        "clicks": 15,
-        "impressions": 460,
-        "ctr": 3.26,
-        "position": 9.2
+        "clicks": 13,
+        "impressions": 433,
+        "ctr": 3.0,
+        "position": 9.5
       },
       "d90": {
-        "clicks": 16,
-        "impressions": 486,
-        "ctr": 3.29,
-        "position": 9.2
+        "clicks": 17,
+        "impressions": 525,
+        "ctr": 3.24,
+        "position": 9.0
       },
       "prev28": {
-        "clicks": 1,
-        "impressions": 26,
-        "ctr": 3.85,
-        "position": 8.7
+        "clicks": 4,
+        "impressions": 92,
+        "ctr": 4.35,
+        "position": 6.8
       }
     },
     "daily": [
@@ -486,11 +496,21 @@
         "date": "2026-10-09",
         "clicks": 2,
         "impressions": 16
+      },
+      {
+        "date": "2026-10-10",
+        "clicks": 1,
+        "impressions": 20
+      },
+      {
+        "date": "2026-10-11",
+        "clicks": 0,
+        "impressions": 19
       }
     ],
     "range": {
-      "start": "2026-09-12",
-      "end": "2026-10-10",
+      "start": "2026-09-14",
+      "end": "2026-10-12",
       "days": 28
     }
   }
