@@ -1,14 +1,14 @@
 {
- "at": "2026-10-15T13:27:37",
- "posts": 35,
- "pass": 12,
+ "at": "2026-10-16T10:34:35",
+ "posts": 36,
+ "pass": 13,
  "fail": 0,
  "checks": [
   {
    "key": "sitemap",
    "title": "사이트맵이 모든 글을 담고 있는가",
    "ok": true,
-   "evidence": "사이트맵 36개 · 발행 35편 · 누락 0",
+   "evidence": "사이트맵 37개 · 발행 36편 · 누락 0",
    "fix": "",
    "fix_by": "user"
   },
@@ -24,7 +24,7 @@
    "key": "coupang_links",
    "title": "쿠팡 링크가 상품으로 연결되는가",
    "ok": true,
-   "evidence": "26개 전부 연결 (상품 20 · 검색·기획전 6)",
+   "evidence": "27개 전부 연결 (상품 21 · 검색·기획전 6)",
    "fix": "",
    "fix_by": "me"
   },
@@ -32,7 +32,7 @@
    "key": "cards",
    "title": "상품 카드가 글마다 하나인가",
    "ok": true,
-   "evidence": "35편 전부 카드 1개 이하",
+   "evidence": "36편 전부 카드 1개 이하",
    "fix": "",
    "fix_by": "auto"
   },
@@ -40,7 +40,7 @@
    "key": "index",
    "title": "색인 검사가 모든 글을 보고 있는가",
    "ok": true,
-   "evidence": "색인 31/36 (86%)",
+   "evidence": "색인 31/37 (84%)",
    "fix": "",
    "fix_by": "auto"
   },
@@ -48,7 +48,7 @@
    "key": "publish",
    "title": "예정된 발행일에 글이 나갔는가",
    "ok": true,
-   "evidence": "예정 발행일 3일 · 게시 4 · 폐기 2",
+   "evidence": "예정 발행일 3일 · 게시 3 · 폐기 2",
    "fix": "",
    "fix_by": "auto"
   },
@@ -72,7 +72,7 @@
    "key": "disclosure",
    "title": "대가성 고지가 모든 글에 있는가",
    "ok": true,
-   "evidence": "35편 전부 보유",
+   "evidence": "36편 전부 보유",
    "fix": "",
    "fix_by": "auto"
   },
@@ -96,7 +96,15 @@
    "key": "silent_errors",
    "title": "매일 실행에 조용히 죽은 단계가 없는가",
    "ok": true,
-   "evidence": "마지막 실행(2026-10-15T09:10) 로그 22줄에 예외 흔적 없음",
+   "evidence": "마지막 실행(2026-10-16T10:21) 로그 26줄에 예외 흔적 없음",
+   "fix": "",
+   "fix_by": "me"
+  },
+  {
+   "key": "enrich_refs",
+   "title": "보강이 실제로 외부 1차 출처를 붙였는가",
+   "ok": true,
+   "evidence": "마지막 보강(2026-10-16T10:21) 2편 중 2편에서 외부 1차 출처가 늘었습니다",
    "fix": "",
    "fix_by": "me"
   }
