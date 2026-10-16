@@ -146,8 +146,33 @@ def usable(url):
 _STOP = {"추천", "비교", "방법", "이유", "가지", "정리", "선택", "구매", "사용", "차이",
          "가격", "후기", "최신", "제품", "기준", "요금", "경우", "효과", "관리", "확인",
          "이것", "그것", "얼마", "하는", "하면", "되는", "쓰는", "살때", "모델"}
-_LADDER = ("{c} 안전주의보 한국소비자원", "{c} 기준 고시", "{c} 표준 규격",
-           "{c} 소비전력 에너지효율", "{c} 소비자분쟁해결기준")
+# 사다리는 품목 성격에 맞는 단만 밟는다. 2026-10-16 실측 — 오일 스프레이
+# (#348, 전기와 무관한 주방 용기) 글에 '에너지소비효율등급'이 붙었다.
+# "{c} 소비전력 에너지효율" 단이 무조건 돌았기 때문이다. 기관 도메인이고
+# 상세 문서라서 모든 필터를 통과했지만, 기름 스프레이와 아무 상관이 없다.
+# 권위·관련성에 이어 **품목 적합성**까지가 출처의 조건이다.
+_LADDER_BASE = ("{c} 안전주의보 한국소비자원", "{c} 기준 고시",
+                "{c} 표준 규격", "{c} 소비자분쟁해결기준")
+_LADDER_POWER = ("{c} 소비전력 에너지소비효율등급",)
+_LADDER_FOOD = ("{c} 식품용기 기준 식품의약품안전처", "{c} 위생 기준 고시")
+_POWER_WORD = ("전기", "전력", "요금", "가전", "충전", "플러그", "콘센트", "히터",
+               "난방", "냉방", "에어컨", "세탁기", "냉장고", "건조기", "청소기",
+               "정수기", "제습기", "가습기", "인덕션", "온풍기", "선풍기", "전열",
+               "소비전력", "와트", "에너지")
+_FOOD_WORD = ("주방", "식기", "용기", "도마", "밀폐", "보관", "조리", "food", "오일",
+              "기름", "물통", "텀블러", "수저", "젓가락", "냄비", "프라이팬", "김치",
+              "식품", "음식", "컵", "병", "빨대", "랩", "호일")
+
+
+def _ladder_for(text):
+    """품목 성격에 맞는 질의 단만 돌려준다."""
+    t = text or ""
+    lad = list(_LADDER_BASE)
+    if any(w in t for w in _POWER_WORD):
+        lad[2:2] = list(_LADDER_POWER)
+    if any(w in t for w in _FOOD_WORD):
+        lad[1:1] = list(_LADDER_FOOD)
+    return tuple(lad)
 
 
 def _core(title, focus=""):
@@ -229,12 +254,13 @@ def gather_refs(title, focus="", want=2):
     """기관 지향 질의를 사다리로 올라가며 권위 출처를 모은다. 실패하면 위키백과."""
     import time as _t
     core = _core(title, focus)
+    ladder = _ladder_for(f"{focus or ''} {title or ''}")
     seen, pool, tried = set(), [], []
     # 사다리를 끝까지 걷지 않고 want 건 모이면 멈추면, 같은 기관 페이지 두 장을
     # 집게 된다(2026-10-16 실측: kca.go.kr 피해예방주의보 2장 / law.go.kr 2장).
     # 서로 다른 기관 두 곳을 인용해야 '여러 1차 출처를 확인한 글'이 되므로,
     # 최소 세 질의까지는 돌려 후보를 모아 두고 호스트별로 하나씩 고른다.
-    for i, pat in enumerate(_LADDER):
+    for i, pat in enumerate(ladder):
         if len(pool) >= want and i >= 3:
             break
         q = pat.format(c=core)
@@ -261,7 +287,7 @@ def gather_refs(title, focus="", want=2):
     if len(head) < 2 or head[0].isdigit():
         head = ""
     if not pool and head and head != core:
-        for pat in _LADDER[:2]:
+        for pat in ladder[:2]:
             q = pat.format(c=head)
             tried.append(q)
             try:
