@@ -380,6 +380,19 @@ def _prompt(title, raw, pf, ref_text, prev_fail=""):
 def enrich(p, pf, cfg, dry):
     title = re.sub("<[^>]+>", "", (p.get("title") or {}).get("rendered", ""))
     raw = (p.get("content") or {}).get("raw") or ""
+    # 2026-10-16: 품목에 안 맞는데 **권위는 있는** 출처가 붙은 경우
+    # (#348 기름 스프레이 글의 '에너지소비효율등급'), strip_denied_links 로는
+    # 못 뗀다 — 도메인이 허용 목록에 있기 때문이다. 사람이 콕 집어 떼는 길이
+    # 하나는 있어야 한다. ENRICH_DROP 에 주소 조각을 쉼표로 넘기면 그것만 푼다.
+    drop = [x.strip() for x in (os.getenv("ENRICH_DROP") or "").split(",") if x.strip()]
+    if drop:
+        def _unwrap(m):
+            return m.group(2) if any(d in m.group(1) for d in drop) else m.group(0)
+        raw2 = re.sub(r'<a[^>]+href="(https?://[^"]+)"[^>]*>(.*?)</a>', _unwrap,
+                      raw, flags=re.S)
+        if raw2 != raw:
+            print(f"      지정 출처 {len(drop)}건 제거")
+            raw = raw2
     cleaned = strip_denied_links(raw)
     if cleaned != raw:
         print("      비권위 외부 링크 정리")
