@@ -1,16 +1,16 @@
 {
- "updated_at": "2026-10-14T10:58:47",
+ "updated_at": "2026-10-16T09:00:35",
  "site": "https://pickdam.com",
- "checked": 36,
+ "checked": 37,
  "indexed": 31,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-14T09:46:05\",\"link\":\"https:\\/\\/pickdam.com\\/direct-water-purifier-guide\\/\"},{\"modified\":\"2026-10-1"
+  "body_head": "[{\"modified\":\"2026-10-16T08:56:12\",\"link\":\"https:\\/\\/pickdam.com\\/bathroom-mini-heater-tips\\/\"},{\"modified\":\"2026-10-15T"
  },
- "posts_n": 35,
+ "posts_n": 36,
  "results": [
   {
    "url": "https://pickdam.com/",
@@ -19,136 +19,10 @@
    "lastCrawl": "2026-10-11"
   },
   {
-   "url": "https://pickdam.com/direct-water-purifier-guide/",
+   "url": "https://pickdam.com/bathroom-mini-heater-tips/",
    "verdict": "NEUTRAL",
    "state": "URL is unknown to Google",
    "lastCrawl": ""
-  },
-  {
-   "url": "https://pickdam.com/sprayer-glass-plastic-kitchen/",
-   "verdict": "NEUTRAL",
-   "state": "Crawled - currently not indexed",
-   "lastCrawl": "2026-10-13"
-  },
-  {
-   "url": "https://pickdam.com/guides/",
-   "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
-   "lastCrawl": ""
-  },
-  {
-   "url": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-13"
-  },
-  {
-   "url": "https://pickdam.com/single-household-mini-induction-kitchen/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-13"
-  },
-  {
-   "url": "https://pickdam.com/one-person-seasoning-storage/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-13"
-  },
-  {
-   "url": "https://pickdam.com/bidet-self-installation-check-valve/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/one-person-food-disposer-install/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/food-waste-disposer-deodorizing-filter-replacement/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-30"
-  },
-  {
-   "url": "https://pickdam.com/food-waste-disposer-rental-cancellation-fee/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/can-opener-comparison-types/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-13"
-  },
-  {
-   "url": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/bedroom-lamp-guide/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/car-air-purifier-choice/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/folding-bluetooth-keyboard-fix/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/mini-dryer-electricity-cost-2026/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/washer-filter-cleaning-guide/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/sink-door-hinge-replace-cost/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-03"
-  },
-  {
-   "url": "https://pickdam.com/post-20261006-b61562/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-06"
-  },
-  {
-   "url": "https://pickdam.com/kitchen-tools-material-guide/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-13"
-  },
-  {
-   "url": "https://pickdam.com/door-draft-stopper-guide-2026/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-01"
-  },
-  {
-   "url": "https://pickdam.com/dehumidifier-20l-electricity-bill-30pyeong/",
-   "verdict": "NEUTRAL",
-   "state": "Crawled - currently not indexed",
-   "lastCrawl": "2026-09-28"
   },
   {
    "url": "https://pickdam.com/single-household-mini-washer-boil-wash/",
@@ -157,40 +31,16 @@
    "lastCrawl": "2026-10-13"
   },
   {
-   "url": "https://pickdam.com/kitchen-sliding-shelf-guide/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/bathroom-mini/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-13"
-  },
-  {
-   "url": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-23"
+   "url": "https://pickdam.com/direct-water-purifier-guide/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/new-apartment-system-appliance-guide-2026-september/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-25"
-  },
-  {
-   "url": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
   },
   {
    "url": "https://pickdam.com/moving-cleaning-quote-cost-comparison-2026/",
@@ -223,10 +73,166 @@
    "lastCrawl": "2026-09-28"
   },
   {
+   "url": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-23"
+  },
+  {
+   "url": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-10-15"
+  },
+  {
+   "url": "https://pickdam.com/food-waste-disposer-rental-cancellation-fee/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
    "url": "https://pickdam.com/water-purifier-filter-replacement-guide-2026/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/door-draft-stopper-guide-2026/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-10-01"
+  },
+  {
+   "url": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/bidet-self-installation-check-valve/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/food-waste-disposer-deodorizing-filter-replacement/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-30"
+  },
+  {
+   "url": "https://pickdam.com/dehumidifier-20l-electricity-bill-30pyeong/",
+   "verdict": "NEUTRAL",
+   "state": "Crawled - currently not indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/one-person-food-disposer-install/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/bedroom-lamp-guide/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-10-13"
+  },
+  {
+   "url": "https://pickdam.com/car-air-purifier-choice/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/sprayer-glass-plastic-kitchen/",
+   "verdict": "NEUTRAL",
+   "state": "Crawled - currently not indexed",
+   "lastCrawl": "2026-10-14"
+  },
+  {
+   "url": "https://pickdam.com/folding-bluetooth-keyboard-fix/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/kitchen-sliding-shelf-guide/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/mini-dryer-electricity-cost-2026/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/washer-filter-cleaning-guide/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/single-household-mini-induction-kitchen/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-10-13"
+  },
+  {
+   "url": "https://pickdam.com/bathroom-mini/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-10-13"
+  },
+  {
+   "url": "https://pickdam.com/guides/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/one-person-seasoning-storage/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-10-13"
+  },
+  {
+   "url": "https://pickdam.com/can-opener-comparison-types/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-10-13"
+  },
+  {
+   "url": "https://pickdam.com/sink-door-hinge-replace-cost/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-10-03"
+  },
+  {
+   "url": "https://pickdam.com/post-20261006-b61562/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-10-06"
+  },
+  {
+   "url": "https://pickdam.com/kitchen-tools-material-guide/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-10-13"
   }
  ],
  "sitemaps_submitted": [
