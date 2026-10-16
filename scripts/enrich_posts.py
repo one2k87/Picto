@@ -62,11 +62,19 @@ _DENY = ("blog.naver.com", "cafe.naver.com", "tistory.com", "brunch.co.kr", "vel
          "medium.com", "wordpress.com", "blogspot.", "post.naver.com", "in.naver.com",
          "namu.wiki", "pinterest.", "youtube.com", "facebook.com", "instagram.com",
          "coupang.com", "11st.co.kr", "gmarket.co.kr", "auction.co.kr", "smartstore.naver.com")
-_ALLOW_SUFFIX = (".go.kr", ".or.kr", ".re.kr", ".ac.kr", ".gov", ".edu")
+# 2026-10-16 실전 사고 — 러너(미국 IP)에서 돌린 보강이 본문에 이런 걸 걸었다:
+#   #625 직수 정수기  → en.wikipedia.org/wiki/Microsoft · irs.gov/payments/...
+#   #325 미니세탁기   → en.wikipedia.org/wiki/1 · simple.wikipedia.org/wiki/1_(number)
+# 전부 authoritative() 와 _specific() 을 **정상 통과**했다(.gov 접미사 / '/wiki/' 포함).
+# 권위와 관련성은 다른 축인데 권위만 봤다. 아무 출처도 없는 것보다 나쁘다.
+# 픽담은 한국 소비자 블로그다 — 미 연방기관·영문 위키는 어떤 경우에도 출처가
+# 아니다. 그래서 허용 목록 자체를 한국 출처로 좁힌다.
+_ALLOW_SUFFIX = (".go.kr", ".or.kr", ".re.kr", ".ac.kr")
 _ALLOW_HOST = ("kepco.co.kr", "energy.or.kr", "kemco.or.kr", "kca.go.kr", "ftc.go.kr",
                "kats.go.kr", "standard.go.kr", "data.go.kr", "law.go.kr", "nts.go.kr",
+               "consumer.go.kr", "safetykorea.kr", "kssn.net",
                "samsung.com", "lge.co.kr", "coway.com", "cuckoo.co.kr", "winix.com",
-               "wikipedia.org", "who.int", "iso.org")
+               "ko.wikipedia.org")
 
 
 def authoritative(url):
@@ -162,8 +170,8 @@ def _wiki(core):
     """
     import urllib.parse
     import urllib.request
-    head = (core or "").split()[-1] if core else ""
-    if len(head) < 2:
+    head = (core or "").split()[0] if core else ""
+    if len(head) < 2 or head[0].isdigit():
         return None
     try:
         u = "https://ko.wikipedia.org/w/api.php?" + urllib.parse.urlencode(
@@ -242,7 +250,12 @@ def gather_refs(title, focus="", want=2):
 
     # 핵심어가 너무 좁으면 기관 문서가 안 걸린다('욕실 온풍기' → 후보 0,
     # 2026-10-16 실측). 빈손이면 품목 낱말 하나로 줄여 두 질의만 더 걸어 본다.
-    head = core.split()[-1] if core.split() else ""
+    # 여기서 뒷말을 집었던 게 위 사고의 방아쇠였다. core 가 '미니세탁기 1인'
+    # 이면 head 가 '1인' 이 되고, "1인 기준 고시" 같은 질의가 영문 위키의
+    # 숫자 1 문서를 물어 온다. 품목말은 언제나 앞말이다.
+    head = core.split()[0] if core.split() else ""
+    if len(head) < 2 or head[0].isdigit():
+        head = ""
     if not pool and head and head != core:
         for pat in _LADDER[:2]:
             q = pat.format(c=head)
