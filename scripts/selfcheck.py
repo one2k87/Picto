@@ -432,6 +432,41 @@ def _silent(ctx):
     return True, f"마지막 실행({when}) 로그 {re_.get('log_lines', 0)}줄에 예외 흔적 없음", ""
 
 
+@check("enrich_refs", "보강이 실제로 외부 1차 출처를 붙였는가", "me")
+def _enrich_refs(ctx):
+    """보강 파이프라인의 존재 이유는 분량이 아니라 **외부 1차 출처**다.
+    40편 전수 비교에서 색인/미색인을 가른 지표가 그것이었다(0.9 vs 0.2).
+
+    그런데 10/13·10/15 두 차례 보강이 '성공'으로 끝나면서 외부인용은 0→0 이었다.
+    enrich 의 보존 가드는 `elif refs and np["external"] <= pf["external"]` 이라
+    **출처를 하나도 못 구하면 가드 자체가 꺼진다** — 하는 일 없는 보강이 초록불로
+    통과한 것이다. 원인은 두 겹이었다(2026-10-16 실측):
+      ① 긴 제목 그대로 검색 → 쇼핑·블로그 결과이거나 무결과
+      ② _alive() 가 네트워크 예외를 '죽음'으로 접음 → 깃허브 러너(해외 IP)에서
+         standard.go.kr·law.go.kr·easylaw.go.kr 가 전멸(한국 IP 에서는 200)
+    둘 다 고쳤지만, 같은 실패가 다시 조용히 지나가는 것만은 막아 둔다."""
+    lg = _json("enrich_log.json", None)
+    if lg is None:
+        return True, "보강 기록이 아직 없습니다 — 판단 보류", ""
+    if lg.get("dry"):
+        return True, f"마지막 기록({(lg.get('at') or '')[:16]})이 dry_run — 판단 보류", ""
+    rows = [r for r in (lg.get("rows") or []) if r.get("ok")]
+    if not rows:
+        return True, f"마지막 보강({(lg.get('at') or '')[:16]})에 반영된 글이 없습니다 — 판단 보류", ""
+    import re as _re
+    gained = 0
+    for r in rows:
+        m = _re.search(r"외부인용\s*(\d+)\s*→\s*(\d+)", r.get("note") or "")
+        if m and int(m.group(2)) > int(m.group(1)):
+            gained += 1
+    if gained:
+        return True, (f"마지막 보강({(lg.get('at') or '')[:16]}) {len(rows)}편 중 "
+                      f"{gained}편에서 외부 1차 출처가 늘었습니다"), ""
+    return False, (f"마지막 보강({(lg.get('at') or '')[:16]}) {len(rows)}편 전부 "
+                   f"외부인용이 늘지 않았습니다 — 분량만 늘린 보강입니다"), \
+           "scripts/enrich_posts.py 의 gather_refs 로그('후보 N · 채택 N건')를 실행 로그에서 확인할 것"
+
+
 def main():
     cfg = json.load(open("config.json", encoding="utf-8"))
     wp = cfg.get("wordpress", {}) or {}

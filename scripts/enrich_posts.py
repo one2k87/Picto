@@ -90,14 +90,202 @@ def strip_denied_links(html):
 
 
 def _alive(url):
-    """실제로 살아 있는 주소만 인용한다. 죽은 링크는 보강이 아니라 흠이다."""
+    """살아 있는 주소만 인용한다. 단 '못 열었다'와 '죽었다'는 다르다.
+
+    2026-10-16 실측 — 이 함수가 보강 파이프라인을 두 번 통째로 무력화했다.
+    같은 주소를 두 곳에서 동시에 열어 보면:
+        standard.go.kr / law.go.kr / easylaw.go.kr / safetykorea.kr
+        · 한국 IP(사용자 맥)      → 200
+        · 해외 IP(깃허브 러너·컨테이너) → ConnectionError
+    공공기관이 해외 IP 를 막는 것이지 주소가 죽은 게 아니다. 그런데 예외를
+    전부 False 로 접어 버리니 DDG 가 제대로 찾아 준 go.kr 출처가 전멸했고,
+    refs 가 비면 '외부 인용이 늘지 않음' 가드도 같이 꺼져서(enrich 의 elif refs)
+    0건짜리 보강이 초록불로 통과했다 — 10/13·10/15 두 차례 모두 외부인용 0→0.
+    그래서 4xx·5xx 만 죽음으로 보고, 네트워크 예외는 '확인 불가'로 돌려준다.
+    """
     try:
         r = requests.head(url, headers=UA, timeout=12, allow_redirects=True)
         if r.status_code >= 400:
             r = requests.get(url, headers=UA, timeout=15, stream=True)
-        return r.status_code < 400
+        return "ok" if r.status_code < 400 else "dead"
     except Exception:
+        return "unknown"
+
+
+def usable(url):
+    """인용해도 되는 주소인가.
+
+    '확인 불가'를 통과시키는 건 authoritative() 로 이미 공공기관·표준·제조사
+    공식·백과로 좁혀 둔 뒤이기 때문이다. 아무 주소나 봐주는 게 아니라, 기관
+    도메인인데 해외에서 안 열리는 경우만 봐준다. 404 는 그대로 떨어뜨린다.
+    """
+    return authoritative(url) and _alive(url) != "dead"
+
+
+# 제목 전체로 검색하면 안 된다 (2026-10-16 실측).
+#   "직수 정수기 필터 교체 주기"        → No results found
+#   "1인 가구 미니세탁기 3kg 5kg"       → 쿠팡·다나와·네이버블로그
+# 기관·제도 단어를 붙인 짧은 질의여야 1차 출처가 올라온다.
+#   "전기히터 화재 한국소비자원"        → kca.go.kr
+#   "정수기 위생 관리 고시"             → law.go.kr · easylaw.go.kr · standard.go.kr
+#   "세탁기 KS 표준 고시"               → standard.go.kr
+# 'site:go.kr' 연산자는 쓰지 않는다 — 도메인만 맞고 주제가 전혀 다른 지자체
+# 무역포털·학회지가 올라온다(실측).
+_STOP = {"추천", "비교", "방법", "이유", "가지", "정리", "선택", "구매", "사용", "차이",
+         "가격", "후기", "최신", "제품", "기준", "요금", "경우", "효과", "관리", "확인",
+         "이것", "그것", "얼마", "하는", "하면", "되는", "쓰는", "살때", "모델"}
+_LADDER = ("{c} 안전주의보 한국소비자원", "{c} 기준 고시", "{c} 표준 규격",
+           "{c} 소비전력 에너지효율", "{c} 소비자분쟁해결기준")
+
+
+def _core(title, focus=""):
+    """제목에서 품목 명사 1~2개만 뽑는다. 검색어는 짧을수록 기관 문서가 나온다."""
+    src = re.sub(r"[^0-9A-Za-z가-힣 ]", " ", "%s %s" % (focus or "", title or ""))
+    out = []
+    for w in src.split():
+        w = re.sub(r"(은|는|이|가|을|를|의|에|로|와|과|도|만)$", "", w)
+        if len(w) < 2 or w in _STOP or w.isdigit():
+            continue
+        if w not in out:
+            out.append(w)
+        if len(out) >= 2:
+            break
+    return " ".join(out) or (title or "")[:12]
+
+
+def _wiki(core):
+    """위키백과 한국어판 — 공공기관과 달리 해외 IP 에서도 열리는 마지막 보루.
+
+    1차 출처는 아니지만 품목 정의·작동 원리를 거는 데는 쓸 만하다. 다만 검색
+    2순위부터는 전혀 다른 표제어가 섞이므로('전기장판' → '판타지 여동생!',
+    2026-10-16 실측) 표제어가 핵심어와 겹칠 때만 채택한다.
+    """
+    import urllib.parse
+    import urllib.request
+    head = (core or "").split()[-1] if core else ""
+    if len(head) < 2:
+        return None
+    try:
+        u = "https://ko.wikipedia.org/w/api.php?" + urllib.parse.urlencode(
+            {"action": "query", "format": "json", "list": "search",
+             "srsearch": head, "srlimit": 3})
+        rq = urllib.request.Request(
+            u, headers={"User-Agent": "pickdam-enrich/1.0 (+https://pickdam.com)"})
+        data = json.loads(urllib.request.urlopen(rq, timeout=12).read().decode("utf-8"))
+    except Exception as e:
+        print("      [wiki] 실패: %s" % e)
+        return None
+    for it in data.get("query", {}).get("search", []):
+        t = it.get("title") or ""
+        if head and (head in t or t in head):
+            return {"title": "%s - 위키백과" % t,
+                    "url": "https://ko.wikipedia.org/wiki/"
+                           + urllib.parse.quote(t.replace(" ", "_"))}
+    return None
+
+
+# 기관 도메인이라고 다 인용거리는 아니다 (2026-10-16 실측).
+# 같은 질의를 두 번 돌렸더니 한 번은 kca.go.kr 의 '피해예방주의보 상세보기'가,
+# 한 번은 '…주의보 목록'과 '한국소비자원 메인'이 올라왔다. 목록·메인을 거는 건
+# 출처 인용이 아니라 링크 늘리기이고, 구글이 가장 싫어하는 종류다.
+# 그래서 '문서인가 허브인가'로 거른다 — 주제어 일치로는 못 거른다. 쓸 만한
+# 상세 페이지도 제목이 'OOO > 소비자뉴스 > 피해예방주의보 > 상세보기' 같은
+# 빵부스러기라 본문 주제어가 안 들어 있기 때문이다.
+_DOC_HINT = ("mode=view", "no=", "seq=", "idx=", "articleno", "admrul", "lsinfo",
+             "stddetail", "cnpcls", "/wiki/", ".pdf", "/view", "bbsid", "ntt")
+_HUB_PATH = ("/", "/index.do", "/main.do", "/home/main.do", "/home/", "/kr/", "/portal/")
+_HUB_TAIL = ("목록", "메인", "> main", "home")
+
+
+def _specific(url, title=""):
+    """목록·메인 같은 허브 페이지는 출처로 쓰지 않는다. 상세 문서만 통과."""
+    u = (url or "").lower()
+    path = "/" + u.split("//", 1)[-1].split("/", 1)[-1] if "//" in u else u
+    if "/" not in u.split("//", 1)[-1]:
+        return False                              # 도메인 루트
+    bare = path.split("?")[0]
+    if bare in _HUB_PATH or bare.endswith(("/main.do", "/index.do", "/sub.do")):
+        if not any(h in u for h in _DOC_HINT):
+            return False
+    t = (title or "").strip().lower()
+    if any(t.endswith(x) for x in _HUB_TAIL):
         return False
+    return any(h in u for h in _DOC_HINT) or len([x for x in bare.split("/") if x]) >= 2
+
+
+def gather_refs(title, focus="", want=2):
+    """기관 지향 질의를 사다리로 올라가며 권위 출처를 모은다. 실패하면 위키백과."""
+    import time as _t
+    core = _core(title, focus)
+    seen, pool, tried = set(), [], []
+    # 사다리를 끝까지 걷지 않고 want 건 모이면 멈추면, 같은 기관 페이지 두 장을
+    # 집게 된다(2026-10-16 실측: kca.go.kr 피해예방주의보 2장 / law.go.kr 2장).
+    # 서로 다른 기관 두 곳을 인용해야 '여러 1차 출처를 확인한 글'이 되므로,
+    # 최소 세 질의까지는 돌려 후보를 모아 두고 호스트별로 하나씩 고른다.
+    for i, pat in enumerate(_LADDER):
+        if len(pool) >= want and i >= 3:
+            break
+        q = pat.format(c=core)
+        tried.append(q)
+        try:
+            cands = find_reference_links(q, max_results=5)
+        except Exception:
+            cands = []
+        for r in cands:
+            u = (r.get("url") or "").split("#")[0]
+            if not u or u in seen:
+                continue
+            seen.add(u)
+            if usable(u) and _specific(u, r.get("title")):
+                pool.append({"title": r.get("title") or u, "url": u})
+        _t.sleep(2)
+
+    # 핵심어가 너무 좁으면 기관 문서가 안 걸린다('욕실 온풍기' → 후보 0,
+    # 2026-10-16 실측). 빈손이면 품목 낱말 하나로 줄여 두 질의만 더 걸어 본다.
+    head = core.split()[-1] if core.split() else ""
+    if not pool and head and head != core:
+        for pat in _LADDER[:2]:
+            q = pat.format(c=head)
+            tried.append(q)
+            try:
+                cands = find_reference_links(q, max_results=5)
+            except Exception:
+                cands = []
+            for r in cands:
+                u = (r.get("url") or "").split("#")[0]
+                if not u or u in seen:
+                    continue
+                seen.add(u)
+                if usable(u) and _specific(u, r.get("title")):
+                    pool.append({"title": r.get("title") or u, "url": u})
+            _t.sleep(2)
+
+    def _host(u):
+        return u.split("//", 1)[-1].split("/", 1)[0].lstrip("www.")
+
+    refs, used = [], set()
+    for r in pool:                       # 1순위: 기관이 서로 다른 것부터
+        h = _host(r["url"])
+        if h in used:
+            continue
+        used.add(h)
+        refs.append(r)
+        if len(refs) >= want:
+            break
+    if len(refs) < want:                 # 2순위: 그래도 모자라면 같은 기관이라도
+        for r in pool:
+            if r not in refs:
+                refs.append(r)
+            if len(refs) >= want:
+                break
+    if not refs:
+        w = _wiki(core)
+        if w:
+            refs.append(w)
+    print("      출처 검색: 핵심어 '%s' · 질의 %d개 · 후보 %d · 채택 %d건(기관 %d곳)"
+          % (core, len(tried), len(pool), len(refs),
+             len({_host(r["url"]) for r in refs})))
+    return refs, core
 
 
 def pick(posts, index_state, want):
@@ -160,24 +348,12 @@ def enrich(p, pf, cfg, dry):
         if cleaned == (p.get("content") or {}).get("raw"):
             return None, "정리할 비권위 링크 없음"
         return raw, "비권위 외부 링크만 정리(LLM 미사용)"
-    # 검색이 간헐적으로 끊긴다(실측: duckduckgo Connection reset). 한 번 더,
-    # 그리고 제목 전체 대신 앞 낱말만으로 줄여서 다시 시도한다.
-    import time as _t
-    cands, short = [], " ".join(re.sub(r"[,?!]", " ", title).split()[:4])
-    for q in (title, title, short):
-        try:
-            cands = find_reference_links(q, max_results=4)
-        except Exception:
-            cands = []
-        if cands:
-            break
-        _t.sleep(3)
-    refs = [r for r in cands if authoritative(r["url"]) and _alive(r["url"])][:2]
+    refs, core = gather_refs(title, p.get("_focus", ""), want=2)
     ref_text = ("\n".join(f"- {r['title'][:60]} : {r['url']}" for r in refs)
                 if refs else "(공공기관·표준·제조사 공식 같은 1차 출처를 못 찾았습니다 — "
                              "외부 링크는 **넣지 마세요**. 블로그·쇼핑몰 링크는 금지입니다)")
     if dry:
-        return None, f"출처 {len(refs)}건 · (dry_run)"
+        return None, f"출처 {len(refs)}건 · 핵심어 '{core}' · (dry_run)"
 
     # 2026-10-13: 첫 실전에서 2편 모두 보존 검증에 걸렸다(이미지 1장 소실 / 출처 누락).
     # 검증을 느슨하게 푸는 건 답이 아니다 — 반려 사유를 그대로 돌려주고 한 번 더 시킨다.
@@ -224,10 +400,11 @@ def enrich(p, pf, cfg, dry):
             stamp = MARK + datetime.date.today().isoformat() + "-->"
             return neo + "\n" + stamp, (f"{_round}회차 · {pf['chars']}→{np['chars']}자 · "
                                          f"목록 {pf['lists']}→{np['lists']} · "
-                                         f"외부인용 {pf['external']}→{np['external']}")
+                                         f"외부인용 {pf['external']}→{np['external']} · "
+                                         f"출처 {len(refs)}건")
         print(f"      {_round}회차 반려: {why}")
         prev, last = why, why
-    return None, last
+    return None, f"{last} · 출처 {len(refs)}건"
 
 
 def main():
