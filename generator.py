@@ -17,7 +17,7 @@ import re
 import html as html_mod
 import random
 from llm import chat
-from links import find_reference_links
+from links import authoritative, find_reference_links, strip_denied_links
 
 # 승인 후 수익 최적화: True면 광고 3개 배치(기본 2개). main.run()에서 설정.
 ADS_BOOST = False
@@ -1237,8 +1237,29 @@ def _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,
         "focus_keyword": data.get("focus_keyword", keyword),
         "tags": data.get("tags", []), "faqs": data.get("faqs", []),
         "kokpick": data.get("kokpick") if isinstance(data.get("kokpick"), dict) else {},
-        "html": full_html, "links": links,
+        # 지시는 샌다 — 모델이 example.com·yourblog.com 을 지어내 걸어 둔 글이
+        # 실제로 있었다(2026-10-19 실측). 출력에서 기계로 걷어낸다.
+        "html": strip_denied_links(full_html), "links": links,
     }
+
+
+def _refs(query, n=2):
+    """생성 경로의 참고 링크 — 권위 도메인만 모델에게 건넨다.
+
+    2026-10-19 전수 점검에서 드러난 것: 보강 경로에는 authoritative() 필터가
+    있었는데 **생성 경로에는 아예 없었다.** find_reference_links 가 준 DDG
+    결과를 그대로 모델에 넘겨서, 새 글이 경쟁 제휴 블로그(choicemon·ittemlab·
+    homegrade·subir…)와 네이버/티스토리를 그대로 걸고 있었다. 36편 중 15편,
+    링크 28개. 경쟁 블로그로 권위를 흘려보내는 건 SEO 상 자해다.
+    """
+    try:
+        cands = find_reference_links(query, max_results=n * 3)
+    except Exception:
+        cands = []
+    out = [r for r in cands if authoritative(r.get("url", ""))][:n]
+    if cands and not out:
+        print(f"[links] '{query}' — 권위 출처 없음, 외부 링크 없이 생성")
+    return out
 
 
 def generate_article(keyword, kind, llm_cfg, category="", related=None,
@@ -1246,7 +1267,7 @@ def generate_article(keyword, kind, llm_cfg, category="", related=None,
                      author="편집부", author_bio="", author_type="Organization", competitive=False):
     """키워드 1개 → 수익형 한국어 글 dict 반환(리스트로 감싸 반환)."""
     related = related or []
-    links = find_reference_links(keyword, max_results=2)
+    links = _refs(keyword)
     art = _gen_one(keyword, kind, llm_cfg, category, links, related, blog_url,
                    insert_ads, image_resolver, author=author, author_bio=author_bio,
                    author_type=author_type, competitive=competitive)
@@ -1295,7 +1316,7 @@ def generate_series(topic, kind, n_parts, llm_cfg, category="", related=None,
     parts_meta = [{"slug": make_slug("", kw, kw) + f"-{i+1}", "url": ""}
                   for i, kw in enumerate(part_kws)]
 
-    links = find_reference_links(topic, max_results=2)
+    links = _refs(topic)
     arts = []
     for i, kw in enumerate(part_kws):
         nav = _series_nav(parts_meta, i, blog_url)

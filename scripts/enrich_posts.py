@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import requests
 
 import quality
-from links import find_reference_links
+from links import authoritative, find_reference_links, strip_denied_links
 from llm import chat
 from publisher import _auth_header, update_post_content
 
@@ -54,47 +54,6 @@ def _profile(html):
     }
 
 
-# 어떤 출처를 '1차 출처'로 볼 것인가 (2026-10-13).
-# 첫 실전에서 모델이 가져온 출처가 네이버 블로그·티스토리·팁 모음 사이트였다.
-# 색인/미색인을 가른 지표는 '외부 링크 수'가 아니라 **권위 있는 출처를 인용했는가**다.
-# 블로그를 걸면 숫자만 늘고 신뢰 신호는 안 생긴다 — 그래서 도메인으로 거른다.
-_DENY = ("blog.naver.com", "cafe.naver.com", "tistory.com", "brunch.co.kr", "velog.io",
-         "medium.com", "wordpress.com", "blogspot.", "post.naver.com", "in.naver.com",
-         "namu.wiki", "pinterest.", "youtube.com", "facebook.com", "instagram.com",
-         "coupang.com", "11st.co.kr", "gmarket.co.kr", "auction.co.kr", "smartstore.naver.com")
-# 2026-10-16 실전 사고 — 러너(미국 IP)에서 돌린 보강이 본문에 이런 걸 걸었다:
-#   #625 직수 정수기  → en.wikipedia.org/wiki/Microsoft · irs.gov/payments/...
-#   #325 미니세탁기   → en.wikipedia.org/wiki/1 · simple.wikipedia.org/wiki/1_(number)
-# 전부 authoritative() 와 _specific() 을 **정상 통과**했다(.gov 접미사 / '/wiki/' 포함).
-# 권위와 관련성은 다른 축인데 권위만 봤다. 아무 출처도 없는 것보다 나쁘다.
-# 픽담은 한국 소비자 블로그다 — 미 연방기관·영문 위키는 어떤 경우에도 출처가
-# 아니다. 그래서 허용 목록 자체를 한국 출처로 좁힌다.
-_ALLOW_SUFFIX = (".go.kr", ".or.kr", ".re.kr", ".ac.kr")
-_ALLOW_HOST = ("kepco.co.kr", "energy.or.kr", "kemco.or.kr", "kca.go.kr", "ftc.go.kr",
-               "kats.go.kr", "standard.go.kr", "data.go.kr", "law.go.kr", "nts.go.kr",
-               "consumer.go.kr", "safetykorea.kr", "kssn.net",
-               "samsung.com", "lge.co.kr", "coway.com", "cuckoo.co.kr", "winix.com",
-               "ko.wikipedia.org")
-
-
-def authoritative(url):
-    """공공기관·법령·표준·제조사 공식·백과만 1차 출처로 본다. 블로그·쇼핑몰은 거른다."""
-    u = (url or "").lower()
-    host = u.split("//", 1)[-1].split("/", 1)[0]
-    if any(d in host for d in _DENY):
-        return False
-    return host.endswith(_ALLOW_SUFFIX) or any(h in host for h in _ALLOW_HOST)
-
-
-def strip_denied_links(html):
-    """블로그·쇼핑몰로 걸린 외부 링크는 글자만 남기고 걷어낸다(재보강 때 자가 정리)."""
-    def un(m):
-        return m.group(2)
-    return re.sub(r'<a[^>]+href="(https?://[^"]+)"[^>]*>(.*?)</a>',
-                  lambda m: un(m) if (("pickdam.com" not in m.group(1))
-                                      and ("coupang" not in m.group(1))
-                                      and not authoritative(m.group(1))) else m.group(0),
-                  html, flags=re.S)
 
 
 def _alive(url):

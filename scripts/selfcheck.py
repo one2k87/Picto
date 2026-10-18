@@ -467,6 +467,75 @@ def _enrich_refs(ctx):
            "scripts/enrich_posts.py 의 gather_refs 로그('후보 N · 채택 N건')를 실행 로그에서 확인할 것"
 
 
+@check("live_links", "글에 실린 외부 링크가 전부 한국 1차 출처인가", "me")
+def _live_links(ctx):
+    """로그가 초록인데 실물이 틀린 경우를 러너가 스스로 잡게 한다.
+
+    2026-10-16 하루에 세 번 같은 자리에서 미끄러졌다. 보강 로그는 매번
+    '외부인용 0→2' 로 멀쩡했는데 사이트를 열어 보니 이랬다:
+      · en.wikipedia.org/wiki/Microsoft · irs.gov  (#625 직수 정수기)
+      · en.wikipedia.org/wiki/1                     (#325 미니세탁기)
+      · 에너지소비효율등급                           (#348 기름 스프레이)
+    세 번 다 **사람이 페이지를 열어 봐서** 잡았다. 숫자만 봤으면 전부
+    '성공'으로 보고했을 것이다. 그 자리를 기계로 막는다.
+
+    도메인 정책만 본다 — 살아 있는지는 보지 않는다. 깃허브 러너는 해외 IP
+    라서 go.kr 상당수가 ConnectionError 로 떨어지고(같은 주소가 한국에서는
+    200), 그걸 '죽음'으로 처리했다가 보강이 두 번 통째로 비었던 전례가 있다.
+    여기서 판정할 수 있는 것은 '어느 도메인을 걸었는가' 뿐이고, 그것만으로
+    위 세 건이 전부 걸린다.
+
+    마지막으로 가장 최근 글 **한 장은 실제로 열어** REST 본문에 있는 외부
+    링크가 라이브에도 남아 있는지 본다(호스트 WAF·테마가 지우는 경우 탐지).
+    """
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from enrich_posts import authoritative
+    except Exception as e:
+        return True, f"authoritative() 를 못 불러와 판단 보류: {e}", ""
+
+    skip = ("pickdam.com", "coupang", "gravatar.com", "wp.me", "w.org",
+            "googletagmanager.com", "google-analytics.com", "fonts.g",
+            "gstatic.com", "schema.org", "wordpress.org")
+
+    def ext(html):
+        return [u for u in re.findall(r'href="(https?://[^"]+)"', html or "")
+                if not any(k in u for k in skip)]
+
+    bad, total = [], 0
+    for p in ctx["posts"]:
+        for u in set(ext((p.get("content") or {}).get("rendered", ""))):
+            total += 1
+            if not authoritative(u):
+                bad.append((p["id"], u))
+
+    if bad:
+        head = " / ".join(f"#{i} {u[:52]}" for i, u in bad[:3])
+        return False, (f"외부 링크 {total}개 중 {len(bad)}개가 한국 1차 출처가 "
+                       f"아닙니다 — {head}"), \
+               ("enrich-posts 를 clean_only=true 로 돌려 걷어내세요. 권위 도메인인데 "
+                "품목과 무관한 경우는 drop 입력에 주소 조각을 넣으세요")
+
+    # 최근 글 한 장은 실제로 열어 본다 — REST 는 멀쩡한데 라이브에서 사라지는 경우
+    live = ""
+    try:
+        newest = sorted(ctx["posts"], key=lambda p: p.get("modified_gmt") or "")[-1]
+        want = set(ext((newest.get("content") or {}).get("rendered", "")))
+        r = requests.get(newest["link"], headers=UA, timeout=25)
+        got = set(ext(r.text))
+        lost = [u for u in want if u not in got and u.replace("&", "&#038;") not in r.text]
+        if lost:
+            return False, (f"#{newest['id']} 는 REST 본문에 외부 링크 {len(want)}개가 "
+                           f"있는데 라이브 페이지에서 {len(lost)}개가 사라졌습니다 — "
+                           f"{lost[0][:60]}"), \
+                   "호스트 WAF 나 테마가 링크를 지우는지 확인할 것"
+        live = f" · 최신 글 #{newest['id']} 라이브 대조 일치({len(want)}개)"
+    except Exception as e:
+        live = f" · 라이브 대조 건너뜀({type(e).__name__})"
+
+    return True, f"{len(ctx['posts'])}편의 외부 링크 {total}개 전부 한국 1차 출처{live}", ""
+
+
 def main():
     cfg = json.load(open("config.json", encoding="utf-8"))
     wp = cfg.get("wordpress", {}) or {}
