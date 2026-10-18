@@ -8,17 +8,17 @@
  "apply_trace": [
   {
    "stage": "진입",
-   "title": "욕실 온풍기, 20분 사용해도 전기 요금 월 1만 ",
+   "title": "비데 분기밸브 누수가 걱정된다면, 2026년 10월",
    "enabled": false,
    "widget_len": 211,
-   "h2": 4
+   "h2": 5
   },
   {
    "stage": "중단:enabled=False",
-   "title": "욕실 온풍기, 20분 사용해도 전기 요금 월 1만 ",
+   "title": "비데 분기밸브 누수가 걱정된다면, 2026년 10월",
    "enabled": false,
    "widget_len": 211,
-   "h2": 4
+   "h2": 5
   }
  ]
 }
