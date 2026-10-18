@@ -519,7 +519,14 @@ def _live_links(ctx):
     # 최근 글 한 장은 실제로 열어 본다 — REST 는 멀쩡한데 라이브에서 사라지는 경우
     live = ""
     try:
-        newest = sorted(ctx["posts"], key=lambda p: p.get("modified_gmt") or "")[-1]
+        # 외부 링크가 **있는** 글 중 가장 최근 것을 고른다. 그냥 최신 글을
+        # 집으면 링크 0개짜리가 걸려 대조가 공허해진다(2026-10-19 실측:
+        # 세척 직후 #21 이 최신으로 잡혀 '일치(0개)' 가 떴다).
+        withlinks = [p for p in ctx["posts"]
+                     if ext((p.get("content") or {}).get("rendered", ""))]
+        if not withlinks:
+            return True, f"{len(ctx['posts'])}편에 외부 링크가 하나도 없습니다", ""
+        newest = sorted(withlinks, key=lambda p: p.get("modified_gmt") or "")[-1]
         want = set(ext((newest.get("content") or {}).get("rendered", "")))
         r = requests.get(newest["link"], headers=UA, timeout=25)
         got = set(ext(r.text))
