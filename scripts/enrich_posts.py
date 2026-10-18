@@ -481,7 +481,11 @@ def main():
                 fail += 1
 
     os.makedirs(DATA, exist_ok=True)
+    # 정리 전용 회차를 기록에 남긴다. 안 남겼더니 작동 점검의 enrich_refs 가
+    # "15편 전부 외부인용이 늘지 않았다"고 실패를 띄웠다 — LLM 을 안 쓴
+    # 세척 회차였으니 당연한 일이다(2026-10-19 실측, 오탐).
     out = {"at": datetime.datetime.now().isoformat()[:19], "dry": dry,
+           "clean_only": (os.getenv("ENRICH_CLEAN_ONLY") or "").lower() == "true",
            "done": done, "fail": fail, "rows": log}
     json.dump(out, open(os.path.join(DATA, "enrich_log.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)

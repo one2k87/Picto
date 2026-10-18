@@ -450,6 +450,11 @@ def _enrich_refs(ctx):
         return True, "보강 기록이 아직 없습니다 — 판단 보류", ""
     if lg.get("dry"):
         return True, f"마지막 기록({(lg.get('at') or '')[:16]})이 dry_run — 판단 보류", ""
+    # 정리 전용 회차는 LLM 을 안 쓴다 — 인용이 안 느는 게 정상이다.
+    if lg.get("clean_only") or all("LLM 미사용" in (r.get("note") or "")
+                                   for r in (lg.get("rows") or []) if r.get("ok")):
+        return True, (f"마지막 기록({(lg.get('at') or '')[:16]})이 링크 정리 전용 회차 "
+                      f"— 보강 판단 보류"), ""
     rows = [r for r in (lg.get("rows") or []) if r.get("ok")]
     if not rows:
         return True, f"마지막 보강({(lg.get('at') or '')[:16]})에 반영된 글이 없습니다 — 판단 보류", ""
