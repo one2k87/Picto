@@ -1,6 +1,6 @@
 {
- "at": "2026-10-19T08:26:34",
- "posts": 36,
+ "at": "2026-10-19T13:31:16",
+ "posts": 37,
  "pass": 13,
  "fail": 1,
  "checks": [
@@ -8,7 +8,7 @@
    "key": "sitemap",
    "title": "사이트맵이 모든 글을 담고 있는가",
    "ok": true,
-   "evidence": "사이트맵 37개 · 발행 36편 · 누락 0",
+   "evidence": "사이트맵 38개 · 발행 37편 · 누락 0",
    "fix": "",
    "fix_by": "user"
   },
@@ -24,7 +24,7 @@
    "key": "coupang_links",
    "title": "쿠팡 링크가 상품으로 연결되는가",
    "ok": true,
-   "evidence": "27개 전부 연결 (상품 21 · 검색·기획전 6)",
+   "evidence": "28개 전부 연결 (상품 22 · 검색·기획전 6)",
    "fix": "",
    "fix_by": "me"
   },
@@ -32,7 +32,7 @@
    "key": "cards",
    "title": "상품 카드가 글마다 하나인가",
    "ok": true,
-   "evidence": "36편 전부 카드 1개 이하",
+   "evidence": "37편 전부 카드 1개 이하",
    "fix": "",
    "fix_by": "auto"
   },
@@ -40,7 +40,7 @@
    "key": "index",
    "title": "색인 검사가 모든 글을 보고 있는가",
    "ok": true,
-   "evidence": "색인 31/37 (84%)",
+   "evidence": "글 색인 31/38 (82%)",
    "fix": "",
    "fix_by": "auto"
   },
@@ -56,7 +56,7 @@
    "key": "strategy",
    "title": "전략 피드백이 주제에 반영되는가",
    "ok": true,
-   "evidence": "winners 8건 반영 중",
+   "evidence": "winners 7건 반영 중",
    "fix": "",
    "fix_by": "auto"
   },
@@ -72,7 +72,7 @@
    "key": "disclosure",
    "title": "대가성 고지가 모든 글에 있는가",
    "ok": true,
-   "evidence": "36편 전부 보유",
+   "evidence": "37편 전부 보유",
    "fix": "",
    "fix_by": "auto"
   },
@@ -87,32 +87,32 @@
   {
    "key": "redirects",
    "title": "없앤 주소가 301 로 이어지는가",
-   "ok": true,
-   "evidence": "없앤 주소 6개 전부 301",
-   "fix": "",
+   "ok": false,
+   "evidence": "1/7개가 301 이 아닙니다: interior-cost-saving-guide(404)",
+   "fix": "Rank Math → 리디렉션에서 해당 주소를 기둥글로 301 등록",
    "fix_by": "me"
   },
   {
    "key": "silent_errors",
    "title": "매일 실행에 조용히 죽은 단계가 없는가",
    "ok": true,
-   "evidence": "마지막 실행(2026-10-19T08:23) 로그 80줄에 예외 흔적 없음",
+   "evidence": "마지막 실행(2026-10-19T10:20) 로그 70줄에 예외 흔적 없음",
    "fix": "",
    "fix_by": "me"
   },
   {
    "key": "enrich_refs",
    "title": "보강이 실제로 외부 1차 출처를 붙였는가",
-   "ok": false,
-   "evidence": "마지막 보강(2026-10-19T08:23) 15편 전부 외부인용이 늘지 않았습니다 — 분량만 늘린 보강입니다",
-   "fix": "scripts/enrich_posts.py 의 gather_refs 로그('후보 N · 채택 N건')를 실행 로그에서 확인할 것",
+   "ok": true,
+   "evidence": "마지막 기록(2026-10-19T08:23)이 링크 정리 전용 회차 — 보강 판단 보류",
+   "fix": "",
    "fix_by": "me"
   },
   {
    "key": "live_links",
    "title": "글에 실린 외부 링크가 전부 한국 1차 출처인가",
    "ok": true,
-   "evidence": "36편의 외부 링크 13개 전부 한국 1차 출처 · 최신 글 #455 라이브 대조 일치(1개)",
+   "evidence": "37편의 외부 링크 13개 전부 한국 1차 출처 · 최신 글 #455 라이브 대조 일치(1개)",
    "fix": "",
    "fix_by": "me"
   }
