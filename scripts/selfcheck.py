@@ -392,28 +392,38 @@ def _redirects(ctx):
     말로 된 규약은 또 샌다 — 없앤 주소를 매일 실제로 두드려 확인한다."""
     # 휴지통으로 보낸 글은 REST 로 주소를 되찾을 수 없으므로, retire 단계가
     # dashboard/data/merge_urls.json 에 남긴 목록과 removed_urls.json 을 본다.
-    urls = []
-    try:
-        rm = _json("../../data/removed_urls.json", {})
-        urls += [u for u in (rm.get("urls") or []) if isinstance(u, str) and u.startswith("http")]
-    except Exception:
-        pass
-    urls += [u for u in (_json("merge_urls.json", {}) or {}).get("retired", []) if u]
-    urls = sorted(set(urls))
-    if not urls:
-        return True, "확인할 '없앤 주소'가 없습니다", ""
-    bad = []
-    for u in urls[:30]:
+    # 2026-10-20: 이 검사가 두 목록을 한 덩어리로 다뤄 오탐을 냈다.
+    #   merge_urls.retired  = **통합**한 글 → 흡수한 기둥글로 **301 이어야** 한다
+    #   removed_urls.urls   = **삭제**한 글 → **404/410 이 정답**이다
+    # 구글 안내도 진짜 삭제된 페이지는 404 가 맞다고 말한다. 그런데 어제
+    # /interior-cost-saving-guide/(실제 404)를 removed 에 등록했더니 "301 이
+    # 아니다"라고 실패가 떴다. 기준이 틀린 경보는 결국 안 보게 된다 — publish
+    # 검사에서 이미 한 번 겪은 일이다. 두 목록을 갈라서 본다.
+    merged = [u for u in (_json("merge_urls.json", {}) or {}).get("retired", []) if u]
+    removed = [u for u in ((_json("../../data/removed_urls.json", {}) or {}).get("urls") or [])
+               if isinstance(u, str) and u.startswith("http")]
+
+    def code(u):
         try:
-            r = requests.get(u, headers=UA, timeout=20, allow_redirects=False)
-            if r.status_code not in (301, 308):
-                bad.append(f"{u.rsplit('/', 2)[-2]}({r.status_code})")
+            return requests.get(u, headers=UA, timeout=20, allow_redirects=False).status_code
         except Exception as e:
-            bad.append(f"{u.rsplit('/', 2)[-2]}({str(e)[:20]})")
+            return str(e)[:18]
+
+    bad = []
+    for u in sorted(set(merged))[:30]:                 # 통합분: 301/308 만 정답
+        c = code(u)
+        if c not in (301, 308):
+            bad.append(f"통합 {u.rsplit('/', 2)[-2]}({c})")
+    for u in sorted(set(removed))[:30]:                # 삭제분: 200 만 아니면 된다
+        c = code(u)
+        if c == 200 or not isinstance(c, int):
+            bad.append(f"삭제 {u.rsplit('/', 2)[-2]}({c})")
     if bad:
-        return False, f"{len(bad)}/{len(urls)}개가 301 이 아닙니다: " + " / ".join(bad[:4]), \
-               "Rank Math → 리디렉션에서 해당 주소를 기둥글로 301 등록"
-    return True, f"없앤 주소 {len(urls)}개 전부 301", ""
+        return False, f"{len(bad)}건이 기대와 다릅니다: " + " / ".join(bad[:4]), \
+               ("통합분은 Rank Math → 리디렉션에서 기둥글로 301 등록. "
+                "삭제분이 200 이면 글이 되살아난 것이니 목록에서 빼거나 다시 지울 것")
+    return True, (f"통합 {len(set(merged))}개 전부 301 · "
+                  f"삭제 {len(set(removed))}개 전부 사라진 상태"), ""
 
 
 # ── 11. 매일 실행 안에서 조용히 죽은 단계가 없는가 ────────────────────
