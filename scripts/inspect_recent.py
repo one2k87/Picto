@@ -63,6 +63,31 @@ cutoff = (datetime.datetime.utcnow() - datetime.timedelta(days=14)).strftime("%Y
 # 교차 확인으로 12편+ 색인 확인, API만 0/29 오답). 디코딩해 보내야 정답이 나온다.
 urls = [site + "/"] + [unquote(p["link"]) for p in posts if p.get("modified", "") >= cutoff]
 
+# 2026-10-19: 여기서 **글만** 검사하는 바람에 대시보드가 '색인 31/37(84%)'이라고
+# 말해 왔다. 같은 날 Search Console 의 페이지 색인 보고서는 **색인 37 / 미색인 31**
+# 이었다. 틀린 게 아니라 **보는 범위가 달랐다** — 구글은 글뿐 아니라 카테고리
+# 아카이브·고정 페이지·피드·옛 주소까지 전부 센다. 그런데 나는 그 84%를 근거로
+# 사용자에게 "미색인은 6건뿐"이라고 보고했다. 범위를 넓혀 실제를 보게 한다.
+# (은퇴 주소는 여기 넣지 않는다 — 301 로 빠지는 게 정상이라 비율만 망가뜨린다.)
+_extra = []
+try:
+    _pg = requests.get(f"{site}/wp-json/wp/v2/pages", timeout=30,
+                       params={"per_page": 50, "status": "publish", "_fields": "link"})
+    if _pg.status_code == 200:
+        _extra += [unquote(x["link"]) for x in _pg.json()]
+except Exception as e:
+    print(f"[inspect] 고정 페이지 목록 실패: {e}")
+try:
+    _ct = requests.get(f"{site}/wp-json/wp/v2/categories", timeout=30,
+                       params={"per_page": 50, "_fields": "link,count"})
+    if _ct.status_code == 200:
+        _extra += [unquote(x["link"]) for x in _ct.json() if (x.get("count") or 0) > 0]
+except Exception as e:
+    print(f"[inspect] 카테고리 목록 실패: {e}")
+_seen = set(urls)
+EXTRA_URLS = [u for u in dict.fromkeys(_extra) if u not in _seen]
+print(f"[inspect] 글 {len(urls)-1} · 글 외(페이지·카테고리) {len(EXTRA_URLS)}")
+
 # 속성 형식 자동 판별(2026-09-10 신설).
 # 픽담의 Search Console 속성은 **도메인 속성**(`sc-domain:pickdam.com`)인데
 # `sc_site_url` 기본값은 WP 주소(`https://pickdam.com/`)라 형식이 어긋난다.
@@ -87,16 +112,21 @@ else:
 sc_site = site_form
 
 results, ok_n = [], 0
-for u in urls[:60]:
+extra_results = []
+for u in urls[:60] + EXTRA_URLS[:25]:
     try:
         res = svc.urlInspection().index().inspect(
             body={"inspectionUrl": u, "siteUrl": sc_site}).execute()
         idx = (res.get("inspectionResult", {}) or {}).get("indexStatusResult", {}) or {}
         verdict = idx.get("verdict", "?")            # PASS = 색인됨
-        results.append({"url": u, "verdict": verdict,
-                        "state": idx.get("coverageState", ""),
-                        "lastCrawl": (idx.get("lastCrawlTime") or "")[:10]})
-        ok_n += 1
+        row = {"url": u, "verdict": verdict,
+               "state": idx.get("coverageState", ""),
+               "lastCrawl": (idx.get("lastCrawlTime") or "")[:10]}
+        if u in _seen:
+            results.append(row)
+            ok_n += 1
+        else:
+            extra_results.append(row)
     except Exception as e:
         results.append({"url": u, "verdict": "ERROR", "state": str(e)[:100], "lastCrawl": ""})
 
@@ -126,7 +156,11 @@ if ghosts:
 out = {"updated_at": datetime.datetime.now().isoformat()[:19],
        "site": site, "checked": ok_n, "indexed": passed, "ghosts": ghosts,
        "site_form": site_form, "form_err": form_err,
-       "posts_diag": diag, "posts_n": len(posts), "results": results}
+       "posts_diag": diag, "posts_n": len(posts), "results": results,
+       # 글 외(고정 페이지·카테고리 아카이브). 비율에는 넣지 않는다 — 이것들은
+       # 애초에 색인을 노리는 대상이 아니다. 다만 **보이기는 해야 한다**.
+       "extra": extra_results,
+       "extra_unindexed": len([r for r in extra_results if r["verdict"] != "PASS"])}
 json.dump(out, open("dashboard/data/index_status.json", "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)
 print(f"[inspect] {ok_n}개 검사 — 색인됨 {passed} / 미색인 {ok_n - passed}")

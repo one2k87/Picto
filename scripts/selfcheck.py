@@ -253,7 +253,16 @@ def _index(ctx):
                "새 글을 늘리기 전에 기존 글 보강·중복 정리로 크롤 이유를 만들 것"
     if ratio < 80:
         return False, f"색인 {indexed}/{checked} ({ratio}%)", "미색인 글에 내부링크 보강 + 사이트맵 확인"
-    return True, f"색인 {indexed}/{checked} ({ratio}%)", ""
+    # 2026-10-19 — 이 한 줄을 "미색인은 6건뿐"으로 읽고 사용자에게 그대로
+    # 보고했다. 같은 날 Search Console 보고서는 **미색인 31건**이었다. 숫자가
+    # 틀린 게 아니라 **범위가 글에 한정**돼 있었는데 내가 전체로 읽었다.
+    # 그래서 범위를 문장에 박아 둔다. 애매한 지표는 결국 잘못 읽힌다.
+    extra = ix.get("extra") or []
+    tail = ""
+    if extra:
+        nu = ix.get("extra_unindexed", 0)
+        tail = f" · 글 외 {len(extra)}건 중 미색인 {nu}(카테고리·고정 페이지, 비율 제외)"
+    return True, f"글 색인 {indexed}/{checked} ({ratio}%){tail}", ""
 
 
 # ── 6. 발행이 실제로 되고 있는가 ────────────────────────────────────
