@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-19T08:47:43",
+ "updated_at": "2026-10-19T10:19:36",
  "site": "https://pickdam.com",
  "checked": 38,
  "indexed": 31,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-19T08:43:22\",\"link\":\"https:\\/\\/pickdam.com\\/bidet-valve-leak-check\\/\"},{\"modified\":\"2026-10-19T08:"
+  "body_head": "[{\"modified\":\"2026-10-19T08:48:41\",\"link\":\"https:\\/\\/pickdam.com\\/bidet-valve-leak-check\\/\"},{\"modified\":\"2026-10-19T08:"
  },
  "posts_n": 37,
  "results": [
