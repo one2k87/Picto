@@ -1,5 +1,5 @@
 {
- "at": "2026-10-20T08:15:09",
+ "at": "2026-10-20T13:40:38",
  "posts": 37,
  "pass": 13,
  "fail": 1,
@@ -7,9 +7,9 @@
   {
    "key": "sitemap",
    "title": "사이트맵이 모든 글을 담고 있는가",
-   "ok": true,
-   "evidence": "사이트맵 38개 · 발행 37편 · 누락 0",
-   "fix": "",
+   "ok": false,
+   "evidence": "사이트맵을 못 읽었습니다 (HTTP 404)",
+   "fix": "Rank Math 사이트맵 설정에서 값을 하나 바꿔 저장",
    "fix_by": "user"
   },
   {
@@ -87,16 +87,16 @@
   {
    "key": "redirects",
    "title": "없앤 주소가 301 로 이어지는가",
-   "ok": false,
-   "evidence": "1/7개가 301 이 아닙니다: interior-cost-saving-guide(404)",
-   "fix": "Rank Math → 리디렉션에서 해당 주소를 기둥글로 301 등록",
+   "ok": true,
+   "evidence": "통합 6개 전부 301 · 삭제 1개 전부 사라진 상태",
+   "fix": "",
    "fix_by": "me"
   },
   {
    "key": "silent_errors",
    "title": "매일 실행에 조용히 죽은 단계가 없는가",
    "ok": true,
-   "evidence": "마지막 실행(2026-10-19T10:20) 로그 70줄에 예외 흔적 없음",
+   "evidence": "마지막 실행(2026-10-20T09:44) 로그 30줄에 예외 흔적 없음",
    "fix": "",
    "fix_by": "me"
   },
@@ -104,7 +104,7 @@
    "key": "enrich_refs",
    "title": "보강이 실제로 외부 1차 출처를 붙였는가",
    "ok": true,
-   "evidence": "마지막 기록(2026-10-19T08:23)이 링크 정리 전용 회차 — 보강 판단 보류",
+   "evidence": "마지막 보강(2026-10-20T09:44) 2편 중 2편에서 외부 1차 출처가 늘었습니다",
    "fix": "",
    "fix_by": "me"
   },
@@ -112,11 +112,20 @@
    "key": "live_links",
    "title": "글에 실린 외부 링크가 전부 한국 1차 출처인가",
    "ok": true,
-   "evidence": "37편의 외부 링크 13개 전부 한국 1차 출처 · 최신 글 #455 라이브 대조 일치(1개)",
+   "evidence": "37편의 외부 링크 15개 전부 한국 1차 출처 · 최신 글 #663 라이브 대조 일치(1개)",
    "fix": "",
    "fix_by": "me"
   }
  ],
  "repaired": [],
- "user_todo": []
+ "user_todo": [
+  {
+   "key": "sitemap",
+   "title": "사이트맵이 모든 글을 담고 있는가",
+   "ok": false,
+   "evidence": "사이트맵을 못 읽었습니다 (HTTP 404)",
+   "fix": "Rank Math 사이트맵 설정에서 값을 하나 바꿔 저장",
+   "fix_by": "user"
+  }
+ ]
 }
