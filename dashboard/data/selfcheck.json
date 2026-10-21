@@ -1,8 +1,8 @@
 {
- "at": "2026-10-20T13:40:38",
- "posts": 37,
- "pass": 13,
- "fail": 1,
+ "at": "2026-10-21T13:34:30",
+ "posts": 38,
+ "pass": 12,
+ "fail": 2,
  "checks": [
   {
    "key": "sitemap",
@@ -32,16 +32,16 @@
    "key": "cards",
    "title": "상품 카드가 글마다 하나인가",
    "ok": true,
-   "evidence": "37편 전부 카드 1개 이하",
+   "evidence": "38편 전부 카드 1개 이하",
    "fix": "",
    "fix_by": "auto"
   },
   {
    "key": "index",
    "title": "색인 검사가 모든 글을 보고 있는가",
-   "ok": true,
-   "evidence": "글 색인 31/38 (82%)",
-   "fix": "",
+   "ok": false,
+   "evidence": "색인 30/38 (79%)",
+   "fix": "미색인 글에 내부링크 보강 + 사이트맵 확인",
    "fix_by": "auto"
   },
   {
@@ -72,7 +72,7 @@
    "key": "disclosure",
    "title": "대가성 고지가 모든 글에 있는가",
    "ok": true,
-   "evidence": "37편 전부 보유",
+   "evidence": "38편 전부 보유",
    "fix": "",
    "fix_by": "auto"
   },
@@ -96,7 +96,7 @@
    "key": "silent_errors",
    "title": "매일 실행에 조용히 죽은 단계가 없는가",
    "ok": true,
-   "evidence": "마지막 실행(2026-10-20T09:44) 로그 30줄에 예외 흔적 없음",
+   "evidence": "마지막 실행(2026-10-21T10:41) 로그 71줄에 예외 흔적 없음",
    "fix": "",
    "fix_by": "me"
   },
@@ -112,7 +112,7 @@
    "key": "live_links",
    "title": "글에 실린 외부 링크가 전부 한국 1차 출처인가",
    "ok": true,
-   "evidence": "37편의 외부 링크 15개 전부 한국 1차 출처 · 최신 글 #663 라이브 대조 일치(1개)",
+   "evidence": "38편의 외부 링크 15개 전부 한국 1차 출처 · 최신 글 #663 라이브 대조 일치(1개)",
    "fix": "",
    "fix_by": "me"
   }
