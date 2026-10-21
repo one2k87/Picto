@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-21T09:18:18",
+ "updated_at": "2026-10-21T10:40:09",
  "site": "https://pickdam.com",
  "checked": 38,
  "indexed": 30,
@@ -8,7 +8,7 @@
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-21T09:12:36\",\"link\":\"https:\\/\\/pickdam.com\\/car-air-purifier-filter-2026-cost\\/\"},{\"modified\":\"202"
+  "body_head": "[{\"modified\":\"2026-10-21T09:19:48\",\"link\":\"https:\\/\\/pickdam.com\\/car-air-purifier-filter-2026-cost\\/\"},{\"modified\":\"202"
  },
  "posts_n": 38,
  "results": [
@@ -231,7 +231,7 @@
   {
    "url": "https://pickdam.com/guides/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -257,7 +257,7 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/appliance-buying/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -269,19 +269,19 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/bidet-bath/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/category/living-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/category/living-kitchen/food-waste-disposer/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -301,8 +301,5 @@
  "sitemaps_submitted": [
   "pickdam.com",
   "feed"
- ],
- "sitemaps_cleaned": [
-  "https://pickdam.com/sitemap_index.xml"
  ]
 }

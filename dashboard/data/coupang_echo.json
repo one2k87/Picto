@@ -4,21 +4,5 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false,
- "apply_trace": [
-  {
-   "stage": "진입",
-   "title": "차량용 공기청정기 필터, 3개월 교체 놓치면 실내 ",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 6
-  },
-  {
-   "stage": "중단:enabled=False",
-   "title": "차량용 공기청정기 필터, 3개월 교체 놓치면 실내 ",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 6
-  }
- ]
+ "file_enabled": false
 }
