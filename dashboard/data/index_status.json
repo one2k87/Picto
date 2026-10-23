@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-23T09:18:37",
+ "updated_at": "2026-10-23T10:35:51",
  "site": "https://pickdam.com",
  "checked": 38,
  "indexed": 30,
@@ -27,7 +27,7 @@
   {
    "url": "https://pickdam.com/car-air-purifier-filter-2026-cost/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -39,7 +39,7 @@
   {
    "url": "https://pickdam.com/bidet-valve-leak-check/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -231,7 +231,7 @@
   {
    "url": "https://pickdam.com/guides/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -251,7 +251,7 @@
   {
    "url": "https://pickdam.com/privacy-policy/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -269,7 +269,7 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/bidet-bath/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {

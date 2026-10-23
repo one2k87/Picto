@@ -13,15 +13,9 @@
   },
   {
    "product": "자동회전냄비",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "자동회전냄비",
-    "volume": 5180,
-    "comp": "중간",
-    "clicks": 178,
-    "depth": 8
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "접이식 플러스도마",
@@ -43,27 +37,15 @@
   },
   {
    "product": "미니세탁기",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "미니세탁기",
-    "volume": 24700,
-    "comp": "중간",
-    "clicks": 594,
-    "depth": 8
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "무드등",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "무드등",
-    "volume": 23950,
-    "comp": "중간",
-    "clicks": 262,
-    "depth": 8
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "그릇정리대",
@@ -109,15 +91,9 @@
   },
   {
    "product": "음식물 쓰레기처리기",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "음식물분쇄기",
-    "volume": 17820,
-    "comp": "중간",
-    "clicks": 338,
-    "depth": 8
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "캡슐 커피 머신 소형",
@@ -127,15 +103,9 @@
   },
   {
    "product": "차량용 공기청정기",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "차량용가습기",
-    "volume": 3780,
-    "comp": "중간",
-    "clicks": 111,
-    "depth": 8
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "무선 물걸레 청소기",
@@ -175,15 +145,9 @@
   },
   {
    "product": "오일 스프레이",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "오일스프레이",
-    "volume": 4230,
-    "comp": "중간",
-    "clicks": 69,
-    "depth": 8
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "계란보관 트레이",
@@ -193,15 +157,9 @@
   },
   {
    "product": "센서등",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "현관센서등",
-    "volume": 15730,
-    "comp": "중간",
-    "clicks": 479,
-    "depth": 8
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "코에서 계란 흰자 주방용품",
@@ -259,15 +217,9 @@
   },
   {
    "product": "주방 슬라이딩 선반",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "주방슬라이딩선반",
-    "volume": 2030,
-    "comp": "중간",
-    "clicks": 50,
-    "depth": 8
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "쿠팡추천템",
@@ -277,15 +229,9 @@
   },
   {
    "product": "주방용품",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "주방용품",
-    "volume": 8300,
-    "comp": "중간",
-    "clicks": 237,
-    "depth": 8
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "주방꿀템",
@@ -295,15 +241,9 @@
   },
   {
    "product": "살림",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "살림",
-    "volume": 2260,
-    "comp": "중간",
-    "clicks": 14,
-    "depth": 3
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "신박한아이템",
@@ -331,15 +271,9 @@
   },
   {
    "product": "다이소추천템",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "다이소추천템",
-    "volume": 13850,
-    "comp": "중간",
-    "clicks": 0,
-    "depth": 2
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "자취꿀템",
@@ -349,15 +283,9 @@
   },
   {
    "product": "다이소꿀템",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "다이소꿀템",
-    "volume": 7900,
-    "comp": "중간",
-    "clicks": 13,
-    "depth": 1
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "주방템",
@@ -385,15 +313,9 @@
   },
   {
    "product": "양념통",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "양념통",
-    "volume": 7480,
-    "comp": "중간",
-    "clicks": 206,
-    "depth": 8
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "소시지 칼집",
@@ -403,15 +325,9 @@
   },
   {
    "product": "캔 따개",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "캔따개",
-    "volume": 3410,
-    "comp": "중간",
-    "clicks": 60,
-    "depth": 8
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "자동 머그컵",
@@ -433,15 +349,9 @@
   },
   {
    "product": "전동 채칼",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "전동채칼",
-    "volume": 4620,
-    "comp": "중간",
-    "clicks": 143,
-    "depth": 8
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "야채 탈수기",
