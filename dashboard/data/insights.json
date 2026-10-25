@@ -1,12 +1,7 @@
 {
-  "updated_at": "2026-10-23",
+  "updated_at": "2026-10-25",
   "search_console": {
     "queries": [
-      {
-        "query": "200만원 24개월 할부",
-        "clicks": 0,
-        "impressions": 1
-      },
       {
         "query": "가전 구독과 카드 무이자 할부의 차이점은?",
         "clicks": 0,
@@ -90,7 +85,7 @@
       {
         "query": "정수기 필터 교체",
         "clicks": 0,
-        "impressions": 3
+        "impressions": 4
       },
       {
         "query": "정수기 필터 자가교체",
@@ -122,9 +117,9 @@
       {
         "page": "https://pickdam.com/folding-bluetooth-keyboard-fix/",
         "clicks": 7,
-        "impressions": 60,
-        "ctr": 11.67,
-        "position": 6.1
+        "impressions": 61,
+        "ctr": 11.48,
+        "position": 6.0
       },
       {
         "page": "https://pickdam.com/",
@@ -143,37 +138,44 @@
       {
         "page": "https://pickdam.com/new-appliance-installment-plan-comparison/",
         "clicks": 2,
-        "impressions": 41,
-        "ctr": 4.88,
-        "position": 10.8
+        "impressions": 39,
+        "ctr": 5.13,
+        "position": 11.0
       },
       {
         "page": "https://pickdam.com/washer-filter-cleaning-guide/",
         "clicks": 2,
-        "impressions": 61,
-        "ctr": 3.28,
-        "position": 6.8
+        "impressions": 62,
+        "ctr": 3.23,
+        "position": 7.0
       },
       {
         "page": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
         "clicks": 2,
-        "impressions": 26,
-        "ctr": 7.69,
-        "position": 4.8
+        "impressions": 32,
+        "ctr": 6.25,
+        "position": 4.9
       },
       {
         "page": "https://pickdam.com/door-draft-stopper-guide-2026/",
         "clicks": 1,
-        "impressions": 23,
-        "ctr": 4.35,
-        "position": 7.8
+        "impressions": 25,
+        "ctr": 4.0,
+        "position": 7.6
       },
       {
         "page": "https://pickdam.com/food-waste-smell-filter-cleaning/",
         "clicks": 1,
-        "impressions": 9,
-        "ctr": 11.11,
-        "position": 9.6
+        "impressions": 11,
+        "ctr": 9.09,
+        "position": 9.4
+      },
+      {
+        "page": "https://pickdam.com/in-gagu-mini-indeoksyeon-gumae-si-1gu-vs/",
+        "clicks": 1,
+        "impressions": 13,
+        "ctr": 7.69,
+        "position": 7.8
       },
       {
         "page": "https://pickdam.com/?p=90",
@@ -181,6 +183,13 @@
         "impressions": 2,
         "ctr": 0,
         "position": 2
+      },
+      {
+        "page": "https://pickdam.com/bathroom-mini/",
+        "clicks": 0,
+        "impressions": 1,
+        "ctr": 0,
+        "position": 1
       },
       {
         "page": "https://pickdam.com/bedroom-lamp-guide/",
@@ -192,37 +201,37 @@
       {
         "page": "https://pickdam.com/bidet-self-installation-check-valve/",
         "clicks": 0,
-        "impressions": 12,
+        "impressions": 11,
         "ctr": 0,
-        "position": 5
+        "position": 4.5
       },
       {
         "page": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
         "clicks": 0,
-        "impressions": 19,
+        "impressions": 20,
         "ctr": 0,
-        "position": 23.1
+        "position": 21.9
       },
       {
         "page": "https://pickdam.com/bidet-self-installation-guide-2026/",
         "clicks": 0,
-        "impressions": 1,
+        "impressions": 6,
         "ctr": 0,
-        "position": 9
+        "position": 8.7
       },
       {
         "page": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
         "clicks": 0,
-        "impressions": 4,
+        "impressions": 3,
         "ctr": 0,
-        "position": 21
+        "position": 22.3
       },
       {
         "page": "https://pickdam.com/can-opener-comparison-types/",
         "clicks": 0,
-        "impressions": 2,
+        "impressions": 3,
         "ctr": 0,
-        "position": 36
+        "position": 27
       },
       {
         "page": "https://pickdam.com/car-air-purifier-choice/",
@@ -248,9 +257,9 @@
       {
         "page": "https://pickdam.com/eumsikmulcheorigi-talchwipilteo-naemsae-an-nage-jettae/",
         "clicks": 0,
-        "impressions": 10,
+        "impressions": 17,
         "ctr": 0,
-        "position": 5.5
+        "position": 6.2
       },
       {
         "page": "https://pickdam.com/food-waste-disposer-deodorizing-filter-replacement/",
@@ -279,40 +288,26 @@
         "impressions": 1,
         "ctr": 0,
         "position": 16
-      },
-      {
-        "page": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
-        "clicks": 0,
-        "impressions": 2,
-        "ctr": 0,
-        "position": 5.5
-      },
-      {
-        "page": "https://pickdam.com/in-gagu-mini-indeoksyeon-gumae-si-1gu-vs/",
-        "clicks": 0,
-        "impressions": 6,
-        "ctr": 0,
-        "position": 9.7
       }
     ],
     "site_form": "sc-domain:pickdam.com",
     "totals": {
       "d28": {
-        "clicks": 19,
-        "impressions": 454,
-        "ctr": 4.19,
+        "clicks": 20,
+        "impressions": 491,
+        "ctr": 4.07,
         "position": 9.2
       },
       "d90": {
-        "clicks": 27,
-        "impressions": 739,
-        "ctr": 3.65,
+        "clicks": 28,
+        "impressions": 788,
+        "ctr": 3.55,
         "position": 8.6
       },
       "prev28": {
         "clicks": 8,
-        "impressions": 285,
-        "ctr": 2.81,
+        "impressions": 297,
+        "ctr": 2.69,
         "position": 7.7
       }
     },
@@ -571,11 +566,26 @@
         "date": "2026-10-20",
         "clicks": 0,
         "impressions": 10
+      },
+      {
+        "date": "2026-10-21",
+        "clicks": 0,
+        "impressions": 19
+      },
+      {
+        "date": "2026-10-22",
+        "clicks": 0,
+        "impressions": 15
+      },
+      {
+        "date": "2026-10-23",
+        "clicks": 1,
+        "impressions": 15
       }
     ],
     "range": {
-      "start": "2026-09-23",
-      "end": "2026-10-21",
+      "start": "2026-09-25",
+      "end": "2026-10-23",
       "days": 28
     }
   }

@@ -1,12 +1,12 @@
 {
-  "updated": "2026-10-19 00:00",
-  "next_review": "2026-10-26",
+  "updated": "2026-10-25 23:58",
+  "next_review": "2026-11-01",
   "data_status": "ok",
-  "verdict": "실측 데이터로 조정했습니다. revenue 42% · evergreen 57%",
+  "verdict": "실측 데이터로 조정했습니다. evergreen 80% · revenue 20%",
   "matched_posts": 19,
   "intent_ratio": {
-    "revenue": 0.42,
-    "evergreen": 0.58
+    "evergreen": 0.8,
+    "revenue": 0.2
   },
   "category_weights": {
     "생활·주방": 1.0
@@ -14,8 +14,8 @@
   "weekday_plan": {
     "0": {
       "label": "월",
-      "revenue": 3,
-      "evergreen": 2
+      "revenue": 2,
+      "evergreen": 3
     },
     "1": {
       "label": "화",
@@ -24,8 +24,8 @@
     },
     "2": {
       "label": "수",
-      "revenue": 2,
-      "evergreen": 3
+      "revenue": 1,
+      "evergreen": 4
     },
     "3": {
       "label": "목",
@@ -34,8 +34,8 @@
     },
     "4": {
       "label": "금",
-      "revenue": 3,
-      "evergreen": 2
+      "revenue": 2,
+      "evergreen": 3
     },
     "5": {
       "label": "토",
@@ -52,10 +52,11 @@
     "비데 설치비용",
     "비데설치비용",
     "오일 스프레이 단점",
-    "비데 설치 비용",
-    "세탁기 구독 vs 무이자 할부 어떤 게 유리한가요?",
     "정수기 필터 교체",
-    "가전 구독과 카드 무이자 할부의 차이점은?"
+    "비데 설치 비용",
+    "가전 구독과 카드 무이자 할부의 차이점은?",
+    "세탁기 구독 vs 무이자 할부 어떤 게 유리한가요?",
+    "음식물 처리기 필터 교체 주기"
   ],
   "weak_queries": [
     "가전 구독과 카드 무이자 할부의 차이점은?",
@@ -64,34 +65,35 @@
     "비데설치비용",
     "세탁기 구독 vs 무이자 할부 어떤 게 유리한가요?",
     "오일 스프레이 단점",
+    "음식물 처리기 필터 교체 주기",
     "정수기 필터 교체"
   ],
   "buckets": [
     {
       "category": "생활·주방",
       "intent": "evergreen",
-      "posts": 22,
-      "clicks": 11,
-      "impressions": 200,
-      "scored": 11,
-      "est_value": 6.1,
-      "value_per_post": 0.28,
-      "ctr": 5.5
+      "posts": 23,
+      "clicks": 13,
+      "impressions": 249,
+      "scored": 12,
+      "est_value": 7.2,
+      "value_per_post": 0.31,
+      "ctr": 5.22
     },
     {
       "category": "생활·주방",
       "intent": "revenue",
       "posts": 20,
       "clicks": 4,
-      "impressions": 140,
-      "scored": 8,
+      "impressions": 107,
+      "scored": 7,
       "est_value": 4.0,
       "value_per_post": 0.2,
-      "ctr": 2.86
+      "ctr": 3.74
     }
   ],
   "actions": [
-    "노출은 있는데 클릭이 0인 검색어 7건 — 해당 글 제목을 다시 쓰세요."
+    "노출은 있는데 클릭이 0인 검색어 8건 — 해당 글 제목을 다시 쓰세요."
   ],
   "note": "글별 수익은 애드센스 API로 조회할 수 없어 '클릭 × 의도별 RPM 배수'로 추정한 값입니다."
 }
