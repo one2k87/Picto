@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-23T10:35:51",
+ "updated_at": "2026-10-26T08:43:47",
  "site": "https://pickdam.com",
  "checked": 38,
  "indexed": 30,
@@ -27,7 +27,7 @@
   {
    "url": "https://pickdam.com/car-air-purifier-filter-2026-cost/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -52,7 +52,7 @@
    "url": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-15"
+   "lastCrawl": "2026-10-25"
   },
   {
    "url": "https://pickdam.com/moving-cleaning-quote-cost-comparison-2026/",
@@ -82,7 +82,7 @@
    "url": "https://pickdam.com/food-waste-disposer-deodorizing-filter-replacement/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-30"
+   "lastCrawl": "2026-10-24"
   },
   {
    "url": "https://pickdam.com/one-person-food-disposer-install/",
@@ -159,7 +159,7 @@
   {
    "url": "https://pickdam.com/direct-water-purifier-guide/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -251,7 +251,7 @@
   {
    "url": "https://pickdam.com/privacy-policy/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -263,7 +263,7 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/insulation-heating/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -275,7 +275,7 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
