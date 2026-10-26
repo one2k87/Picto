@@ -1,5 +1,5 @@
 {
- "at": "2026-10-25T13:31:07",
+ "at": "2026-10-26T13:36:11",
  "posts": 38,
  "pass": 12,
  "fail": 2,
@@ -56,7 +56,7 @@
    "key": "strategy",
    "title": "전략 피드백이 주제에 반영되는가",
    "ok": true,
-   "evidence": "winners 7건 반영 중",
+   "evidence": "winners 8건 반영 중",
    "fix": "",
    "fix_by": "auto"
   },
@@ -96,7 +96,7 @@
    "key": "silent_errors",
    "title": "매일 실행에 조용히 죽은 단계가 없는가",
    "ok": true,
-   "evidence": "마지막 실행(2026-10-23T10:36) 로그 87줄에 예외 흔적 없음",
+   "evidence": "마지막 실행(2026-10-26T10:15) 로그 91줄에 예외 흔적 없음",
    "fix": "",
    "fix_by": "me"
   },
