@@ -1,8 +1,8 @@
 {
- "updated_at": "2026-10-26T10:14:23",
+ "updated_at": "2026-10-28T09:51:30",
  "site": "https://pickdam.com",
- "checked": 38,
- "indexed": 30,
+ "checked": 36,
+ "indexed": 29,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
@@ -76,7 +76,7 @@
    "url": "https://pickdam.com/bidet-self-installation-check-valve/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-20"
+   "lastCrawl": "2026-10-27"
   },
   {
    "url": "https://pickdam.com/food-waste-disposer-deodorizing-filter-replacement/",
@@ -118,7 +118,7 @@
    "url": "https://pickdam.com/kitchen-tools-material-guide/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-13"
+   "lastCrawl": "2026-10-27"
   },
   {
    "url": "https://pickdam.com/can-opener-comparison-types/",
@@ -227,18 +227,6 @@
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-10-13"
-  },
-  {
-   "url": "https://pickdam.com/guides/",
-   "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
-   "lastCrawl": ""
-  },
-  {
-   "url": "https://pickdam.com/one-person-seasoning-storage/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-13"
   }
  ],
  "extra": [
@@ -269,19 +257,19 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/bidet-bath/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/category/living-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/category/living-kitchen/food-waste-disposer/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
