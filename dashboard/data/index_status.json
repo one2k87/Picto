@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-28T09:51:30",
+ "updated_at": "2026-10-28T11:19:55",
  "site": "https://pickdam.com",
  "checked": 36,
  "indexed": 29,
@@ -27,7 +27,7 @@
   {
    "url": "https://pickdam.com/car-air-purifier-filter-2026-cost/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -159,7 +159,7 @@
   {
    "url": "https://pickdam.com/direct-water-purifier-guide/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -257,19 +257,19 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/bidet-bath/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/category/living-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/category/living-kitchen/food-waste-disposer/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
