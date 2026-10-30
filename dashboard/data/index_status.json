@@ -1,11 +1,12 @@
 {
- "updated_at": "2026-10-30T11:39:57",
+ "updated_at": "2026-10-30T16:35:18",
  "site": "https://pickdam.com",
  "checked": 25,
  "indexed": 18,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
+ "intended": 25,
  "posts_diag": {
   "http": 200,
   "body_head": "[{\"modified\":\"2026-10-22T09:19:58\",\"link\":\"https:\\/\\/pickdam.com\\/car-air-purifier-choice\\/\"},{\"modified\":\"2026-10-22T09"
@@ -27,7 +28,7 @@
   {
    "url": "https://pickdam.com/car-air-purifier-filter-2026-cost/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -148,7 +149,7 @@
    "url": "https://pickdam.com/single-household-mini-induction-kitchen/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-13"
+   "lastCrawl": "2026-10-30"
   },
   {
    "url": "https://pickdam.com/single-household-mini-washer-boil-wash/",
@@ -159,7 +160,7 @@
   {
    "url": "https://pickdam.com/direct-water-purifier-guide/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   }
  ],
@@ -191,7 +192,7 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/bidet-bath/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -203,7 +204,7 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/food-waste-disposer/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {

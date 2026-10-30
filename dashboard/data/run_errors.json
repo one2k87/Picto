@@ -1,5 +1,14 @@
 {
- "at": "2026-10-30T11:40:49",
- "log_lines": 91,
- "errors": []
+ "at": "2026-10-30T16:36:28",
+ "log_lines": 89,
+ "errors": [
+  {
+   "step": "블로그 생성",
+   "line": "[치명적] LLM 호출 실패 — 키 또는 모델명을 확인하세요."
+  },
+  {
+   "step": "블로그 생성",
+   "line": "::error::LLM_BLOCKED unknown"
+  }
+ ]
 }

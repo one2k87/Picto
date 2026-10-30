@@ -1,5 +1,5 @@
 {
- "at": "2026-10-30T11:40:48",
+ "at": "2026-10-30T16:36:27",
  "n": 38,
  "avg": 100,
  "fails": [],
@@ -218,7 +218,14 @@
   "err": []
  },
  "sitemap": {
-  "checked": false,
-  "err": "HTTP 404"
+  "checked": true,
+  "urls": 39,
+  "posts": 38,
+  "missing_n": 0,
+  "missing": [],
+  "ghost_urls": [],
+  "cached_suspect": false,
+  "lastmod_max": "2026-10-30T07:33:19+00:00",
+  "post_modified_max": "2026-10-30T07:33:19"
  }
 }
