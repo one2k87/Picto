@@ -156,6 +156,10 @@ if ghosts:
 out = {"updated_at": datetime.datetime.now().isoformat()[:19],
        "site": site, "checked": ok_n, "indexed": passed, "ghosts": ghosts,
        "site_form": site_form, "form_err": form_err,
+       # 검사 '대상'이 몇 개였는지 남긴다. 작동 점검이 발행 전수와 비교하는 바람에
+       # "38편 중 25편만 검사 — 상한에 걸렸습니다"라는 **틀린 진단**이 떴다
+       # (2026-10-30). 상한이 아니라 **최근 14일 수정분만 보는 설계**였다.
+       "intended": len(urls),
        "posts_diag": diag, "posts_n": len(posts), "results": results,
        # 글 외(고정 페이지·카테고리 아카이브). 비율에는 넣지 않는다 — 이것들은
        # 애초에 색인을 노리는 대상이 아니다. 다만 **보이기는 해야 한다**.

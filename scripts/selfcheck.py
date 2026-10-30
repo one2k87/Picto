@@ -223,10 +223,14 @@ def _fix_cards(ctx):
 def _index(ctx):
     ix = _json("index_status.json")
     checked, indexed = ix.get("checked", 0), ix.get("indexed", 0)
-    n = len(ctx["posts"])
-    if checked < n:
-        return False, f"발행 {n}편 중 {checked}편만 검사됐습니다 (색인 {indexed}) — 상한에 걸렸습니다", \
-               "inspect_recent 의 하루 상한을 올리거나 이틀에 나눠 검사"
+    # inspect_recent 는 **최근 14일 수정분**만 본다(설계). 그런데 여기서 발행
+    # 전수와 비교하는 바람에 "38편 중 25편만 검사 — 상한에 걸렸습니다"라는
+    # 틀린 진단이 떴다(2026-10-30). 상한이 아니라 범위였다. 기준이 틀린 경보는
+    # 결국 안 보게 된다 — 오늘만 세 번째로 고치는 같은 종류의 실수다.
+    want = ix.get("intended")
+    if want and checked < want - 1:
+        return False, f"검사 대상 {want}개 중 {checked}개만 끝났습니다 (색인 {indexed})", \
+               "Search Console API 응답 실패가 섞였는지 실행 로그를 확인할 것"
     ratio = round(indexed / max(checked, 1) * 100)
     # 전체 공지(2026-10-10) ③: 색인 N/M 과 **7일 정체 경보**를 브리핑에 노출한다.
     # 숫자가 멈춰 있는 것 자체가 신호다 — 10/8~10/11 에 색인이 28 에서 1도 안 움직였다.
