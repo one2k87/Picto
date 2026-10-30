@@ -1090,7 +1090,9 @@ def run():
     if not lcfg.get("api_key") or "여기에" in str(lcfg.get("api_key")):
         raise SystemExit("[치명적] LLM api_key 가 비어 있습니다. GitHub 시크릿 LLM_API_KEY 를 확인하세요.")
     try:
-        t = chat("한 단어로 'OK' 만 답하세요.", lcfg, max_tokens=8, temperature=0)
+        # max_tokens=8 이었다가 2026-10-30 에 발행을 멈췄다 — 2.5 계열은 사고
+        # 토큰을 먼저 쓰기 때문에 8 토큰이면 텍스트가 하나도 안 나온다.
+        t = chat("한 단어로 'OK' 만 답하세요.", lcfg, max_tokens=256, temperature=0)
         print(f"[preflight] LLM OK (provider={lcfg.get('provider')}, model={lcfg.get('model')}) → {str(t)[:30]!r}")
     except Exception as e:
         # 2026-10-30: 이 메시지가 열흘을 삼켰다. 10/23~10/30 매일 실행이 죽은
@@ -1102,6 +1104,7 @@ def run():
             "prepayment credits", "credits are depleted", "billing", "quota exceeded",
             "insufficient", "payment", "402", "exceeded your current quota"))
         daily = ("per day" in m) or ("daily limit" in m) or ("free tier" in m)
+        budget = ("valid `part`" in m) or ("finish_reason" in m) or ("max_tokens" in m)
         print("=" * 64)
         if billing:
             print("[치명적·결제] LLM 호출이 결제 문제로 거절됐습니다 — 키 문제가 아닙니다.")
@@ -1110,6 +1113,10 @@ def run():
             print("  ※ 키를 재발급해도 같은 프로젝트면 그대로 막힙니다.")
         elif daily:
             print("[치명적·한도] 오늘 무료 사용 한도를 다 썼습니다. 내일 자동 복구됩니다.")
+        elif budget:
+            print("[치명적·출력예산] 모델이 **사고 토큰만 쓰고 답을 안 냈습니다**(finish_reason=2).")
+            print("  키·결제 문제가 아닙니다. max_output_tokens 를 늘려야 합니다.")
+            print("  2.5 계열은 답 전에 사고 토큰을 먼저 씁니다.")
         else:
             print("[치명적] LLM 호출 실패 — 키 또는 모델명을 확인하세요.")
             print("  힌트: 모델명을 바꿔보거나, LLM_API_KEY 가 올바른 키인지 확인하세요.")
@@ -1121,14 +1128,15 @@ def run():
             import json as _j, os as _o, datetime as _dt
             _o.makedirs(os.path.join("dashboard", "data"), exist_ok=True)
             _j.dump({"at": _dt.datetime.now().isoformat()[:19],
-                     "kind": "billing" if billing else ("daily_quota" if daily else "unknown"),
+                     "kind": ("billing" if billing else "daily_quota" if daily
+                              else "output_budget" if budget else "unknown"),
                      "message": str(e)[:300]},
                     open(os.path.join("dashboard", "data", "llm_block.json"), "w",
                          encoding="utf-8"), ensure_ascii=False, indent=1)
         except Exception:
             pass
         print("::error::LLM_BLOCKED " + ("billing" if billing else
-              ("daily_quota" if daily else "unknown")))
+              "daily_quota" if daily else "output_budget" if budget else "unknown"))
         raise SystemExit(1)
 
     hist = load_history()

@@ -99,10 +99,38 @@ def _anthropic(prompt, cfg, model, system, max_tokens, temperature):
     return "".join(b.text for b in resp.content if getattr(b, "type", "") == "text")
 
 
+# 2.5 계열은 답을 내기 전에 **사고 토큰**을 먼저 쓴다. 그래서 max_output_tokens
+# 가 작으면 사고만 하다 예산을 다 쓰고 **텍스트 Part 를 하나도 안 돌려준다**
+# (finish_reason=2 = MAX_TOKENS). 이때 resp.text 는 값이 없다고 예외를 던지는데,
+# 메시지가 "quick accessor requires ... a valid Part" 라 키 문제처럼 보인다.
+# 2026-10-30 실측: 크레딧을 충전하고 모델을 바꾼 직후, 프리플라이트의
+# max_tokens=8 이 전부 사고에 먹혀 발행이 또 멈췄다. 결제 문제를 고치자마자
+# 같은 자리에서 다른 이유로 멈춘 것이다.
+_MIN_OUT = 64          # 사고 토큰에 다 먹히지 않게 하는 하한
+
+
 def _gemini(prompt, cfg, model, system, max_tokens, temperature):
     import google.generativeai as genai
     genai.configure(api_key=cfg["api_key"])
     gm = genai.GenerativeModel(model or "gemini-2.5-flash-lite", system_instruction=system or None)
-    resp = gm.generate_content(
-        prompt, generation_config={"max_output_tokens": max_tokens, "temperature": temperature})
-    return resp.text
+
+    def _ask(budget):
+        return gm.generate_content(
+            prompt,
+            generation_config={"max_output_tokens": budget, "temperature": temperature})
+
+    budget = max(int(max_tokens or 0), _MIN_OUT)
+    resp = _ask(budget)
+    try:
+        return resp.text
+    except Exception:
+        # 텍스트가 안 왔다. 예산 때문이면 한 번만 넉넉히 다시 묻는다.
+        fr = ""
+        try:
+            fr = str((resp.candidates or [None])[0].finish_reason)
+        except Exception:
+            pass
+        if "2" in fr or "MAX_TOKENS" in fr.upper():
+            resp = _ask(max(budget * 4, 512))
+            return resp.text
+        raise
