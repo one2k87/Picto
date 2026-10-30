@@ -1,0 +1,73 @@
+{
+ "_doc": "주간 라인업. 작성 주체는 픽토(F 2026-10-30 v1.1 지시). 매주 월요일 갱신. 캐스토 쇼츠·스레드가 이 목록을 그대로 쓴다 — 상품 3~5개, 고단가 1개 이상, 각 상품에 픽담 글 URL·쿠팡 링크·한 줄 훅이 반드시 있어야 한다.",
+ "week_of": "2026-11-02",
+ "theme": "겨울 준비 1주차 — 새는 곳부터 막고, 안 마르는 빨래를 푼다",
+ "generated_at": "2026-10-30T07:19:58",
+ "author": "picto",
+ "items": [
+  {
+   "key": "문풍지",
+   "name": "문풍지 (문틈 바람막이)",
+   "price_band": "저가",
+   "pickdam_url": "https://pickdam.com/door-draft-stopper-guide-2026/",
+   "coupang_url": "https://link.coupang.com/a/hzLugWdfrM",
+   "hook": "창틀보다 현관문이 더 샙니다 — 한 통에 1만 원 안쪽, 붙인 날 바로 체감되는 품목."
+  },
+  {
+   "key": "창문단열시트",
+   "name": "창문 단열 시트 (뽁뽁이·방풍비닐)",
+   "price_band": "저가",
+   "pickdam_url": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
+   "coupang_url": "https://link.coupang.com/a/hzL7YalkaW",
+   "hook": "뽁뽁이와 방풍비닐은 쓰는 자리가 다릅니다. 결로까지 잡으려면 어느 쪽인지부터."
+  },
+  {
+   "key": "미니온풍기",
+   "name": "미니 온풍기",
+   "price_band": "중가",
+   "pickdam_url": "https://pickdam.com/bathroom-mini-heater-tips/",
+   "coupang_url": "https://link.coupang.com/a/hzLK8yNOHB",
+   "hook": "욕실 20분 쓰고도 전기요금 월 1만 원을 안 넘기려면 소비전력 1000W 미만."
+  },
+  {
+   "key": "미니건조기",
+   "name": "미니 건조기",
+   "price_band": "고단가",
+   "pickdam_url": "https://pickdam.com/mini-dryer-electricity-cost-2026/",
+   "coupang_url": "https://link.coupang.com/a/hzLGRrkqhU",
+   "hook": "겨울엔 빨래가 안 마릅니다. 전기요금까지 계산해 보고 사는 쪽이 덜 후회합니다."
+  },
+  {
+   "key": "음식물처리기",
+   "name": "음식물처리기",
+   "price_band": "고단가",
+   "pickdam_url": "https://pickdam.com/one-person-food-disposer-install/",
+   "coupang_url": "https://link.coupang.com/a/hzLDXQJ0TI",
+   "hook": "김장철엔 음식물 쓰레기가 몰립니다. 설치 가능한 싱크대인지부터 확인하세요."
+  }
+ ],
+ "high_ticket_count": 2,
+ "season_calendar_2w": [
+  {
+   "week_of": "2026-11-09",
+   "theme": "김장 주간",
+   "planned": [
+    "김치통",
+    "음식물처리기",
+    "오일스프레이"
+   ],
+   "note": "김치통은 쿠팡 링크는 있는데 **픽담 글이 없다** — 글이 먼저다."
+  },
+  {
+   "week_of": "2026-11-16",
+   "theme": "건조한 실내",
+   "planned": [
+    "가습기",
+    "전기장판",
+    "창문단열시트"
+   ],
+   "note": "가습기·전기장판도 전용 글이 없다. 11/15 까지 생성 주제에 넣을 것."
+  }
+ ],
+ "_빈칸": "겨울 품목인데 쿠팡 링크만 있고 글이 없는 것: 가습기 · 김치통 · 전기장판. 전기장판은 match 가 제습기 글에 잘못 걸려 '글 있음'처럼 보였다(2026-10-30 실측). 이 셋이 다음 생성 주제 1순위다."
+}
