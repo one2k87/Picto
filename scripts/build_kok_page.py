@@ -24,8 +24,13 @@ from publisher import _auth_header
 
 SUBID = "kokpick_hub"      # with_subid 가 영숫자·밑줄만 남기므로 처음부터 그 형태로 둔다
 MAX_CARDS = 8              # famto 지시: 모바일 첫 화면 중심으로 5~8종. 24장을 깔면 아무도 안 내린다
-# 10~11월에 먼저 보여 줄 품목(사용자 결정 2026-10-01: 중가 필요형 우선, 난방·김장)
-SEASON = ["문풍지", "창문단열시트", "전기장판", "가습기", "제습기", "김치통", "온풍기"]
+# 겨울 스프린트(2026-10-30 F 지시, 11/1~11/15): 상단을 '겨울 준비'로 고정한다.
+# ⚠️ 여기 적는 값은 **대장(products.json)의 key** 여야 한다. 이전 목록의 "온풍기"는
+# 대장에 없는 이름이라(실제 key 는 "미니온풍기") 정렬에서 조용히 99위로 밀려
+# 겨울 핵심 품목이 첫 화면 밖에 있었다 — 2026-10-30 실측으로 발견.
+WINTER = ["전기장판", "미니온풍기", "문풍지", "창문단열시트", "가습기", "김치통"]
+SEASON = WINTER + ["제습기"]
+_WINTER_SET = set(WINTER)
 
 
 def _notice():
@@ -46,14 +51,39 @@ def build(items):
         f'누르기 전에 상세페이지에서 확인하세요. '
         f'<span style="color:#98a2b3">({today.year}년 {today.month}월 {today.day}일 갱신)</span></p>'
     )
-    cards = []
+    # 겨울 준비 섹션을 맨 위에 둔다. 카드는 그대로 쓰되 소제목으로 갈라서
+    # "지금 사야 하는 것"이 첫 화면에 먼저 오게 한다(F 2026-10-30 지시 ②).
+    win, rest = [], []
     for p in live:
+        (win if p.get("key") in _WINTER_SET else rest).append(p)
+    cards, n_win = [], 0
+    for p in win:
         if len(cards) >= MAX_CARDS:
             break
         c = card_html(p, SUBID, with_notice=False)
         if c:
             cards.append(c)
-    body = _notice() + head + "\n".join(cards)
+            n_win += 1
+    tail = []
+    for p in rest:
+        if len(cards) + len(tail) >= MAX_CARDS:
+            break
+        c = card_html(p, SUBID, with_notice=False)
+        if c:
+            tail.append(c)
+
+    def _h2(t, sub):
+        return (f'<h2 style="margin:26px 0 6px;font-size:19px;font-weight:700;color:#1d2939">{t}</h2>'
+                f'<p style="margin:0 0 12px;font-size:14px;color:#667085">{sub}</p>')
+
+    body = _notice() + head
+    if cards:
+        body += _h2("❄️ 겨울 준비", "난방비와 결로가 몰리는 달입니다. 먼저 보는 품목부터 올렸습니다.")
+        body += "\n".join(cards)
+    if tail:
+        body += _h2("그 밖에 영상에서 다룬 제품", "계절과 무관하게 자주 찾는 품목입니다.")
+        body += "\n".join(tail)
+    cards = cards + tail
     body += ('<p style="margin-top:26px;font-size:14px;color:#667085">'
              f'여기 없는 품목({max(0, len(live) - len(cards))}종)과 고르는 기준은 '
              '<a href="https://pickdam.com/">픽담 글 목록</a>에서 품목별 글로 보세요.</p>')
