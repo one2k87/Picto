@@ -18,6 +18,10 @@ on:
         description: "true면 이미 넣은 글도 카드 교체"
         default: "false"
         required: false
+      ids:
+        description: "특정 글 ID만 (쉼표 구분, 비우면 전체)"
+        default: ""
+        required: false
 
 jobs:
   backfill:
@@ -42,6 +46,7 @@ jobs:
           BACKFILL_LIMIT: ${{ github.event.inputs.limit }}
           BACKFILL_DRY: ${{ github.event.inputs.dry_run }}
           BACKFILL_FORCE: ${{ github.event.inputs.force }}
+          BACKFILL_IDS: ${{ github.event.inputs.ids }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python scripts/backfill_product_links.py

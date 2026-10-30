@@ -8,6 +8,7 @@
 재실행 안전: <!--picklink--> 마커가 있는 글은 건너뛴다(force=true면 교체).
 안전장치: 링크가 비어 있는 제품은 절대 삽입하지 않는다.
 환경: BACKFILL_LIMIT(기본 100) / BACKFILL_DRY(true면 계획만) / BACKFILL_FORCE
+      BACKFILL_IDS(쉼표로 글 ID 지정 — 그 글만 처리)
 """
 import json
 import os
@@ -45,6 +46,10 @@ def main():
     limit = int(os.getenv("BACKFILL_LIMIT") or "100")
     dry = (os.getenv("BACKFILL_DRY") or "").lower() == "true"
     force = (os.getenv("BACKFILL_FORCE") or "").lower() == "true"
+    # 2026-10-30: 글 하나의 카드만 바로잡아야 하는 일이 생겼다. force 를 전수로
+    # 돌리면 마커 없는 옛 카드가 있는 글에 카드가 하나 더 붙는다(2026-10-14 실측
+    # 으로 그런 글이 12편 있었다). 그래서 **대상을 콕 집는 수단**을 둔다.
+    only = {x.strip() for x in (os.getenv("BACKFILL_IDS") or "").split(",") if x.strip()}
 
     posts, page = [], 1
     while True:
@@ -64,6 +69,8 @@ def main():
         if done >= limit:
             break
         pid = p["id"]
+        if only and str(pid) not in only:
+            continue
         title = strip_tags((p.get("title") or {}).get("rendered") or "")
         slug = p.get("slug") or ""
         content = (p.get("content") or {}).get("raw") or (p.get("content") or {}).get("rendered", "")
