@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-30T16:35:18",
+ "updated_at": "2026-10-30T16:44:06",
  "site": "https://pickdam.com",
  "checked": 25,
  "indexed": 18,
@@ -9,7 +9,7 @@
  "intended": 25,
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-22T09:19:58\",\"link\":\"https:\\/\\/pickdam.com\\/car-air-purifier-choice\\/\"},{\"modified\":\"2026-10-22T09"
+  "body_head": "[{\"modified\":\"2026-10-30T16:33:19\",\"link\":\"https:\\/\\/pickdam.com\\/bathroom-mini-heater-tips\\/\"},{\"modified\":\"2026-10-22T"
  },
  "posts_n": 38,
  "results": [
@@ -18,6 +18,12 @@
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-10-21"
+  },
+  {
+   "url": "https://pickdam.com/bathroom-mini-heater-tips/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/car-air-purifier-choice/",
@@ -32,15 +38,9 @@
    "lastCrawl": ""
   },
   {
-   "url": "https://pickdam.com/bathroom-mini-heater-tips/",
-   "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
-   "lastCrawl": ""
-  },
-  {
    "url": "https://pickdam.com/bidet-valve-leak-check/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -160,7 +160,7 @@
   {
    "url": "https://pickdam.com/direct-water-purifier-guide/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   }
  ],
@@ -192,13 +192,13 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/bidet-bath/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/category/living-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -216,7 +216,7 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/water-purifier/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   }
  ],
