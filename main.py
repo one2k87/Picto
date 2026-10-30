@@ -1093,13 +1093,42 @@ def run():
         t = chat("한 단어로 'OK' 만 답하세요.", lcfg, max_tokens=8, temperature=0)
         print(f"[preflight] LLM OK (provider={lcfg.get('provider')}, model={lcfg.get('model')}) → {str(t)[:30]!r}")
     except Exception as e:
+        # 2026-10-30: 이 메시지가 열흘을 삼켰다. 10/23~10/30 매일 실행이 죽은
+        # 진짜 이유는 **결제**였는데("429 Your prepayment credits are depleted"),
+        # 화면에는 "키 또는 모델명을 확인하세요"만 떴다. 틀린 힌트는 없는 것보다
+        # 나쁘다 — 사람을 엉뚱한 곳(키 재발급)으로 보낸다. 원인별로 갈라 말한다.
+        m = str(e).lower()
+        billing = any(k in m for k in (
+            "prepayment credits", "credits are depleted", "billing", "quota exceeded",
+            "insufficient", "payment", "402", "exceeded your current quota"))
+        daily = ("per day" in m) or ("daily limit" in m) or ("free tier" in m)
         print("=" * 64)
-        print("[치명적] LLM 호출 실패 — 키 또는 모델명을 확인하세요.")
+        if billing:
+            print("[치명적·결제] LLM 호출이 결제 문제로 거절됐습니다 — 키 문제가 아닙니다.")
+            print("  사람이 할 일: Google AI Studio 결제 화면에서 크레딧을 충전하거나")
+            print("                무료 등급 키로 교체하세요. https://aistudio.google.com/")
+            print("  ※ 키를 재발급해도 같은 프로젝트면 그대로 막힙니다.")
+        elif daily:
+            print("[치명적·한도] 오늘 무료 사용 한도를 다 썼습니다. 내일 자동 복구됩니다.")
+        else:
+            print("[치명적] LLM 호출 실패 — 키 또는 모델명을 확인하세요.")
+            print("  힌트: 모델명을 바꿔보거나, LLM_API_KEY 가 올바른 키인지 확인하세요.")
         print(f"  provider={lcfg.get('provider')}  model={lcfg.get('model')}")
         print(f"  오류: {e}")
-        print("  힌트: 모델을 'gemini-2.5-flash' → 'gemini-1.5-flash' 로 바꿔보거나,")
-        print("        LLM_API_KEY 가 올바른 Gemini API 키(AIza...)인지 확인하세요.")
         print("=" * 64)
+        # 무음 실패 스캐너가 집어가도록 원인 분류를 한 줄로 남긴다.
+        try:
+            import json as _j, os as _o, datetime as _dt
+            _o.makedirs(os.path.join("dashboard", "data"), exist_ok=True)
+            _j.dump({"at": _dt.datetime.now().isoformat()[:19],
+                     "kind": "billing" if billing else ("daily_quota" if daily else "unknown"),
+                     "message": str(e)[:300]},
+                    open(os.path.join("dashboard", "data", "llm_block.json"), "w",
+                         encoding="utf-8"), ensure_ascii=False, indent=1)
+        except Exception:
+            pass
+        print("::error::LLM_BLOCKED " + ("billing" if billing else
+              ("daily_quota" if daily else "unknown")))
         raise SystemExit(1)
 
     hist = load_history()

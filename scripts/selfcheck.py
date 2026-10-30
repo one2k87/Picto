@@ -567,6 +567,42 @@ def _live_links(ctx):
     return True, f"{len(ctx['posts'])}편의 외부 링크 {total}개 전부 한국 1차 출처{live}", ""
 
 
+@check("llm_block", "글 생성이 결제·한도로 막혀 있지 않은가", "user")
+def _llm_block(ctx):
+    """2026-10-30 신설 — **열흘을 삼킨 구멍**.
+
+    10/23~10/30 매일 실행이 전부 죽었는데 화면에 뜬 말은 "키 또는 모델명을
+    확인하세요"였다. 진짜 이유는 결제였다(429 prepayment credits are depleted).
+    그 사이 작동 점검은 11/14 로 거의 초록이었고, 발행 검사만 조용히 실패했다.
+    **파이프라인이 멈춘 진짜 이유가 한 줄로 안 보이면 사람은 못 고친다.**
+    main.py 가 남기는 llm_block.json 을 읽어 원인을 그대로 올린다.
+
+    결제는 사람만 풀 수 있으니 fix_by='user' 다 — 관문 보드로 올라간다.
+    """
+    b = _json("llm_block.json", None)
+    if not b:
+        return True, "생성 차단 기록 없음", ""
+    at = (b.get("at") or "")[:16]
+    kind = b.get("kind") or "unknown"
+    # 차단 이후 글이 나갔으면 풀린 것이다 — 기록만 남고 상태는 해제.
+    try:
+        newest = max((p.get("date") or "") for p in ctx["posts"]) if ctx["posts"] else ""
+    except Exception:
+        newest = ""
+    if newest and newest[:19] > (b.get("at") or "")[:19]:
+        return True, f"{at} 차단({kind}) 이후 {newest[:16]} 에 발행됨 — 해소", ""
+    if kind == "billing":
+        return False, (f"{at} 부터 **결제 문제로 글 생성이 막혀 있습니다** — "
+                       f"키 문제가 아닙니다. {str(b.get('message'))[:90]}"), \
+               ("Google AI Studio(https://aistudio.google.com/) 결제 화면에서 크레딧 충전 "
+                "또는 무료 등급 키로 교체. 키만 재발급하면 같은 프로젝트라 그대로 막힙니다")
+    if kind == "daily_quota":
+        return False, f"{at} 무료 일일 한도 소진 — 보통 하루 뒤 자동 복구", \
+               "하루 뒤에도 계속되면 유료 등급 또는 모델 분산을 검토"
+    return False, f"{at} 생성 차단({kind}): {str(b.get('message'))[:90]}", \
+           "실행 로그에서 원인을 확인할 것"
+
+
 def main():
     cfg = json.load(open("config.json", encoding="utf-8"))
     wp = cfg.get("wordpress", {}) or {}

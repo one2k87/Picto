@@ -10,8 +10,16 @@ import re
 import sys
 
 OUT = os.path.join("dashboard", "data", "run_errors.json")
+# 2026-10-30: 열흘을 통째로 놓친 뒤 추가. 10/23~10/30 매일 실행이 LLM 결제
+# 문제로 죽었는데(429 prepayment credits are depleted) run_errors 는 계속
+# "예외 흔적 없음"이었다. 파이썬 예외가 아니라 **정상 종료 경로의 치명적
+# 메시지**였기 때문이다. 결제·한도 차단은 예외보다 더 자주 파이프라인을
+# 멈추게 하는데 패턴에 없었다.
 PAT = re.compile(r"Traceback \(most recent call last\)|ModuleNotFoundError|ImportError"
-                 r"|^\w*Error: |^::error")
+                 r"|^\w*Error: |^::error"
+                 r"|\[치명적"
+                 r"|prepayment credits|credits are depleted|quota exceeded"
+                 r"|RESOURCE_EXHAUSTED|PERMISSION_DENIED")
 
 
 def main():
