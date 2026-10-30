@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-30T10:26:05",
+ "updated_at": "2026-10-30T11:39:57",
  "site": "https://pickdam.com",
  "checked": 25,
  "indexed": 18,
@@ -27,7 +27,7 @@
   {
    "url": "https://pickdam.com/car-air-purifier-filter-2026-cost/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -39,7 +39,7 @@
   {
    "url": "https://pickdam.com/bidet-valve-leak-check/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -159,7 +159,7 @@
   {
    "url": "https://pickdam.com/direct-water-purifier-guide/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   }
  ],
@@ -197,13 +197,13 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/category/living-kitchen/food-waste-disposer/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -215,7 +215,7 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/water-purifier/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   }
  ],
