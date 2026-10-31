@@ -1,15 +1,15 @@
 {
- "at": "2026-10-30T14:36:26",
- "posts": 38,
+ "at": "2026-10-31T14:26:34",
+ "posts": 39,
  "pass": 11,
- "fail": 3,
+ "fail": 4,
  "checks": [
   {
    "key": "sitemap",
    "title": "사이트맵이 모든 글을 담고 있는가",
-   "ok": false,
-   "evidence": "사이트맵을 못 읽었습니다 (HTTP 404)",
-   "fix": "Rank Math 사이트맵 설정에서 값을 하나 바꿔 저장",
+   "ok": true,
+   "evidence": "사이트맵 40개 · 발행 39편 · 누락 0",
+   "fix": "",
    "fix_by": "user"
   },
   {
@@ -32,7 +32,7 @@
    "key": "cards",
    "title": "상품 카드가 글마다 하나인가",
    "ok": true,
-   "evidence": "38편 전부 카드 1개 이하",
+   "evidence": "39편 전부 카드 1개 이하",
    "fix": "",
    "fix_by": "auto"
   },
@@ -40,15 +40,15 @@
    "key": "index",
    "title": "색인 검사가 모든 글을 보고 있는가",
    "ok": false,
-   "evidence": "발행 38편 중 25편만 검사됐습니다 (색인 18) — 상한에 걸렸습니다",
-   "fix": "inspect_recent 의 하루 상한을 올리거나 이틀에 나눠 검사",
+   "evidence": "색인 18/25 (72%)",
+   "fix": "미색인 글에 내부링크 보강 + 사이트맵 확인",
    "fix_by": "auto"
   },
   {
    "key": "publish",
    "title": "예정된 발행일에 글이 나갔는가",
    "ok": false,
-   "evidence": "예정 발행일 3일 중 3일이 비었습니다 (10-28, 10-26, 10-23) · 게시 0 · 폐기 1",
+   "evidence": "예정 발행일 3일 중 3일이 비었습니다 (10-30, 10-28, 10-26) · 게시 0 · 폐기 0",
    "fix": "폐기 사유를 보고 생성 프롬프트를 고칠 것",
    "fix_by": "auto"
   },
@@ -72,7 +72,7 @@
    "key": "disclosure",
    "title": "대가성 고지가 모든 글에 있는가",
    "ok": true,
-   "evidence": "38편 전부 보유",
+   "evidence": "39편 전부 보유",
    "fix": "",
    "fix_by": "auto"
   },
@@ -95,9 +95,9 @@
   {
    "key": "silent_errors",
    "title": "매일 실행에 조용히 죽은 단계가 없는가",
-   "ok": true,
-   "evidence": "마지막 실행(2026-10-30T11:40) 로그 91줄에 예외 흔적 없음",
-   "fix": "",
+   "ok": false,
+   "evidence": "마지막 실행(2026-10-30T16:45)에서 2건이 조용히 죽었습니다 — [블로그 생성] [치명적] LLM 호출 실패 — 키 또는 모델명을 확인하세요. / [블로그 생성] ::error::LLM_BLOCKED unknown",
+   "fix": "해당 스크립트를 고치고, 그 단계의 '|| true' 를 걷어낼지 판단할 것",
    "fix_by": "me"
   },
   {
@@ -112,19 +112,27 @@
    "key": "live_links",
    "title": "글에 실린 외부 링크가 전부 한국 1차 출처인가",
    "ok": true,
-   "evidence": "38편의 외부 링크 17개 전부 한국 1차 출처 · 최신 글 #339 라이브 대조 일치(1개)",
+   "evidence": "39편의 외부 링크 17개 전부 한국 1차 출처 · 최신 글 #663 라이브 대조 일치(1개)",
    "fix": "",
    "fix_by": "me"
+  },
+  {
+   "key": "llm_block",
+   "title": "글 생성이 결제·한도로 막혀 있지 않은가",
+   "ok": false,
+   "evidence": "2026-10-30T16:40 생성 차단(unknown): Invalid operation: The `response.text` quick accessor requires the response to contain a v",
+   "fix": "실행 로그에서 원인을 확인할 것",
+   "fix_by": "user"
   }
  ],
  "repaired": [],
  "user_todo": [
   {
-   "key": "sitemap",
-   "title": "사이트맵이 모든 글을 담고 있는가",
+   "key": "llm_block",
+   "title": "글 생성이 결제·한도로 막혀 있지 않은가",
    "ok": false,
-   "evidence": "사이트맵을 못 읽었습니다 (HTTP 404)",
-   "fix": "Rank Math 사이트맵 설정에서 값을 하나 바꿔 저장",
+   "evidence": "2026-10-30T16:40 생성 차단(unknown): Invalid operation: The `response.text` quick accessor requires the response to contain a v",
+   "fix": "실행 로그에서 원인을 확인할 것",
    "fix_by": "user"
   }
  ]
