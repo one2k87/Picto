@@ -1,23 +1,35 @@
 {
- "updated_at": "2026-10-30T16:44:06",
+ "updated_at": "2026-11-02T09:56:41",
  "site": "https://pickdam.com",
- "checked": 25,
- "indexed": 18,
+ "checked": 21,
+ "indexed": 16,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
- "intended": 25,
+ "intended": 21,
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-10-30T16:33:19\",\"link\":\"https:\\/\\/pickdam.com\\/bathroom-mini-heater-tips\\/\"},{\"modified\":\"2026-10-22T"
+  "body_head": "[{\"modified\":\"2026-11-02T09:53:03\",\"link\":\"https:\\/\\/pickdam.com\\/one-room-single-electric-blanket-emf-washable\\/\"},{\"mo"
  },
- "posts_n": 38,
+ "posts_n": 40,
  "results": [
   {
    "url": "https://pickdam.com/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-21"
+   "lastCrawl": "2026-10-30"
+  },
+  {
+   "url": "https://pickdam.com/one-room-single-electric-blanket-emf-washable/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/studio-single-electric-blanket-carbon-mat/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/bathroom-mini-heater-tips/",
@@ -40,7 +52,7 @@
   {
    "url": "https://pickdam.com/bidet-valve-leak-check/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -53,7 +65,7 @@
    "url": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-25"
+   "lastCrawl": "2026-10-30"
   },
   {
    "url": "https://pickdam.com/moving-cleaning-quote-cost-comparison-2026/",
@@ -83,7 +95,7 @@
    "url": "https://pickdam.com/food-waste-disposer-deodorizing-filter-replacement/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-28"
+   "lastCrawl": "2026-11-01"
   },
   {
    "url": "https://pickdam.com/one-person-food-disposer-install/",
@@ -95,7 +107,7 @@
    "url": "https://pickdam.com/bedroom-lamp-guide/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-19"
+   "lastCrawl": "2026-11-01"
   },
   {
    "url": "https://pickdam.com/kitchen-sliding-shelf-guide/",
@@ -125,43 +137,7 @@
    "url": "https://pickdam.com/can-opener-comparison-types/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-13"
-  },
-  {
-   "url": "https://pickdam.com/sprayer-glass-plastic-kitchen/",
-   "verdict": "NEUTRAL",
-   "state": "Crawled - currently not indexed",
-   "lastCrawl": "2026-10-19"
-  },
-  {
-   "url": "https://pickdam.com/dehumidifier-20l-electricity-bill-30pyeong/",
-   "verdict": "NEUTRAL",
-   "state": "Crawled - currently not indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-22"
-  },
-  {
-   "url": "https://pickdam.com/single-household-mini-induction-kitchen/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-30"
-  },
-  {
-   "url": "https://pickdam.com/single-household-mini-washer-boil-wash/",
-   "verdict": "NEUTRAL",
-   "state": "Crawled - currently not indexed",
-   "lastCrawl": "2026-10-20"
-  },
-  {
-   "url": "https://pickdam.com/direct-water-purifier-guide/",
-   "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
-   "lastCrawl": ""
+   "lastCrawl": "2026-10-31"
   }
  ],
  "extra": [
@@ -204,7 +180,7 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/food-waste-disposer/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -216,7 +192,7 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/water-purifier/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   }
  ],

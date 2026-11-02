@@ -17,9 +17,9 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "자동회전냄비",
-    "volume": 5990,
+    "volume": 6110,
     "comp": "중간",
-    "clicks": 169,
+    "clicks": 184,
     "depth": 8
    }
   },
@@ -47,9 +47,9 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "미니세탁기",
-    "volume": 24330,
+    "volume": 24270,
     "comp": "중간",
-    "clicks": 661,
+    "clicks": 605,
     "depth": 8
    }
   },
@@ -59,9 +59,9 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "무드등",
-    "volume": 25650,
+    "volume": 26130,
     "comp": "중간",
-    "clicks": 291,
+    "clicks": 304,
     "depth": 8
    }
   },
@@ -113,9 +113,9 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "음식물쓰레기통",
-    "volume": 18330,
+    "volume": 17760,
     "comp": "중간",
-    "clicks": 335,
+    "clicks": 312,
     "depth": 8
    }
   },
@@ -131,9 +131,9 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "차량용가습기",
-    "volume": 5200,
+    "volume": 6060,
     "comp": "중간",
-    "clicks": 142,
+    "clicks": 177,
     "depth": 8
    }
   },
@@ -179,9 +179,9 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "오일스프레이",
-    "volume": 4200,
+    "volume": 4150,
     "comp": "중간",
-    "clicks": 72,
+    "clicks": 78,
     "depth": 8
    }
   },
@@ -197,9 +197,9 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "현관센서등",
-    "volume": 16350,
+    "volume": 16440,
     "comp": "중간",
-    "clicks": 522,
+    "clicks": 550,
     "depth": 8
    }
   },
@@ -263,9 +263,9 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "주방슬라이딩선반",
-    "volume": 2080,
+    "volume": 2050,
     "comp": "중간",
-    "clicks": 49,
+    "clicks": 52,
     "depth": 8
    }
   },
@@ -277,15 +277,9 @@
   },
   {
    "product": "주방용품",
-   "tier": "교집합",
-   "cta": "픽담 개별 글",
-   "best": {
-    "keyword": "주방용품",
-    "volume": 8510,
-    "comp": "중간",
-    "clicks": 237,
-    "depth": 8
-   }
+   "tier": "영상전용",
+   "cta": "쿠팡 직링크",
+   "best": null
   },
   {
    "product": "주방꿀템",
@@ -301,7 +295,7 @@
     "keyword": "살림",
     "volume": 2230,
     "comp": "중간",
-    "clicks": 11,
+    "clicks": 8,
     "depth": 3
    }
   },
@@ -335,9 +329,9 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "다이소추천템",
-    "volume": 13780,
+    "volume": 13730,
     "comp": "중간",
-    "clicks": 1,
+    "clicks": 5,
     "depth": 2
    }
   },
@@ -353,7 +347,7 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "다이소꿀템",
-    "volume": 7800,
+    "volume": 7840,
     "comp": "중간",
     "clicks": 9,
     "depth": 1
@@ -389,9 +383,9 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "양념통",
-    "volume": 7360,
+    "volume": 7290,
     "comp": "중간",
-    "clicks": 197,
+    "clicks": 183,
     "depth": 8
    }
   },
@@ -407,7 +401,7 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "캔따개",
-    "volume": 3450,
+    "volume": 3420,
     "comp": "중간",
     "clicks": 64,
     "depth": 8
@@ -437,9 +431,9 @@
    "cta": "픽담 개별 글",
    "best": {
     "keyword": "전동채칼",
-    "volume": 5240,
+    "volume": 5500,
     "comp": "중간",
-    "clicks": 158,
+    "clicks": 176,
     "depth": 8
    }
   },

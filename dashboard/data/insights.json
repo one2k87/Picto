@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25",
+  "updated_at": "2026-11-02",
   "search_console": {
     "queries": [
       {
@@ -13,11 +13,6 @@
         "impressions": 1
       },
       {
-        "query": "네",
-        "clicks": 0,
-        "impressions": 1
-      },
-      {
         "query": "대형 가구 구매 장기 무이자 카드 순위",
         "clicks": 0,
         "impressions": 1
@@ -25,22 +20,27 @@
       {
         "query": "무드등과 스탠드 조명의 분위기 차이를 비교하고, 아늑한 거실이나 침실에 적합한 제품을 추천해줘",
         "clicks": 0,
-        "impressions": 1
+        "impressions": 3
       },
       {
         "query": "비데 설치 비용",
         "clicks": 0,
-        "impressions": 3
+        "impressions": 1
       },
       {
         "query": "비데 설치비용",
         "clicks": 0,
-        "impressions": 6
+        "impressions": 2
       },
       {
         "query": "비데설치비용",
         "clicks": 0,
-        "impressions": 4
+        "impressions": 2
+      },
+      {
+        "query": "사진도 같이 올려줘",
+        "clicks": 0,
+        "impressions": 1
       },
       {
         "query": "세탁기 거름망 청소",
@@ -50,7 +50,7 @@
       {
         "query": "세탁기 구독 vs 무이자 할부 어떤 게 유리한가요?",
         "clicks": 0,
-        "impressions": 2
+        "impressions": 1
       },
       {
         "query": "수동 병따개 시장",
@@ -61,11 +61,6 @@
         "query": "오일 스프레이 단점",
         "clicks": 0,
         "impressions": 4
-      },
-      {
-        "query": "원룸 비데 설치",
-        "clicks": 0,
-        "impressions": 1
       },
       {
         "query": "음식물 처리기 필터 교체 주기",
@@ -83,9 +78,24 @@
         "impressions": 1
       },
       {
+        "query": "인덕션 1구랑 2구 중 어떤 게 나아? 추천 제품도 같이 알려줘",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
+        "query": "인덕션 2구랑 3구 중 어떤 게 맞아? 요리 빈도나 가족 수에 따라 어떤 게 더 적합한지 비교해주고 추천 제품도 같이 알려줘",
+        "clicks": 0,
+        "impressions": 1
+      },
+      {
         "query": "정수기 필터 교체",
         "clicks": 0,
-        "impressions": 4
+        "impressions": 11
+      },
+      {
+        "query": "정수기 필터 교체 주기",
+        "clicks": 0,
+        "impressions": 2
       },
       {
         "query": "정수기 필터 자가교체",
@@ -103,12 +113,12 @@
         "impressions": 1
       },
       {
-        "query": "침실 무드등 추천해줘",
+        "query": "침실 조명 추천",
         "clicks": 0,
         "impressions": 1
       },
       {
-        "query": "침실 조명 추천",
+        "query": "현관 콘센트",
         "clicks": 0,
         "impressions": 1
       }
@@ -116,66 +126,73 @@
     "pages": [
       {
         "page": "https://pickdam.com/folding-bluetooth-keyboard-fix/",
-        "clicks": 7,
+        "clicks": 8,
         "impressions": 61,
-        "ctr": 11.48,
+        "ctr": 13.11,
         "position": 6.0
       },
       {
-        "page": "https://pickdam.com/",
-        "clicks": 2,
-        "impressions": 3,
-        "ctr": 66.67,
-        "position": 1.3
+        "page": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
+        "clicks": 4,
+        "impressions": 51,
+        "ctr": 7.84,
+        "position": 4.8
       },
       {
         "page": "https://pickdam.com/kitchen-sliding-shelf-guide/",
         "clicks": 2,
-        "impressions": 32,
-        "ctr": 6.25,
-        "position": 6.5
+        "impressions": 27,
+        "ctr": 7.41,
+        "position": 6.6
       },
       {
         "page": "https://pickdam.com/new-appliance-installment-plan-comparison/",
         "clicks": 2,
-        "impressions": 39,
-        "ctr": 5.13,
-        "position": 11.0
+        "impressions": 32,
+        "ctr": 6.25,
+        "position": 11.4
       },
       {
         "page": "https://pickdam.com/washer-filter-cleaning-guide/",
         "clicks": 2,
-        "impressions": 62,
-        "ctr": 3.23,
-        "position": 7.0
+        "impressions": 58,
+        "ctr": 3.45,
+        "position": 8.1
       },
       {
-        "page": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
-        "clicks": 2,
-        "impressions": 32,
-        "ctr": 6.25,
-        "position": 4.9
+        "page": "https://pickdam.com/",
+        "clicks": 1,
+        "impressions": 4,
+        "ctr": 25.0,
+        "position": 1.8
       },
       {
         "page": "https://pickdam.com/door-draft-stopper-guide-2026/",
         "clicks": 1,
-        "impressions": 25,
-        "ctr": 4.0,
-        "position": 7.6
+        "impressions": 23,
+        "ctr": 4.35,
+        "position": 7.5
       },
       {
         "page": "https://pickdam.com/food-waste-smell-filter-cleaning/",
         "clicks": 1,
-        "impressions": 11,
-        "ctr": 9.09,
-        "position": 9.4
+        "impressions": 17,
+        "ctr": 5.88,
+        "position": 8.4
       },
       {
         "page": "https://pickdam.com/in-gagu-mini-indeoksyeon-gumae-si-1gu-vs/",
         "clicks": 1,
-        "impressions": 13,
-        "ctr": 7.69,
-        "position": 7.8
+        "impressions": 22,
+        "ctr": 4.55,
+        "position": 6.3
+      },
+      {
+        "page": "https://pickdam.com/water-purifier-filter-replacement-guide-2026/",
+        "clicks": 1,
+        "impressions": 30,
+        "ctr": 3.33,
+        "position": 20.1
       },
       {
         "page": "https://pickdam.com/?p=90",
@@ -187,44 +204,44 @@
       {
         "page": "https://pickdam.com/bathroom-mini/",
         "clicks": 0,
-        "impressions": 1,
+        "impressions": 6,
         "ctr": 0,
-        "position": 1
+        "position": 5
       },
       {
         "page": "https://pickdam.com/bedroom-lamp-guide/",
         "clicks": 0,
-        "impressions": 28,
+        "impressions": 24,
         "ctr": 0,
-        "position": 18.2
+        "position": 14.0
       },
       {
         "page": "https://pickdam.com/bidet-self-installation-check-valve/",
         "clicks": 0,
-        "impressions": 11,
+        "impressions": 13,
         "ctr": 0,
-        "position": 4.5
+        "position": 6.2
       },
       {
         "page": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
         "clicks": 0,
-        "impressions": 20,
+        "impressions": 9,
         "ctr": 0,
-        "position": 21.9
+        "position": 32.6
       },
       {
         "page": "https://pickdam.com/bidet-self-installation-guide-2026/",
         "clicks": 0,
-        "impressions": 6,
+        "impressions": 9,
         "ctr": 0,
-        "position": 8.7
+        "position": 7.9
       },
       {
         "page": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
         "clicks": 0,
-        "impressions": 3,
+        "impressions": 1,
         "ctr": 0,
-        "position": 22.3
+        "position": 30
       },
       {
         "page": "https://pickdam.com/can-opener-comparison-types/",
@@ -243,30 +260,30 @@
       {
         "page": "https://pickdam.com/entrance/",
         "clicks": 0,
-        "impressions": 8,
+        "impressions": 6,
         "ctr": 0,
-        "position": 8.8
+        "position": 10
       },
       {
         "page": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
         "clicks": 0,
-        "impressions": 4,
+        "impressions": 14,
         "ctr": 0,
-        "position": 3.2
+        "position": 5.3
       },
       {
         "page": "https://pickdam.com/eumsikmulcheorigi-talchwipilteo-naemsae-an-nage-jettae/",
         "clicks": 0,
-        "impressions": 17,
+        "impressions": 29,
         "ctr": 0,
-        "position": 6.2
+        "position": 6.6
       },
       {
         "page": "https://pickdam.com/food-waste-disposer-deodorizing-filter-replacement/",
         "clicks": 0,
-        "impressions": 12,
+        "impressions": 13,
         "ctr": 0,
-        "position": 8.7
+        "position": 11.4
       },
       {
         "page": "https://pickdam.com/food-waste-disposer-rental-cancellation-fee/",
@@ -281,34 +298,27 @@
         "impressions": 2,
         "ctr": 0,
         "position": 7.5
-      },
-      {
-        "page": "https://pickdam.com/hello-world/",
-        "clicks": 0,
-        "impressions": 1,
-        "ctr": 0,
-        "position": 16
       }
     ],
     "site_form": "sc-domain:pickdam.com",
     "totals": {
       "d28": {
-        "clicks": 20,
-        "impressions": 491,
-        "ctr": 4.07,
-        "position": 9.2
+        "clicks": 23,
+        "impressions": 546,
+        "ctr": 4.21,
+        "position": 9.3
       },
       "d90": {
-        "clicks": 28,
-        "impressions": 788,
-        "ctr": 3.55,
-        "position": 8.6
+        "clicks": 32,
+        "impressions": 905,
+        "ctr": 3.54,
+        "position": 9.0
       },
       "prev28": {
-        "clicks": 8,
-        "impressions": 297,
-        "ctr": 2.69,
-        "position": 7.7
+        "clicks": 9,
+        "impressions": 358,
+        "ctr": 2.51,
+        "position": 8.5
       }
     },
     "daily": [
@@ -581,11 +591,46 @@
         "date": "2026-10-23",
         "clicks": 1,
         "impressions": 15
+      },
+      {
+        "date": "2026-10-24",
+        "clicks": 2,
+        "impressions": 18
+      },
+      {
+        "date": "2026-10-25",
+        "clicks": 0,
+        "impressions": 19
+      },
+      {
+        "date": "2026-10-26",
+        "clicks": 1,
+        "impressions": 10
+      },
+      {
+        "date": "2026-10-27",
+        "clicks": 0,
+        "impressions": 16
+      },
+      {
+        "date": "2026-10-28",
+        "clicks": 0,
+        "impressions": 20
+      },
+      {
+        "date": "2026-10-29",
+        "clicks": 1,
+        "impressions": 19
+      },
+      {
+        "date": "2026-10-30",
+        "clicks": 0,
+        "impressions": 15
       }
     ],
     "range": {
-      "start": "2026-09-25",
-      "end": "2026-10-23",
+      "start": "2026-10-03",
+      "end": "2026-10-31",
       "days": 28
     }
   }
