@@ -1,5 +1,5 @@
 {
- "at": "2026-11-02T09:57:34",
+ "at": "2026-11-02T10:07:41",
  "n": 40,
  "avg": 100,
  "fails": [],
@@ -209,19 +209,8 @@
   "of": 40
  },
  "seo": {
-  "cat_set": [
-   {
-    "id": 724,
-    "title": "원룸 싱글 침대 전기장판 살 때 전자파 없는 EMF 인증과 세탁 가능 여",
-    "cat": "가전 구매·렌탈"
-   }
-  ],
-  "bc_added": [
-   {
-    "id": 724,
-    "title": "원룸 싱글 침대 전기장판 살 때 전자파 없는 EMF 인증과 세탁 가능 여"
-   }
-  ],
+  "cat_set": [],
+  "bc_added": [],
   "title_set": [],
   "desc_set": [],
   "romaja_slug": [],
@@ -237,6 +226,6 @@
   "ghost_urls": [],
   "cached_suspect": false,
   "lastmod_max": "2026-11-02T00:57:31+00:00",
-  "post_modified_max": "2026-11-02T00:53:03"
+  "post_modified_max": "2026-11-02T00:57:31"
  }
 }

@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-02T09:56:41",
+ "updated_at": "2026-11-02T10:06:35",
  "site": "https://pickdam.com",
  "checked": 21,
  "indexed": 16,
@@ -9,7 +9,7 @@
  "intended": 21,
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-11-02T09:53:03\",\"link\":\"https:\\/\\/pickdam.com\\/one-room-single-electric-blanket-emf-washable\\/\"},{\"mo"
+  "body_head": "[{\"modified\":\"2026-11-02T09:57:31\",\"link\":\"https:\\/\\/pickdam.com\\/one-room-single-electric-blanket-emf-washable\\/\"},{\"mo"
  },
  "posts_n": 40,
  "results": [
@@ -22,7 +22,7 @@
   {
    "url": "https://pickdam.com/one-room-single-electric-blanket-emf-washable/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -52,7 +52,7 @@
   {
    "url": "https://pickdam.com/bidet-valve-leak-check/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -156,7 +156,7 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/appliance-buying/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -168,19 +168,19 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/bidet-bath/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/category/living-kitchen/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/category/living-kitchen/food-waste-disposer/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -192,7 +192,7 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/water-purifier/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   }
  ],

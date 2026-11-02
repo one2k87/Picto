@@ -4,21 +4,5 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false,
- "apply_trace": [
-  {
-   "stage": "진입",
-   "title": "원룸 싱글 침대 전기장판 살 때 전자파 없는 EMF",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 7
-  },
-  {
-   "stage": "중단:enabled=False",
-   "title": "원룸 싱글 침대 전기장판 살 때 전자파 없는 EMF",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 7
-  }
- ]
+ "file_enabled": false
 }
