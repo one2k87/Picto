@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-02T10:06:35",
+ "updated_at": "2026-11-02T11:33:59",
  "site": "https://pickdam.com",
  "checked": 21,
  "indexed": 16,
@@ -22,13 +22,13 @@
   {
    "url": "https://pickdam.com/one-room-single-electric-blanket-emf-washable/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/studio-single-electric-blanket-carbon-mat/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -162,7 +162,7 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/insulation-heating/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -180,7 +180,7 @@
   {
    "url": "https://pickdam.com/category/living-kitchen/food-waste-disposer/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
