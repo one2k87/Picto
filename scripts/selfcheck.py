@@ -67,7 +67,7 @@ def _posts(site):
     while page <= 5:
         r = requests.get(f"{site}/wp-json/wp/v2/posts", headers=UA, timeout=30,
                          params={"per_page": 50, "page": page, "status": "publish",
-                                 "_fields": "id,link,title,modified_gmt,content"})
+                                 "_fields": "id,link,title,date,modified_gmt,content"})
         if r.status_code != 200:
             break
         chunk = r.json()
@@ -279,6 +279,16 @@ PUBLISH_WEEKDAYS = {0, 2, 4}      # 월·수·금 (KST)
 
 @check("publish", "예정된 발행일에 글이 나갔는가", "auto")
 def _publish(ctx):
+    # 2026-11-02: 10/30 에 글이 실제로 나갔는데(#718, 16:49) 이 검사는 그날을
+    # '비었다'고 했다. 그날 대시보드 파일이 **커밋 push 경쟁에서 유실**됐기
+    # 때문이다(실행 로그에 "결과 push 3회 실패" 경고). 로그 파일이 정답이 아니라
+    # **사이트에 글이 있느냐**가 정답이다. 파일은 폐기 건수를 세는 데만 쓴다.
+    live = set()
+    for p_ in ctx.get("posts") or []:
+        d = (p_.get("date") or "")[:10]
+        if d:
+            live.add(d)
+
     pub = dis = 0
     planned, missed = [], []
     for i in range(1, 8):
@@ -286,6 +296,8 @@ def _publish(ctx):
         j = _json(f"{day.isoformat()}.json", None)
         arts = (j or {}).get("articles") or []
         p = sum(1 for a in arts if a.get("status") == "게시됨")
+        if not p and day.isoformat() in live:     # 파일은 없어도 글은 나갔다
+            p = 1
         pub += p
         dis += sum(1 for a in arts if a.get("status") == "폐기")
         if day.weekday() in PUBLISH_WEEKDAYS:
@@ -448,6 +460,15 @@ def _silent(ctx):
                "daily-blog 가 한 번 돌면 생깁니다. 이틀이 지나도 없으면 '무음 예외 기록' 단계를 확인할 것"
     errs = re_.get("errors") or []
     when = (re_.get("at") or "")[:16]
+    # 그 기록 이후에 글이 나갔으면 이미 지나간 실패다(2026-11-02: 10/30 16:40
+    # 실패 기록이 16:49 발행 뒤에도 계속 빨간불이었다).
+    try:
+        newest = max((p.get("date") or "") for p in (ctx.get("posts") or [])) or ""
+    except Exception:
+        newest = ""
+    if errs and newest and newest[:19] > (re_.get("at") or "")[:19]:
+        return True, (f"{when} 실패 {len(errs)}건은 그 뒤 {newest[:16]} 발행으로 "
+                      f"해소됐습니다"), ""
     if errs:
         head = " / ".join(f"[{e.get('step')}] {e.get('line','')[:70]}" for e in errs[:3])
         return False, f"마지막 실행({when})에서 {len(errs)}건이 조용히 죽었습니다 — {head}", \
