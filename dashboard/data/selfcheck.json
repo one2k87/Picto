@@ -1,8 +1,8 @@
 {
- "at": "2026-11-01T14:52:12",
+ "at": "2026-11-02T09:35:43",
  "posts": 39,
- "pass": 11,
- "fail": 4,
+ "pass": 13,
+ "fail": 2,
  "checks": [
   {
    "key": "sitemap",
@@ -48,7 +48,7 @@
    "key": "publish",
    "title": "예정된 발행일에 글이 나갔는가",
    "ok": false,
-   "evidence": "예정 발행일 3일 중 3일이 비었습니다 (10-30, 10-28, 10-26) · 게시 0 · 폐기 0",
+   "evidence": "예정 발행일 3일 중 2일이 비었습니다 (10-28, 10-26) · 게시 1 · 폐기 0",
    "fix": "폐기 사유를 보고 생성 프롬프트를 고칠 것",
    "fix_by": "auto"
   },
@@ -95,9 +95,9 @@
   {
    "key": "silent_errors",
    "title": "매일 실행에 조용히 죽은 단계가 없는가",
-   "ok": false,
-   "evidence": "마지막 실행(2026-10-30T16:45)에서 2건이 조용히 죽었습니다 — [블로그 생성] [치명적] LLM 호출 실패 — 키 또는 모델명을 확인하세요. / [블로그 생성] ::error::LLM_BLOCKED unknown",
-   "fix": "해당 스크립트를 고치고, 그 단계의 '|| true' 를 걷어낼지 판단할 것",
+   "ok": true,
+   "evidence": "2026-10-30T16:45 실패 2건은 그 뒤 2026-10-30T16:49 발행으로 해소됐습니다",
+   "fix": "",
    "fix_by": "me"
   },
   {
@@ -119,21 +119,12 @@
   {
    "key": "llm_block",
    "title": "글 생성이 결제·한도로 막혀 있지 않은가",
-   "ok": false,
-   "evidence": "2026-10-30T16:40 생성 차단(unknown): Invalid operation: The `response.text` quick accessor requires the response to contain a v",
-   "fix": "실행 로그에서 원인을 확인할 것",
+   "ok": true,
+   "evidence": "2026-10-30T16:40 차단(unknown) 이후 2026-10-30T16:49 에 발행됨 — 해소",
+   "fix": "",
    "fix_by": "user"
   }
  ],
  "repaired": [],
- "user_todo": [
-  {
-   "key": "llm_block",
-   "title": "글 생성이 결제·한도로 막혀 있지 않은가",
-   "ok": false,
-   "evidence": "2026-10-30T16:40 생성 차단(unknown): Invalid operation: The `response.text` quick accessor requires the response to contain a v",
-   "fix": "실행 로그에서 원인을 확인할 것",
-   "fix_by": "user"
-  }
- ]
+ "user_todo": []
 }
