@@ -1,5 +1,14 @@
 {
- "at": "2026-11-02T11:34:54",
- "log_lines": 73,
- "errors": []
+ "at": "2026-11-03T12:06:54",
+ "log_lines": 95,
+ "errors": [
+  {
+   "step": "글 보강",
+   "line": "Traceback (most recent call last):"
+  },
+  {
+   "step": "글 보강",
+   "line": "종료 코드 1"
+  }
+ ]
 }
