@@ -1,8 +1,8 @@
 {
- "at": "2026-11-03T15:36:41",
+ "at": "2026-11-04T15:04:35",
  "posts": 40,
- "pass": 13,
- "fail": 2,
+ "pass": 12,
+ "fail": 3,
  "checks": [
   {
    "key": "sitemap",
@@ -40,7 +40,7 @@
    "key": "index",
    "title": "색인 검사가 모든 글을 보고 있는가",
    "ok": false,
-   "evidence": "색인 16/21 (76%)",
+   "evidence": "색인 2/6 (33%)",
    "fix": "미색인 글에 내부링크 보강 + 사이트맵 확인",
    "fix_by": "auto"
   },
@@ -96,7 +96,7 @@
    "key": "silent_errors",
    "title": "매일 실행에 조용히 죽은 단계가 없는가",
    "ok": false,
-   "evidence": "마지막 실행(2026-11-03T12:06)에서 2건이 조용히 죽었습니다 — [글 보강] Traceback (most recent call last): / [글 보강] 종료 코드 1",
+   "evidence": "마지막 실행(2026-11-04T12:06)에서 2건이 조용히 죽었습니다 — [블로그 생성] [치명적] LLM 호출 실패 — 키 또는 모델명을 확인하세요. / [블로그 생성] ::error::LLM_BLOCKED unknown",
    "fix": "해당 스크립트를 고치고, 그 단계의 '|| true' 를 걷어낼지 판단할 것",
    "fix_by": "me"
   },
@@ -119,12 +119,21 @@
   {
    "key": "llm_block",
    "title": "글 생성이 결제·한도로 막혀 있지 않은가",
-   "ok": true,
-   "evidence": "2026-10-30T16:40 차단(unknown) 이후 2026-11-02T09:52 에 발행됨 — 해소",
-   "fix": "",
+   "ok": false,
+   "evidence": "2026-11-04T12:02 생성 차단(unknown): 404 This model models/gemini-2.5-flash-lite is no longer available to new users. Please up",
+   "fix": "실행 로그에서 원인을 확인할 것",
    "fix_by": "user"
   }
  ],
  "repaired": [],
- "user_todo": []
+ "user_todo": [
+  {
+   "key": "llm_block",
+   "title": "글 생성이 결제·한도로 막혀 있지 않은가",
+   "ok": false,
+   "evidence": "2026-11-04T12:02 생성 차단(unknown): 404 This model models/gemini-2.5-flash-lite is no longer available to new users. Please up",
+   "fix": "실행 로그에서 원인을 확인할 것",
+   "fix_by": "user"
+  }
+ ]
 }
