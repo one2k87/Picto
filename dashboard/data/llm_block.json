@@ -1,5 +1,5 @@
 {
- "at": "2026-10-30T16:40:07",
+ "at": "2026-11-04T10:42:09",
  "kind": "unknown",
- "message": "Invalid operation: The `response.text` quick accessor requires the response to contain a valid `Part`, but none were returned. The candidate's [finish_reason](https://ai.google.dev/api/generate-content#finishreason) is 2."
+ "message": "404 This model models/gemini-2.5-flash-lite is no longer available to new users. Please update your code to use models/gemini-3.5-flash-lite for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs/get-started)."
 }
