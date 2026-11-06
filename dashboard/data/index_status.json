@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-06T10:51:59",
+ "updated_at": "2026-11-06T12:34:18",
  "site": "https://pickdam.com",
  "checked": 4,
  "indexed": 1,
@@ -28,7 +28,7 @@
   {
    "url": "https://pickdam.com/studio-single-electric-blanket-carbon-mat/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -48,7 +48,7 @@
   {
    "url": "https://pickdam.com/privacy-policy/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
