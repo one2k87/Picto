@@ -1,12 +1,12 @@
 {
- "updated_at": "2026-11-04T12:04:52",
+ "updated_at": "2026-11-06T10:51:59",
  "site": "https://pickdam.com",
- "checked": 6,
- "indexed": 2,
+ "checked": 4,
+ "indexed": 1,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
- "intended": 6,
+ "intended": 4,
  "posts_diag": {
   "http": 200,
   "body_head": "[{\"modified\":\"2026-11-02T09:57:31\",\"link\":\"https:\\/\\/pickdam.com\\/one-room-single-electric-blanket-emf-washable\\/\"},{\"mo"
@@ -22,7 +22,7 @@
   {
    "url": "https://pickdam.com/one-room-single-electric-blanket-emf-washable/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -36,18 +36,6 @@
    "verdict": "NEUTRAL",
    "state": "Discovered - currently not indexed",
    "lastCrawl": ""
-  },
-  {
-   "url": "https://pickdam.com/car-air-purifier-choice/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-17"
-  },
-  {
-   "url": "https://pickdam.com/car-air-purifier-filter-2026-cost/",
-   "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
-   "lastCrawl": ""
   }
  ],
  "extra": [
@@ -60,7 +48,7 @@
   {
    "url": "https://pickdam.com/privacy-policy/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
