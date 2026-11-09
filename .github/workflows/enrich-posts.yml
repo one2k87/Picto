@@ -56,6 +56,7 @@ jobs:
           WP_USER: ${{ secrets.WP_USER }}
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_API_KEY_PAID: ${{ secrets.LLM_API_KEY_PAID }}
           LLM_PROVIDER: ${{ secrets.LLM_PROVIDER }}
           LLM_MODEL: ${{ secrets.LLM_MODEL }}
         run: python build_config.py
@@ -68,6 +69,7 @@ jobs:
           ENRICH_CLEAN_ONLY: ${{ github.event.inputs.clean_only }}
           ENRICH_DROP: ${{ github.event.inputs.drop }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_API_KEY_PAID: ${{ secrets.LLM_API_KEY_PAID }}
         run: bash scripts/run_step.sh "글 보강" python scripts/enrich_posts.py
       # '|| true'·continue-on-error 뒤에서 죽는 걸 막는다(2026-10-13 실측:
       # LLM 키 이름이 틀려 보강이 통째로 죽었는데 실행은 초록색이었다).

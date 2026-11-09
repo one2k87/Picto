@@ -219,11 +219,11 @@ cfg = {
     "llm": {
         "provider": envs("LLM_PROVIDER", "gemini"),
         "api_key": envs("LLM_API_KEY", ""),
-        # 무료 등급: 2.5-flash 는 하루 20회로 축소됨 → flash-lite 를 기본
-        "model": envs("LLM_MODEL", "gemini-2.5-flash"),   # 품질 위해 flash(유료). 무료면 flash-lite 권장
+        "api_key_paid": envs("LLM_API_KEY_PAID", ""),      # 넘침 처리·이미지용 유료 키(2026-11-09 키 분배)
+        "model": envs("LLM_MODEL", "gemini-3.5-flash-lite"),   # 2026-11-09 키 분배: 본문은 Lite, 문제 보이면 승격
         # 한도에 걸리면 아래 순서로 자동 전환
         "fallback_models": [s.strip() for s in envs(
-            "FALLBACK_MODELS", "gemini-2.5-flash-lite,gemini-2.0-flash").split(",") if s.strip()],
+            "FALLBACK_MODELS", "gemini-3.1-flash-lite").split(",") if s.strip()],
     },
     "metrics": {
         "provider": envs("METRICS_PROVIDER", "naver"),
