@@ -1,5 +1,5 @@
 {
- "at": "2026-11-09T10:37:24",
+ "at": "2026-11-09T11:42:27",
  "n": 41,
  "avg": 100,
  "fails": [],
@@ -209,19 +209,8 @@
   "of": 41
  },
  "seo": {
-  "cat_set": [
-   {
-    "id": 730,
-    "title": "4mm 일반형이냐 8mm 3중 구조냐, 유리창 결로 막는 단열 에어캡 선",
-    "cat": "단열·난방"
-   }
-  ],
-  "bc_added": [
-   {
-    "id": 730,
-    "title": "4mm 일반형이냐 8mm 3중 구조냐, 유리창 결로 막는 단열 에어캡 선"
-   }
-  ],
+  "cat_set": [],
+  "bc_added": [],
   "title_set": [],
   "desc_set": [],
   "romaja_slug": [],
@@ -237,6 +226,6 @@
   "ghost_urls": [],
   "cached_suspect": false,
   "lastmod_max": "2026-11-09T01:37:21+00:00",
-  "post_modified_max": "2026-11-09T01:34:35"
+  "post_modified_max": "2026-11-09T01:37:21"
  }
 }

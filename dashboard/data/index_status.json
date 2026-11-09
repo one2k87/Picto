@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-09T10:36:31",
+ "updated_at": "2026-11-09T11:41:37",
  "site": "https://pickdam.com",
  "checked": 5,
  "indexed": 1,
@@ -9,7 +9,7 @@
  "intended": 5,
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-11-09T10:34:35\",\"link\":\"https:\\/\\/pickdam.com\\/window-insulation-bubble-wrap-4mm-8mm\\/\"},{\"modified\":"
+  "body_head": "[{\"modified\":\"2026-11-09T10:37:21\",\"link\":\"https:\\/\\/pickdam.com\\/window-insulation-bubble-wrap-4mm-8mm\\/\"},{\"modified\":"
  },
  "posts_n": 41,
  "results": [
@@ -28,7 +28,7 @@
   {
    "url": "https://pickdam.com/one-room-single-electric-blanket-emf-washable/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -40,7 +40,7 @@
   {
    "url": "https://pickdam.com/bathroom-mini-heater-tips/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   }
  ],
