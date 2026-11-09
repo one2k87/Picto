@@ -1,6 +1,6 @@
 {
- "at": "2026-11-06T12:35:29",
- "n": 40,
+ "at": "2026-11-09T10:37:24",
+ "n": 41,
  "avg": 100,
  "fails": [],
  "auto_repair": true,
@@ -8,9 +8,13 @@
  "repair_fail": [],
  "defaults": [],
  "noimgv2": {
-  "n": 37,
-  "of": 40,
+  "n": 38,
+  "of": 41,
   "posts": [
+   {
+    "id": 730,
+    "title": "4mm 일반형이냐 8mm 3중 구조냐, 유리창 결로 막는 단열 에어캡 선"
+   },
    {
     "id": 724,
     "title": "원룸 싱글 침대 전기장판 살 때 전자파 없는 EMF 인증과 세탁 가능 여"
@@ -86,10 +90,6 @@
    {
     "id": 348,
     "title": "오일 스프레이, 유리 500ml vs 플라스틱 200ml, 주방 환경과 "
-   },
-   {
-    "id": 339,
-    "title": "차량용 공기청정기, 필터 교체형과 반영구형 중 어떤 선택이 나을까요?"
    }
   ]
  },
@@ -98,9 +98,9 @@
   "posts": []
  },
  "link_coverage": {
-  "of": 40,
-  "matched": 28,
-  "linked": 28,
+  "of": 41,
+  "matched": 29,
+  "linked": 29,
   "unmatched": 12
  },
  "link_fill": {
@@ -206,11 +206,22 @@
     "title": "픽담 주제별 가이드"
    }
   ],
-  "of": 40
+  "of": 41
  },
  "seo": {
-  "cat_set": [],
-  "bc_added": [],
+  "cat_set": [
+   {
+    "id": 730,
+    "title": "4mm 일반형이냐 8mm 3중 구조냐, 유리창 결로 막는 단열 에어캡 선",
+    "cat": "단열·난방"
+   }
+  ],
+  "bc_added": [
+   {
+    "id": 730,
+    "title": "4mm 일반형이냐 8mm 3중 구조냐, 유리창 결로 막는 단열 에어캡 선"
+   }
+  ],
   "title_set": [],
   "desc_set": [],
   "romaja_slug": [],
@@ -219,13 +230,13 @@
  },
  "sitemap": {
   "checked": true,
-  "urls": 41,
-  "posts": 40,
+  "urls": 42,
+  "posts": 41,
   "missing_n": 0,
   "missing": [],
   "ghost_urls": [],
   "cached_suspect": false,
-  "lastmod_max": "2026-11-02T00:57:31+00:00",
-  "post_modified_max": "2026-11-02T00:57:31"
+  "lastmod_max": "2026-11-09T01:37:21+00:00",
+  "post_modified_max": "2026-11-09T01:34:35"
  }
 }

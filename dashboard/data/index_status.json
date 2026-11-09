@@ -1,17 +1,17 @@
 {
- "updated_at": "2026-11-06T12:34:18",
+ "updated_at": "2026-11-09T10:36:31",
  "site": "https://pickdam.com",
- "checked": 4,
+ "checked": 5,
  "indexed": 1,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
- "intended": 4,
+ "intended": 5,
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-11-02T09:57:31\",\"link\":\"https:\\/\\/pickdam.com\\/one-room-single-electric-blanket-emf-washable\\/\"},{\"mo"
+  "body_head": "[{\"modified\":\"2026-11-09T10:34:35\",\"link\":\"https:\\/\\/pickdam.com\\/window-insulation-bubble-wrap-4mm-8mm\\/\"},{\"modified\":"
  },
- "posts_n": 40,
+ "posts_n": 41,
  "results": [
   {
    "url": "https://pickdam.com/",
@@ -20,9 +20,15 @@
    "lastCrawl": "2026-11-03"
   },
   {
-   "url": "https://pickdam.com/one-room-single-electric-blanket-emf-washable/",
+   "url": "https://pickdam.com/window-insulation-bubble-wrap-4mm-8mm/",
    "verdict": "NEUTRAL",
    "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/one-room-single-electric-blanket-emf-washable/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -48,7 +54,7 @@
   {
    "url": "https://pickdam.com/privacy-policy/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {

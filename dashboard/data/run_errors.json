@@ -1,10 +1,5 @@
 {
- "at": "2026-11-06T12:35:29",
- "log_lines": 178,
- "errors": [
-  {
-   "step": "블로그 생성",
-   "line": "Traceback (most recent call last):"
-  }
- ]
+ "at": "2026-11-09T10:37:24",
+ "log_lines": 129,
+ "errors": []
 }
