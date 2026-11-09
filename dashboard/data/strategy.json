@@ -1,12 +1,12 @@
 {
-  "updated": "2026-11-02 01:22",
-  "next_review": "2026-11-09",
+  "updated": "2026-11-09 01:31",
+  "next_review": "2026-11-16",
   "data_status": "ok",
-  "verdict": "실측 데이터로 조정했습니다. evergreen 80% · revenue 20%",
+  "verdict": "실측 데이터로 조정했습니다. revenue 43% · evergreen 56%",
   "matched_posts": 20,
   "intent_ratio": {
-    "evergreen": 0.8,
-    "revenue": 0.2
+    "revenue": 0.43,
+    "evergreen": 0.57
   },
   "category_weights": {
     "생활·주방": 1.0
@@ -14,8 +14,8 @@
   "weekday_plan": {
     "0": {
       "label": "월",
-      "revenue": 2,
-      "evergreen": 3
+      "revenue": 3,
+      "evergreen": 2
     },
     "1": {
       "label": "화",
@@ -24,8 +24,8 @@
     },
     "2": {
       "label": "수",
-      "revenue": 1,
-      "evergreen": 4
+      "revenue": 2,
+      "evergreen": 3
     },
     "3": {
       "label": "목",
@@ -34,8 +34,8 @@
     },
     "4": {
       "label": "금",
-      "revenue": 2,
-      "evergreen": 3
+      "revenue": 3,
+      "evergreen": 2
     },
     "5": {
       "label": "토",
@@ -52,17 +52,11 @@
     "정수기 필터 교체",
     "오일 스프레이 단점",
     "무드등과 스탠드 조명의 분위기 차이를 비교하고, 아늑한 거실이나 침실에 적합한 제품을 추천해줘",
-    "가전 구독과 카드 무이자 할부의 차이점은?",
-    "비데 설치비용",
-    "비데설치비용",
     "음식물 처리기 필터 교체 주기",
     "정수기 필터 교체 주기"
   ],
   "weak_queries": [
-    "가전 구독과 카드 무이자 할부의 차이점은?",
     "무드등과 스탠드 조명의 분위기 차이를 비교하고, 아늑한 거실이나 침실에 적합한 제품을 추천해줘",
-    "비데 설치비용",
-    "비데설치비용",
     "오일 스프레이 단점",
     "음식물 처리기 필터 교체 주기",
     "정수기 필터 교체",
@@ -73,27 +67,27 @@
       "category": "생활·주방",
       "intent": "evergreen",
       "posts": 24,
-      "clicks": 15,
-      "impressions": 300,
-      "scored": 13,
-      "est_value": 8.2,
-      "value_per_post": 0.34,
-      "ctr": 5.0
+      "clicks": 12,
+      "impressions": 273,
+      "scored": 12,
+      "est_value": 6.6,
+      "value_per_post": 0.27,
+      "ctr": 4.4
     },
     {
       "category": "생활·주방",
       "intent": "revenue",
       "posts": 20,
-      "clicks": 6,
-      "impressions": 104,
-      "scored": 7,
-      "est_value": 6.0,
-      "value_per_post": 0.3,
-      "ctr": 5.77
+      "clicks": 4,
+      "impressions": 116,
+      "scored": 8,
+      "est_value": 4.0,
+      "value_per_post": 0.2,
+      "ctr": 3.45
     }
   ],
   "actions": [
-    "노출은 있는데 클릭이 0인 검색어 8건 — 해당 글 제목을 다시 쓰세요."
+    "노출은 있는데 클릭이 0인 검색어 5건 — 해당 글 제목을 다시 쓰세요."
   ],
   "note": "글별 수익은 애드센스 API로 조회할 수 없어 '클릭 × 의도별 RPM 배수'로 추정한 값입니다."
 }
