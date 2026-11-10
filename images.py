@@ -155,14 +155,26 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category=""):
     global LAST_KIND
     LAST_KIND = "photo"
     if provider == "free":
-        # 무료 우선: ①Gemini 무료 생성(키 있을 때) ②스톡 ③코드 썸네일. 항상 무언가는 나옴.
-        # (2026-08-30: 옛 순서는 스톡→썸네일뿐이라 CI에 스톡 키·Pillow가 없으면 전부 None
-        #  → '이미지 1장' 요건에서 글이 통째로 폐기되던 원인)
-        if cfg_images.get("api_key"):
+        # 2026-11-09 순서 변경 (famto 지시, 사용자 승인: "최대한 무료").
+        #   Pexels 실사 → Cloudflare FLUX → 코드 썸네일 → (허용 시에만) Gemini
+        # 왜 바꿨나: 키 분배 뒤 Gemini 이미지는 **유료 키가 먼저**라 장당 돈이 나간다.
+        # 그 전까지는 무료 등급이 429 로 막혀 공짜였지만, 그건 절약이 아니라 실패였다
+        # (실측: 11/9 실행에서 이미지 3장이 전부 429 → 코드 썸네일로 대체).
+        # 이제 무료 경로를 먼저 세우고, Gemini 는 IMAGE_ALLOW_PAID=1 일 때만 쓴다.
+        allow_paid = str(cfg_images.get("allow_paid")
+                         or os.getenv("IMAGE_ALLOW_PAID", "")).strip().lower() in ("1", "true", "yes")
+        data = _stock(desc, category, cfg_images, size)      # ① 무료 실사(출처 표기 포함)
+        if not data and _cf_ready(cfg_images):               # ② 무료 AI
+            data = _cloudflare(build_prompt(desc, category, style), cfg_images, size)
+            if data:
+                LAST_KIND = "ai"
+        if not data and allow_paid and cfg_images.get("api_key"):   # ④ 유료는 맨 뒤
+            print("[images] 무료 경로 모두 실패 · IMAGE_ALLOW_PAID=1 → Gemini(유료) 사용")
             data = _gemini(build_prompt(desc, category, style), cfg_images)
-            if data: LAST_KIND = "ai"
-        if not data:
-            data = _stock(desc, category, cfg_images, size) or _thumbnail(desc, category, size)
+            if data:
+                LAST_KIND = "ai"
+        if not data:                                         # ③ 마지막 보루
+            data = _thumbnail(desc, category, size)
     elif provider in ("stock", "pexels", "unsplash"):
         data = _stock(desc, category, cfg_images, size)
     elif provider in ("thumbnail", "thumb", "code"):
@@ -170,7 +182,11 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category=""):
     elif provider == "openai":
         data = _openai(build_prompt(desc, category, style), cfg_images, size)
     elif provider in ("gemini", "imagen", "google"):
+        # provider 를 직접 gemini 로 지정한 경우는 '의도한 유료'로 본다.
         data = _gemini(build_prompt(desc, category, style), cfg_images)
+        if data: LAST_KIND = "ai"
+    elif provider in ("cloudflare", "cf", "flux"):
+        data = _cloudflare(build_prompt(desc, category, style), cfg_images, size)
         if data: LAST_KIND = "ai"
     # 자동 확대검수: AI 생성 이미지 속 글자가 깨졌으면 다시 만든다.
     #
@@ -190,7 +206,12 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category=""):
             extra = NO_TEXT_RETRY if _try == 1 else (NO_TEXT_RETRY + REFRAME_RETRY)
             print(f"[images] 🔍 글자 깨짐 감지 → 재생성 {_try}/2"
                   + (" (구도 변경)" if _try == 2 else ""))
-            d2 = _gemini(build_prompt(desc, category, style) + extra, cfg_images)
+            # 재생성도 무료 경로를 먼저 쓴다(유료 호출이 조용히 늘지 않게).
+            _p2 = build_prompt(desc, category, style) + extra
+            d2 = (_cloudflare(_p2, cfg_images, size) if _cf_ready(cfg_images) else None)
+            if not d2 and str(cfg_images.get("allow_paid")
+                              or os.getenv("IMAGE_ALLOW_PAID", "")).strip().lower() in ("1", "true", "yes"):
+                d2 = _gemini(_p2, cfg_images)
             if not d2:
                 print("[images]    재생성 실패 — 다음 시도")
                 continue
@@ -219,6 +240,66 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category=""):
     with open(path, "wb") as f:
         f.write(data)
     return path
+
+
+# ── Cloudflare Workers AI (FLUX.1 schnell) — 무료 AI 이미지 ────────
+# 2026-11-09 famto 지시(사용자 승인): "최대한 무료". Gemini 이미지는 키 분배 뒤
+# 유료 키가 먼저라 장당 돈이 나간다. 무료 축을 둘 둔다 — Pexels 실사와 이 FLUX.
+# 계정당 하루 10,000 뉴런(00:00 UTC 리셋), 1024² 4스텝 ≈58~173뉴런.
+# 구현은 Scripto images.py 의 _cf_ready/_cloudflare 를 가져와 맞춘 것이다.
+def _cf_ready(cfg):
+    return bool((cfg.get("cf_account_id") or os.getenv("CF_ACCOUNT_ID"))
+                and (cfg.get("cf_api_token") or os.getenv("CF_API_TOKEN")))
+
+
+def _fit(img_bytes, size):
+    """정사각 생성물을 블로그 규격(기본 1200x675)으로 중앙 크롭·확대."""
+    try:
+        from PIL import Image
+        import io as _io
+        w, h = (int(x) for x in str(size or "1200x675").lower().split("x"))
+        im = Image.open(_io.BytesIO(img_bytes)).convert("RGB")
+        sc = max(w / im.width, h / im.height)
+        im = im.resize((round(im.width * sc), round(im.height * sc)), Image.LANCZOS)
+        l, t = (im.width - w) // 2, (im.height - h) // 2
+        out = _io.BytesIO()
+        im.crop((l, t, l + w, t + h)).save(out, "PNG", optimize=True)
+        return out.getvalue()
+    except Exception as e:
+        print(f"[images] 크기 맞춤 생략: {e}")
+        return img_bytes
+
+
+def _cloudflare(prompt, cfg, size=None):
+    """Cloudflare Workers AI — FLUX.1 schnell. 키가 없으면 호출 자체를 안 한다."""
+    try:
+        import base64 as _b64m
+        import requests as _rq
+        acc = cfg.get("cf_account_id") or os.getenv("CF_ACCOUNT_ID")
+        tok = cfg.get("cf_api_token") or os.getenv("CF_API_TOKEN")
+        model = (cfg.get("cf_model") or os.getenv("CF_IMAGE_MODEL")
+                 or "@cf/black-forest-labs/flux-1-schnell")
+        r = _rq.post(f"https://api.cloudflare.com/client/v4/accounts/{acc}/ai/run/{model}",
+                     headers={"Authorization": f"Bearer {tok}"},
+                     json={"prompt": prompt[:2048], "steps": 4}, timeout=120)
+        if r.status_code != 200:
+            globals()["LAST_ERR"] = f"cloudflare HTTP {r.status_code}: {r.text[:150]}"
+            print(f"[images] {globals()['LAST_ERR']}")
+            return None
+        if r.headers.get("content-type", "").startswith("image/"):
+            raw = r.content
+        else:
+            b64 = ((r.json() or {}).get("result") or {}).get("image")
+            if not b64:
+                print("[images] cloudflare 응답에 이미지 없음")
+                return None
+            raw = _b64m.b64decode(b64)
+        print("[images] Cloudflare FLUX 생성 성공(무료)")
+        return _fit(raw, size)
+    except Exception as e:
+        globals()["LAST_ERR"] = f"cloudflare 예외: {str(e)[:150]}"
+        print(f"[images] cloudflare 생성 실패: {e}")
+    return None
 
 
 # ── 무료 스톡 사진 (Pexels / Unsplash) ─────────────────────────────
@@ -251,8 +332,15 @@ def _http_get(url, headers=None, params=None, timeout=15):
     return requests.get(url, headers=headers or {}, params=params or {}, timeout=timeout)
 
 
+# Pexels API 약관: 쓴 사진마다 **작가 이름과 사진 페이지 링크**, 그리고
+# "Photos provided by Pexels" 를 보이게 둬야 한다. 바이트만 받아 오면 그 정보가
+# 사라지므로 여기서 같이 들고 나온다(2026-11-09 famto 지시 ③).
+LAST_ATTRIB = None          # {"src":"pexels","author":str,"url":str} | None
+
+
 def _stock(desc, category, cfg, size):
-    """무료 스톡 사진 1장의 바이트를 반환(실패 시 None)."""
+    """무료 스톡 사진 1장의 바이트를 반환(실패 시 None). 출처는 LAST_ATTRIB 에."""
+    globals()["LAST_ATTRIB"] = None
     query = _stock_query(desc, category)
     if not query:          # 주제 매칭 실패 → 무관한 사진 대신 썸네일 폴백에 맡긴다
         return None
@@ -266,11 +354,18 @@ def _stock(desc, category, cfg, size):
             if r.status_code == 200:
                 photos = r.json().get("photos", [])
                 if photos:
-                    src = photos[0]["src"].get("large") or photos[0]["src"].get("original")
+                    p0 = photos[0]
+                    src = p0["src"].get("large") or p0["src"].get("original")
                     img = _http_get(src)
                     if img.status_code == 200:
-                        print(f"[images] 무료 스톡(Pexels) 사용: {query}")
-                        return img.content
+                        globals()["LAST_ATTRIB"] = {
+                            "src": "pexels",
+                            "author": str(p0.get("photographer") or "")[:60],
+                            "url": str(p0.get("url") or ""),
+                        }
+                        print(f"[images] 무료 스톡(Pexels) 사용: {query}"
+                              f" · 작가 {globals()['LAST_ATTRIB']['author']}")
+                        return _fit(img.content, size)
             else:
                 print(f"[images] Pexels 응답 {r.status_code}")
         if unsplash:
@@ -280,11 +375,17 @@ def _stock(desc, category, cfg, size):
             if r.status_code == 200:
                 res = r.json().get("results", [])
                 if res:
-                    src = res[0]["urls"].get("regular")
+                    r0 = res[0]
+                    src = r0["urls"].get("regular")
                     img = _http_get(src)
                     if img.status_code == 200:
+                        globals()["LAST_ATTRIB"] = {
+                            "src": "unsplash",
+                            "author": str((r0.get("user") or {}).get("name") or "")[:60],
+                            "url": str((r0.get("links") or {}).get("html") or ""),
+                        }
                         print(f"[images] 무료 스톡(Unsplash) 사용: {query}")
-                        return img.content
+                        return _fit(img.content, size)
     except Exception as e:
         print(f"[images] 스톡 사진 실패(무시): {e}")
     return None

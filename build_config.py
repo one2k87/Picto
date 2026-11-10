@@ -215,6 +215,12 @@ cfg = {
         "size": envs("IMAGE_SIZE", "1200x675"),                        # 디스커버/SNS 규격
         "max_per_run": envi("IMAGE_MAX_PER_RUN", 20),                   # 비용 상한(유료)
         "api_key": envs("IMAGE_API_KEY", ""),
+        # 2026-11-09 이미지 무료화(사용자 승인). Cloudflare Workers AI FLUX = 무료 AI 축.
+        "cf_account_id": envs("CF_ACCOUNT_ID", ""),
+        "cf_api_token": envs("CF_API_TOKEN", ""),
+        # Gemini 이미지는 키 분배 뒤 **유료 키가 먼저**라 장당 돈이 나간다.
+        # 그래서 기본은 끄고, 이 값이 1일 때만 유료 경로를 연다.
+        "allow_paid": envs("IMAGE_ALLOW_PAID", ""),
     },
     "llm": {
         "provider": envs("LLM_PROVIDER", "gemini"),

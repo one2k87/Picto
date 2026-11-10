@@ -283,9 +283,40 @@ def make_image_resolver(cfg, auto_publish, category="", budget=None):
                   "object": "AI로 연출한 참고 이미지입니다"}
         note = (_notes.get(getattr(images, "LAST_STYLE", ""), None)
                 if getattr(images, "LAST_KIND", "") == "ai" else None)
+        # Pexels·Unsplash 약관: 쓴 사진마다 작가 이름과 사진 페이지 링크를
+        # 보이게 둬야 한다. 모아 뒀다가 글 끝에 한 번에 붙인다(2026-11-09).
+        at = getattr(images, "LAST_ATTRIB", None)
+        if at and at.get("url"):
+            PHOTO_CREDITS.append(at)
         return images.figure_html(src, alt, note)
 
     return resolver
+
+
+# 이 글에서 쓴 무료 스톡 사진의 출처. 글 하나를 만들 때마다 비운다.
+PHOTO_CREDITS = []
+
+
+def photo_credit_html():
+    """무료 스톡 출처 블록. 쓴 사진이 없으면 빈 문자열."""
+    if not PHOTO_CREDITS:
+        return ""
+    seen, items = set(), []
+    for c in PHOTO_CREDITS:
+        key = c.get("url")
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        who = html_mod.escape(c.get("author") or "작가 미상")
+        items.append(f'<a href="{html_mod.escape(key)}" target="_blank" '
+                     f'rel="nofollow noopener">{who}</a>')
+    if not items:
+        return ""
+    src = "Pexels" if any(c.get("src") == "pexels" for c in PHOTO_CREDITS) else "Unsplash"
+    home = "https://www.pexels.com" if src == "Pexels" else "https://unsplash.com"
+    return ('<p style="margin:22px 0 0;font-size:12px;color:#98a2b3;line-height:1.7">'
+            f'사진 제공: <a href="{home}" target="_blank" rel="nofollow noopener">'
+            f'Photos provided by {src}</a> · ' + " · ".join(items) + '</p>')
 
 
 def save_copy_html(article):
@@ -517,6 +548,7 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
     def gen_job(job):
         lane, mode, n_parts, kw = job
         comp = bool(kw.get("competitive"))
+        PHOTO_CREDITS.clear()        # 글 한 편마다 출처 목록을 새로 모은다
         try:
             if mode == "series":
                 print(f"-> [시리즈 {n_parts}편][{lane}]{'[상위노출강화]' if comp else ''} {kw['keyword']}")
@@ -535,7 +567,10 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
         except Exception as e:
             print(f"[오류] '{kw['keyword']}' 글 생성 실패(건너뜀): {e}")
             return []
+        credit = photo_credit_html()
         for a in arts:
+            if credit and credit not in (a.get("html") or ""):
+                a["html"] = (a.get("html") or "") + credit
             a["category"] = name
             a["wp_category"] = cat.get("wp_category", name)
             a["wp_category_slug"] = cat.get("wp_slug", "")
