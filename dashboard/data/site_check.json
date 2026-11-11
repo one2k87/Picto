@@ -1,6 +1,6 @@
 {
- "at": "2026-11-09T11:42:27",
- "n": 41,
+ "at": "2026-11-11T10:34:17",
+ "n": 42,
  "avg": 100,
  "fails": [],
  "auto_repair": true,
@@ -8,9 +8,13 @@
  "repair_fail": [],
  "defaults": [],
  "noimgv2": {
-  "n": 38,
-  "of": 41,
+  "n": 39,
+  "of": 42,
   "posts": [
+   {
+    "id": 738,
+    "title": "1인 가구 미니 세탁기 3kg, 통돌이와 드럼 선택 후회 막는 3가지 기"
+   },
    {
     "id": 730,
     "title": "4mm 일반형이냐 8mm 3중 구조냐, 유리창 결로 막는 단열 에어캡 선"
@@ -86,10 +90,6 @@
    {
     "id": 355,
     "title": "접이식 블루투스 키보드, 갑자기 고장 날 때 흔한 문제 2가지와 복구 절"
-   },
-   {
-    "id": 348,
-    "title": "오일 스프레이, 유리 500ml vs 플라스틱 200ml, 주방 환경과 "
    }
   ]
  },
@@ -98,9 +98,9 @@
   "posts": []
  },
  "link_coverage": {
-  "of": 41,
-  "matched": 29,
-  "linked": 29,
+  "of": 42,
+  "matched": 30,
+  "linked": 30,
   "unmatched": 12
  },
  "link_fill": {
@@ -206,11 +206,22 @@
     "title": "픽담 주제별 가이드"
    }
   ],
-  "of": 41
+  "of": 42
  },
  "seo": {
-  "cat_set": [],
-  "bc_added": [],
+  "cat_set": [
+   {
+    "id": 738,
+    "title": "1인 가구 미니 세탁기 3kg, 통돌이와 드럼 선택 후회 막는 3가지 기",
+    "cat": "가전 구매·렌탈"
+   }
+  ],
+  "bc_added": [
+   {
+    "id": 738,
+    "title": "1인 가구 미니 세탁기 3kg, 통돌이와 드럼 선택 후회 막는 3가지 기"
+   }
+  ],
   "title_set": [],
   "desc_set": [],
   "romaja_slug": [],
@@ -219,13 +230,13 @@
  },
  "sitemap": {
   "checked": true,
-  "urls": 42,
-  "posts": 41,
+  "urls": 43,
+  "posts": 42,
   "missing_n": 0,
   "missing": [],
   "ghost_urls": [],
   "cached_suspect": false,
-  "lastmod_max": "2026-11-09T01:37:21+00:00",
-  "post_modified_max": "2026-11-09T01:37:21"
+  "lastmod_max": "2026-11-11T01:34:14+00:00",
+  "post_modified_max": "2026-11-11T01:31:01"
  }
 }
