@@ -1,25 +1,38 @@
 # -*- coding: utf-8 -*-
-"""「이번 주 유행템」 주간 리포트 — 캐스토 실측 트렌드 + 쿠팡 공식API 가격/링크 (2026-11-12 신설).
+"""「이번 주 유행템」 주간 리포트 — 신호는 전자동, 쿠팡 링크만 주 1회 사람 손 (2026-11-12).
 
-**지시 근거**: famto 2026-11-11 — 주 1회 글 1편, 1~20만 원대 상위 5개, 상품마다 '왜 뜨는지'
+**지시**: famto 2026-11-11 — 주 1회 글 1편, 1~20만 원대 상위 5개, 상품마다 '왜 뜨는지'
 근거 1~2개 + 쿠팡 링크(대가성 문구). **공식 API만 — 쿠팡 리뷰·인스타 크롤링 금지.**
 
-**왜 이 글이 수익 축인가**
-  픽담의 실측 병목은 색인(31/37)이 아니라 **유입(주 41세션)과 클릭(카드 노출 53·클릭 0)**이다.
-  개별 제품 글은 '검색해서 오는 사람'을 기다리지만, 유행템 리포트는 **지금 뜨는 품목**을
-  묶어서 다루므로 ①검색 수요가 아직 안 생긴 품목도 태울 수 있고 ②한 글에 5개 링크가 들어가
-  노출당 클릭 기회가 5배다. 캐스토 쇼츠 CTA의 착지점으로도 개별 글보다 어울린다.
+**왜 반자동인가 (사용자 결정 2026-11-12)**
+  쿠팡 파트너스 오픈API는 **누적 수익 ₩150,000 → 최종승인** 뒤에야 열린다(2026-09 가이드 실측).
+  픽담은 파트너스 클릭 0이라 당분간 못 쓴다. 네이버 쇼핑 '검색' API도 2026-07-31 종료라
+  **상품 가격·링크를 받을 공식 경로가 하나도 없다.** 그래서:
+    · 신호(무엇이 뜨는가·찾는 사람이 있는가)는 **전부 무료 공식 API로 자동**
+    · 쿠팡 링크만 주 1회 5개 사람이 만들어 붙인다(약 5분)
+    · 붙인 링크는 `data/products.json`에 **누적**되어 과거 글에도 소급된다(backfill-links.yml)
+      → 주가 갈수록 손이 줄고, 누적 15만 원을 넘기면 `coupang_api.py`가 그대로 켜진다.
 
-**근거는 전부 실측치만 쓴다**
-  '왜 뜨는지'를 LLM이 쓰면 그럴듯한 거짓말이 된다(이 레포의 상습 실패). 그래서 근거 문장은
-  캐스토 `trend_board.json`의 숫자(영상 수·채널 수·노출 합·중앙 조회수·언급량·직전 대비)와
-  쿠팡 API의 가격·리뷰 수로만 조립한다. LLM은 쓰지 않는다.
+**신호 4층 (없는 층은 조용히 빠지고 나머지로 진행한다)**
+  ① 발굴  캐스토 `trend_board.json` (유튜브 실측)  — 공개 raw, 읽기만
+  ② 검증  네이버 검색광고 `/keywordstool` 월간 검색량 — `demand.monthly_volume` (이미 배포됨)
+  ③ 보조  구글 Suggest 자동완성 — `demand.suggest_hits` (키 없음)
+  ④ 기준가 공공데이터 생필품 조사가격 — `price_ref` (활용신청 필요, 없으면 생략)
 
-**데이터 경계**
-  캐스토 레포는 **읽기만** 한다(공개 레포 raw, 토큰 불필요). 캐스토 파일을 수정하지 않는다.
+**가격 표기 (사용자 지시 2026-11-12 개정)**
+  "가격대(만 원대)"로 뭉개면 **채널 신뢰도가 떨어진다** — 정확한 금액을 쓴다.
+  금액의 출처는 `products.json`의 `price`/`price_at`이고, 그 값은 **세션이 사용자 크롬으로
+  쿠팡 상품 페이지의 JSON-LD(`Product.offers.price`)를 읽어** 채운다(2026-11-12 실측으로 확인:
+  price·availability·brand·rating 이 전부 들어 있다). 서버(Actions)에서는 하지 않는다 —
+  쿠팡 봇 차단에 걸리고 약관 위험이 있다. 그래서 글에는 **반드시 조사일을 함께 적는다.**
+  소비자원 조사가격은 "정상가 대비 얼마나 싼지"를 보여주는 보조선으로만 쓴다.
 
-실행:  python scripts/weekly_trend_report.py            # dry-run(파일로만 출력)
-       python scripts/weekly_trend_report.py --publish  # 실제 발행
+**'왜 뜨는지'는 LLM을 쓰지 않는다.** 실측 숫자만으로 문장을 조립한다. 모델이 쓰면
+그럴듯한 거짓말이 되고, 이 레포에서 이미 세 번 당했다.
+
+실행
+  python scripts/weekly_trend_report.py              # ① 선정 + 링크 요청 블록 출력
+  python scripts/weekly_trend_report.py --publish    # ② 링크가 찬 뒤 발행
 """
 import datetime as dt
 import html
@@ -31,31 +44,32 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import requests
 
-import coupang_api
+import demand
+import price_ref
 import products as products_mod
 
-RAW = "https://raw.githubusercontent.com/one2k87/Casto/main/data/trend_board.json"
-LOCAL = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                     "..", "Casto", "data", "trend_board.json")
+BOARD_RAW = "https://raw.githubusercontent.com/one2k87/Casto/main/data/trend_board.json"
+BOARD_LOCAL = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                           "..", "Casto", "data", "trend_board.json")
+PICK = "data/weekly_trend_pick.json"
 PREVIEW = "data/trend_report_preview.html"
-LOG = "data/trend_report_log.json"
 NOTICE = ("이 포스팅은 쿠팡 파트너스 활동의 일환으로, "
           "이에 따른 일정액의 수수료를 제공받습니다.")
-BAND_LO, BAND_HI = 10_000, 200_000
-CHEAP_HI = 30_000          # 하단 '같이 담는 것들' 비교표 상한
+PARTNERS_LINK_UI = "https://partners.coupang.com/#affiliate/ws/link/dynamic"
 WANT = 5
-MIN_VIDEOS, MIN_CHANNELS = 3, 3   # 근거 하한 — 영상 1개·채널 1곳은 "유행"이 아니다
-SPREAD_CHANNELS = 5                  # 이보다 적으면 "대형 채널 탓이 아니다"라고 말할 수 없다
-QUADRANT_KO = {"peak": "정점(노출·실수요 둘 다 높음)",
-               "bubble": "노출 과열(실수요는 아직 덜 따라옴)",
-               "ignore": "관심 낮음",
-               "rising": "상승 중"}
+MIN_PUBLISH_LINKS = 3        # 링크가 이보다 적으면 발행하지 않는다 — 링크 없는 리포트는 수익이 0이다
+MIN_VIDEOS, MIN_CHANNELS = 3, 3
+SPREAD_CHANNELS = 5          # 이보다 적으면 "한두 채널 탓이 아니다"라고 말할 수 없다
+MIN_VOLUME = 50              # 월간 검색량 하한(검색광고가 살아 있을 때만 적용)
+QUADRANT_KO = {"peak": "노출과 실수요가 같이 높은 구간",
+               "bubble": "노출이 앞서 간 구간(실수요는 아직 덜 따라왔습니다)",
+               "rising": "올라오는 구간"}
 
 
+# ─── 입력 ────────────────────────────────────────────────────────────────────
 def load_board():
-    """원격(공개 raw) 우선, 실패 시 로컬 체크아웃. 둘 다 없으면 None — 추측으로 글을 쓰지 않는다."""
     try:
-        r = requests.get(RAW, timeout=25)
+        r = requests.get(BOARD_RAW, timeout=25)
         if r.status_code == 200:
             print("[board] 캐스토 raw 에서 받음")
             return r.json()
@@ -63,189 +77,217 @@ def load_board():
     except Exception as e:
         print(f"[board] raw 실패: {str(e)[:90]}")
     try:
-        with open(LOCAL, encoding="utf-8") as f:
+        with open(BOARD_LOCAL, encoding="utf-8") as f:
             print("[board] 로컬 체크아웃에서 읽음")
             return json.load(f)
     except Exception:
         return None
 
 
-def rank(board):
-    """peak 먼저, 그다음 상승(delta=up), 그 안에서 노출 합 큰 순. ignore·차단은 버린다."""
+def load_config():
+    """워크플로에서는 build_config.py 가 만든 config.json. 없으면 빈 설정으로 진행."""
+    try:
+        with open("config.json", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def candidates(board):
+    """blocked·ignore 제외, 근거 하한 통과, peak → 상승 → 나머지 순. 노출 합 내림차순."""
     seen, pool = set(), []
     for item in (board.get("briefing") or []) + (board.get("all") or []):
         k = item.get("key")
         if not k or k in seen or item.get("blocked"):
             continue
         seen.add(k)
-        q, d = item.get("quadrant"), item.get("delta")
-        if q == "ignore":
+        if item.get("quadrant") == "ignore":
             continue
         if (item.get("videos") or 0) < MIN_VIDEOS or (item.get("channels") or 0) < MIN_CHANNELS:
-            continue   # 근거가 영상 1~2개면 '이번 주 유행'이라고 쓸 수 없다
-        tier = 0 if q == "peak" else (1 if d == "up" else 2)
+            continue   # 영상 1~2개를 '이번 주 유행'이라고 쓸 수 없다
+        tier = 0 if item.get("quadrant") == "peak" else (1 if item.get("delta") == "up" else 2)
         pool.append((tier, -(item.get("exposure") or 0), item))
     pool.sort(key=lambda x: (x[0], x[1]))
     return [p[2] for p in pool]
 
 
-def reasons(item, prod, days):
-    """'왜 뜨는지' 1~2개 — 실측치만. 없는 축은 문장을 만들지 않는다."""
+def enrich(items, cfg):
+    """검색량·자동완성·대장 링크·기준가를 붙인다. 각 층은 실패해도 나머지로 진행."""
+    kws = [(x.get("keyword") or x.get("name")) for x in items]
+    vol = demand.monthly_volume(kws, cfg) or {}
+    if vol:
+        print(f"[demand] 검색광고 월간 검색량 {len(vol)}건 확보")
+    else:
+        print(f"[demand] 검색량 없음(키 미배포 또는 실패: {demand.LAST_ERR or '-'}) — 이 층은 빼고 진행")
     out = []
-    v, c, ex = item.get("videos"), item.get("channels"), item.get("exposure")
+    for it in items:
+        kw = it.get("keyword") or it.get("name")
+        pr = products_mod.find_for({"title": it.get("name") or "", "keyword": kw})
+        band = (pr or {}).get("price_band") or it.get("price_band") or ""
+        ref = price_ref.lookup(it.get("name") or kw) if price_ref.ready() else None
+        out.append({"item": it, "kw": kw, "volume": vol.get(kw),
+                    "product": pr, "band": band, "ref": ref,
+                    "link": (pr or {}).get("coupang_url") or ""})
+    if vol:
+        # 검색량이 잡힌 품목은 수요 순으로 올린다 — '찾아오는 사람'이 유입의 전부다.
+        out.sort(key=lambda r: (r["volume"] is None, -(r["volume"] or 0)))
+        out = [r for r in out if r["volume"] is None or r["volume"] >= MIN_VOLUME]
+    return out[:WANT]
+
+
+# ─── 본문 ────────────────────────────────────────────────────────────────────
+def reasons(row, days):
+    it = row["item"]
+    out = []
+    v, c, ex = it.get("videos"), it.get("channels"), it.get("exposure")
     if v and c and ex:
-        out.append(f"최근 {days}일 유튜브에서 이 품목을 다룬 영상이 {v}개, "
+        out.append(f"최근 {days}일 동안 이 품목을 다룬 유튜브 영상이 {v}개, "
                    f"올린 채널이 {c}곳입니다. 합산 노출은 약 {int(ex):,}회입니다.")
-    mv = item.get("median_views")
+    if row["volume"]:
+        out.append(f"네이버에서 이 키워드를 한 달에 약 {int(row['volume']):,}번 검색합니다. "
+                   f"영상으로만 뜬 게 아니라 직접 찾아보는 사람이 있다는 뜻입니다.")
+    mv = it.get("median_views")
     if mv and len(out) < 2:
-        # ⚠️ '대형 채널 탓이 아니다'는 채널이 여러 곳일 때만 참이다. 영상 1개·채널 1곳에
-        #    이 문장을 붙였다가 거짓 주장이 됐다(2026-11-12 미리보기 실물 확인에서 잡음).
         if (c or 0) >= SPREAD_CHANNELS:
             out.append(f"영상 한 편의 중앙 조회수가 {int(mv):,}회입니다. "
                        f"여러 채널에 퍼져 있어 한두 곳이 끌어올린 수치가 아닙니다.")
         else:
             out.append(f"영상 한 편의 중앙 조회수가 {int(mv):,}회입니다. "
                        f"다만 올린 채널이 {c or 0}곳뿐이라 아직 한쪽에 쏠린 관심입니다.")
-    mn = item.get("mentions")
+    mn = it.get("mentions")
     if mn and len(out) < 2:
         out.append(f"네이버 블로그·카페 언급이 {int(mn):,}건 잡힙니다.")
-    if prod and prod.get("review_count") and len(out) < 2:
-        out.append(f"쿠팡 리뷰가 {prod['review_count']:,}건입니다. "
-                   f"리뷰는 구매해야만 남을 수 있어 꾸며내기 어려운 숫자입니다.")
-    if item.get("delta") == "up" and len(out) < 2:
+    if it.get("delta") == "up" and len(out) < 2:
         out.append("직전 집계보다 지표가 올라왔습니다.")
     return out[:2]
 
 
-def section(i, item, prod, days):
-    name = html.escape(item.get("name") or item.get("keyword") or "")
-    rs = "".join(f"<li>{html.escape(r)}</li>" for r in reasons(item, prod, days))
-    q = QUADRANT_KO.get(item.get("quadrant"), item.get("quadrant") or "")
-    h = [f'<h2>{i}. {name}</h2>',
-         f'<p><strong>지금 상태</strong>: {html.escape(q)}</p>',
-         f'<ul>{rs}</ul>']
-    if prod:
-        pn = html.escape(prod.get("name") or name)
-        rocket = "이고 로켓배송" if prod.get("rocket") else ""
-        h.append(f'<p>쿠팡 기준 가격은 <strong>{prod["price"]:,}원</strong>'
-                 f'{rocket}입니다. (조회 시점 가격이라 바뀔 수 있습니다)</p>')
-        h.append(f'<p><a href="{prod["url"]}" target="_blank" rel="nofollow sponsored noopener">'
-                 f'{pn} 쿠팡에서 보기</a></p>')
-    else:
-        h.append('<p>이 품목은 가격대(1만~20만 원) 안에서 고를 만한 상품을 '
-                 '이번 집계에서는 찾지 못했습니다. 링크를 넣지 않았습니다.</p>')
+def section(i, row, days, slug):
+    it = row["item"]
+    name = html.escape(it.get("name") or row["kw"] or "")
+    rs = "".join(f"<li>{html.escape(r)}</li>" for r in reasons(row, days))
+    h = [f"<h2>{i}. {name}</h2>"]
+    q = QUADRANT_KO.get(it.get("quadrant"))
+    if q:
+        h.append(f"<p><strong>지금 상태</strong>: {html.escape(q)}</p>")
+    h.append(f"<ul>{rs}</ul>")
+    pr = row["product"] or {}
+    price, at = pr.get("price"), pr.get("price_at")
+    if price:
+        # 금액에는 **반드시 조사일**을 붙인다. 날짜 없는 금액은 언제 틀렸는지 알 수 없다.
+        sold_out = str(pr.get("availability") or "").lower() in ("outofstock", "soldout")
+        h.append(f"<p><strong>{int(price):,}원</strong>"
+                 + (f" ({html.escape(str(at))} 기준)" if at else "")
+                 + ("  — 현재 품절입니다." if sold_out else "") + "</p>")
+    elif row["band"]:
+        h.append(f"<p>가격대는 {html.escape(str(row['band']))}입니다.</p>")
+    ref = row["ref"]
+    if ref:
+        h.append(f"<p>참고로 한국소비자원 참가격의 생필품 조사 기록에서 이 품목은 "
+                 f"평균 {ref['avg']:,}원, 최저 {ref['min']:,}원으로 조사됐습니다"
+                 f"({ref['n']}건{', ' + html.escape(str(ref['day'])) + ' 기준' if ref.get('day') else ''}). "
+                 f"온라인 가격이 이보다 낮은지 보면 됩니다.</p>")
+    if row["link"]:
+        url = products_mod.with_subid(row["link"], products_mod.safe_subid(slug, keyword=row["kw"]))
+        h.append(f'<p><a href="{url}" target="_blank" rel="nofollow sponsored noopener">'
+                 f'{name} 쿠팡에서 보기</a></p>')
+    # 링크가 없으면 **아무 문장도 넣지 않는다** — "아직 링크를 걸어두지 않았습니다"는
+    # 독자에게 아무 쓸모가 없는 운영 사정이다. 발행 자체가 링크 3개 하한으로 막혀 있다.
     return "".join(h)
 
 
-def cheap_table(rows):
-    if not rows:
-        return ""
-    tr = "".join(
-        f'<tr><td>{html.escape(r["label"])}</td>'
-        f'<td style="text-align:right">{r["price"]:,}원</td>'
-        f'<td style="text-align:center">{"○" if r["rocket"] else "-"}</td>'
-        f'<td><a href="{r["url"]}" target="_blank" rel="nofollow sponsored noopener">보기</a></td></tr>'
-        for r in rows)
-    return ('<h2>3만 원 이하, 같이 담으면 배송비가 안 아까운 것들</h2>'
-            '<p>위 품목과 같은 집계에서 가격이 3만 원 이하로 확인된 것만 모았습니다.</p>'
-            '<figure class="wp-block-table"><table>'
-            '<thead><tr><th>제품</th><th style="text-align:right">가격</th>'
-            '<th style="text-align:center">로켓</th><th>링크</th></tr></thead>'
-            f'<tbody>{tr}</tbody></table></figure>')
-
-
-def build(board, picks, cheap, days):
+def build(board, rows, days):
     today = dt.date.today()
-    week = today.isocalendar()[1]
-    title = f"이번 주 유행템 5가지 ({today.month}월 {today.day}일 기준)"
-    intro = (f'<p>{NOTICE}</p>'
-             f'<p>이 글은 느낌으로 고른 목록이 아닙니다. 최근 {days}일 동안 '
-             f'유튜브에 올라온 영상 수·채널 수·노출량과 네이버 언급량을 모아 점수를 내고, '
-             f'그중 쿠팡에서 1만~20만 원대로 살 수 있는 것만 다섯 개 골랐습니다. '
-             f'품목마다 왜 올라왔는지를 숫자로 적었습니다.</p>'
-             f'<p>집계 기준일은 {html.escape(str(board.get("updated")))}입니다.</p>')
-    body = "".join(section(i, it, pr, days) for i, (it, pr) in enumerate(picks, 1))
-    tail = (cheap_table(cheap) +
-            '<h2>이 목록을 만든 방법</h2>'
-            f'<ul><li>노출·공급: 유튜브 데이터 API로 최근 {days}일 영상 집계</li>'
-            '<li>언급량: 네이버 검색 API</li>'
-            '<li>가격·리뷰·링크: 쿠팡 파트너스 공개 API</li>'
-            '<li>순위는 정점 품목을 먼저, 그다음 직전 집계보다 오른 품목을 노출 합 순으로 놓았습니다.</li></ul>'
-            f'<p>다음 주 같은 기준으로 다시 집계합니다.</p>')
-    return {
-        "title": title,
-        "slug": f"weekly-trend-{today:%Y%m%d}",
-        "html": intro + body + tail,
-        "meta": f"최근 {days}일 노출·언급 집계로 고른 1만~20만 원대 유행템 5가지. 품목마다 오른 이유를 숫자로 정리했습니다.",
-        "seo_title": f"이번 주 유행템 5가지 — {today.month}/{today.day} 집계",
-        "focus_keyword": "이번 주 유행템",
-        "category": "트렌드",
-        "wp_category": "트렌드",
-        "wp_category_slug": "trend",
-        "_week": week,
-    }
+    slug = f"weekly-trend-{today:%Y%m%d}"
+    linked = sum(1 for r in rows if r["link"])
+    how = ["노출·공급: 유튜브 데이터 API로 최근 %d일 영상 집계" % days]
+    if any(r["volume"] for r in rows):
+        how.append("검색 수요: 네이버 검색광고 키워드 도구의 월간 검색수")
+    if any(r["ref"] for r in rows):
+        how.append("기준가: 공공데이터포털 「한국소비자원 생필품 가격 정보」")
+    intro = (f"<p>{NOTICE}</p>"
+             f"<p>느낌으로 고른 목록이 아닙니다. 최근 {days}일 동안 유튜브에 올라온 영상 수와 "
+             f"채널 수, 노출량을 모으고, 거기에 네이버에서 실제로 몇 번 검색되는지를 겹쳐 "
+             f"다섯 개를 골랐습니다. 품목마다 왜 올라왔는지를 숫자로 적었습니다.</p>"
+             f"<p>집계 기준일은 {html.escape(str(board.get('updated')))}입니다. "
+             f"가격은 글에 적힌 날짜 기준이며, 쿠팡에서 수시로 바뀝니다.</p>")
+    body = "".join(section(i, r, days, slug) for i, r in enumerate(rows, 1))
+    tail = ("<h2>이 목록을 만든 방법</h2><ul>"
+            + "".join(f"<li>{html.escape(x)}</li>" for x in how)
+            + "<li>순위는 노출과 실수요가 같이 높은 품목을 먼저, 그다음 올라오는 품목을 "
+              "검색량 순으로 놓았습니다.</li></ul>"
+              "<p>다음 주에 같은 기준으로 다시 집계합니다.</p>")
+    return {"title": f"이번 주 유행템 5가지 ({today.month}월 {today.day}일 집계)",
+            "slug": slug, "html": intro + body + tail,
+            "meta": f"최근 {days}일 유튜브 노출과 네이버 검색량을 겹쳐 고른 유행템 5가지. "
+                    f"품목마다 오른 이유를 숫자로 정리했습니다.",
+            "seo_title": f"이번 주 유행템 5가지 — {today.month}/{today.day} 집계",
+            "focus_keyword": "이번 주 유행템",
+            "category": "트렌드", "wp_category": "트렌드", "wp_category_slug": "trend",
+            "_linked": linked}
 
 
+def link_block(rows):
+    """링크 없는 품목의 '사람이 할 일' 블록 — 복사해서 바로 쓸 수 있게."""
+    need = [r for r in rows if not r["link"]]
+    if not need:
+        return "모든 품목에 링크가 있습니다 — 바로 발행할 수 있습니다."
+    lines = [f"쿠팡 파트너스 딥링크가 필요한 품목 {len(need)}개 "
+             f"(생성: {PARTNERS_LINK_UI})", ""]
+    for r in need:
+        lines.append(f"  · {r['item'].get('name')}   검색어: {r['kw']}")
+    lines += ["", "만든 링크를 아래 형식으로 픽토 채팅에 붙여넣으면 대장에 넣고 발행합니다.", ""]
+    for r in need:
+        lines.append(f"{r['item'].get('name')} = ")
+    return "\n".join(lines)
+
+
+# ─── 실행 ────────────────────────────────────────────────────────────────────
 def main():
     publish = "--publish" in sys.argv
     board = load_board()
     if not board:
-        print("::error::캐스토 trend_board.json 을 못 받았다 — 글을 만들지 않는다")
+        print("::error::캐스토 trend_board.json 을 못 받았다 — 추측으로 글을 쓰지 않는다")
         return 1
     days = int(board.get("snapshot_days") or 24)
-    if not coupang_api.ready():
-        print("::warning::COUPANG_ACCESS_KEY/SECRET 없음 — 가격·링크 없이 글을 만들 수 없다. "
-              "금고에 키가 있으니 keys.sh apply 로 Picto 에 배포할 것(요청은 keys/requests.txt 에 적어 뒀다)")
-        return 2
+    cfg = load_config()
+    if not price_ref.ready():
+        print("[price_ref] PRICE_REF_API_KEY 없음 — 소비자원 기준가 줄은 생략한다")
 
-    picks, cheap, tried, skipped = [], [], 0, []
-    for item in rank(board):
-        if len(picks) >= WANT:
-            break
-        kw = item.get("keyword") or item.get("name")
-        if not kw:
-            continue
-        tried += 1
-        pr = coupang_api.best_in_band(kw, BAND_LO, BAND_HI)
-        if not pr:
-            skipped.append(kw)
-            continue
-        picks.append((item, pr))
-        if pr["price"] <= CHEAP_HI:
-            cheap.append({"label": item.get("name") or kw, "price": pr["price"],
-                          "rocket": pr["rocket"], "url": pr["url"]})
-
-    print(f"[pick] 후보 조회 {tried}건 · 채택 {len(picks)}건 · 가격대 밖/무결과 {len(skipped)}건")
-    if skipped:
-        print("       탈락: " + ", ".join(skipped[:8]))
-    if len(picks) < 3:
-        print(f"::error::채택이 {len(picks)}건뿐이다 — 5개 리포트로 쓰기 부족해 발행하지 않는다")
+    rows = enrich(candidates(board), cfg)
+    if len(rows) < MIN_PUBLISH_LINKS:
+        print(f"::error::근거 하한을 통과한 품목이 {len(rows)}개뿐이다 — 집계가 묵었는지 확인할 것")
         return 3
-
-    art = build(board, picks, cheap, days)
+    art = build(board, rows, days)
     os.makedirs("data", exist_ok=True)
     with open(PREVIEW, "w", encoding="utf-8") as f:
         f.write(f"<h1>{html.escape(art['title'])}</h1>" + art["html"])
-    rec = {"date": dt.date.today().isoformat(), "board_updated": board.get("updated"),
-           "picked": [p[0].get("name") for p in picks], "tried": tried,
-           "skipped": skipped, "published": None}
+    with open(PICK, "w", encoding="utf-8") as f:
+        json.dump({"date": dt.date.today().isoformat(),
+                   "board_updated": board.get("updated"),
+                   "rows": [{"name": r["item"].get("name"), "keyword": r["kw"],
+                             "volume": r["volume"], "band": r["band"],
+                             "has_link": bool(r["link"])} for r in rows]},
+                  f, ensure_ascii=False, indent=1)
 
-    if publish:
-        import publisher
-        from main import load_config
-        cfg = load_config()
-        wp = dict(cfg.get("wordpress") or {})
-        if not wp.get("enabled"):
-            print("::warning::config 의 wordpress.enabled 가 False — 발행 생략(로컬 설정은 예시값이다)")
-        else:
-            url = publisher.publish_to_wordpress(art, wp)
-            rec["published"] = url
-            print(f"[wp] 발행: {url}")
-    else:
-        print(f"[dry] 미리보기만 저장: {PREVIEW}")
+    print(f"[pick] 선정 {len(rows)}개 · 링크 있음 {art['_linked']}개 · 미리보기 {PREVIEW}")
+    print("─" * 60)
+    print(link_block(rows))
+    print("─" * 60)
 
-    with open(LOG, "w", encoding="utf-8") as f:
-        json.dump(rec, f, ensure_ascii=False, indent=1)
+    if not publish:
+        return 0
+    if art["_linked"] < MIN_PUBLISH_LINKS:
+        print(f"::error::링크가 {art['_linked']}개뿐이다(하한 {MIN_PUBLISH_LINKS}) — "
+              f"링크 없는 리포트는 수익이 0이라 발행하지 않는다")
+        return 4
+    import publisher
+    wp = dict(cfg.get("wordpress") or {})
+    if not wp.get("enabled"):
+        print("::warning::wordpress.enabled 가 False — 발행 생략(로컬 config는 예시값이다)")
+        return 0
+    url = publisher.publish_to_wordpress(art, wp)
+    print(f"[wp] 발행: {url}")
     return 0
 
 

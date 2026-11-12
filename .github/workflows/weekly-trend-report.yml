@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "true면 미리보기만 만들고 발행하지 않음"
+        description: "true면 선정·미리보기만(링크 요청 블록 출력), false면 발행까지"
         required: false
         default: "true"
 
@@ -38,12 +38,18 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python build_config.py
-      - name: 유행템 리포트 생성·발행
+      - name: 유행템 리포트 선정·발행
         env:
-          # 쿠팡 파트너스 공개 API — 가격대(1~20만 원) 필터와 파트너스 링크의 유일한 합법 경로.
-          # 네이버 쇼핑 검색 API는 2026-07-31 종료라 가격을 받을 수 없다.
-          COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
-          COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
+          # 신호 층: 네이버 검색광고(월간 검색량) — 이미 배포된 키. 없으면 이 층만 빠진다.
+          NAVER_AD_API_KEY: ${{ secrets.NAVER_AD_API_KEY }}
+          NAVER_AD_SECRET: ${{ secrets.NAVER_AD_SECRET }}
+          NAVER_AD_CUSTOMER_ID: ${{ secrets.NAVER_AD_CUSTOMER_ID }}
+          # 기준가 층: 공공데이터포털 「한국소비자원 생필품 가격 정보」. 없으면 기준가 줄만 빠진다.
+          PRICE_REF_API_KEY: ${{ secrets.PRICE_REF_API_KEY }}
+          # 쿠팡 파트너스 오픈API는 누적 수익 15만 원 달성 후에야 발급된다(2026-09 확인).
+          # 그때 아래 두 줄을 켜면 coupang_api.py 가 그대로 동작한다.
+          # COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
+          # COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
         run: |
           if [ "${{ github.event.inputs.dry_run }}" = "false" ] || [ "${{ github.event_name }}" = "schedule" ]; then
             python scripts/weekly_trend_report.py --publish
@@ -57,5 +63,5 @@ jobs:
           name: trend-report-preview
           path: |
             data/trend_report_preview.html
-            data/trend_report_log.json
+            data/weekly_trend_pick.json
           if-no-files-found: ignore

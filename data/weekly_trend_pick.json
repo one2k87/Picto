@@ -1,0 +1,41 @@
+{
+ "date": "2026-11-12",
+ "board_updated": "2026-11-02",
+ "rows": [
+  {
+   "name": "주방그릇 수납 정리대",
+   "keyword": "주방 그릇 수납 정리대",
+   "volume": null,
+   "band": "중가",
+   "has_link": false
+  },
+  {
+   "name": "보관형 감자칼",
+   "keyword": "다기능 채칼 야채 감자칼 보관형",
+   "volume": null,
+   "band": "저가",
+   "has_link": false
+  },
+  {
+   "name": "틈새 청소 솔",
+   "keyword": "살림 틈새 청소 솔",
+   "volume": null,
+   "band": "저가",
+   "has_link": false
+  },
+  {
+   "name": "야채 슬라이서",
+   "keyword": "야채 슬라이서 채칼",
+   "volume": null,
+   "band": "중가",
+   "has_link": false
+  },
+  {
+   "name": "세제 일체형 설거지 장갑",
+   "keyword": "버튼식 세제 설거지 장갑",
+   "volume": null,
+   "band": "저가",
+   "has_link": false
+  }
+ ]
+}
