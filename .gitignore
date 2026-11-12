@@ -43,3 +43,7 @@ img_*.png
 강의자료/01_스크린샷/**/*.jpg
 brand/partners_pages.zip
 brand/partners_shots/
+
+# 유행템 리포트 미리보기는 실행 산출물 — 커밋하지 않는다(가짜 링크가 섞일 수 있다)
+data/trend_report_preview.html
+data/trend_report_log.json

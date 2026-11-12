@@ -1,0 +1,61 @@
+name: 주간 유행템 리포트
+
+# 매주 목요일 아침 (KST) — cron 시각은 '투입 시각'이지 발행 시각이 아니다.
+# 실측: GitHub Actions 예약 실행은 30회 중앙값 141분 지연(최소 35·최대 219, 실패 0).
+# 00:37 UTC = 09:37 KST 투입 → 실제 발행은 대개 11:00~13:00 KST.
+# 분을 0으로 두지 않는 이유: 정시는 전 세계 큐가 몰려 지연이 더 커진다.
+on:
+  schedule:
+    - cron: "37 0 * * 4"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true면 미리보기만 만들고 발행하지 않음"
+        required: false
+        default: "true"
+
+permissions:
+  contents: read
+
+jobs:
+  trend-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 의존성(최소)
+        run: pip install requests
+      - name: config.json 생성
+        env:
+          WP_ENABLED: ${{ secrets.WP_ENABLED }}
+          WP_SITE: ${{ secrets.WP_SITE }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          WP_STATUS: ${{ secrets.WP_STATUS }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python build_config.py
+      - name: 유행템 리포트 생성·발행
+        env:
+          # 쿠팡 파트너스 공개 API — 가격대(1~20만 원) 필터와 파트너스 링크의 유일한 합법 경로.
+          # 네이버 쇼핑 검색 API는 2026-07-31 종료라 가격을 받을 수 없다.
+          COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
+          COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "false" ] || [ "${{ github.event_name }}" = "schedule" ]; then
+            python scripts/weekly_trend_report.py --publish
+          else
+            python scripts/weekly_trend_report.py
+          fi
+      - name: 미리보기 올려두기
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trend-report-preview
+          path: |
+            data/trend_report_preview.html
+            data/trend_report_log.json
+          if-no-files-found: ignore
