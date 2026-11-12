@@ -49,6 +49,8 @@ import price_ref
 import products as products_mod
 
 BOARD_RAW = "https://raw.githubusercontent.com/one2k87/Casto/main/data/trend_board.json"
+# 상품 단위 언급 빈도 — 캐스토에 요청해 둔 파일(2026-11-12 P→F). 아직 없으면 조용히 건너뛴다.
+MENTIONS_RAW = "https://raw.githubusercontent.com/one2k87/Casto/main/data/product_mentions.json"
 BOARD_LOCAL = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                            "..", "Casto", "data", "trend_board.json")
 PICK = "data/weekly_trend_pick.json"
@@ -84,6 +86,45 @@ def load_board():
         return None
 
 
+def load_mentions():
+    """상품 단위 언급 빈도. 없으면 None — 품목 단위만으로도 글은 완성돼야 한다.
+
+    **해외 상품 규칙(사용자 지시 2026-11-12)**: 해외에서 뜬 물건도 **한국에서 정식 판매 중이면**
+    소개한다. 판정은 캐스토가 설명란 링크로 하고(`overseas_only`), 직구 전용은 여기서 뺀다.
+    """
+    try:
+        r = requests.get(MENTIONS_RAW, timeout=20)
+        if r.status_code != 200:
+            print(f"[mentions] 아직 없음(HTTP {r.status_code}) — 품목 단위로만 진행")
+            return None
+        data = r.json()
+    except Exception as e:
+        print(f"[mentions] 못 받음: {str(e)[:70]} — 품목 단위로만 진행")
+        return None
+    rows = data.get("products") if isinstance(data, dict) else data
+    rows = [x for x in (rows or []) if not x.get("overseas_only")]
+    print(f"[mentions] 상품 {len(rows)}건(직구 전용 제외)")
+    return rows
+
+
+def pick_mention(rows, keyword, name):
+    """품목에 해당하는 상품 중 **서로 다른 채널 수**가 가장 많은 것 — 유행의 폭이 곧 신호다."""
+    if not rows:
+        return None
+    hay = (str(keyword or "") + " " + str(name or "")).replace(" ", "")
+    best = None
+    for r in rows:
+        for cand in (r.get("name_candidates") or []):
+            c = str(cand).replace(" ", "")
+            if not c:
+                continue
+            if c in hay or any(w and w in c for w in str(name or "").split()):
+                if not best or (r.get("channels") or 0) > (best.get("channels") or 0):
+                    best = r
+                break
+    return best
+
+
 def load_config():
     """워크플로에서는 build_config.py 가 만든 config.json. 없으면 빈 설정으로 진행."""
     try:
@@ -113,6 +154,7 @@ def candidates(board):
 
 def enrich(items, cfg):
     """검색량·자동완성·대장 링크·기준가를 붙인다. 각 층은 실패해도 나머지로 진행."""
+    mentions = load_mentions()
     kws = [(x.get("keyword") or x.get("name")) for x in items]
     vol = demand.monthly_volume(kws, cfg) or {}
     if vol:
@@ -127,6 +169,7 @@ def enrich(items, cfg):
         ref = price_ref.lookup(it.get("name") or kw) if price_ref.ready() else None
         out.append({"item": it, "kw": kw, "volume": vol.get(kw),
                     "product": pr, "band": band, "ref": ref,
+                    "mention": pick_mention(mentions, kw, it.get("name")),
                     "link": (pr or {}).get("coupang_url") or ""})
     if vol:
         # 검색량이 잡힌 품목은 수요 순으로 올린다 — '찾아오는 사람'이 유입의 전부다.
@@ -143,6 +186,11 @@ def reasons(row, days):
     if v and c and ex:
         out.append(f"최근 {days}일 동안 이 품목을 다룬 유튜브 영상이 {v}개, "
                    f"올린 채널이 {c}곳입니다. 합산 노출은 약 {int(ex):,}회입니다.")
+    mn = row.get("mention")
+    if mn and mn.get("channels"):
+        out.append(f"이 상품을 영상 설명란에 직접 건 유튜브 채널이 "
+                   f"{int(mn['channels'])}곳입니다(영상 {int(mn.get('videos') or 0)}개). "
+                   f"한 채널이 밀어준 게 아니라 여러 사람이 같은 물건을 집었다는 뜻입니다.")
     if row["volume"]:
         out.append(f"네이버에서 이 키워드를 한 달에 약 {int(row['volume']):,}번 검색합니다. "
                    f"영상으로만 뜬 게 아니라 직접 찾아보는 사람이 있다는 뜻입니다.")
