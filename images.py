@@ -80,7 +80,19 @@ def pick_style(desc, category=""):
     return "photo"   # 기본은 실사 — 블로그 체감 퀄리티가 가장 높다
 
 
-def build_prompt(desc, category, style=None):
+NO_TEXT_RULE = (
+    "TEXT POLICY — ABSOLUTE: render NO written characters anywhere in the image. "
+    "No signs, no shop signage, no posters, no banners, no labels, no packaging text, "
+    "no screen or UI text, no handwriting, no numbers. Choose a composition that needs none; "
+    "leave such surfaces blank. This rule overrides every other instruction.")
+LIGHT_TEXT_RULE = (
+    "TEXT POLICY: written text is optional and must be minimal — at most one short "
+    "Korean label or sign (a few words), rendered large, straight, and perfectly legible. "
+    "Never dense paragraphs, receipts, or screens full of writing. "
+    "If the text would not be clearly legible, omit it entirely.")
+
+
+def build_prompt(desc, category, style=None, no_text=False):
     """스타일 프리셋 + 구체 묘사 결합. (구 config.images.style 문자열은 폐기 — 저퀄 원인)
     2026-09-05 강화: '글과 무관한 이미지' 재발 방지 — 묘사를 문자 그대로, 소재 중심으로 그리게 강제."""
     key = style if style in STYLE_PRESETS else pick_style(desc, category)
@@ -89,11 +101,12 @@ def build_prompt(desc, category, style=None):
                "Do NOT add unrelated scenery, random people, or generic stock-photo filler; "
                "every element in the image must clearly belong to this subject and to the article's topic. "
                f"Context: an image for a Korean blog post about {category or 'daily life and home'}. "
-               # 텍스트 정책(2026-09-05 v2): 짧은 한글 라벨은 허용하되, 생성 후 자동 검수로 깨짐을 잡는다
-               "TEXT POLICY: written text is optional and must be minimal — at most one short "
-               "Korean label or sign (a few words), rendered large, straight, and perfectly legible. "
-               "Never dense paragraphs, receipts, or screens full of writing. "
-               "If the text would not be clearly legible, omit it entirely.")
+               # 텍스트 정책(2026-11-13 v3): **글자를 아예 금지**하는 길을 연다.
+               # 왜: Cloudflare FLUX 는 한글을 쓰지 못한다. 짧은 라벨을 허용했더니 간판·표지판에
+               # 깨진 글자가 박힌 채 3편 9장이 라이브로 나갔다(마크토 제보 2026-11-13, 실물 확인).
+               # 생성 후 검수(_check_text)에만 기대지 않고 **프롬프트에서 원천 차단**한다
+               # (캐스토 54d0e18 과 같은 방식: 글자가 보이는 장면 자체를 빼게 한다).
+               + (NO_TEXT_RULE if no_text else LIGHT_TEXT_RULE))
     return f"{STYLE_PRESETS[key]} {subject}"
 
 
@@ -136,7 +149,7 @@ def _check_text(img_bytes, cfg):
         return None
 
 
-def generate_image(desc, cfg_images, out_dir, idx=0, category=""):
+def generate_image(desc, cfg_images, out_dir, idx=0, category="", title=""):
     """desc(한국어 설명)로 이미지 1장 생성 → 저장 경로 반환(실패 시 None)."""
     cfg_images = cfg_images or {}
     provider = cfg_images.get("provider", "none")
@@ -165,7 +178,7 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category=""):
                          or os.getenv("IMAGE_ALLOW_PAID", "")).strip().lower() in ("1", "true", "yes")
         data = _stock(desc, category, cfg_images, size)      # ① 무료 실사(출처 표기 포함)
         if not data and _cf_ready(cfg_images):               # ② 무료 AI
-            data = _cloudflare(build_prompt(desc, category, style), cfg_images, size)
+            data = _cloudflare(build_prompt(desc, category, style, no_text=True), cfg_images, size)
             if data:
                 LAST_KIND = "ai"
         if not data and allow_paid and cfg_images.get("api_key"):   # ④ 유료는 맨 뒤
@@ -174,11 +187,11 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category=""):
             if data:
                 LAST_KIND = "ai"
         if not data:                                         # ③ 마지막 보루
-            data = _thumbnail(desc, category, size)
+            data = _thumbnail(title or desc, category, size)
     elif provider in ("stock", "pexels", "unsplash"):
         data = _stock(desc, category, cfg_images, size)
     elif provider in ("thumbnail", "thumb", "code"):
-        data = _thumbnail(desc, category, size)
+        data = _thumbnail(title or desc, category, size)
     elif provider == "openai":
         data = _openai(build_prompt(desc, category, style), cfg_images, size)
     elif provider in ("gemini", "imagen", "google"):
@@ -186,7 +199,7 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category=""):
         data = _gemini(build_prompt(desc, category, style), cfg_images)
         if data: LAST_KIND = "ai"
     elif provider in ("cloudflare", "cf", "flux"):
-        data = _cloudflare(build_prompt(desc, category, style), cfg_images, size)
+        data = _cloudflare(build_prompt(desc, category, style, no_text=True), cfg_images, size)
         if data: LAST_KIND = "ai"
     # 자동 확대검수: AI 생성 이미지 속 글자가 깨졌으면 다시 만든다.
     #
@@ -207,7 +220,7 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category=""):
             print(f"[images] 🔍 글자 깨짐 감지 → 재생성 {_try}/2"
                   + (" (구도 변경)" if _try == 2 else ""))
             # 재생성도 무료 경로를 먼저 쓴다(유료 호출이 조용히 늘지 않게).
-            _p2 = build_prompt(desc, category, style) + extra
+            _p2 = build_prompt(desc, category, style, no_text=True) + extra
             d2 = (_cloudflare(_p2, cfg_images, size) if _cf_ready(cfg_images) else None)
             if not d2 and str(cfg_images.get("allow_paid")
                               or os.getenv("IMAGE_ALLOW_PAID", "")).strip().lower() in ("1", "true", "yes"):
@@ -421,10 +434,30 @@ def _find_kr_font():
     return None
 
 
-def _short_title(desc):
+def _short_title(desc, limit=34):
+    """썸네일에 얹을 짧은 제목.
+
+    ⚠️ 예전에는 `t[:40]` 으로 **글자 중간을 뚝 잘랐다.** 그래서 코드 썸네일에
+    "창문 단열 뽁뽁이 4mm 기본형 롤과 8mm 3중 구조 롤의 단면 및 공" 처럼
+    묘사문이 어중간하게 끊긴 채 라이브로 나갔다(마크토 제보 2026-11-13, 실물 확인).
+    이제 **어절 단위로 끊고 말줄임표**를 붙인다. 쉼표·중점이 먼저 나오면 거기서 끊는다.
+    """
     t = re.sub(r"\s+", " ", str(desc or "")).strip()
     t = re.sub(r"[\"'“”‘’]", "", t)
-    return t[:40] if len(t) > 40 else t
+    if not t:
+        return ""
+    # 첫 구절이 충분히 길면 거기까지만 — 묘사문의 수식어 꼬리를 떼어 낸다
+    head = re.split(r"[,·]", t)[0].strip()
+    if 8 <= len(head) <= limit:
+        t = head
+    if len(t) <= limit:
+        return t
+    out = ""
+    for w in t.split(" "):
+        if len(out) + len(w) + 1 > limit:
+            break
+        out = (out + " " + w).strip()
+    return (out + "…") if out else (t[:limit] + "…")
 
 
 def _thumbnail(desc, category, size):
