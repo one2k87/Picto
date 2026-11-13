@@ -1,0 +1,41 @@
+name: 깨진 이미지 교체(코드 썸네일)
+
+# 본문에 남은 깨진 글자 이미지를 코드 썸네일로 바꾼다. 수동 실행만.
+on:
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: '글ID:파일명,파일명;글ID:파일명  (예 746:img_a.png,img_b.png)'
+        required: true
+      dry_run:
+        description: "true면 계획만"
+        default: "true"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  fiximg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 의존성
+        run: pip install requests pillow
+      - name: config.json 생성
+        env:
+          WP_ENABLED: ${{ secrets.WP_ENABLED }}
+          WP_SITE: ${{ secrets.WP_SITE }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          WP_STATUS: ${{ secrets.WP_STATUS }}
+        run: python build_config.py
+      - name: 교체
+        env:
+          FIXIMG_TARGETS: ${{ github.event.inputs.targets }}
+          FIXIMG_DRY: ${{ github.event.inputs.dry_run }}
+        run: python scripts/replace_broken_images.py
