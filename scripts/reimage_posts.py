@@ -99,6 +99,15 @@ def main():
         if len(batch) < 50:
             break
         page += 1
+    # 특정 글만 정밀 교체 — 전수 재생성은 비용·시간이 크고, 사고 수습은 보통 몇 편뿐이다.
+    # (2026-11-13 신설: 깨진 한글 이미지 3편 9장을 골라 교체하려고 만들었다.
+    #  backfill_product_links 의 BACKFILL_IDS 와 같은 방식이다.)
+    only = {x.strip() for x in (os.getenv("REIMAGE_IDS") or "").split(",") if x.strip()}
+    if only:
+        posts = [x for x in posts if str(x.get("id")) in only]
+        missing = only - {str(x.get("id")) for x in posts}
+        print(f"[ids] 지정 {len(only)}건 → 대상 {len(posts)}건"
+              + (f" · 못 찾음 {sorted(missing)}" if missing else ""))
     print(f"발행 글 {len(posts)}개 발견 (limit={limit}, dry={dry})")
 
     done = skipped = failed = 0

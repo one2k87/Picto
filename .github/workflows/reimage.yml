@@ -17,6 +17,10 @@ on:
         description: "true면 이미 교체한 글(imgv2)도 다시 교체"
         default: "false"
         required: false
+      ids:
+        description: "쉼표로 구분한 글 ID만 교체(비우면 전체). 예: 746,738,730"
+        default: ""
+        required: false
 
 jobs:
   reimage:
@@ -47,6 +51,7 @@ jobs:
         env:
           REIMAGE_LIMIT: ${{ github.event.inputs.limit }}
           REIMAGE_DRY: ${{ github.event.inputs.dry_run }}
+          REIMAGE_IDS: ${{ github.event.inputs.ids }}
           REIMAGE_FORCE: ${{ github.event.inputs.force }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
