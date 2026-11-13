@@ -1,23 +1,41 @@
 {
- "updated_at": "2026-11-11T11:48:28",
+ "updated_at": "2026-11-13T11:14:12",
  "site": "https://pickdam.com",
- "checked": 6,
- "indexed": 1,
+ "checked": 8,
+ "indexed": 2,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
- "intended": 6,
+ "intended": 8,
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-11-11T10:34:14\",\"link\":\"https:\\/\\/pickdam.com\\/mini-washing-machine-3kg-comparison\\/\"},{\"modified\":\"2"
+  "body_head": "[{\"modified\":\"2026-11-13T11:11:40\",\"link\":\"https:\\/\\/pickdam.com\\/bidet-self-installation-cost-saving-tips\\/\"},{\"modifie"
  },
- "posts_n": 42,
+ "posts_n": 43,
  "results": [
   {
    "url": "https://pickdam.com/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-11-10"
+  },
+  {
+   "url": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-23"
+  },
+  {
+   "url": "https://pickdam.com/standby-power-cutoff-multi-tap-4-way/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/studio-single-electric-blanket-carbon-mat/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/mini-washing-machine-3kg-comparison/",
@@ -38,15 +56,9 @@
    "lastCrawl": ""
   },
   {
-   "url": "https://pickdam.com/studio-single-electric-blanket-carbon-mat/",
-   "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
-   "lastCrawl": ""
-  },
-  {
    "url": "https://pickdam.com/bathroom-mini-heater-tips/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   }
  ],
