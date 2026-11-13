@@ -504,6 +504,14 @@ def _thumbnail(desc, category, size):
 
     font_path = _find_kr_font()
     title = _short_title(desc)
+    if not font_path:
+        # ⚠️ 2026-11-13: 폰트가 없으면 **글자를 그리지 않고 배경만** 반환했다. 그래서
+        #    한글 폰트가 없는 러너(내가 만든 fix-broken-images 워크플로)에서 돌았을 때
+        #    의미 없는 보라색 사각형이 본문에 들어갔다. 빈 배경은 깨진 글자만큼 나쁘다.
+        #    이제 **실패로 돌려** 호출부가 다른 경로를 쓰거나 건너뛰게 한다.
+        print("::warning::[images] 한글 폰트를 찾지 못해 코드 썸네일을 만들지 않습니다 "
+              "(러너에 fonts-noto-cjk 설치 필요)")
+        return None
     if font_path:
         # 제목 폰트 크기: 이미지 폭에 맞춰 조정
         fsize = max(28, int(w / 12))

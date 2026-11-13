@@ -26,6 +26,12 @@ jobs:
           python-version: "3.11"
       - name: 의존성
         run: pip install requests pillow
+      - name: 한글 폰트 설치
+        # 코드 썸네일이 한글을 그리려면 러너에 CJK 폰트가 있어야 한다.
+        # 없으면 글자가 통째로 빠진 빈 배경이 나온다(2026-11-13 실측).
+        run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+        timeout-minutes: 5
+        continue-on-error: true
       - name: config.json 생성
         env:
           WP_ENABLED: ${{ secrets.WP_ENABLED }}
