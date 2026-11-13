@@ -91,6 +91,12 @@ def main():
 
             r = requests.get(f"{base}/wp-json/wp/v2/posts/{pid}", headers=headers,
                              params={"context": "edit", "_fields": "id,title,content"}, timeout=30)
+            if r.status_code == 404:
+                # 글이 삭제되거나 다른 글로 통합되면 404 가 난다. 운영상 정상이므로
+                # 실패로 올리지 않는다 — 실패로 두면 워크플로가 매번 빨개져서
+                # 진짜 실패를 못 본다(2026-11-13: 낡은 패치 3건 때문에 run #11 실패).
+                skipped.append(f"{name}(글 없음 #{pid} — 삭제·통합된 것으로 보임)")
+                continue
             if r.status_code != 200:
                 failed.append(f"{name}(조회 HTTP {r.status_code})")
                 continue
