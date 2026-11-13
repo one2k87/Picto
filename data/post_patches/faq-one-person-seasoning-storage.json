@@ -1,0 +1,31 @@
+{
+ "post_id": 581,
+ "marker": "<!--patch:faq-one-person-seasoning-storage-->",
+ "note": "빈 h3 5개만 제거 · 기존 FAQ 1개는 그대로 둠",
+ "replace": [
+  {
+   "old": "<h3></h3><p></p>",
+   "new": ""
+  },
+  {
+   "old": "<h3></h3>\n<p></p>",
+   "new": ""
+  },
+  {
+   "old": "<h3></h3>\n\n<p></p>",
+   "new": ""
+  },
+  {
+   "old": "<h3></h3><p>&nbsp;</p>",
+   "new": ""
+  },
+  {
+   "old": "<h3></h3>",
+   "new": ""
+  },
+  {
+   "old": "<p></p>",
+   "new": ""
+  }
+ ]
+}

@@ -1,0 +1,35 @@
+{
+ "post_id": 746,
+ "marker": "<!--patch:faq-standby-power-cutoff-multi-tap-4-way-->",
+ "note": "답변 없음 → 빈 h3 3개와 제목까지 제거",
+ "replace": [
+  {
+   "old": "<h3></h3><p></p>",
+   "new": ""
+  },
+  {
+   "old": "<h3></h3>\n<p></p>",
+   "new": ""
+  },
+  {
+   "old": "<h3></h3>\n\n<p></p>",
+   "new": ""
+  },
+  {
+   "old": "<h3></h3><p>&nbsp;</p>",
+   "new": ""
+  },
+  {
+   "old": "<h3></h3>",
+   "new": ""
+  },
+  {
+   "old": "<p></p>",
+   "new": ""
+  },
+  {
+   "old": "<h2>자주 묻는 질문</h2>",
+   "new": ""
+  }
+ ]
+}

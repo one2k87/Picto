@@ -552,7 +552,9 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
         "7. summary_table: 핵심을 한눈에 보는 요약표(2~4행) 데이터를 rows로 제공."
         if _use_table else "7. summary_table: 이 글에는 넣지 않는다. 빈 값으로 두세요.")
     _parts_rules.append(
-        f"8. faqs: 실제로 많이 묻는 질문 {_n_faq}개와 간결한 답(각 2~3문장)."
+        f"8. faqs: 실제로 많이 묻는 질문 {_n_faq}개. 각 원소는 반드시 "
+        '{"q": 질문 한 줄, "a": 답 2~3문장} 형태의 객체로, '
+        "q·a 키 이름을 그대로 쓸 것(빈 문자열 금지)."
         if _n_faq else "8. faqs: 이 글에는 넣지 않는다. 빈 배열로 두세요.")
     _parts_rules.append(
         "9. tldr: 글 맨 위에 넣을 '핵심 요약' 2~3개(각 한 문장, 결론부터)."
@@ -757,7 +759,7 @@ def _article_prompt(keyword, kind, category, links, related, insert_ads, competi
 본문은 JSON이 아니라 그냥 HTML이므로 따옴표를 이스케이프하지 마세요.
 
 ===META===
-{{"title":"클릭 유도형 제목","seo_title":"검색용 짧은 제목(28자 이내, 타깃 키워드로 시작, 숫자 1개 포함)","meta":"90~120자 메타설명(첫 70자 안에 답과 숫자를 넣을 것)","slug":"english-hyphen-slug(소문자 영문 낱말 3~6개를 하이픈으로. 한글·숫자만·빈값 금지)","focus_keyword":"{keyword}","tags":["태그1","태그2","태그3","태그4","태그5"],"hook":"3초 후킹 첫 문장","gain":"{_gain_key}","tldr":[],"checklist":[],"summary_table":{{"headers":[],"rows":[]}},"faqs":[],"kokpick":{{"price_band":"","condition_branch":[],"size_install":"","maintenance":{{"cycle":"","cost_per_year":"","consumable_url":""}},"cautions":[],"alt_uses":[],"alt_uses_source":""}}}}
+{{"title":"클릭 유도형 제목","seo_title":"검색용 짧은 제목(28자 이내, 타깃 키워드로 시작, 숫자 1개 포함)","meta":"90~120자 메타설명(첫 70자 안에 답과 숫자를 넣을 것)","slug":"english-hyphen-slug(소문자 영문 낱말 3~6개를 하이픈으로. 한글·숫자만·빈값 금지)","focus_keyword":"{keyword}","tags":["태그1","태그2","태그3","태그4","태그5"],"hook":"3초 후킹 첫 문장","gain":"{_gain_key}","tldr":[],"checklist":[],"summary_table":{{"headers":[],"rows":[]}},"faqs":[{{"q":"질문 한 줄","a":"답 2~3문장"}}],"kokpick":{{"price_band":"","condition_branch":[],"size_install":"","maintenance":{{"cycle":"","cost_per_year":"","consumable_url":""}},"cautions":[],"alt_uses":[],"alt_uses_source":""}}}}
 (위 tldr·checklist·summary_table·faqs는 '배정된 것만' 채우고, 배정되지 않은 항목은 위처럼 빈 채로 두세요)
 (kokpick = 유튜브 채널이 읽어갈 구조화 정보입니다. **본문에 실제로 쓴 내용만** 옮겨 담고,
  본문에 없는 값은 반드시 빈 채로 두세요 — 지어내면 영상과 글의 근거가 어긋납니다.
@@ -913,12 +915,35 @@ def _build_toc(items):
     return f'<nav class="toc" aria-label="목차"><strong>목차</strong><ul>{lis}</ul></nav>'
 
 
+# 2026-11-13: 라이브 10편에 <h3></h3> 가 36개 비어 있었다(마크토 제보, 픽토 실측).
+# 원인은 프롬프트가 faqs 원소의 키 이름을 지시하지 않아 모델이 question/answer 등으로
+# 돌려줬는데 코드는 f["q"]/f["a"] 만 읽은 것. 키를 넓게 받고, 그래도 비면 그 블록을 버린다.
+_FAQ_Q_KEYS = ("q", "question", "Q", "질문", "title", "name")
+_FAQ_A_KEYS = ("a", "answer", "A", "답", "답변", "text", "content")
+
+
+def _faq_pairs(faqs):
+    """faqs 를 (질문, 답) 쌍으로 정규화한다. 둘 중 하나라도 비면 버린다."""
+    out = []
+    for f in (faqs or []):
+        if isinstance(f, (list, tuple)) and len(f) >= 2:
+            q, a = str(f[0] or "").strip(), str(f[1] or "").strip()
+        elif isinstance(f, dict):
+            q = next((str(f[k]).strip() for k in _FAQ_Q_KEYS if f.get(k)), "")
+            a = next((str(f[k]).strip() for k in _FAQ_A_KEYS if f.get(k)), "")
+        else:
+            continue
+        if q and a:
+            out.append((q, a))
+    return out
+
+
 def _build_faq_html(faqs):
-    if not faqs:
+    pairs = _faq_pairs(faqs)
+    if not pairs:
         return ""
     blocks = "".join(
-        f'<h3>{html_mod.escape(f.get("q",""))}</h3><p>{html_mod.escape(f.get("a",""))}</p>'
-        for f in faqs)
+        f'<h3>{html_mod.escape(q)}</h3><p>{html_mod.escape(a)}</p>' for q, a in pairs)
     return f"<h2>자주 묻는 질문</h2>{blocks}"
 
 
@@ -1125,11 +1150,12 @@ def _build_jsonld(title, meta, faqs, author="편집부", lang="ko", author_type=
             "author": author_obj,
             "mainEntityOfPage": {"@type": "WebPage"}}
     scripts = [json.dumps(blog, ensure_ascii=False)]
-    if faqs:
+    _pairs = _faq_pairs(faqs)
+    if _pairs:
         faq = {"@context": "https://schema.org", "@type": "FAQPage",
-               "mainEntity": [{"@type": "Question", "name": f.get("q", ""),
-                               "acceptedAnswer": {"@type": "Answer", "text": f.get("a", "")}}
-                              for f in faqs]}
+               "mainEntity": [{"@type": "Question", "name": q,
+                               "acceptedAnswer": {"@type": "Answer", "text": a}}
+                              for q, a in _pairs]}
         scripts.append(json.dumps(faq, ensure_ascii=False))
     return "".join(f'<script type="application/ld+json">{s}</script>' for s in scripts)
 
