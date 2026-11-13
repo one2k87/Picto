@@ -80,6 +80,18 @@ def pick_style(desc, category=""):
     return "photo"   # 기본은 실사 — 블로그 체감 퀄리티가 가장 높다
 
 
+def cf_safe_style(style):
+    """Cloudflare FLUX 로 그릴 때 안전한 스타일로 바꾼다.
+
+    2026-11-13 실측: 교체 실행에서 `diagram`(인포그래픽) 프리셋이 뽑히자 FLUX 가
+    말풍선과 주석을 가득 그렸고, **한글을 못 써서 전부 깨진 글자**가 됐다.
+    인포그래픽은 본질적으로 글자가 있어야 성립하는 형식이라, 글자를 금지하면
+    빈 말풍선이 되고 허용하면 깨진다 — **CF 에서는 이 스타일을 쓰지 않는다.**
+    (프롬프트에 'NO TEXT' 를 넣어도 형식 자체가 글자를 유도해 이기지 못한다.)
+    """
+    return "illust" if style == "diagram" else style
+
+
 NO_TEXT_RULE = (
     "TEXT POLICY — ABSOLUTE: render NO written characters anywhere in the image. "
     "No signs, no shop signage, no posters, no banners, no labels, no packaging text, "
@@ -178,7 +190,7 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category="", title=""):
                          or os.getenv("IMAGE_ALLOW_PAID", "")).strip().lower() in ("1", "true", "yes")
         data = _stock(desc, category, cfg_images, size)      # ① 무료 실사(출처 표기 포함)
         if not data and _cf_ready(cfg_images):               # ② 무료 AI
-            data = _cloudflare(build_prompt(desc, category, style, no_text=True), cfg_images, size)
+            data = _cloudflare(build_prompt(desc, category, cf_safe_style(style), no_text=True), cfg_images, size)
             if data:
                 LAST_KIND = "ai"
         if not data and allow_paid and cfg_images.get("api_key"):   # ④ 유료는 맨 뒤
@@ -199,7 +211,7 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category="", title=""):
         data = _gemini(build_prompt(desc, category, style), cfg_images)
         if data: LAST_KIND = "ai"
     elif provider in ("cloudflare", "cf", "flux"):
-        data = _cloudflare(build_prompt(desc, category, style, no_text=True), cfg_images, size)
+        data = _cloudflare(build_prompt(desc, category, cf_safe_style(style), no_text=True), cfg_images, size)
         if data: LAST_KIND = "ai"
     # 자동 확대검수: AI 생성 이미지 속 글자가 깨졌으면 다시 만든다.
     #
@@ -220,7 +232,7 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category="", title=""):
             print(f"[images] 🔍 글자 깨짐 감지 → 재생성 {_try}/2"
                   + (" (구도 변경)" if _try == 2 else ""))
             # 재생성도 무료 경로를 먼저 쓴다(유료 호출이 조용히 늘지 않게).
-            _p2 = build_prompt(desc, category, style, no_text=True) + extra
+            _p2 = build_prompt(desc, category, cf_safe_style(style), no_text=True) + extra
             d2 = (_cloudflare(_p2, cfg_images, size) if _cf_ready(cfg_images) else None)
             if not d2 and str(cfg_images.get("allow_paid")
                               or os.getenv("IMAGE_ALLOW_PAID", "")).strip().lower() in ("1", "true", "yes"):
