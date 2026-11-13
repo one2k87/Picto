@@ -1,39 +1,54 @@
 {
- "date": "2026-11-12",
- "board_updated": "2026-11-02",
+ "date": "2026-11-13",
+ "source": "2026-11-13",
  "rows": [
   {
-   "name": "주방그릇 수납 정리대",
-   "keyword": "주방 그릇 수납 정리대",
-   "volume": null,
+   "name": "기울어진 쌀통",
+   "keyword": "기울어진 쌀통 주방용품",
+   "channels": 12,
+   "videos": 19,
+   "views": 30369,
+   "rise": 1.093001140965399,
    "band": "중가",
    "has_link": false
   },
   {
-   "name": "보관형 감자칼",
-   "keyword": "다기능 채칼 야채 감자칼 보관형",
-   "volume": null,
+   "name": "미니 LP 자석",
+   "keyword": "미니 LP 냉장고 자석",
+   "channels": 10,
+   "videos": 10,
+   "views": 29497,
+   "rise": 1.1457884407965897,
    "band": "저가",
    "has_link": false
   },
   {
-   "name": "틈새 청소 솔",
-   "keyword": "살림 틈새 청소 솔",
-   "volume": null,
-   "band": "저가",
+   "name": "미니 식기세척기",
+   "keyword": "소형 미니 식기세척기",
+   "channels": 8,
+   "videos": 9,
+   "views": 25448,
+   "rise": 1.136495072430764,
+   "band": "고가",
    "has_link": false
   },
   {
-   "name": "야채 슬라이서",
-   "keyword": "야채 슬라이서 채칼",
-   "volume": null,
+   "name": "전동 야채다지기",
+   "keyword": "전동 야채다지기 자동 다지기",
+   "channels": 5,
+   "videos": 9,
+   "views": 9497,
+   "rise": 1.3664596273291925,
    "band": "중가",
    "has_link": false
   },
   {
-   "name": "세제 일체형 설거지 장갑",
-   "keyword": "버튼식 세제 설거지 장갑",
-   "volume": null,
+   "name": "도마 가위",
+   "keyword": "칼 도마 일체형 주방가위",
+   "channels": 3,
+   "videos": 9,
+   "views": 11925,
+   "rise": 1.1493393920816168,
    "band": "저가",
    "has_link": false
   }
