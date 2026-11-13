@@ -128,8 +128,14 @@ def main():
         if dry:
             done += 1
             continue
-        path = images.generate_image(f"{style}|{desc}",
-                                     {"provider": "gemini", "api_key": img_key},
+        # ⚠️ 2026-11-13: 여기는 provider 가 "gemini" 로 **하드코딩**돼 있었다. 그래서
+        #    11/10 에 세운 무료 경로(Pexels→CF FLUX→코드썸네일)를 전혀 타지 않고
+        #    무료 Gemini 만 때리다 429 로 3건 전부 실패했다(실측 로그).
+        #    본편과 같은 free 경로를 쓰고, CF 키와 검수용 키를 함께 넘긴다.
+        imgcfg = dict((cfg.get("images") or {}))
+        imgcfg["provider"] = imgcfg.get("provider") or "free"
+        imgcfg["api_key"] = img_key          # _check_text(비전 검수)가 쓴다
+        path = images.generate_image(f"{style}|{desc}", imgcfg,
                                      "output/reimg", pid, category="")
         if not path:
             print(f"  ✗ 생성 실패: {images.LAST_ERR[:100]}"); failed += 1
