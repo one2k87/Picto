@@ -16,6 +16,7 @@
 결과: dashboard/data/merge_log.json
 """
 import datetime
+import datetime as dt
 import json
 import os
 import re
@@ -52,6 +53,28 @@ def _spans(html, opener='<div class="pick-product"'):
         i = j
 
 
+# ── 링크프라이스 캠페인 글 보호 (2026-11-13 신설) ─────────────────────────────
+# 링크프라이스 약관 제17조①: 캠페인 콘텐츠는 **결과 발표일로부터 6개월** 게시를 유지해야 하고,
+# 임의 삭제·숨김 시 수수료를 환수당한다(제17조②). 통합·은퇴 대상에서 반드시 제외한다.
+# 판정은 본문에 링크프라이스 링크가 있는지로 한다 — 대장과 달리 글 자체가 근거다.
+LINKPRICE_HOSTS = ("click.linkprice.com", "lase.kr", "lpweb.kr", "linkmoa.kr",
+                   "bestmore.net", "newtip.net", "app.ac")
+PROTECT_DAYS = 185        # 6개월 + 여유
+
+
+def linkprice_protected(raw_html, published_iso=""):
+    """링크프라이스 링크가 있고 게시 6개월이 안 지났으면 True — 손대지 않는다."""
+    if not any(h in (raw_html or "") for h in LINKPRICE_HOSTS):
+        return False
+    if not published_iso:
+        return True                      # 날짜를 모르면 보호 쪽으로 기운다
+    try:
+        d = dt.datetime.fromisoformat(str(published_iso).replace("Z", "")[:19])
+    except Exception:
+        return True
+    return (dt.datetime.utcnow() - d).days < PROTECT_DAYS
+
+
 def strip_commerce(html):
     """원문에서 상품 카드·고지 문구를 걷어낸다 — 기둥글에 이미 제 것이 있다."""
     h = html
@@ -86,7 +109,7 @@ def main():
 
     def get(pid):
         r = requests.get(f"{base}/wp-json/wp/v2/posts/{pid}", headers=headers, timeout=40,
-                         params={"context": "edit", "_fields": "id,link,title,content,status"})
+                         params={"context": "edit", "_fields": "id,link,title,content,status,date_gmt"})
         return r.json() if r.status_code == 200 else None
 
     log, ok, skip, bad = [], 0, 0, 0
@@ -98,6 +121,12 @@ def main():
             bad += 1
             continue
         st = re.sub("<[^>]+>", "", (s.get("title") or {}).get("rendered", ""))[:34]
+        # 링크프라이스 캠페인 글은 6개월 동안 통합·은퇴 대상에서 뺀다(약관 제17조①).
+        _sraw0 = (s.get("content") or {}).get("raw") or ""
+        if linkprice_protected(_sraw0, s.get("date_gmt") or ""):
+            print(f"  · #{sid} {st} — 링크프라이스 캠페인 글(6개월 유지 의무) 보호, 건너뜀")
+            skip += 1
+            continue
         mark = f"<!--merged:{sid}-->"
         traw = (t.get("content") or {}).get("raw") or ""
         sraw = (s.get("content") or {}).get("raw") or ""

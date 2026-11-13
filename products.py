@@ -87,17 +87,48 @@ def safe_subid(slug, post_id=None, keyword=""):
     return sid[:50]
 
 
-NOTICE = ('<p class="coupang-notice" style="font-size:12px;color:#98a2b3;margin:10px 0 4px;'
-          'padding:8px 12px;background:#fafbfc;border-left:3px solid #ff5a5f">'
-          '이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>')
+def _notice(text):
+    return ('<p class="coupang-notice" style="font-size:12px;color:#98a2b3;margin:10px 0 4px;'
+            'padding:8px 12px;background:#fafbfc;border-left:3px solid #ff5a5f">'
+            + text + '</p>')
+
+
+NOTICE = _notice('이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.')
+# 링크프라이스 경유 상품은 **문구가 다르다**(머천트 상세의 '대가성 문구' 실측, 2026-11-13).
+NOTICE_LINKPRICE = _notice('이 포스팅은 제휴마케팅이 포함된 광고로 커미션을 지급 받습니다.')
+MERCHANT_LABEL = {"coupang": "쿠팡", "linkprice": "판매처"}
+
+
+def merchant_of(product):
+    """'coupang'(기본) 또는 'linkprice'. 대장의 merchant 값으로 정한다."""
+    m = str((product or {}).get("merchant") or "coupang").strip().lower()
+    return "linkprice" if m.startswith("linkprice") else "coupang"
+
+
+def link_of(product, subid):
+    """제휴 링크를 돌려준다.
+
+    ⚠️ **링크프라이스 링크에는 subid 를 붙이지 않는다.** 링크프라이스 약관 제8조③7 은
+       "광고 링크를 임의로 가공, 변형하는 등 운영자가 제공한 형태와 다르게 활용하는 행위"를
+       금지한다(2026-11-13 실측). 쿠팡은 subid 부착이 공식 기능이라 그대로 둔다.
+    """
+    if merchant_of(product) == "linkprice":
+        return (product.get("link") or product.get("coupang_url") or "").strip()
+    return with_subid(product.get("coupang_url") or "", subid)
+
+
+def notice_of(product):
+    return NOTICE_LINKPRICE if merchant_of(product) == "linkprice" else NOTICE
 
 
 def card_html(product, subid, with_notice=True):
     """상품 링크 카드. 광고처럼 보이지 않게 '확인용 링크' 톤을 유지한다.
     rel='sponsored nofollow'는 검색엔진 정책 준수(제휴 링크 표기 의무)."""
-    url = with_subid(product.get("coupang_url") or "", subid)
+    url = link_of(product, subid)
     if not url:
         return ""
+    shop = MERCHANT_LABEL[merchant_of(product)]
+    notice = notice_of(product)
     name = product.get("name") or product.get("key") or "추천 상품"
     band = product.get("price_band") or ""
     note = product.get("note") or "가격·재고는 수시로 바뀌므로 구매 전 상세페이지에서 확인하세요."
@@ -126,10 +157,10 @@ def card_html(product, subid, with_notice=True):
             + f'<a href="{url}" target="_blank" rel="sponsored nofollow noopener" '
               'referrerpolicy="unsafe-url" '
               'style="display:inline-block;padding:9px 16px;border-radius:9px;background:#2e9e6b;'
-              'color:#fff;font-size:14px;font-weight:600;text-decoration:none">쿠팡에서 가격 확인</a>'
+              'color:#fff;font-size:14px;font-weight:600;text-decoration:none">' + shop + '에서 가격 확인</a>'
             '</div></div></div>'
         )
-        return (NOTICE + card) if with_notice else card
+        return (notice + card) if with_notice else card
 
     card = (
         '<div class="pick-product" style="margin:22px 0;padding:14px 16px;border:1px solid #e5e7eb;'
@@ -139,11 +170,11 @@ def card_html(product, subid, with_notice=True):
         + (f'<div style="font-size:13px;color:#667085;margin-bottom:8px">{band}</div>' if band else '')
         + f'<a href="{url}" target="_blank" rel="sponsored nofollow noopener" '
           'style="display:inline-block;padding:9px 16px;border-radius:9px;background:#2e9e6b;'
-          'color:#fff;font-size:14px;font-weight:600;text-decoration:none">쿠팡에서 가격 확인</a>'
+          'color:#fff;font-size:14px;font-weight:600;text-decoration:none">' + shop + '에서 가격 확인</a>'
         f'<div style="font-size:12px;color:#98a2b3;margin-top:8px">{note}</div>'
         '</div>'
     )
-    return (NOTICE + card) if with_notice else card
+    return (notice + card) if with_notice else card
 
 
 def _distinctive_words(pr):
