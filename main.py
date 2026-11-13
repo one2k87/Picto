@@ -254,6 +254,8 @@ def make_image_resolver(cfg, auto_publish, category="", budget=None):
     imgcfg = dict(cfg.get("images", {}) or {})
     if imgcfg.get("provider") in ("gemini", "imagen", "google", "free") and not imgcfg.get("api_key"):
         imgcfg["api_key"] = cfg["llm"].get("api_key_paid") or cfg["llm"].get("api_key", "")   # Gemini 키 재사용(free도 도해 1순위)
+    # 글자 검수(_check_text)는 유료 키를 먼저 쓴다 — 무료 키는 429 로 검수가 조용히 죽는다(2026-11-13 실측).
+    imgcfg.setdefault("check_api_key", cfg["llm"].get("api_key_paid") or cfg["llm"].get("api_key", ""))
     wp_cfg = cfg.get("wordpress", {})
     out = os.path.join(OUT_DIR, "images")
 

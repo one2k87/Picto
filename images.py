@@ -146,10 +146,17 @@ def _check_text(img_bytes, cfg):
                      "왜곡·오탈자·비문·존재하지 않는 글자꼴로 깨져 보이면 broken=true. "
                      '순수 JSON만: {"has_text":true,"broken":false,"read":"…"}'}]}],
             "generationConfig": {"maxOutputTokens": 250, "temperature": 0}}
+        # 검수 키: 유료 키가 있으면 그쪽을 먼저 쓴다.
+        # 2026-11-13 실측 — 무료 키로 429 가 나면서 응답에 candidates 가 없었고,
+        # except 로 떨어져 **"통과 처리"** 됐다. 그래서 깨진 글자가 그대로 발행됐다.
+        # 검수가 죽은 줄 모르고 지나가는 게 가장 위험하므로 로그를 ::warning:: 으로 올린다.
+        _key = (cfg.get("check_api_key") or cfg.get("api_key_paid") or cfg.get("api_key", ""))
         r = _rq.post(url, json=body, timeout=60,
-                     headers={"x-goog-api-key": cfg.get("api_key", ""),
-                              "Content-Type": "application/json"})
-        t = r.json()["candidates"][0]["content"]["parts"][0]["text"]
+                     headers={"x-goog-api-key": _key, "Content-Type": "application/json"})
+        _j = r.json()
+        if "candidates" not in _j:
+            raise RuntimeError(f"HTTP {r.status_code} / {str(_j)[:120]}")
+        t = _j["candidates"][0]["content"]["parts"][0]["text"]
         import json as _js
         import re as _re
         j = _js.loads(_re.search(r"\{.*\}", t, _re.S).group(0))
@@ -157,7 +164,7 @@ def _check_text(img_bytes, cfg):
             return "none"
         return "broken" if j.get("broken") else "ok"
     except Exception as e:
-        print(f"[images] 글자 검수 실패(통과 처리): {e}")
+        print(f"::warning::[images] 글자 검수가 동작하지 않았습니다(통과 처리) — {e}")
         return None
 
 

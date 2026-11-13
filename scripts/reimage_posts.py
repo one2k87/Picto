@@ -134,7 +134,10 @@ def main():
         #    본편과 같은 free 경로를 쓰고, CF 키와 검수용 키를 함께 넘긴다.
         imgcfg = dict((cfg.get("images") or {}))
         imgcfg["provider"] = imgcfg.get("provider") or "free"
-        imgcfg["api_key"] = img_key          # _check_text(비전 검수)가 쓴다
+        imgcfg["api_key"] = img_key
+        # 검수는 유료 키 우선 — 무료 키면 429 로 검수가 조용히 죽는다(2026-11-13 실측)
+        imgcfg["check_api_key"] = ((cfg.get("llm") or {}).get("api_key_paid")
+                                   or (cfg.get("images") or {}).get("api_key") or img_key)
         path = images.generate_image(f"{style}|{desc}", imgcfg,
                                      "output/reimg", pid, category="")
         if not path:
