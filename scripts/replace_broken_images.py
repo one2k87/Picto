@@ -64,6 +64,16 @@ def main():
             continue
         p = r.json()
         content = (p.get("content") or {}).get("raw") or ""
+        # 상단 라벨용 카테고리 — 빈 값이면 썸네일 위아래가 모두 '픽담' 으로 찍힌다(2026-11-13 실측)
+        cat = ""
+        try:
+            cr = requests.get(f"{base}/wp-json/wp/v2/posts/{pid}", headers=headers, timeout=20,
+                              params={"_fields": "categories", "_embed": "wp:term"})
+            if cr.status_code == 200:
+                terms = (cr.json().get("_embedded") or {}).get("wp:term") or []
+                cat = next((t[0].get("name", "") for t in terms if t), "")
+        except Exception:
+            pass
         title = re.sub("<[^>]+>", "", (p.get("title") or {}).get("raw", ""))
         new = content
         for name in names:
@@ -75,7 +85,7 @@ def main():
             tag = m.group(0)
             alt = (re.search(r'alt="([^"]*)"', tag) or [None, ""])[1]
             cap = alt or title
-            data = images._thumbnail(cap, "", "1200x675")
+            data = images._thumbnail(cap, cat, "1200x675")
             if not data:
                 print(f"  ✗ #{pid} {name} — 썸네일 생성 실패")
                 bad += 1
@@ -86,7 +96,8 @@ def main():
                 continue
             tmp = os.path.join("output", "fiximg")
             os.makedirs(tmp, exist_ok=True)
-            fp = os.path.join(tmp, f"{pid}_{name}")
+            base_name = re.sub(r"^(?:\d+_)+", "", name)   # 이미 교체된 파일은 접두사가 붙어 있다
+            fp = os.path.join(tmp, f"{pid}_{base_name}")
             with open(fp, "wb") as f:
                 f.write(data)
             url = upload_media(fp, wp, alt=cap)
