@@ -129,6 +129,8 @@ def card_html(product, subid, with_notice=True):
         return ""
     shop = MERCHANT_LABEL[merchant_of(product)]
     notice = notice_of(product)
+    # 스토어형(kind=store)은 '이 글에서 다룬 제품'이 아니다 — 판매처 소개다.
+    head = "같이 보면 좋은 판매처" if (product.get("kind") == "store") else "이 글에서 다룬 제품"
     name = product.get("name") or product.get("key") or "추천 상품"
     band = product.get("price_band") or ""
     note = product.get("note") or "가격·재고는 수시로 바뀌므로 구매 전 상세페이지에서 확인하세요."
@@ -147,7 +149,7 @@ def card_html(product, subid, with_notice=True):
         card = (
             '<div class="pick-product" style="margin:22px 0;padding:14px 16px;border:1px solid #e5e7eb;'
             'border-radius:12px;background:#fafbfc">'
-            '<div style="font-size:12px;color:#98a2b3;margin-bottom:10px">이 글에서 다룬 제품</div>'
+            '<div style="font-size:12px;color:#98a2b3;margin-bottom:10px">' + head + '</div>'
             '<div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">'
             + banner +
             '<div style="flex:1 1 220px;min-width:200px">'
@@ -165,7 +167,7 @@ def card_html(product, subid, with_notice=True):
     card = (
         '<div class="pick-product" style="margin:22px 0;padding:14px 16px;border:1px solid #e5e7eb;'
         'border-radius:12px;background:#fafbfc">'
-        f'<div style="font-size:12px;color:#98a2b3;margin-bottom:4px">이 글에서 다룬 제품</div>'
+        f'<div style="font-size:12px;color:#98a2b3;margin-bottom:4px">' + head + '</div>'
         f'<div style="font-weight:700;font-size:15px;margin-bottom:2px">{name}</div>'
         + (f'<div style="font-size:13px;color:#667085;margin-bottom:8px">{band}</div>' if band else '')
         + f'<a href="{url}" target="_blank" rel="sponsored nofollow noopener" '
