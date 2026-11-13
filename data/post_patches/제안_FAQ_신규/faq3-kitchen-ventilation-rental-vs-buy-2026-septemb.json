@@ -1,0 +1,11 @@
+{
+ "post_id": 65,
+ "marker": "<!--patch:faq3-kitchen-ventilation-rental-vs-buy-2026-septemb-->",
+ "note": "사라진 FAQ 를 마크토 답변으로 복구(확인 단락 앞)",
+ "replace": [
+  {
+   "old": "<p class=\"verified\"",
+   "new": "<h2>자주 묻는 질문</h2><h3>주방 환기 시스템을 렌탈하는 것이 구매하는 것보다 저렴한가요?</h3><p>2026년 9월 기준으로 주방 환기 시스템 렌탈은 초기 목돈 부담이 적지만, 총 비용 측면에서는 구매보다 비쌀 수 있습니다. 예를 들어, 50만 원짜리 제품을 3년 렌탈 시 총 90만 원을 지불하게 됩니다.</p><p class=\"verified\""
+  }
+ ]
+}

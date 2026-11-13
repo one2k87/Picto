@@ -1,0 +1,11 @@
+{
+ "post_id": 57,
+ "marker": "<!--patch:faq3-food-waste-disposer-rental-cancellation-fee-->",
+ "note": "사라진 FAQ 를 마크토 답변으로 복구(확인 단락 앞)",
+ "replace": [
+  {
+   "old": "<p class=\"verified\"",
+   "new": "<h2>자주 묻는 질문</h2><h3>음식물처리기 렌탈 계약을 중도 해지하면 위약금이 얼마나 나오나요?</h3><p>음식물처리기 렌탈 계약을 중도 해지할 경우, 최대 50만 원에서 70만 원에 달하는 위약금이 발생할 수 있습니다. 이는 잔여 렌탈료, 초기 할인 혜택 반환금, 그리고 제품 회수 및 철거 비용이 합산되어 산정됩니다.</p><p class=\"verified\""
+  }
+ ]
+}

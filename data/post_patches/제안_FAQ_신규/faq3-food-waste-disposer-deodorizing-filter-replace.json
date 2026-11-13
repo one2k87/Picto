@@ -1,0 +1,11 @@
+{
+ "post_id": 216,
+ "marker": "<!--patch:faq3-food-waste-disposer-deodorizing-filter-replace-->",
+ "note": "사라진 FAQ 를 마크토 답변으로 복구(확인 단락 앞)",
+ "replace": [
+  {
+   "old": "<p class=\"verified\"",
+   "new": "<h2>자주 묻는 질문</h2><h3>음식물처리기 탈취필터는 언제 교체해야 하나요?</h3><p>음식물처리기 탈취필터는 일반적으로 2~4개월마다 교체하는 것이 좋습니다. 3개월이 지나면 활성탄의 흡착력이 포화되어 오히려 냄새를 유발할 수 있기 때문입니다.</p><p class=\"verified\""
+  }
+ ]
+}
