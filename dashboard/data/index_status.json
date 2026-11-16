@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-16T10:31:30",
+ "updated_at": "2026-11-16T11:47:28",
  "site": "https://pickdam.com",
  "checked": 21,
  "indexed": 15,
@@ -9,7 +9,7 @@
  "intended": 21,
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-11-16T10:27:51\",\"link\":\"https:\\/\\/pickdam.com\\/broken-water-purifier-rental-penalty-waiver-strategy\\/"
+  "body_head": "[{\"modified\":\"2026-11-16T10:32:25\",\"link\":\"https:\\/\\/pickdam.com\\/direct-water-purifier-cost-comparison\\/\"},{\"modified\":"
  },
  "posts_n": 44,
  "results": [
@@ -20,16 +20,16 @@
    "lastCrawl": "2026-11-10"
   },
   {
+   "url": "https://pickdam.com/direct-water-purifier-cost-comparison/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
    "url": "https://pickdam.com/broken-water-purifier-rental-penalty-waiver-strategy/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/direct-water-purifier-cost-comparison/",
-   "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
-   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/one-person-seasoning-storage/",
@@ -46,7 +46,7 @@
   {
    "url": "https://pickdam.com/mini-washing-machine-3kg-comparison/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -106,7 +106,7 @@
   {
    "url": "https://pickdam.com/window-insulation-bubble-wrap-4mm-8mm/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -124,7 +124,7 @@
   {
    "url": "https://pickdam.com/one-room-single-electric-blanket-emf-washable/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -150,7 +150,7 @@
   {
    "url": "https://pickdam.com/privacy-policy/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
