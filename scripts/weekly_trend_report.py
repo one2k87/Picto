@@ -326,9 +326,16 @@ def reasons(r, days):
 
 
 def section(i, r, days, slug):
-    name = html.escape(r["name"])
+    # 집계 쪽 이름은 'ically자동섞이는컵'처럼 붙어 있어 독자가 읽기 나쁘다.
+    # 대장에 등록된 이름이 있으면 그것을 쓴다(유행템 이름 + 괄호 설명으로 지어 둔다).
+    pr = r.get("product") or {}
+    name = html.escape(pr.get("name") or r["name"])
     rs = "".join(f"<li>{html.escape(x)}</li>" for x in reasons(r, days))
     h = [f"<h2>{i}. {name}</h2>", f"<ul>{rs}</ul>"]
+    # 어떤 제품을 가리키는지 글에 적는다 — 이름만으로는 뭘 사야 할지 모른다(사용자 2026-11-13).
+    alt = (pr.get("banner_alt") or "").strip()
+    if alt:
+        h.append(f"<p>이 글에서 고른 제품: {html.escape(alt)}</p>")
     if r.get("price"):
         h.append(f"<p><strong>{int(r['price']):,}원</strong>"
                  + (f" ({html.escape(str(r['price_at']))} 기준)" if r.get("price_at") else "") + "</p>")
@@ -342,6 +349,8 @@ def section(i, r, days, slug):
         url = products_mod.with_subid(r["link"], products_mod.safe_subid(slug, keyword=r["keyword"]))
         h.append(f'<p><a href="{url}" target="_blank" rel="nofollow sponsored noopener">'
                  f'{name} 쿠팡에서 보기</a></p>')
+        if (pr.get("note") or "").startswith("🚀"):
+            h.append("<p>로켓배송 상품입니다.</p>")
     return "".join(h)
 
 

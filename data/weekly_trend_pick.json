@@ -1,56 +1,56 @@
 {
- "date": "2026-11-13",
- "source": "2026-11-13",
+ "date": "2026-11-17",
+ "source": "2026-11-17",
  "rows": [
   {
-   "name": "기울어진 쌀통",
-   "keyword": "기울어진 쌀통 주방용품",
+   "name": "전동스프레이",
+   "keyword": "주방용 전동 오일 스프레이",
    "channels": 12,
-   "videos": 19,
-   "views": 30369,
-   "rise": 1.093001140965399,
-   "band": "중가",
-   "has_link": false
-  },
-  {
-   "name": "미니 LP 자석",
-   "keyword": "미니 LP 냉장고 자석",
-   "channels": 10,
-   "videos": 10,
-   "views": 29497,
-   "rise": 1.1457884407965897,
+   "videos": 16,
+   "views": 26692,
+   "rise": 1.1649090076476751,
    "band": "저가",
-   "has_link": false
+   "has_link": true
   },
   {
-   "name": "미니 식기세척기",
-   "keyword": "소형 미니 식기세척기",
-   "channels": 8,
-   "videos": 9,
-   "views": 25448,
-   "rise": 1.136495072430764,
-   "band": "고가",
-   "has_link": false
-  },
-  {
-   "name": "전동 야채다지기",
-   "keyword": "전동 야채다지기 자동 다지기",
+   "name": "자동섞이는컵",
+   "keyword": "자동 섞이는 컵",
    "channels": 5,
-   "videos": 9,
-   "views": 9497,
-   "rise": 1.3664596273291925,
+   "videos": 5,
+   "views": 8019,
+   "rise": null,
+   "band": "저가",
+   "has_link": true
+  },
+  {
+   "name": "자동디스펜서",
+   "keyword": "브렉스 자동 디스펜서",
+   "channels": 5,
+   "videos": 5,
+   "views": 5862,
+   "rise": 1.1105837869670336,
    "band": "중가",
-   "has_link": false
+   "has_link": true
+  },
+  {
+   "name": "접이식계량스푼",
+   "keyword": "접이식 계량스푼",
+   "channels": 4,
+   "videos": 4,
+   "views": 11212,
+   "rise": 1.5663526020106204,
+   "band": "저가",
+   "has_link": true
   },
   {
    "name": "도마 가위",
-   "keyword": "칼 도마 일체형 주방가위",
-   "channels": 3,
-   "videos": 9,
-   "views": 11925,
-   "rise": 1.1493393920816168,
+   "keyword": "칼 도마 합친 주방 가위",
+   "channels": 34,
+   "videos": 45,
+   "views": 109400,
+   "rise": 0.9183673494203808,
    "band": "저가",
-   "has_link": false
+   "has_link": true
   }
  ]
 }
