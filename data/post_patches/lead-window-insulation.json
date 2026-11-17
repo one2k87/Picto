@@ -1,0 +1,11 @@
+{
+ "post_id": 201,
+ "marker": "<!--patch:lead-window-insulation-->",
+ "note": "첫머리에 결론 3줄(본문에 이미 있는 숫자만 끌어올림)",
+ "replace": [
+  {
+   "old": "아침저녁으로 찬 기운이 느껴질 때, 제일 먼저 신경 쓰이는 곳은 창문입니다. 올겨울 난방비 걱정을 줄이고",
+   "new": "<p class=\"lead-answer\" style=\"font-size:16px;line-height:1.75;padding:12px 14px;border-left:3px solid #7c5cff;background:#f6f4ff;margin:0 0 16px\"><strong>찬 바람이 들어오면 방풍비닐, 유리 자체가 차가우면 뽁뽁이입니다.</strong> 뽁뽁이는 유리에 붙여 복사열을 막고 창 하나에 10~20분, 방풍비닐은 창틀 전체를 덮어 틈새 바람을 막고 20~40분이 걸립니다. 외풍이 심한 노후 창·베란다는 방풍비닐, 신축 아파트나 이중창은 뽁뽁이가 맞습니다.</p>아침저녁으로 찬 기운이 느껴질 때, 제일 먼저 신경 쓰이는 곳은 창문입니다. 올겨울 난방비 걱정을 줄이고"
+  }
+ ]
+}

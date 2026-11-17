@@ -1,0 +1,11 @@
+{
+ "post_id": 90,
+ "marker": "<!--patch:lead-door-draft-->",
+ "note": "첫머리에 결론 3줄(본문에 이미 있는 숫자만 끌어올림)",
+ "replace": [
+  {
+   "old": "실제로 문 틈새를 통해 유실되는 에너지 비율은 전체 열 손실의 10~15%에 달한다는 연구 결과도 있습니다.",
+   "new": "<p class=\"lead-answer\" style=\"font-size:16px;line-height:1.75;padding:12px 14px;border-left:3px solid #7c5cff;background:#f6f4ff;margin:0 0 16px\"><strong>문풍지는 틈새를 재고 고릅니다.</strong> 1mm 미만은 실리콘·고무, 1~3mm는 스펀지나 PVC, 3mm 이상은 모헤어가 맞습니다. 상단·양 측면·하단을 따로 재서 가장 넓은 곳을 기준으로 잡고, 문 하단은 문지방 때문에 간격이 다르니 반드시 별도로 재야 합니다.</p>실제로 문 틈새를 통해 유실되는 에너지 비율은 전체 열 손실의 10~15%에 달한다는 연구 결과도 있습니다."
+  }
+ ]
+}

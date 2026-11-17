@@ -1,0 +1,11 @@
+{
+ "post_id": 379,
+ "marker": "<!--patch:lead-washer-filter-->",
+ "note": "첫머리에 결론 3줄(본문에 이미 있는 숫자만 끌어올림)",
+ "replace": [
+  {
+   "old": "빨래를 마친 옷에서 꿉꿉한 냄새가 나거나, 오히려 깨끗해야 할 빨랫감에 세균이 다시 묻어 나오는 것 같아 불안하신가요?",
+   "new": "<p class=\"lead-answer\" style=\"font-size:16px;line-height:1.75;padding:12px 14px;border-left:3px solid #7c5cff;background:#f6f4ff;margin:0 0 16px\"><strong>세탁기 거름망은 2개월에 한 번 비우는 것이 기준입니다.</strong> 한 번 빨 때 섬유 찌꺼기가 평균 5~10g 나오고, 거름망 안은 습도가 70~90%라 물때와 곰팡이가 자라기 좋습니다. 세탁조 클리너를 써도 거름망을 그대로 두면 그 물로 다시 빨게 됩니다.</p>빨래를 마친 옷에서 꿉꿉한 냄새가 나거나, 오히려 깨끗해야 할 빨랫감에 세균이 다시 묻어 나오는 것 같아 불안하신가요?"
+  }
+ ]
+}

@@ -1,0 +1,11 @@
+{
+ "post_id": 63,
+ "marker": "<!--patch:lead-appliance-installment-->",
+ "note": "첫머리에 결론 3줄(본문에 이미 있는 숫자만 끌어올림)",
+ "replace": [
+  {
+   "old": "새로운 가전제품을 구매할 때, 특히 고가의 제품일수록 결제 방식은 신중하게 고려해야 할 부분입니다.",
+   "new": "<p class=\"lead-answer\" style=\"font-size:16px;line-height:1.75;padding:12px 14px;border-left:3px solid #7c5cff;background:#f6f4ff;margin:0 0 16px\"><strong>24개월 무이자는 대개 200만 원 이상 결제해야 열립니다.</strong> 100만 원 미만은 최대 6개월, 100만~200만 원은 12~18개월이 보통이라 180만 원짜리 TV를 24개월로 기대했다가 12개월만 되는 일이 자주 생깁니다. 구독(렌탈)은 월 납입액이 싸 보이지만 납입 횟수가 2~3배라 총액은 정가보다 큽니다.</p>새로운 가전제품을 구매할 때, 특히 고가의 제품일수록 결제 방식은 신중하게 고려해야 할 부분입니다."
+  }
+ ]
+}
