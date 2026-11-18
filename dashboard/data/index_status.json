@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-18T12:14:39",
+ "updated_at": "2026-11-18T13:22:00",
  "site": "https://pickdam.com",
  "checked": 24,
  "indexed": 16,
@@ -9,7 +9,7 @@
  "intended": 24,
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-11-18T12:10:42\",\"link\":\"https:\\/\\/pickdam.com\\/high-efficiency-appliance-energy-cashback-2026-09\\/\"},"
+  "body_head": "[{\"modified\":\"2026-11-18T12:15:48\",\"link\":\"https:\\/\\/pickdam.com\\/weekly-trend-20261117\\/\"},{\"modified\":\"2026-11-18T12:1"
  },
  "posts_n": 46,
  "results": [
@@ -17,19 +17,25 @@
    "url": "https://pickdam.com/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-11-10"
+   "lastCrawl": "2026-11-18"
   },
   {
-   "url": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-11-17"
+   "url": "https://pickdam.com/weekly-trend-20261117/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/rice-dispenser-capacity-comparison/",
    "verdict": "NEUTRAL",
    "state": "Discovered - currently not indexed",
    "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-11-17"
   },
   {
    "url": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
@@ -62,12 +68,6 @@
    "lastCrawl": "2026-09-28"
   },
   {
-   "url": "https://pickdam.com/weekly-trend-20261117/",
-   "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
-   "lastCrawl": ""
-  },
-  {
    "url": "https://pickdam.com/direct-water-purifier-cost-comparison/",
    "verdict": "NEUTRAL",
    "state": "Discovered - currently not indexed",
@@ -76,7 +76,7 @@
   {
    "url": "https://pickdam.com/standby-power-cutoff-multi-tap-4-way/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -148,7 +148,7 @@
   {
    "url": "https://pickdam.com/studio-single-electric-blanket-carbon-mat/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -168,7 +168,7 @@
   {
    "url": "https://pickdam.com/privacy-policy/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
