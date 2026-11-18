@@ -1,17 +1,17 @@
 {
- "updated_at": "2026-11-16T11:47:28",
+ "updated_at": "2026-11-18T12:14:39",
  "site": "https://pickdam.com",
- "checked": 21,
- "indexed": 15,
+ "checked": 24,
+ "indexed": 16,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
- "intended": 21,
+ "intended": 24,
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-11-16T10:32:25\",\"link\":\"https:\\/\\/pickdam.com\\/direct-water-purifier-cost-comparison\\/\"},{\"modified\":"
+  "body_head": "[{\"modified\":\"2026-11-18T12:10:42\",\"link\":\"https:\\/\\/pickdam.com\\/high-efficiency-appliance-energy-cashback-2026-09\\/\"},"
  },
- "posts_n": 44,
+ "posts_n": 46,
  "results": [
   {
    "url": "https://pickdam.com/",
@@ -20,7 +20,61 @@
    "lastCrawl": "2026-11-10"
   },
   {
+   "url": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-11-17"
+  },
+  {
+   "url": "https://pickdam.com/rice-dispenser-capacity-comparison/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-11-07"
+  },
+  {
+   "url": "https://pickdam.com/washer-filter-cleaning-guide/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-10-19"
+  },
+  {
+   "url": "https://pickdam.com/door-draft-stopper-guide-2026/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-10-01"
+  },
+  {
+   "url": "https://pickdam.com/folding-bluetooth-keyboard-fix/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-11-17"
+  },
+  {
+   "url": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "verdict": "PASS",
+   "state": "Submitted and indexed",
+   "lastCrawl": "2026-09-28"
+  },
+  {
+   "url": "https://pickdam.com/weekly-trend-20261117/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
    "url": "https://pickdam.com/direct-water-purifier-cost-comparison/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/standby-power-cutoff-multi-tap-4-way/",
    "verdict": "NEUTRAL",
    "state": "Discovered - currently not indexed",
    "lastCrawl": ""
@@ -46,7 +100,7 @@
   {
    "url": "https://pickdam.com/mini-washing-machine-3kg-comparison/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -62,12 +116,6 @@
    "lastCrawl": "2026-11-13"
   },
   {
-   "url": "https://pickdam.com/window-insulation-bubble-wrap-windproof-vinyl-comparison/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-11-07"
-  },
-  {
    "url": "https://pickdam.com/bedroom-lamp-guide/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
@@ -80,22 +128,10 @@
    "lastCrawl": "2026-11-07"
   },
   {
-   "url": "https://pickdam.com/folding-bluetooth-keyboard-fix/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-19"
-  },
-  {
    "url": "https://pickdam.com/mini-dryer-electricity-cost-2026/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-10-20"
-  },
-  {
-   "url": "https://pickdam.com/washer-filter-cleaning-guide/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-10-19"
   },
   {
    "url": "https://pickdam.com/sink-door-hinge-replace-cost/",
@@ -106,19 +142,13 @@
   {
    "url": "https://pickdam.com/window-insulation-bubble-wrap-4mm-8mm/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/studio-single-electric-blanket-carbon-mat/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
-   "lastCrawl": ""
-  },
-  {
-   "url": "https://pickdam.com/standby-power-cutoff-multi-tap-4-way/",
-   "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -126,18 +156,6 @@
    "verdict": "NEUTRAL",
    "state": "Discovered - currently not indexed",
    "lastCrawl": ""
-  },
-  {
-   "url": "https://pickdam.com/new-appliance-installment-plan-comparison/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-09-28"
-  },
-  {
-   "url": "https://pickdam.com/high-efficiency-appliance-energy-cashback-2026-09/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
-   "lastCrawl": "2026-11-13"
   }
  ],
  "extra": [
@@ -150,7 +168,7 @@
   {
    "url": "https://pickdam.com/privacy-policy/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -194,9 +212,15 @@
    "verdict": "NEUTRAL",
    "state": "URL is unknown to Google",
    "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/category/trend/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
   }
  ],
- "extra_unindexed": 8,
+ "extra_unindexed": 9,
  "sitemaps_submitted": [
   "pickdam.com",
   "feed"
