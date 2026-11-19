@@ -1,0 +1,15 @@
+{
+ "post_id": 63,
+ "marker": "<!--patch:move-link-new-appliance-installment-plan-compariso-->",
+ "note": "링크 블록을 「최적의 가전제품 무이자 할부 선택을 위한 2가지 핵심 전략」 앞으로 이동(대가성 문구 동반)",
+ "replace": [
+  {
+   "old": "<div class=\"pick-product\" style=\"margin:22px 0;padding:14px 16px;border:1px solid #e5e7eb;border-radius:12px;background:#fafbfc\">\n<div style=\"font-weight:700;font-size:15px;margin-bottom:4px\">가전 구매 전 가격부터 확인</div>\n<div style=\"font-size:13px;color:#667085;margin-bottom:10px\">냉장고·세탁기 같은 고가 가전은 같은 모델도 판매처마다 값이 다릅니다. 할부 조건을 따지기 전에 기준 가격을 먼저 보세요.</div>\n<p><a href=\"https://link.coupang.com/a/hzMjMnjLoa\" target=\"_blank\" rel=\"sponsored nofollow noopener\" referrerpolicy=\"unsafe-url\" style=\"display:inline-block;padding:9px 16px;border-radius:9px;background:#2e9e6b;color:#fff;font-size:14px;font-weight:600;text-decoration:none\">냉장고 가격 보기</a></p>\n<div style=\"font-size:12px;color:#98a2b3;margin-top:8px\">가격·재고는 수시로 바뀌므로 구매 전 상세페이지에서 확인하세요.</div>\n</div>",
+   "new": ""
+  },
+  {
+   "old": "<h2>최적의 가전제품 무이자 할부 선택을 위한 2가지 핵심 전략</h2>",
+   "new": "<h2>최적의 가전제품 무이자 할부 선택을 위한 2가지 핵심 전략</h2><div class=\"pick-product\" style=\"margin:22px 0;padding:14px 16px;border:1px solid #e5e7eb;border-radius:12px;background:#fafbfc\">\n<div style=\"font-weight:700;font-size:15px;margin-bottom:4px\">가전 구매 전 가격부터 확인</div>\n<div style=\"font-size:13px;color:#667085;margin-bottom:10px\">냉장고·세탁기 같은 고가 가전은 같은 모델도 판매처마다 값이 다릅니다. 할부 조건을 따지기 전에 기준 가격을 먼저 보세요.</div>\n<p><a href=\"https://link.coupang.com/a/hzMjMnjLoa\" target=\"_blank\" rel=\"sponsored nofollow noopener\" referrerpolicy=\"unsafe-url\" style=\"display:inline-block;padding:9px 16px;border-radius:9px;background:#2e9e6b;color:#fff;font-size:14px;font-weight:600;text-decoration:none\">냉장고 가격 보기</a></p>\n<div style=\"font-size:12px;color:#98a2b3;margin-top:8px\">가격·재고는 수시로 바뀌므로 구매 전 상세페이지에서 확인하세요.</div>\n</div>"
+  }
+ ]
+}
