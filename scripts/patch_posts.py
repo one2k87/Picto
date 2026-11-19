@@ -145,11 +145,20 @@ def main():
             rep = p.get("replace") or []
             if rep:
                 neo_r, hits = raw, 0
-                for r in rep:
+                # 2026-11-19: 치환 합계만 찍어서 '어느 치환이 빗나갔는지'를 못 봤다.
+                # 블록 이동(삭제+삽입)처럼 짝이 맞아야 하는 패치는 하나만 맞으면 글이 망가진다.
+                # 치환마다 적중 수를 찍고, 0인 것은 경고로 올린다.
+                for idx, r in enumerate(rep):
                     old, new = r.get("old") or "", r.get("new") or ""
-                    if old and old in neo_r:
-                        hits += neo_r.count(old)
+                    n = neo_r.count(old) if old else 0
+                    tag = (old[:46] + "…") if len(old) > 46 else old
+                    tag = tag.replace("\n", " ")
+                    if n:
+                        hits += n
                         neo_r = neo_r.replace(old, new)
+                        print(f"      [{idx}] {n}곳 ← {tag}")
+                    else:
+                        print(f"::warning::[{name}] 치환 {idx} 이 한 곳도 안 맞았습니다 — {tag}")
                 if hits and not dry:
                     if update_post_content(wp, pid, neo_r):
                         raw = neo_r
