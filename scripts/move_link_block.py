@@ -59,7 +59,7 @@ def main():
     if not base:
         print("::error::wordpress.site_url 이 없습니다")
         return 2
-    headers = _auth_header(wp)
+    headers = _auth_header(wp["username"], wp["app_password"])
     with open(PLAN, encoding="utf-8") as f:
         plan = json.load(f)
 
