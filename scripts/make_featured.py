@@ -135,10 +135,15 @@ def crop_shot(im):
     """배너에서 상품 사진 영역만 떼고, 둘레의 흰 여백을 잘라낸다."""
     w, h = im.size
     box = im.crop((0, int(h * SHOT_TOP), w, int(h * SHOT_BOT)))
+    # 배너 바깥 테두리선을 먼저 깎는다. 11/20 실측: 좌우 맨 1열의 평균 밝기가 224 이고
+    # 그 안쪽은 254~255 였다. 이 선을 남기면 ①비백색으로 잡혀 여백 제거가 통째로 빗나가고
+    # ②테두리 흰색 비율이 0.52 로 떨어져 흰 배경 판정이 깨진다. 둘 다 "잘린 자국"으로 보인다.
+    if box.width > 14:
+        box = box.crop((3, 0, box.width - 3, box.height))
     try:
         import numpy as np
         a = np.asarray(box.convert("L"), dtype=float)
-        ys, xs = np.where(a < 243)
+        ys, xs = np.where(a < 246)
         if len(ys) > 50:
             m = 4
             box = box.crop((max(0, xs.min() - m), max(0, ys.min() - m),
@@ -148,51 +153,124 @@ def crop_shot(im):
     return box
 
 
-def podium(title, shots, sub, labels):
-    """1위를 가운데 높은 자리에, 2·3위를 좌우 낮은 자리에. 순위 경쟁처럼 보이게."""
+# 2026-11-20 사용자 지시: "가격도 빼고 우선은 상품만 나오게 하고,
+# 저렇게 자른 티가 안 나게 자연스럽게 보이도록".
+# 잘라 낸 자국이 보이던 이유는 두 가지였다.
+#   ① 배너가 JPEG 라 '흰' 배경이 실제로는 248~253 이어서 흰 캔버스 위에 네모가 떠 보였다.
+#   ② 배너 안쪽 테두리선 1~2px 이 같이 잘려 들어왔다.
+# 그래서 흰 배경 상품컷은 배경을 완전한 흰색으로 밀어 캔버스에 녹이고,
+# 사진·그래픽 배경은 모서리를 둥글려 카드처럼 보이게 한다. 바닥에는 옅은 그림자를 깔아
+# 물건이 떠 있지 않고 서 있는 것처럼 만든다.
+def _arr(im):
+    import numpy as np
+    return np.asarray(im.convert("RGB")).astype("int16")
+
+
+def _white_edge_ratio(im):
+    """테두리 픽셀 중 거의 흰색인 비율 — 흰 배경 상품컷인지 가른다."""
+    try:
+        import numpy as np
+        a = _arr(im)
+        L = a.max(axis=2)
+        b = np.concatenate([L[0, :], L[-1, :], L[:, 0], L[:, -1]])
+        return float((b >= 234).mean())
+    except Exception:
+        return 0.0
+
+
+def _round_corners(im, r=18):
+    """사진 배경은 모서리를 둥글려 흰 바탕 위에 카드처럼 앉힌다."""
+    mask = Image.new("L", im.size, 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, im.width - 1, im.height - 1],
+                                           radius=r, fill=255)
+    out = Image.new("RGB", im.size, BG)
+    out.paste(im, (0, 0), mask)
+    return out
+
+
+def naturalize(im):
+    """자른 자국을 지운다. (손질한 이미지, 흰배경이었는지)"""
+    wr = _white_edge_ratio(im)
+    if wr >= 0.85:
+        # 밝기 임계로 한 번에 밀면 **흰 제품이 같이 지워진다**(11/20 실측: 흰 디스펜서
+        # 몸통이 240~252 라 236 임계에 통째로 날아갔다). 그래서 네 귀퉁이에서
+        # 번져 나가는 방식으로 **배경에 닿아 있는 흰색만** 지운다. 제품 안쪽의
+        # 밝은 면은 배경과 이어져 있지 않으므로 건드리지 않는다.
+        try:
+            im = im.convert("RGB").copy()
+            w, h = im.size
+            for seed in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1),
+                         (w // 2, 0), (w // 2, h - 1)):
+                try:
+                    ImageDraw.floodfill(im, seed, (255, 255, 255), thresh=10)
+                except Exception:
+                    pass
+            if w > 8 and h > 8:
+                im = im.crop((2, 2, w - 2, h - 2))
+        except Exception:
+            pass
+        return im, True
+    return _round_corners(im), False
+
+
+def _floor_shadow(img, cx, base_y, w):
+    """바닥 그림자 — 물건이 서 있는 것처럼 보이게."""
+    try:
+        from PIL import ImageFilter
+        sw, sh = int(w * 0.82), 26
+        if sw < 10:
+            return
+        lay = Image.new("L", (sw + 40, sh + 40), 0)
+        ImageDraw.Draw(lay).ellipse([20, 20, 20 + sw, 20 + sh], fill=46)
+        lay = lay.filter(ImageFilter.GaussianBlur(11))
+        dark = Image.new("RGB", lay.size, (120, 128, 138))
+        img.paste(dark, (cx - lay.width // 2, base_y - 14), lay)
+    except Exception:
+        pass
+
+
+def podium(title, shots, sub, labels=None):
+    """1위를 가운데 크게, 2·3위를 좌우 작게. 상품만 보이게 하고 가격은 넣지 않는다."""
     img = Image.new("RGB", (W, H), BG)
     d = ImageDraw.Draw(img)
-    ft, fs, fr, fp = font(52), font(26), font(34), font(32)
-    for i, ln in enumerate(wrap(d, title, ft, W - 120, lines=1)):
+    ft, fs, fr = font(52), font(26), font(30)
+    for ln in wrap(d, title, ft, W - 120, lines=1):
         d.text((60, 46), ln, font=ft, fill=INK)
     if sub:
         d.text((60, 110), sub, font=fs, fill=SUB)
 
-    base = H - 118                     # 사진이 서는 바닥선(아래에 가격·출처 자리를 둔다)
-    # 1위가 한눈에 커 보여야 순위로 읽힌다. 가운데를 크게, 좌우를 작게.
-    # (가로중심, 최대높이, 최대너비)
+    base = H - 96                      # 사진이 서는 바닥선(아래는 순위 뱃지·출처 자리)
     order = [1, 0, 2][:len(shots)]     # 왼쪽 2위 · 가운데 1위 · 오른쪽 3위
-    slots = [(200, 265, 290), (610, 400, 400), (1010, 265, 290)][:len(shots)]
+    slots = [(205, 285, 300), (615, 415, 410), (1020, 285, 300)][:len(shots)]
     if len(shots) == 1:
-        order, slots = [0], [(600, 400, 430)]
+        order, slots = [0], [(600, 420, 450)]
     elif len(shots) == 2:
-        order, slots = [0, 1], [(420, 400, 400), (830, 290, 310)]
+        order, slots = [0, 1], [(430, 415, 410), (840, 300, 320)]
 
-    rank_bg = [(222, 170, 44), (160, 170, 182), (176, 131, 94)]
+    rank_bg = [(222, 170, 44), (168, 176, 186), (183, 138, 99)]
     for pos, idx in enumerate(order):
         if idx >= len(shots):
             continue
-        im = shots[idx]
+        im, was_white = naturalize(shots[idx])
         cx, maxh, maxw = slots[pos]
         s = min(maxw / im.width, maxh / im.height)
-        w2, h2 = int(im.width * s), int(im.height * s)
+        w2, h2 = max(1, int(im.width * s)), max(1, int(im.height * s))
         y0 = base - h2
+        if was_white:
+            _floor_shadow(img, cx, base, w2)
         img.paste(im.resize((w2, h2), Image.LANCZOS), (cx - w2 // 2, y0))
-        # 순위 뱃지
-        r = 24
-        bx, by = cx - w2 // 2 - 6, y0 - 10
-        d.ellipse([bx - r, by - r, bx + r, by + r], fill=rank_bg[min(idx, 2)])
+        # 순위는 사진 아래 가운데에 작은 원으로. 사진 위에 얹으면 상품을 가린다.
+        r = 19
+        by = base + 30
+        d.ellipse([cx - r, by - r, cx + r, by + r], fill=rank_bg[min(idx, 2)])
         n = str(idx + 1)
-        tw = d.textlength(n, font=fr)
-        d.text((bx - tw / 2, by - 22), n, font=fr, fill=(255, 255, 255))
-        if idx < len(labels) and labels[idx]:
-            lw = d.textlength(labels[idx], font=fp)
-            d.text((cx - lw / 2, base + 12), labels[idx], font=fp,
-                   fill=INK if idx == 0 else SUB)
-    # 출처는 왼쪽 아래에. 오른쪽에 두면 3위 가격과 겹친다(11/20 실측).
+        d.text((cx - d.textlength(n, font=fr) / 2, by - 19), n, font=fr,
+               fill=(255, 255, 255))
     fsrc = font(20)
-    d.text((60, H - 36), "이미지: 쿠팡 파트너스 제공", font=fsrc, fill=(170, 178, 189))
+    d.text((60, H - 34), "이미지: 쿠팡 파트너스 제공", font=fsrc, fill=(178, 186, 196))
     return img
+
+
 
 
 def resolve(entry):
@@ -232,18 +310,19 @@ def main():
             print(f"  ✗ {disp}: 쓸 수 있는 상품 사진이 하나도 없다 — 대표 이미지를 만들지 않는다")
             continue
         today = dt.date.today()
-        asof = f"{today.year}년 {today.month}월 {today.day}일 기준 가격"
+        # 2026-11-20 사용자 지시로 대표 이미지에서 가격을 뺐다. 상품만 보이게 한다.
+        # 가격은 본문 상품 카드에 날짜와 함께 적혀 있다.
+        asof = f"{today.year}년 {today.month}월 {today.day}일 기준"
         shots = [im for _, im in pairs]
-        labels = [(f"{int(e['price']):,}원" if e.get("price") else "") for e, _ in pairs]
 
         p1 = os.path.join(OUT, base + ".png")
-        podium(f"{disp}, 지금 얼마에 살 수 있나", shots[:1], asof, labels[:1]).save(p1)
+        podium(f"{disp}, 지금 얼마에 살 수 있나", shots[:1], asof).save(p1)
         made.append((base, p1))
         print(f"  ✓ {p1}  (상품 사진 1장)")
 
         if len(shots) >= 2:
             p2 = os.path.join(OUT, base + "-top3.png")
-            podium(f"{disp} 톱3 비교", shots[:3], asof, labels[:3]).save(p2)
+            podium(f"{disp} 톱3 비교", shots[:3], asof).save(p2)
             made.append((base + "-top3", p2))
             print(f"  ✓ {p2}  (상품 사진 {len(shots[:3])}장)")
 
