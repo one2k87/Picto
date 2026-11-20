@@ -21,6 +21,10 @@ on:
         description: "쉼표로 구분한 글 ID만 교체(비우면 전체). 예: 746,738,730"
         default: ""
         required: false
+      per_post:
+        description: "글 하나에서 교체할 최대 장수"
+        default: "3"
+        required: false
 
 jobs:
   reimage:
@@ -63,6 +67,7 @@ jobs:
           REIMAGE_LIMIT: ${{ github.event.inputs.limit }}
           REIMAGE_DRY: ${{ github.event.inputs.dry_run }}
           REIMAGE_IDS: ${{ github.event.inputs.ids }}
+          REIMAGE_PER_POST: ${{ github.event.inputs.per_post }}
           REIMAGE_FORCE: ${{ github.event.inputs.force }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}

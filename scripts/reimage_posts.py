@@ -30,6 +30,33 @@ RE_FIGURE = re.compile(r'<figure style="margin:22px 0;[^>]*>.*?</figure>', re.S)
 RE_SLOT = re.compile(r'<div[^>]*>\s*📷 이미지 삽입:.*?</div>', re.S)
 
 
+
+# 2026-11-20: 한 글에 3장이 들어 있는데 매번 첫 장만 바꾸고 끝났다(count=1).
+# 그래서 11/20 시험 실행에서 #800 은 1/3 장만 교체됐다. 아직 안 바꾼 블록을 찾아
+# 글당 REIMAGE_PER_POST(기본 3)장까지 이어서 교체한다.
+# 쿠팡 파트너스 배너(image/affiliate/banner/…)는 상품 사진이므로 절대 건드리지 않는다.
+_TARGET_RX = [
+    RE_FIGURE,
+    RE_SLOT,
+    re.compile(r"<figure\b.*?</figure>", re.S),
+    re.compile(r"<img\b[^>]*>"),
+]
+
+def next_target(html):
+    """아직 교체하지 않은 첫 이미지 블록의 (시작, 끝, 원래 묘사)."""
+    for rx in _TARGET_RX:
+        for m in rx.finditer(html):
+            blk = m.group(0)
+            if "image/affiliate" in blk:        # 쿠팡 제공 상품 배너는 그대로 둔다
+                continue
+            if html[m.end():m.end() + len(MARK)] == MARK:
+                continue                        # 이번 실행에서 이미 바꾼 자리
+            alt = re.search(r'alt="([^"]*)"', blk)
+            cap = re.search(r"<figcaption[^>]*>(.*?)</figcaption>", blk, re.S)
+            d = (alt.group(1) if alt else "") or (strip_html(cap.group(1)) if cap else "")
+            return m.start(), m.end(), d.strip()
+    return None
+
 def strip_html(s):
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", s or "")).strip()
 
@@ -84,6 +111,7 @@ def main():
     llm_model = (cfg.get("llm") or {}).get("model") or "gemini-2.5-flash"
     img_key = (cfg.get("images") or {}).get("api_key") or llm_key
     limit = int(os.getenv("REIMAGE_LIMIT") or "100")
+    per_post = int(os.getenv("REIMAGE_PER_POST") or "3")   # 글당 교체할 최대 장수
     dry = (os.getenv("REIMAGE_DRY") or "").lower() == "true"
     force = (os.getenv("REIMAGE_FORCE") or "").lower() == "true"   # imgv2 마커 무시하고 재교체
 
@@ -142,37 +170,42 @@ def main():
         # 검수는 유료 키 우선 — 무료 키면 429 로 검수가 조용히 죽는다(2026-11-13 실측)
         imgcfg["check_api_key"] = ((cfg.get("llm") or {}).get("api_key_paid")
                                    or (cfg.get("images") or {}).get("api_key") or img_key)
-        path = images.generate_image(f"{style}|{desc}", imgcfg,
-                                     "output/reimg", pid, category="")
-        if not path:
-            print(f"  ✗ 생성 실패: {images.LAST_ERR[:100]}"); failed += 1
-            time.sleep(8); continue
-        url = upload_media(path, wp, alt=desc)
-        if not url:
-            print("  ✗ 업로드 실패"); failed += 1
-            time.sleep(8); continue
-        note = NOTES.get(style)
-        fig = images.figure_html(url, desc, note) + MARK
-        new = RE_FIGURE.sub(fig, content, count=1)
-        if new == content:
-            new = RE_SLOT.sub(fig, content, count=1)
-        if new == content:                      # 일반 figure/단독 img도 교체 대상(중복 삽입 방지)
-            new = re.sub(r"<figure\b.*?</figure>", fig, content, count=1, flags=re.S)
-        if new == content:
-            new = re.sub(r"<img\b[^>]*>", fig, content, count=1)
-        if new == content:                      # 이미지가 아예 없던 글: 첫 소제목 뒤 삽입
-            if "</h2>" in content:
-                new = content.replace("</h2>", "</h2>" + fig, 1)
+        # 2026-11-20: 글 하나에 3장이 들어 있으므로 글당 여러 장을 이어서 교체한다.
+        # 원래 묘사(alt/figcaption)가 남아 있으면 그 장면을 그대로 다시 그린다.
+        made = 0
+        for _slot in range(per_post):
+            tgt = next_target(content)
+            if tgt is None and _slot:
+                break                                   # 더 바꿀 자리가 없다
+            d = (tgt[2] if (tgt and tgt[2]) else desc)
+            path = images.generate_image(f"{style}|{d}", imgcfg,
+                                         "output/reimg", f"{pid}_{_slot}", category="")
+            if not path:
+                print(f"  ✗ {_slot+1}장째 생성 실패: {images.LAST_ERR[:90]}")
+                time.sleep(8); break
+            url = upload_media(path, wp, alt=d)
+            if not url:
+                print(f"  ✗ {_slot+1}장째 업로드 실패"); time.sleep(8); break
+            fig = images.figure_html(url, d, NOTES.get(style)) + MARK
+            if tgt:
+                content = content[:tgt[0]] + fig + content[tgt[1]:]
+            elif "</h2>" in content:                    # 이미지가 아예 없던 글
+                content = content.replace("</h2>", "</h2>" + fig, 1)
             else:
-                new = fig + content
+                content = fig + content
+            made += 1
+            print(f"  · {_slot+1}장째 교체 — {d[:44]}")
+            time.sleep(8)   # 이미지 모델 분당 한도 보호
+        if not made:
+            failed += 1
+            continue
         r = requests.post(f"{base}/wp-json/wp/v2/posts/{pid}",
                           headers={**headers, "Content-Type": "application/json"},
-                          json={"content": new}, timeout=60)
+                          json={"content": content}, timeout=60)
         if r.status_code in (200, 201):
-            print("  ✓ 교체 완료"); done += 1
+            print(f"  ✓ {made}장 교체 완료"); done += 1
         else:
             print(f"  ✗ 글 수정 실패 {r.status_code}: {r.text[:120]}"); failed += 1
-        time.sleep(8)   # 무료 등급 이미지 모델 분당 한도 보호
 
     summary = f"이미지 재생성: 성공 {done} · 스킵(기교체) {skipped} · 실패 {failed} / 전체 {len(posts)}"
     print("\n" + summary)

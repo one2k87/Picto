@@ -159,7 +159,12 @@ def _check_text(img_bytes, cfg):
         t = _j["candidates"][0]["content"]["parts"][0]["text"]
         import json as _js
         import re as _re
-        j = _js.loads(_re.search(r"\{.*\}", t, _re.S).group(0))
+        # 2026-11-20: 모델이 JSON 이 아닌 문장을 돌려주면 search() 가 None 이라
+        # .group 에서 터지고 '검수 동작 안 함(통과 처리)' 로 조용히 넘어갔다(11/20 실측).
+        _m = _re.search(r"\{.*\}", t, _re.S)
+        if not _m:
+            raise RuntimeError(f"JSON 아님: {t[:100]}")
+        j = _js.loads(_m.group(0))
         if not j.get("has_text"):
             return "none"
         return "broken" if j.get("broken") else "ok"
