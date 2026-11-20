@@ -463,6 +463,28 @@ def main():
     if not price_ref.ready():
         print("[price_ref] PRICE_REF_API_KEY 없음 — 소비자원 기준가 줄은 생략한다")
 
+    # 2026-11-20: --update 로 지난 리포트에 사진만 넣을 때는 **그 글이 쓰였을 때의 집계**를
+    # 써야 한다. 오늘 집계를 그대로 덮으면 글 내용이 통째로 바뀐다.
+    # data/weekly_trend_pick.json 에 그때 고른 품목이 남아 있으므로 그것으로 되살린다.
+    if update_id and os.path.exists(PICK):
+        with open(PICK, encoding="utf-8") as f:
+            saved = json.load(f)
+        rows = [dict(r, price_band=r.get("band")) for r in (saved.get("rows") or [])]
+        src = str(saved.get("source") or saved.get("date") or "")
+        print(f"[update] 저장된 선정({src})으로 되살린다 — 품목 {len(rows)}개")
+        rows = enrich(rows, cfg)
+        art = build(src, rows, 0)
+        import publisher
+        wp = dict(cfg.get("wordpress") or {})
+        if not wp.get("enabled"):
+            print("::warning::wordpress.enabled 가 False — 갱신 생략")
+            return 0
+        linked = sum(1 for r in rows if r.get("link"))
+        print(f"[update] 링크 {linked}/{len(rows)}개")
+        okx = publisher.update_post_content(wp, update_id, art["html"])
+        print(f"[wp] #{update_id} 본문 갱신: {okx}")
+        return 0 if okx else 5
+
     daily = load_daily()
     if daily:
         rows, src = from_daily(daily), str(daily.get("date") or "")
