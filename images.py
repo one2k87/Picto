@@ -193,15 +193,23 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category="", title=""):
         # 그 전까지는 무료 등급이 429 로 막혀 공짜였지만, 그건 절약이 아니라 실패였다
         # (실측: 11/9 실행에서 이미지 3장이 전부 429 → 코드 썸네일로 대체).
         # 이제 무료 경로를 먼저 세우고, Gemini 는 IMAGE_ALLOW_PAID=1 일 때만 쓴다.
-        allow_paid = str(cfg_images.get("allow_paid")
-                         or os.getenv("IMAGE_ALLOW_PAID", "")).strip().lower() in ("1", "true", "yes")
+        # 2026-11-20 되돌림 (사용자 지시: "픽담 사진들 아주 엉망이네 전부 체크해서 바꿔줘").
+        # 실측 근거: 11/10 CF 전환 뒤 발행한 8편(#718~#832) 24장을 전수로 눈으로 확인했더니
+        #   · 상품과 무관한 그림 10장 (쌀통 요청에 갈색 달걀, 직수정수기 요청에 빈 받침대)
+        #   · 한글이 깨진 일러스트 4장 ("무잠액쿼"·"레시우"·"ALI")
+        #   · CF 도 실패해 글자만 남은 코드 썸네일 10장  — 전부 불량이었다.
+        # #705 이하 37편 127장(Gemini 시절)은 대체로 멀쩡했다. 즉 무료로 바꾼 것이 원인이다.
+        # 못 쓰는 그림은 절약이 아니라 손실이므로 CF 를 기본 경로에서 뺀다.
+        #   Pexels 실사 → Gemini → 코드 썸네일.
+        # CF 를 다시 쓰고 싶으면 IMAGE_USE_CF=1 로만 되살아난다(기본 꺼짐).
+        use_cf = str(cfg_images.get("use_cf")
+                     or os.getenv("IMAGE_USE_CF", "")).strip().lower() in ("1", "true", "yes")
         data = _stock(desc, category, cfg_images, size)      # ① 무료 실사(출처 표기 포함)
-        if not data and _cf_ready(cfg_images):               # ② 무료 AI
+        if not data and use_cf and _cf_ready(cfg_images):    # ②(기본 꺼짐) 무료 AI
             data = _cloudflare(build_prompt(desc, category, cf_safe_style(style), no_text=True), cfg_images, size)
             if data:
                 LAST_KIND = "ai"
-        if not data and allow_paid and cfg_images.get("api_key"):   # ④ 유료는 맨 뒤
-            print("[images] 무료 경로 모두 실패 · IMAGE_ALLOW_PAID=1 → Gemini(유료) 사용")
+        if not data and cfg_images.get("api_key"):           # ② Gemini — 키는 LLM 유료 키 재사용
             data = _gemini(build_prompt(desc, category, style), cfg_images)
             if data:
                 LAST_KIND = "ai"
@@ -238,12 +246,10 @@ def generate_image(desc, cfg_images, out_dir, idx=0, category="", title=""):
             extra = NO_TEXT_RETRY if _try == 1 else (NO_TEXT_RETRY + REFRAME_RETRY)
             print(f"[images] 🔍 글자 깨짐 감지 → 재생성 {_try}/2"
                   + (" (구도 변경)" if _try == 2 else ""))
-            # 재생성도 무료 경로를 먼저 쓴다(유료 호출이 조용히 늘지 않게).
+            # 2026-11-20: 재생성도 CF 를 먼저 쓰던 것을 멈춘다. 깨진 글자를 CF 로 다시
+            # 그리면 또 깨진 글자가 나온다(11/13~11/19 재발 3회). 바로 Gemini 로 간다.
             _p2 = build_prompt(desc, category, cf_safe_style(style), no_text=True) + extra
-            d2 = (_cloudflare(_p2, cfg_images, size) if _cf_ready(cfg_images) else None)
-            if not d2 and str(cfg_images.get("allow_paid")
-                              or os.getenv("IMAGE_ALLOW_PAID", "")).strip().lower() in ("1", "true", "yes"):
-                d2 = _gemini(_p2, cfg_images)
+            d2 = (_gemini(_p2, cfg_images) if cfg_images.get("api_key") else None)
             if not d2:
                 print("[images]    재생성 실패 — 다음 시도")
                 continue

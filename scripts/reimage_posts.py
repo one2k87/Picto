@@ -76,7 +76,11 @@ def main():
     wp = cfg.get("wordpress", {})
     if not (wp.get("enabled") and wp.get("site_url")):
         print("WP 설정 없음 — 종료"); return
-    llm_key = (cfg.get("llm") or {}).get("api_key", "")
+    # 2026-11-20: 이미지 생성에 무료 LLM 키를 쓰던 것을 유료 키 우선으로 바꾼다.
+    # 무료 등급 키는 이미지 요청에서 429 로 막혀 조용히 코드 썸네일로 떨어진다(11/9 실측).
+    # 그 결과가 글자만 남은 보라·녹색 카드 10장이었다(11/20 전수 확인).
+    llm_key = ((cfg.get("llm") or {}).get("api_key_paid")
+               or (cfg.get("llm") or {}).get("api_key", ""))
     llm_model = (cfg.get("llm") or {}).get("model") or "gemini-2.5-flash"
     img_key = (cfg.get("images") or {}).get("api_key") or llm_key
     limit = int(os.getenv("REIMAGE_LIMIT") or "100")
