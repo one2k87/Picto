@@ -21,10 +21,15 @@ import images
 from publisher import _auth_header, upload_media
 
 MARK = "<!--imgv2-->"
+# 2026-11-20 사용자 지적: "이거 상품사진을 보고 만드는 거 맞아?"
+# 아니다. 이 그림들은 글의 주제만 보고 그린 것이라 **특정 제품의 사진이 아니다**.
+# 읽는 사람이 "이게 그 물건이구나" 로 받아들이면 그대로 신뢰도 문제가 되므로
+# 캡션에서 못을 박는다. 실제 그 제품의 사진이 필요한 자리에는 쿠팡 파트너스가
+# 내주는 공식 상품 배너만 쓴다(weekly_trend_report.product_card).
 NOTES = {"diagram": "이해를 돕기 위한 도해입니다",
          "illust": "내용을 표현한 일러스트입니다",
-         "photo": "AI로 연출한 참고 이미지입니다",
-         "object": "AI로 연출한 참고 이미지입니다"}
+         "photo": "특정 제품의 사진이 아니라, 이해를 돕기 위해 AI로 그린 그림입니다",
+         "object": "특정 제품의 사진이 아니라, 이해를 돕기 위해 AI로 그린 그림입니다"}
 # 본문에서 교체할 기존 이미지: 우리가 심은 figure(스타일 인라인) 또는 이미지 자리표시 div
 RE_FIGURE = re.compile(r'<figure style="margin:22px 0;[^>]*>.*?</figure>', re.S)
 RE_SLOT = re.compile(r'<div[^>]*>\s*📷 이미지 삽입:.*?</div>', re.S)

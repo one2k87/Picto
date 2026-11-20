@@ -281,8 +281,10 @@ def make_image_resolver(cfg, auto_publish, category="", budget=None):
             src = images.to_data_uri(path)     # 미게시/업로드 실패 시 인라인
         _notes = {"diagram": "이해를 돕기 위한 도해입니다",
                   "illust": "내용을 표현한 일러스트입니다",
-                  "photo": "AI로 연출한 참고 이미지입니다",
-                  "object": "AI로 연출한 참고 이미지입니다"}
+                  # 2026-11-20: "참고 이미지" 로는 약하다. 이 그림은 특정 제품의
+                  # 사진이 아니라는 사실을 캡션에서 분명히 말한다(사용자 지적).
+                  "photo": "특정 제품의 사진이 아니라, 이해를 돕기 위해 AI로 그린 그림입니다",
+                  "object": "특정 제품의 사진이 아니라, 이해를 돕기 위해 AI로 그린 그림입니다"}
         note = (_notes.get(getattr(images, "LAST_STYLE", ""), None)
                 if getattr(images, "LAST_KIND", "") == "ai" else None)
         # Pexels·Unsplash 약관: 쓴 사진마다 작가 이름과 사진 페이지 링크를

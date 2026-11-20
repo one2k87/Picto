@@ -1,0 +1,41 @@
+name: 기발행 글에 상품 카드 넣기
+
+# 수동 전용. data/product_card_plan.json 에 적힌 (글, 제품) 쌍만 처리한다.
+# 글과 제품을 자동으로 맞추지 않는 이유는 스크립트 머리말에 적어 두었다.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "true 면 실제로 반영(비우면 계획만 출력)"
+        default: "false"
+        required: false
+
+jobs:
+  cards:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: 의존성
+        run: pip install requests
+      - name: 설정 생성
+        env:
+          LLM_PROVIDER: ${{ secrets.LLM_PROVIDER }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_API_KEY_PAID: ${{ secrets.LLM_API_KEY_PAID }}
+          BLOG_URL: ${{ secrets.BLOG_URL }}
+          WP_ENABLED: ${{ secrets.WP_ENABLED }}
+          WP_SITE: ${{ secrets.WP_SITE }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          WP_STATUS: ${{ secrets.WP_STATUS }}
+        run: python build_config.py
+      - name: 상품 카드 삽입
+        run: |
+          if [ "${{ github.event.inputs.apply }}" = "true" ]; then
+            python scripts/insert_product_cards.py --apply
+          else
+            python scripts/insert_product_cards.py
+          fi
