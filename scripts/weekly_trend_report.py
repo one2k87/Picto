@@ -325,16 +325,64 @@ def reasons(r, days):
     return out[:3]
 
 
+# 2026-11-20: 쿠팡 파트너스 "이미지+텍스트 → 블로그용 태그" 가 주는 공식 상품 배너.
+# 사진·가격·링크가 한 덩어리로 오고, 쿠팡이 게시용으로 내주는 것이라 권리 문제가 없다.
+# 채널은 전부 pickdamblog 로 만들어 두었다(리포트에서 어느 글이 벌었는지 보려면 필수).
+def product_card(pr, r, slug):
+    """상품 사진 + 이름 + 가격 + 링크를 한 블록으로. 사진이 없으면 빈 문자열."""
+    img = (pr or {}).get("image")
+    if not img:
+        return ""
+    link = (pr.get("banner_link") or pr.get("coupang_url") or "")
+    if link:
+        link = products_mod.with_subid(link, products_mod.safe_subid(slug, keyword=r.get("keyword", "")))
+    alt = html.escape((pr.get("banner_alt") or pr.get("name") or "").strip())
+    price = pr.get("price")
+    bits = []
+    if alt:
+        bits.append(f"<p style=\"margin:0 0 6px\">{alt}</p>")
+    if price:
+        line = f"<strong style=\"font-size:1.15em\">{int(price):,}원</strong>"
+        if pr.get("origin_price") and pr.get("discount_rate"):
+            line += (f' <span style="color:#888;text-decoration:line-through">'
+                     f'{int(pr["origin_price"]):,}원</span>'
+                     f' <span style="color:#c0392b">{int(pr["discount_rate"])}%</span>')
+        bits.append(f"<p style=\"margin:0 0 6px\">{line}</p>")
+        if pr.get("price_at"):
+            bits.append(f'<p style="margin:0 0 6px;color:#777;font-size:.92em">'
+                        f'{html.escape(str(pr["price_at"]))} 기준 가격입니다. 쿠팡 가격은 수시로 바뀝니다.</p>')
+    if (pr.get("note") or "").startswith("🚀"):
+        bits.append('<p style="margin:0 0 6px">🚀 로켓배송 상품입니다.</p>')
+    if link:
+        bits.append(f'<p style="margin:0"><a href="{link}" target="_blank" '
+                    f'rel="nofollow sponsored noopener">쿠팡에서 현재 가격 보기</a></p>')
+    imgtag = (f'<img src="{html.escape(img)}" alt="{alt}" width="150" height="300" '
+              f'style="border:1px solid #e8e8e8;border-radius:8px;display:block">')
+    if link:
+        imgtag = (f'<a href="{link}" target="_blank" rel="nofollow sponsored noopener">'
+                  f'{imgtag}</a>')
+    return ('<div style="display:flex;gap:18px;align-items:flex-start;'
+            'margin:18px 0;flex-wrap:wrap">'
+            f'{imgtag}<div style="flex:1;min-width:230px">{"".join(bits)}</div></div>')
+
+
 def section(i, r, days, slug):
     # 집계 쪽 이름은 'ically자동섞이는컵'처럼 붙어 있어 독자가 읽기 나쁘다.
     # 대장에 등록된 이름이 있으면 그것을 쓴다(유행템 이름 + 괄호 설명으로 지어 둔다).
     pr = r.get("product") or {}
     name = html.escape(pr.get("name") or r["name"])
     rs = "".join(f"<li>{html.escape(x)}</li>" for x in reasons(r, days))
-    h = [f"<h2>{i}. {name}</h2>", f"<ul>{rs}</ul>"]
+    h = [f"<h2>{i}. {name}</h2>"]
+    # 2026-11-20 사용자 지시: "유행템에 사진이 하나도 없다".
+    # 사진은 쿠팡 파트너스가 링크 생성 화면에서 주는 공식 상품 배너를 그대로 쓴다.
+    # AI 로 그리면 한국 생활용품은 엉뚱한 물건이 나오고 한글이 깨진다(11/20 전수 확인).
+    card = product_card(pr, r, slug)
+    if card:
+        h.append(card)
+    h.append(f"<ul>{rs}</ul>")
     # 어떤 제품을 가리키는지 글에 적는다 — 이름만으로는 뭘 사야 할지 모른다(사용자 2026-11-13).
     alt = (pr.get("banner_alt") or "").strip()
-    if alt:
+    if alt and not card:
         h.append(f"<p>이 글에서 고른 제품: {html.escape(alt)}</p>")
     if r.get("price"):
         h.append(f"<p><strong>{int(r['price']):,}원</strong>"

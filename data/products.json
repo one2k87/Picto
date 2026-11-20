@@ -1,641 +1,676 @@
 {
- "_설명": "글별 쿠팡 상품 링크 대장. coupang_url이 비어 있으면 그 제품을 다루는 글에 링크가 들어가지 않는다. 링크를 한 번 채우면 그 제품을 다루는 모든 글에 자동 삽입되고, 과거 글은 backfill-links.yml로 소급된다.",
- "_링크_만드는_법": "쿠팡 파트너스 > 링크 생성 > 딥링크 > 상품 URL 붙여넣기 > 생성. 생성된 링크를 coupang_url에 넣는다. subid는 파이프라인이 글 slug로 자동 부착하므로 직접 붙이지 말 것.",
- "_주의": "제휴 링크는 파트너스 사이트나 오픈 API로만 생성된다. 상품 URL에 파라미터를 임의로 붙인 링크는 수수료가 잡히지 않는다.",
- "_검색어_설계": "search 필드는 앱의 [쿠팡에서 상품 찾기] 버튼이 쓰는 검색어다. 글 주제어가 아니라 '그 글을 읽은 사람이 실제로 사는 물건'으로 정했다. 렌탈·위약금 글의 독자가 원하는 건 대개 '렌탈 대신 사버리기'이고, 보유자 대상 글의 독자는 소모품을 산다(소모품=저가·반복구매·구매의도 확실).",
- "products": [
-  {
-   "key": "문풍지",
-   "name": "문풍지 (문틈 바람막이)",
-   "search": "현관문 문풍지 방풍",
-   "match": [
-    "문틈",
-    "문풍지",
-    "웃풍",
-    "외풍"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLugWdfrM",
-   "price_band": "",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://image2.coupangcdn.com/image/affiliate/banner/52aa42ca0aa7c48f00abece2ebaab2ea@2x.jpg",
-   "banner_alt": "Perfectforyou 차단 현관문 방음 방풍 문틈 고무패킹 그레이, 1개",
-   "price": 5900,
-   "price_at": "2026-11-12",
-   "availability": "InStock",
-   "rating": 4.5
-  },
-  {
-   "key": "창문단열시트",
-   "name": "창문 단열 시트 (뽁뽁이·방풍비닐)",
-   "search": "창문 단열 뽁뽁이 방풍비닐",
-   "match": [
-    "창문 단열",
-    "결로",
-    "곰팡이 예방",
-    "단열 시공"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzL7YalkaW",
-   "price_band": "",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://image11.coupangcdn.com/image/affiliate/banner/ef6bc7a63ca3181122de0e4fe9e9b21f@2x.jpg",
-   "banner_alt": "뽁순이 물없이 붙이는 6중 단열 뽁뽁이 민무늬, 1개"
-  },
-  {
-   "key": "비데",
-   "name": "비데 본체",
-   "search": "비데 자가설치형",
-   "match": [
-    "비데",
-    "비데 자가설치",
-    "비데 자가 설치",
-    "비데 추천",
-    "비데 교체"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLrqCV8mG",
-   "price_band": "",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://img5c.coupangcdn.com/image/affiliate/banner/6b59a7a3b268e3416f54631c7f2bd00e@2x.jpg",
-   "banner_alt": "노비타 컴팩트 플러스 실속형 리모컨 전자식 위생 비데 자가설치, BD-SD600"
-  },
-  {
-   "key": "비데설치공구",
-   "name": "비데 설치 부자재 (분기밸브·테프론테이프)",
-   "search": "비데 분기밸브 설치 공구 세트",
-   "match": [
-    "비데 분기밸브",
-    "비데 설치 공구",
-    "테프론",
-    "비데 설치 부자재"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLwPfau72",
-   "price_band": "",
-   "note": "",
-   "updated": "2026-10-04",
-   "_memo": "2026-09-09 좁힘: match가 '비데 자가 설치'·'비데 설치'로 넓어서 비데 본체 글까지 전부 이쪽으로 매칭됐다. 그 결과 「비데」(본체)가 영원히 '글 없는 제품'으로 남아 자동 주제배정이 비데 글만 3편 반복 생성했다. 공구를 실제로 사는 사람이 검색할 말만 남긴다.",
-   "banner_img": "https://image3.coupangcdn.com/image/affiliate/banner/88bc8381f758bea2492589e1f63c51df@2x.jpg",
-   "banner_alt": "툴스터치 욕실주방 수전용 공구 2종세트, 와이드몽키 + 첼라 x 1세트, 1세트"
-  },
-  {
-   "key": "직수정수기",
-   "name": "직수 정수기 (자가관리형)",
-   "search": "직수정수기 자가관리 무설치",
-   "match": [
-    "정수기"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLzsUCz6q",
-   "price_band": "",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://image9.coupangcdn.com/image/affiliate/banner/29c55ff7b6f822afcb5052912c6ff5c0@2x.jpg",
-   "banner_alt": "퓨리얼 유로체인저 직수형 정수기 화이트 자가설치, PPA-300"
-  },
-  {
-   "key": "정수기필터",
-   "name": "정수기 교체 필터",
-   "search": "정수기 필터 교체",
-   "match": [
-    "정수기 필터",
-    "정수기 관리",
-    "정수기 수리"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLXC71uM0",
-   "price_band": "",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://img1c.coupangcdn.com/image/affiliate/banner/43dba6bdca7b4d25f1c0b857aed3c32e@2x.jpg",
-   "banner_alt": "LG 퓨리케어 정수기 최고급형 호환 필터 세트, 1개, 1세트 호환가능모델명 상세페이지참고"
-  },
-  {
-   "key": "음식물처리기",
-   "name": "음식물처리기",
-   "search": "음식물처리기 건조분쇄",
-   "match": [
-    "음식물처리기",
-    "음식물 처리기",
-    "음식물분쇄기"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLDXQJ0TI",
-   "price_band": "",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://image12.coupangcdn.com/image/affiliate/banner/fdc2cc00a1b63bb6fcaa0ee1c68ce980@2x.jpg",
-   "banner_alt": "미닉스 더플렌더 Max 건조분쇄 음식물처리기 가정용, MNFD-200G, 그레이지"
-  },
-  {
-   "key": "음식물처리기필터",
-   "name": "음식물처리기 탈취 필터",
-   "search": "음식물처리기 탈취필터",
-   "match": [
-    "음식물처리기 필터",
-    "음식물처리기 관리",
-    "음식물처리기 냄새"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLTtQUSlw",
-   "price_band": "",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://img5c.coupangcdn.com/image/affiliate/banner/fafca7930dd35222e59ff2b8055757ef@2x.jpg",
-   "banner_alt": "미닉스 더 플렌더 3중 리필 필터 음식물 처리기, 블랙"
-  },
-  {
-   "key": "고효율가전",
-   "name": "대기전력 차단 멀티탭 (개별 스위치 4구)",
-   "search": "대기전력 차단 멀티탭 개별스위치",
-   "match": [
-    "고효율 가전",
-    "에너지 캐시백",
-    "1등급 가전",
-    "에너지효율"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzJtVDnNgO",
-   "price_band": "",
-   "note": "",
-   "updated": "2026-10-04",
-   "_memo": "2026-10-04 교체: 기존 링크 gSKBVSP25c 는 itemId(옵션) 소멸로 '상품 없음' 페이지로 떨어졌다. 상품 자체는 살아 있었다 — 딥링크가 옵션 단위로 박히는 구조가 원인.",
-   "banner_img": "https://image5.coupangcdn.com/image/affiliate/banner/eada4ef5c24930556e98fd3ad4baf02c@2x.jpg",
-   "banner_alt": "현대일렉트릭 국산 개별스위치 절전 멀티탭 4구 과부하차단 16A, 화이트, 1개, 1.5m"
-  },
-  {
-   "key": "제습기",
-   "name": "제습기",
-   "search": "제습기 20L",
-   "match": [
-    "제습기",
-    "습기 제거"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLZSNVNcW",
-   "price_band": "",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://image11.coupangcdn.com/image/affiliate/banner/214f890397739d88baf0c9441f2cfe53@2x.jpg",
-   "banner_alt": "홈플래닛 20L 제습기, PD08A-12"
-  },
-  {
-   "key": "세탁조클리너",
-   "name": "세탁조 클리너",
-   "search": "세탁조 클리너",
-   "match": [
-    "세탁조",
-    "거름망",
-    "세탁기 청소",
-    "섬유 찌꺼기"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLOKwKJH2",
-   "price_band": "",
-   "band_tier": "low",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://image10.coupangcdn.com/image/affiliate/banner/3a13459d84794795823ec8185c6c3638@2x.jpg",
-   "banner_alt": "무로 퍼퓸 앰플 초강력 캡슐 세탁조 클리너 10개입, 110g, 1개"
-  },
-  {
-   "key": "오일스프레이",
-   "name": "오일 스프레이",
-   "search": "오일 스프레이 유리",
-   "match": [
-    "오일 스프레이",
-    "오일스프레이",
-    "분무기"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLRMllOFg",
-   "price_band": "",
-   "band_tier": "low",
-   "note": " ※ 수동 분사형. 전동 오일 스프레이는 별도 항목.",
-   "updated": "2026-10-04",
-   "banner_img": "https://image13.coupangcdn.com/image/affiliate/banner/9cf5cc60aee650c37fef65aa099f8e51@2x.jpg",
-   "banner_alt": "제이에스타 2way 오일 스프레이 유리 오일병 그린, 2세트, 470ml"
-  },
-  {
-   "key": "현관센서등",
-   "name": "현관 센서등",
-   "search": "현관 센서등 무선",
-   "match": [
-    "센서등",
-    "현관 조명",
-    "무선 조명"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzMasbycuq",
-   "price_band": "",
-   "band_tier": "low",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://img2c.coupangcdn.com/image/affiliate/banner/4d7aaaf204526d31b344ca214f7eb9fc@2x.jpg",
-   "banner_alt": "원목 무선 센서등 벽조명 자석 탈착 충전식 LED 조명 호두나무/물푸레나무 실내 인테리어 무드등 현관 복도 계단 부착식 무타공, 1개, 물푸레나무-화이트"
-  },
-  {
-   "key": "침실무드등",
-   "name": "침실 무드등",
-   "search": "침실 무드등 수면등",
-   "match": [
-    "무드등",
-    "수면등",
-    "수유등"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLBzuL908",
-   "price_band": "",
-   "band_tier": "low",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://image12.coupangcdn.com/image/affiliate/banner/ca1eab9914eedbd72e94ae0ef6eaba66@2x.jpg",
-   "banner_alt": "홈플래닛 충전식 LED 스탠드 무드등 + 리모컨 세트, 화이트"
-  },
-  {
-   "key": "슬라이딩선반",
-   "name": "주방 슬라이딩 선반",
-   "search": "싱크대 슬라이딩 선반",
-   "match": [
-    "슬라이딩 선반",
-    "싱크대 선반",
-    "수납 선반"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzL3e0ZiE0",
-   "price_band": "",
-   "band_tier": "low",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://image12.coupangcdn.com/image/affiliate/banner/8df6e7cf09d6069e071253c06f10c468@2x.jpg",
-   "banner_alt": "고급형 무타공 길이조절 슬라이딩선반 싱크대 정리 주방 선반 고정레일3개/선반들림방지 부품 포함/3가지 색상/4가지 사이즈, 1개, 화이트"
-  },
-  {
-   "key": "미니인덕션",
-   "name": "미니 인덕션",
-   "search": "1구 인덕션",
-   "match": [
-    "인덕션",
-    "하이라이트",
-    "1구 인덕션"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLMUY20VE",
-   "price_band": "",
-   "band_tier": "mid",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://image14.coupangcdn.com/image/affiliate/banner/bd76ab2560e71a14614e765580121577@2x.jpg",
-   "banner_alt": "삼성전자 인덕션 1구, NZ31DG200CFH(화이트), 일반형"
-  },
-  {
-   "key": "접이식키보드",
-   "name": "접이식 블루투스 키보드",
-   "search": "접이식 블루투스 키보드",
-   "match": [
-    "접이식 키보드",
-    "블루투스 키보드",
-    "폴딩 키보드"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLVlIdP7Q",
-   "price_band": "",
-   "band_tier": "mid",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://image6.coupangcdn.com/image/affiliate/banner/d6dfe5315daced8f367ed9d8c31a9909@2x.jpg",
-   "banner_alt": "엔보우 N패드 블루투스 무선 접이식 키보드, 실버, SMART-NOTE, 제조사축"
-  },
-  {
-   "key": "차량용공기청정기",
-   "name": "차량용 공기청정기",
-   "search": "차량용 공기청정기",
-   "match": [
-    "차량용 공기청정기",
-    "차량 공기청정"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzL5BcQzZs",
-   "price_band": "",
-   "band_tier": "mid",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://image10.coupangcdn.com/image/affiliate/banner/71759104bf1f8db1d87dab1cb932e0ed@2x.jpg",
-   "banner_alt": "실내 및 차량용 공기청정기, JP-700AP, 블랙"
-  },
-  {
-   "key": "미니세탁기",
-   "name": "미니 세탁기",
-   "search": "미니 세탁기 3kg",
-   "match": [
-    "미니세탁기",
-    "미니 세탁기",
-    "소형 세탁기"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLJbvJDzM",
-   "price_band": "",
-   "band_tier": "high",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://img5c.coupangcdn.com/image/affiliate/banner/402966eaed9cb7b7f8d425032ee22d30@2x.jpg",
-   "banner_alt": "비스카 미니 세탁기 3kg, MR-H100WM, 블랙 + 화이트"
-  },
-  {
-   "key": "미니건조기",
-   "name": "미니 건조기",
-   "search": "미니 건조기 히트펌프",
-   "match": [
-    "미니 건조기",
-    "소형 건조기",
-    "히트펌프"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLGRrkqhU",
-   "price_band": "",
-   "band_tier": "high",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://img2c.coupangcdn.com/image/affiliate/banner/b916d4464313e1e1ebfe29d48c0239e8@2x.jpg",
-   "banner_alt": "대웅 4세대 스마트 AI 회전형 미니건조기 4kg 고객직접설치, DWCD-E2404SJ, 블랙"
-  },
-  {
-   "key": "전기장판",
-   "name": "전기장판",
-   "search": "전기장판 싱글",
-   "match": [
-    "전기장판",
-    "전기매트",
-    "온수매트",
-    "전기요패드"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzMf1q3wSy",
-   "price_band": "",
-   "band_tier": "mid",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://img1a.coupangcdn.com/image/affiliate/banner/cc9fe647856ad71c90ac30b985a42dfd@2x.jpg",
-   "banner_alt": "HanilMedical 탄소열선 고급 전기요 HL-D205(25), 북극곰, M (100 x 180 cm)"
-  },
-  {
-   "key": "미니온풍기",
-   "name": "미니 온풍기",
-   "search": "미니 온풍기 욕실",
-   "match": [
-    "온풍기",
-    "욕실 히터",
-    "미니 히터"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzLK8yNOHB",
-   "price_band": "",
-   "band_tier": "mid",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://image2.coupangcdn.com/image/affiliate/banner/9edd8f495e165eb9247b70ce23c26102@2x.jpg",
-   "banner_alt": "한일 미니온풍기 가정용 욕실 사무실 화장실 온풍기 캠핑용 터치 HEF-1000UE, 상세페이지참조"
-  },
-  {
-   "key": "가습기",
-   "name": "가습기",
-   "search": "가습기 초음파",
-   "match": [
-    "가습기",
-    "초음파 가습"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzMcE3TGhg",
-   "price_band": "",
-   "band_tier": "mid",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://img3a.coupangcdn.com/image/affiliate/banner/42bd4125e18e72aa079876769f20ea1a@2x.jpg",
-   "banner_alt": "홈플래닛 초음파 가습기 4L, H1001D11"
-  },
-  {
-   "key": "김치통",
-   "name": "김치통",
-   "search": "김치통 4L",
-   "match": [
-    "김치통",
-    "김치 용기",
-    "김장 용기"
-   ],
-   "coupang_url": "https://link.coupang.com/a/hzMez8dVF6",
-   "price_band": "",
-   "band_tier": "low",
-   "note": "",
-   "updated": "2026-10-04",
-   "banner_img": "https://image8.coupangcdn.com/image/affiliate/banner/4e587dd90342c595a0c1d21a7d19b3b5@2x.jpg",
-   "banner_alt": "제오닉 코코아락 원핸들 김치통, 4L, 2개"
-  },
-  {
-   "key": "리퍼연구소",
-   "name": "리퍼연구소 (리퍼 가전·IT)",
-   "search": "리퍼 가전 리퍼연구소",
-   "match": [
-    "리퍼",
-    "리퍼브",
-    "리퍼 가전",
-    "리퍼연구소"
-   ],
-   "merchant": "linkprice",
-   "link": "http://app.ac/btnfhfM43",
-   "coupang_url": "",
-   "kind": "store",
-   "price_band": "",
-   "note": "새 제품에 가까운 리퍼 제품을 품질보증·A/S·환불 보장과 함께 파는 곳입니다. 같은 모델을 새것보다 싸게 사는 경로라 가격을 먼저 비교해 보세요.",
-   "updated": "2026-11-13",
-   "_조건": "요율 4.9% · 광고효과 인정기간 21일 · 생성형 AI 홍보 금지 조항 없음(2026-11-13 실측). 카테고리 가전/디지털/IT."
-  },
-  {
-   "key": "레노버액세서리",
-   "name": "레노버 공식몰 (노트북 액세서리)",
-   "search": "레노버 액세서리",
-   "match": [
-    "레노버",
-    "씽크패드",
-    "ThinkPad",
-    "노트북 액세서리"
-   ],
-   "merchant": "linkprice",
-   "link": "http://app.ac/DtnfhtM13",
-   "coupang_url": "",
-   "kind": "store",
-   "price_band": "",
-   "note": "레노버 공식몰의 키보드·마우스·독·모니터 액세서리 코너입니다.",
-   "updated": "2026-11-13",
-   "_조건": "요율 5.6% · 광고효과 인정기간 30일(가장 김) · AI 금지 조항 없음(2026-11-13 실측). 단 픽담에 IT 글이 1편뿐이라 당장 붙을 자리가 거의 없다."
-  },
-  {
-   "key": "기울어진쌀통",
-   "name": "기울어진 쌀통 (회전형 계량 쌀통)",
-   "search": "회전형 쌀통 계량",
-   "match": [
-    "쌀통",
-    "쌀독",
-    "잡곡통",
-    "기울어진 쌀통",
-    "회전형 쌀통"
-   ],
-   "coupang_url": "https://link.coupang.com/a/iDHMckkQ20",
-   "price_band": "3~6만",
-   "note": "일반 배송 — 이 품목군에 로켓 상품이 없다(11/13 전수 확인)",
-   "updated": "2026-11-13",
-   "banner_alt": "GBED 회전형 쌀통 밀폐 대용량 계량 저장통 보관함 방충 방습 쌀독 잡곡통 5kg 주방용품, 1개, 화이트",
-   "price": 41000,
-   "price_at": "2026-11-13",
-   "merchant": "coupang",
-   "channel": "pickdamblog"
-  },
-  {
-   "key": "미니LP자석",
-   "name": "미니 LP 자석 (레트로 냉장고 자석)",
-   "search": "LP판 냉장고 자석 레트로",
-   "match": [
-    "LP 자석",
-    "레코드 자석",
-    "냉장고 자석",
-    "미니 LP"
-   ],
-   "coupang_url": "https://link.coupang.com/a/iDHR2vVC6S",
-   "price_band": "1만 이하",
-   "note": "일반 배송 — 이 품목군에 로켓 상품이 없다(11/13 전수 확인)",
-   "updated": "2026-11-13",
-   "banner_alt": "이삭유통 빈티지 레코드 LP판 카세트 테이프 자석 인테리어 레트로 소품 냉장고 자석 4P 1세트, 카세트테이프",
-   "price": 2400,
-   "price_at": "2026-11-13",
-   "merchant": "coupang",
-   "channel": "pickdamblog"
-  },
-  {
-   "key": "미니식기세척기",
-   "name": "미니 식기세척기 (3인용 탁상형)",
-   "search": "미니 식기세척기 3인용",
-   "match": [
-    "식기세척기",
-    "미니 식기세척기",
-    "탁상형 식기세척기"
-   ],
-   "coupang_url": "https://link.coupang.com/a/iDJzZ8l3QW",
-   "price_band": "30만 이상",
-   "note": "🚀 로켓배송",
-   "updated": "2026-11-13",
-   "banner_alt": "미닉스 미니 식기세척기 PRO 3인용, 그레이지, MNDW-110G",
-   "price": 319110,
-   "price_at": "2026-11-13",
-   "merchant": "coupang",
-   "channel": "pickdamblog"
-  },
-  {
-   "key": "전동야채다지기",
-   "name": "전동 야채다지기 (무선 충전식)",
-   "search": "무선 전동 다지기",
-   "match": [
-    "다지기",
-    "야채다지기",
-    "전동 다지기",
-    "전동 채칼",
-    "마늘 다지기"
-   ],
-   "coupang_url": "https://link.coupang.com/a/iDJCwFuLEy",
-   "price_band": "1~3만",
-   "note": "🚀 로켓배송",
-   "updated": "2026-11-13",
-   "banner_alt": "필쿡 무선 전동 만능 다지기 300ml, FK-TM02",
-   "price": 16620,
-   "price_at": "2026-11-13",
-   "merchant": "coupang",
-   "channel": "pickdamblog"
-  },
-  {
-   "key": "도마가위",
-   "name": "도마 가위 (도마 일체형 만능가위)",
-   "search": "도마가위 만능가위",
-   "match": [
-    "도마가위",
-    "도마 가위",
-    "만능가위",
-    "캠핑가위"
-   ],
-   "coupang_url": "https://link.coupang.com/a/iDHQ0umksC",
-   "price_band": "1만 이하",
-   "note": "일반 배송 — 이 품목군에 로켓 상품이 없다(11/13 전수 확인)",
-   "updated": "2026-11-13",
-   "banner_alt": "전참시 이국주 가위 도마가위 만능가위 캠핑가위 K405",
-   "price": 5490,
-   "price_at": "2026-11-13",
-   "merchant": "coupang",
-   "channel": "pickdamblog"
-  },
-  {
-   "key": "자동섞이는컵",
-   "name": "자동 섞이는 컵 (충전식 회전 믹스컵)",
-   "search": "자동 회전 믹스컵 충전식",
-   "match": [
-    "자동 섞이는 컵",
-    "회전 믹스컵",
-    "자동 믹스컵",
-    "회전컵",
-    "자동 교반"
-   ],
-   "coupang_url": "https://link.coupang.com/a/iKaWfuhgZM",
-   "price_band": "1~3만",
-   "note": "일반 배송 — 이 품목군에 로켓 상품이 없다(11/17 전수 확인 — 로켓은 전부 수동 쉐이커)",
-   "updated": "2026-11-17",
-   "banner_alt": "ROYAI ONE 충전식 회전식 믹스컵 원터치 온도 커피컵 회전컵 머그컵, 1개, 블랙",
-   "price": 17900,
-   "price_at": "2026-11-17",
-   "merchant": "coupang",
-   "channel": "pickdamblog"
-  },
-  {
-   "key": "자동디스펜서",
-   "name": "자동 디스펜서 (손 대면 나오는 세정기)",
-   "search": "자동 디스펜서 손세정기",
-   "match": [
-    "자동 디스펜서",
-    "디스펜서",
-    "손세정기",
-    "자동 세제"
-   ],
-   "coupang_url": "https://link.coupang.com/a/iKa0oIbDa0",
-   "price_band": "1~3만",
-   "note": "🚀 로켓배송",
-   "updated": "2026-11-17",
-   "banner_alt": "무아스 클린업 소프트버블 자동 손세정기 디스펜서 300ml, 화이트, 1개",
-   "price": 26500,
-   "price_at": "2026-11-17",
-   "merchant": "coupang",
-   "channel": "pickdamblog"
-  },
-  {
-   "key": "접이식계량스푼",
-   "name": "접이식 계량스푼 (3-in-1 평면형)",
-   "search": "접이식 계량스푼",
-   "match": [
-    "접이식 계량스푼",
-    "계량스푼",
-    "계량 스푼",
-    "접이식 스푼"
-   ],
-   "coupang_url": "https://link.coupang.com/a/iKa3aP6jbE",
-   "price_band": "1~3만",
-   "note": "일반 배송 — 접이식은 로켓 상품이 없다(11/17 확인 — 로켓은 전부 일반 계량스푼)",
-   "updated": "2026-11-17",
-   "banner_alt": "[26년 신상] 접이식 계량스푼 3-in-1 평면 접이식 계량 스푼, 1세트, 블랙",
-   "price": 12800,
-   "price_at": "2026-11-17",
-   "merchant": "coupang",
-   "channel": "pickdamblog"
-  },
-  {
-   "key": "전동오일스프레이",
-   "name": "전동 오일 스프레이 (주방용 자동 분무)",
-   "search": "전동 오일 스프레이 주방",
-   "match": [
-    "전동 오일 스프레이",
-    "전동 스프레이",
-    "전동스프레이",
-    "전동 분무기",
-    "자동 오일 스프레이"
-   ],
-   "coupang_url": "https://link.coupang.com/a/iKbbfvUZMa",
-   "price_band": "1~3만",
-   "note": "일반 배송 — 전동은 로켓 상품이 없다(11/17 확인, 로켓은 전부 수동 분사형)",
-   "updated": "2026-11-17",
-   "banner_alt": "식품용 오일 분무기 스프레이 전동 공병 자동 200ml, 1개, 300ml black",
-   "price": 18500,
-   "price_at": "2026-11-17",
-   "merchant": "coupang",
-   "channel": "pickdamblog"
-  }
- ],
- "_note_주의": "note는 상품 카드에 독자에게 그대로 보이는 문구다. 내부 메모는 절대 여기 쓰지 말고 _memo에 쓸 것(2026-09-08 사고).",
- "_주의_match": "match는 '가장 긴 키워드'가 이긴다(products.find_for). 그래서 부속품 제품의 match를 넓게 잡으면 본체 글을 전부 빼앗아 간다 — 본체가 영원히 미매칭으로 남고 자동 주제배정이 같은 주제를 반복 생성한다(2026-09-09 실측: 비데 글 3편).",
- "_match_주의": "match 어휘는 **흔한 말에 삼켜지지 않는 것**으로 쓴다. 공백을 지우고 부분문자열로 비교하기 때문이다. 2026-10-30 실측 사고: '전기요'가 '전기 요금'(→'전기요금')에 걸려, 욕실 온풍기 글 #663 이 전기장판으로 배정되고 본문에 **전기요 카드**가 붙었다. 동시에 전기장판은 '이미 다룬 품목'으로 빠져 겨울에 전용 글이 영영 안 나오고 있었다. 짧은 어휘를 넣을 때는 요금·비용·관리·교체 같은 말에 삼켜지는지 먼저 확인할 것.",
- "_가격_읽는_법": "price/price_at/availability/rating 은 세션이 사용자 크롬으로 쿠팡 상품 페이지를 열어 JSON-LD(script[type=application/ld+json] 의 @type=Product)에서 읽어 채운다 — offers.price(원), offers.availability(InStock/OutOfStock), aggregateRating.ratingValue. 2026-11-12 실측 확인. ⚠️ GitHub Actions 에서는 하지 않는다(쿠팡 봇 차단·약관). 그래서 글에는 반드시 price_at(조사일)을 함께 적는다. 쿠팡 파트너스 오픈API 는 누적 수익 15만 원 달성 후에만 발급되므로 그 전까지 이 경로가 유일하다.",
- "_머천트_필드": "제품에 merchant:'linkprice' 와 link:'<링크프라이스 링크>' 를 넣으면 쿠팡 대신 그쪽으로 카드가 나간다. ① 대가성 문구가 '이 포스팅은 제휴마케팅이 포함된 광고로 커미션을 지급 받습니다.' 로 바뀐다(머천트 상세 실측). ② ⚠️ 링크프라이스 링크에는 subid 를 붙이지 않는다 — 약관 제8조③7 이 '광고 링크를 임의로 가공·변형'하는 행위를 금지한다. ③ 링크프라이스 캠페인 글은 제17조① 에 따라 6개월간 삭제·숨김이 금지되므로 merge_posts 가 자동으로 보호한다. ④ 등록 매체(pickdam.com) 외에서는 쓰지 않는다(제8조③15). 조건 비교(2026-11-13 실측): 레노버 5.6%·쿠키 30일 / 하이마트 1.26%·0일 / 링크프라이스 쿠팡 3.15%·1일(단 생성형 AI 홍보 금지 조항 있음 → 쓰지 않는다)."
+  "_설명": "글별 쿠팡 상품 링크 대장. coupang_url이 비어 있으면 그 제품을 다루는 글에 링크가 들어가지 않는다. 링크를 한 번 채우면 그 제품을 다루는 모든 글에 자동 삽입되고, 과거 글은 backfill-links.yml로 소급된다.",
+  "_링크_만드는_법": "쿠팡 파트너스 > 링크 생성 > 딥링크 > 상품 URL 붙여넣기 > 생성. 생성된 링크를 coupang_url에 넣는다. subid는 파이프라인이 글 slug로 자동 부착하므로 직접 붙이지 말 것.",
+  "_주의": "제휴 링크는 파트너스 사이트나 오픈 API로만 생성된다. 상품 URL에 파라미터를 임의로 붙인 링크는 수수료가 잡히지 않는다.",
+  "_검색어_설계": "search 필드는 앱의 [쿠팡에서 상품 찾기] 버튼이 쓰는 검색어다. 글 주제어가 아니라 '그 글을 읽은 사람이 실제로 사는 물건'으로 정했다. 렌탈·위약금 글의 독자가 원하는 건 대개 '렌탈 대신 사버리기'이고, 보유자 대상 글의 독자는 소모품을 산다(소모품=저가·반복구매·구매의도 확실).",
+  "products": [
+    {
+      "key": "문풍지",
+      "name": "문풍지 (문틈 바람막이)",
+      "search": "현관문 문풍지 방풍",
+      "match": [
+        "문틈",
+        "문풍지",
+        "웃풍",
+        "외풍"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLugWdfrM",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://image2.coupangcdn.com/image/affiliate/banner/52aa42ca0aa7c48f00abece2ebaab2ea@2x.jpg",
+      "banner_alt": "Perfectforyou 차단 현관문 방음 방풍 문틈 고무패킹 그레이, 1개",
+      "price": 5900,
+      "price_at": "2026-11-12",
+      "availability": "InStock",
+      "rating": 4.5
+    },
+    {
+      "key": "창문단열시트",
+      "name": "창문 단열 시트 (뽁뽁이·방풍비닐)",
+      "search": "창문 단열 뽁뽁이 방풍비닐",
+      "match": [
+        "창문 단열",
+        "결로",
+        "곰팡이 예방",
+        "단열 시공"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzL7YalkaW",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://image11.coupangcdn.com/image/affiliate/banner/ef6bc7a63ca3181122de0e4fe9e9b21f@2x.jpg",
+      "banner_alt": "뽁순이 물없이 붙이는 6중 단열 뽁뽁이 민무늬, 1개"
+    },
+    {
+      "key": "비데",
+      "name": "비데 본체",
+      "search": "비데 자가설치형",
+      "match": [
+        "비데",
+        "비데 자가설치",
+        "비데 자가 설치",
+        "비데 추천",
+        "비데 교체"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLrqCV8mG",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://img5c.coupangcdn.com/image/affiliate/banner/6b59a7a3b268e3416f54631c7f2bd00e@2x.jpg",
+      "banner_alt": "노비타 컴팩트 플러스 실속형 리모컨 전자식 위생 비데 자가설치, BD-SD600"
+    },
+    {
+      "key": "비데설치공구",
+      "name": "비데 설치 부자재 (분기밸브·테프론테이프)",
+      "search": "비데 분기밸브 설치 공구 세트",
+      "match": [
+        "비데 분기밸브",
+        "비데 설치 공구",
+        "테프론",
+        "비데 설치 부자재"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLwPfau72",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-10-04",
+      "_memo": "2026-09-09 좁힘: match가 '비데 자가 설치'·'비데 설치'로 넓어서 비데 본체 글까지 전부 이쪽으로 매칭됐다. 그 결과 「비데」(본체)가 영원히 '글 없는 제품'으로 남아 자동 주제배정이 비데 글만 3편 반복 생성했다. 공구를 실제로 사는 사람이 검색할 말만 남긴다.",
+      "banner_img": "https://image3.coupangcdn.com/image/affiliate/banner/88bc8381f758bea2492589e1f63c51df@2x.jpg",
+      "banner_alt": "툴스터치 욕실주방 수전용 공구 2종세트, 와이드몽키 + 첼라 x 1세트, 1세트"
+    },
+    {
+      "key": "직수정수기",
+      "name": "직수 정수기 (자가관리형)",
+      "search": "직수정수기 자가관리 무설치",
+      "match": [
+        "정수기"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLzsUCz6q",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://image9.coupangcdn.com/image/affiliate/banner/29c55ff7b6f822afcb5052912c6ff5c0@2x.jpg",
+      "banner_alt": "퓨리얼 유로체인저 직수형 정수기 화이트 자가설치, PPA-300"
+    },
+    {
+      "key": "정수기필터",
+      "name": "정수기 교체 필터",
+      "search": "정수기 필터 교체",
+      "match": [
+        "정수기 필터",
+        "정수기 관리",
+        "정수기 수리"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLXC71uM0",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://img1c.coupangcdn.com/image/affiliate/banner/43dba6bdca7b4d25f1c0b857aed3c32e@2x.jpg",
+      "banner_alt": "LG 퓨리케어 정수기 최고급형 호환 필터 세트, 1개, 1세트 호환가능모델명 상세페이지참고"
+    },
+    {
+      "key": "음식물처리기",
+      "name": "음식물처리기",
+      "search": "음식물처리기 건조분쇄",
+      "match": [
+        "음식물처리기",
+        "음식물 처리기",
+        "음식물분쇄기"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLDXQJ0TI",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://image12.coupangcdn.com/image/affiliate/banner/fdc2cc00a1b63bb6fcaa0ee1c68ce980@2x.jpg",
+      "banner_alt": "미닉스 더플렌더 Max 건조분쇄 음식물처리기 가정용, MNFD-200G, 그레이지"
+    },
+    {
+      "key": "음식물처리기필터",
+      "name": "음식물처리기 탈취 필터",
+      "search": "음식물처리기 탈취필터",
+      "match": [
+        "음식물처리기 필터",
+        "음식물처리기 관리",
+        "음식물처리기 냄새"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLTtQUSlw",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://img5c.coupangcdn.com/image/affiliate/banner/fafca7930dd35222e59ff2b8055757ef@2x.jpg",
+      "banner_alt": "미닉스 더 플렌더 3중 리필 필터 음식물 처리기, 블랙"
+    },
+    {
+      "key": "고효율가전",
+      "name": "대기전력 차단 멀티탭 (개별 스위치 4구)",
+      "search": "대기전력 차단 멀티탭 개별스위치",
+      "match": [
+        "고효율 가전",
+        "에너지 캐시백",
+        "1등급 가전",
+        "에너지효율"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzJtVDnNgO",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-10-04",
+      "_memo": "2026-10-04 교체: 기존 링크 gSKBVSP25c 는 itemId(옵션) 소멸로 '상품 없음' 페이지로 떨어졌다. 상품 자체는 살아 있었다 — 딥링크가 옵션 단위로 박히는 구조가 원인.",
+      "banner_img": "https://image5.coupangcdn.com/image/affiliate/banner/eada4ef5c24930556e98fd3ad4baf02c@2x.jpg",
+      "banner_alt": "현대일렉트릭 국산 개별스위치 절전 멀티탭 4구 과부하차단 16A, 화이트, 1개, 1.5m"
+    },
+    {
+      "key": "제습기",
+      "name": "제습기",
+      "search": "제습기 20L",
+      "match": [
+        "제습기",
+        "습기 제거"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLZSNVNcW",
+      "price_band": "",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://image11.coupangcdn.com/image/affiliate/banner/214f890397739d88baf0c9441f2cfe53@2x.jpg",
+      "banner_alt": "홈플래닛 20L 제습기, PD08A-12"
+    },
+    {
+      "key": "세탁조클리너",
+      "name": "세탁조 클리너",
+      "search": "세탁조 클리너",
+      "match": [
+        "세탁조",
+        "거름망",
+        "세탁기 청소",
+        "섬유 찌꺼기"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLOKwKJH2",
+      "price_band": "",
+      "band_tier": "low",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://image10.coupangcdn.com/image/affiliate/banner/3a13459d84794795823ec8185c6c3638@2x.jpg",
+      "banner_alt": "무로 퍼퓸 앰플 초강력 캡슐 세탁조 클리너 10개입, 110g, 1개"
+    },
+    {
+      "key": "오일스프레이",
+      "name": "오일 스프레이",
+      "search": "오일 스프레이 유리",
+      "match": [
+        "오일 스프레이",
+        "오일스프레이",
+        "분무기"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLRMllOFg",
+      "price_band": "",
+      "band_tier": "low",
+      "note": " ※ 수동 분사형. 전동 오일 스프레이는 별도 항목.",
+      "updated": "2026-10-04",
+      "banner_img": "https://image13.coupangcdn.com/image/affiliate/banner/9cf5cc60aee650c37fef65aa099f8e51@2x.jpg",
+      "banner_alt": "제이에스타 2way 오일 스프레이 유리 오일병 그린, 2세트, 470ml"
+    },
+    {
+      "key": "현관센서등",
+      "name": "현관 센서등",
+      "search": "현관 센서등 무선",
+      "match": [
+        "센서등",
+        "현관 조명",
+        "무선 조명"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzMasbycuq",
+      "price_band": "",
+      "band_tier": "low",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://img2c.coupangcdn.com/image/affiliate/banner/4d7aaaf204526d31b344ca214f7eb9fc@2x.jpg",
+      "banner_alt": "원목 무선 센서등 벽조명 자석 탈착 충전식 LED 조명 호두나무/물푸레나무 실내 인테리어 무드등 현관 복도 계단 부착식 무타공, 1개, 물푸레나무-화이트"
+    },
+    {
+      "key": "침실무드등",
+      "name": "침실 무드등",
+      "search": "침실 무드등 수면등",
+      "match": [
+        "무드등",
+        "수면등",
+        "수유등"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLBzuL908",
+      "price_band": "",
+      "band_tier": "low",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://image12.coupangcdn.com/image/affiliate/banner/ca1eab9914eedbd72e94ae0ef6eaba66@2x.jpg",
+      "banner_alt": "홈플래닛 충전식 LED 스탠드 무드등 + 리모컨 세트, 화이트"
+    },
+    {
+      "key": "슬라이딩선반",
+      "name": "주방 슬라이딩 선반",
+      "search": "싱크대 슬라이딩 선반",
+      "match": [
+        "슬라이딩 선반",
+        "싱크대 선반",
+        "수납 선반"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzL3e0ZiE0",
+      "price_band": "",
+      "band_tier": "low",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://image12.coupangcdn.com/image/affiliate/banner/8df6e7cf09d6069e071253c06f10c468@2x.jpg",
+      "banner_alt": "고급형 무타공 길이조절 슬라이딩선반 싱크대 정리 주방 선반 고정레일3개/선반들림방지 부품 포함/3가지 색상/4가지 사이즈, 1개, 화이트"
+    },
+    {
+      "key": "미니인덕션",
+      "name": "미니 인덕션",
+      "search": "1구 인덕션",
+      "match": [
+        "인덕션",
+        "하이라이트",
+        "1구 인덕션"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLMUY20VE",
+      "price_band": "",
+      "band_tier": "mid",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://image14.coupangcdn.com/image/affiliate/banner/bd76ab2560e71a14614e765580121577@2x.jpg",
+      "banner_alt": "삼성전자 인덕션 1구, NZ31DG200CFH(화이트), 일반형"
+    },
+    {
+      "key": "접이식키보드",
+      "name": "접이식 블루투스 키보드",
+      "search": "접이식 블루투스 키보드",
+      "match": [
+        "접이식 키보드",
+        "블루투스 키보드",
+        "폴딩 키보드"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLVlIdP7Q",
+      "price_band": "",
+      "band_tier": "mid",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://image6.coupangcdn.com/image/affiliate/banner/d6dfe5315daced8f367ed9d8c31a9909@2x.jpg",
+      "banner_alt": "엔보우 N패드 블루투스 무선 접이식 키보드, 실버, SMART-NOTE, 제조사축"
+    },
+    {
+      "key": "차량용공기청정기",
+      "name": "차량용 공기청정기",
+      "search": "차량용 공기청정기",
+      "match": [
+        "차량용 공기청정기",
+        "차량 공기청정"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzL5BcQzZs",
+      "price_band": "",
+      "band_tier": "mid",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://image10.coupangcdn.com/image/affiliate/banner/71759104bf1f8db1d87dab1cb932e0ed@2x.jpg",
+      "banner_alt": "실내 및 차량용 공기청정기, JP-700AP, 블랙"
+    },
+    {
+      "key": "미니세탁기",
+      "name": "미니 세탁기",
+      "search": "미니 세탁기 3kg",
+      "match": [
+        "미니세탁기",
+        "미니 세탁기",
+        "소형 세탁기"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLJbvJDzM",
+      "price_band": "",
+      "band_tier": "high",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://img5c.coupangcdn.com/image/affiliate/banner/402966eaed9cb7b7f8d425032ee22d30@2x.jpg",
+      "banner_alt": "비스카 미니 세탁기 3kg, MR-H100WM, 블랙 + 화이트"
+    },
+    {
+      "key": "미니건조기",
+      "name": "미니 건조기",
+      "search": "미니 건조기 히트펌프",
+      "match": [
+        "미니 건조기",
+        "소형 건조기",
+        "히트펌프"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLGRrkqhU",
+      "price_band": "",
+      "band_tier": "high",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://img2c.coupangcdn.com/image/affiliate/banner/b916d4464313e1e1ebfe29d48c0239e8@2x.jpg",
+      "banner_alt": "대웅 4세대 스마트 AI 회전형 미니건조기 4kg 고객직접설치, DWCD-E2404SJ, 블랙"
+    },
+    {
+      "key": "전기장판",
+      "name": "전기장판",
+      "search": "전기장판 싱글",
+      "match": [
+        "전기장판",
+        "전기매트",
+        "온수매트",
+        "전기요패드"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzMf1q3wSy",
+      "price_band": "",
+      "band_tier": "mid",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://img1a.coupangcdn.com/image/affiliate/banner/cc9fe647856ad71c90ac30b985a42dfd@2x.jpg",
+      "banner_alt": "HanilMedical 탄소열선 고급 전기요 HL-D205(25), 북극곰, M (100 x 180 cm)"
+    },
+    {
+      "key": "미니온풍기",
+      "name": "미니 온풍기",
+      "search": "미니 온풍기 욕실",
+      "match": [
+        "온풍기",
+        "욕실 히터",
+        "미니 히터"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzLK8yNOHB",
+      "price_band": "",
+      "band_tier": "mid",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://image2.coupangcdn.com/image/affiliate/banner/9edd8f495e165eb9247b70ce23c26102@2x.jpg",
+      "banner_alt": "한일 미니온풍기 가정용 욕실 사무실 화장실 온풍기 캠핑용 터치 HEF-1000UE, 상세페이지참조"
+    },
+    {
+      "key": "가습기",
+      "name": "가습기",
+      "search": "가습기 초음파",
+      "match": [
+        "가습기",
+        "초음파 가습"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzMcE3TGhg",
+      "price_band": "",
+      "band_tier": "mid",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://img3a.coupangcdn.com/image/affiliate/banner/42bd4125e18e72aa079876769f20ea1a@2x.jpg",
+      "banner_alt": "홈플래닛 초음파 가습기 4L, H1001D11"
+    },
+    {
+      "key": "김치통",
+      "name": "김치통",
+      "search": "김치통 4L",
+      "match": [
+        "김치통",
+        "김치 용기",
+        "김장 용기"
+      ],
+      "coupang_url": "https://link.coupang.com/a/hzMez8dVF6",
+      "price_band": "",
+      "band_tier": "low",
+      "note": "",
+      "updated": "2026-10-04",
+      "banner_img": "https://image8.coupangcdn.com/image/affiliate/banner/4e587dd90342c595a0c1d21a7d19b3b5@2x.jpg",
+      "banner_alt": "제오닉 코코아락 원핸들 김치통, 4L, 2개"
+    },
+    {
+      "key": "리퍼연구소",
+      "name": "리퍼연구소 (리퍼 가전·IT)",
+      "search": "리퍼 가전 리퍼연구소",
+      "match": [
+        "리퍼",
+        "리퍼브",
+        "리퍼 가전",
+        "리퍼연구소"
+      ],
+      "merchant": "linkprice",
+      "link": "http://app.ac/btnfhfM43",
+      "coupang_url": "",
+      "kind": "store",
+      "price_band": "",
+      "note": "새 제품에 가까운 리퍼 제품을 품질보증·A/S·환불 보장과 함께 파는 곳입니다. 같은 모델을 새것보다 싸게 사는 경로라 가격을 먼저 비교해 보세요.",
+      "updated": "2026-11-13",
+      "_조건": "요율 4.9% · 광고효과 인정기간 21일 · 생성형 AI 홍보 금지 조항 없음(2026-11-13 실측). 카테고리 가전/디지털/IT."
+    },
+    {
+      "key": "레노버액세서리",
+      "name": "레노버 공식몰 (노트북 액세서리)",
+      "search": "레노버 액세서리",
+      "match": [
+        "레노버",
+        "씽크패드",
+        "ThinkPad",
+        "노트북 액세서리"
+      ],
+      "merchant": "linkprice",
+      "link": "http://app.ac/DtnfhtM13",
+      "coupang_url": "",
+      "kind": "store",
+      "price_band": "",
+      "note": "레노버 공식몰의 키보드·마우스·독·모니터 액세서리 코너입니다.",
+      "updated": "2026-11-13",
+      "_조건": "요율 5.6% · 광고효과 인정기간 30일(가장 김) · AI 금지 조항 없음(2026-11-13 실측). 단 픽담에 IT 글이 1편뿐이라 당장 붙을 자리가 거의 없다."
+    },
+    {
+      "key": "기울어진쌀통",
+      "name": "기울어진 쌀통 (회전형 계량 쌀통)",
+      "search": "회전형 쌀통 계량",
+      "match": [
+        "쌀통",
+        "쌀독",
+        "잡곡통",
+        "기울어진 쌀통",
+        "회전형 쌀통"
+      ],
+      "coupang_url": "https://link.coupang.com/a/iDHMckkQ20",
+      "price_band": "3~6만",
+      "note": "일반 배송 — 이 품목군에 로켓 상품이 없다(11/13 전수 확인)",
+      "updated": "2026-11-13",
+      "banner_alt": "GBED 회전형 쌀통 밀폐 대용량 계량 저장통 보관함 방충 방습 쌀독 잡곡통 5kg 주방용품, 1개, 화이트",
+      "price": 41000,
+      "price_at": "2026-11-13",
+      "merchant": "coupang",
+      "channel": "pickdamblog"
+    },
+    {
+      "key": "미니LP자석",
+      "name": "미니 LP 자석 (레트로 냉장고 자석)",
+      "search": "LP판 냉장고 자석 레트로",
+      "match": [
+        "LP 자석",
+        "레코드 자석",
+        "냉장고 자석",
+        "미니 LP"
+      ],
+      "coupang_url": "https://link.coupang.com/a/iDHR2vVC6S",
+      "price_band": "1만 이하",
+      "note": "일반 배송 — 이 품목군에 로켓 상품이 없다(11/13 전수 확인)",
+      "updated": "2026-11-13",
+      "banner_alt": "이삭유통 빈티지 레코드 LP판 카세트 테이프 자석 인테리어 레트로 소품 냉장고 자석 4P 1세트, 카세트테이프",
+      "price": 2400,
+      "price_at": "2026-11-20",
+      "merchant": "coupang",
+      "channel": "pickdamblog",
+      "image": "https://img1a.coupangcdn.com/image/affiliate/banner/22a2c688d5fbbed510b1f8e549663e26@2x.jpg",
+      "banner_link": "https://link.coupang.com/a/iPleyyKLBc",
+      "origin_price": 2400,
+      "discount_rate": 0,
+      "image_at": "2026-11-20"
+    },
+    {
+      "key": "미니식기세척기",
+      "name": "미니 식기세척기 (3인용 탁상형)",
+      "search": "미니 식기세척기 3인용",
+      "match": [
+        "식기세척기",
+        "미니 식기세척기",
+        "탁상형 식기세척기"
+      ],
+      "coupang_url": "https://link.coupang.com/a/iDJzZ8l3QW",
+      "price_band": "30만 이상",
+      "note": "🚀 로켓배송",
+      "updated": "2026-11-13",
+      "banner_alt": "미닉스 미니 식기세척기 PRO 3인용, 그레이지, MNDW-110G, 고객직접설치",
+      "price": 319110,
+      "price_at": "2026-11-20",
+      "merchant": "coupang",
+      "channel": "pickdamblog",
+      "image": "https://image7.coupangcdn.com/image/affiliate/banner/42b745d7cacdf20491df957295de0b60@2x.jpg",
+      "banner_link": "https://link.coupang.com/a/iPkrqz3hpQ",
+      "origin_price": 619000,
+      "discount_rate": 48,
+      "image_at": "2026-11-20"
+    },
+    {
+      "key": "전동야채다지기",
+      "name": "전동 야채다지기 (무선 충전식)",
+      "search": "무선 전동 다지기",
+      "match": [
+        "다지기",
+        "야채다지기",
+        "전동 다지기",
+        "전동 채칼",
+        "마늘 다지기"
+      ],
+      "coupang_url": "https://link.coupang.com/a/iDJCwFuLEy",
+      "price_band": "1~3만",
+      "note": "🚀 로켓배송",
+      "updated": "2026-11-13",
+      "banner_alt": "필쿡 무선 전동 만능 다지기 300ml, FK-TM02",
+      "price": 16620,
+      "price_at": "2026-11-20",
+      "merchant": "coupang",
+      "channel": "pickdamblog",
+      "image": "https://image8.coupangcdn.com/image/affiliate/banner/5d7545e9850e283f32e7b105243a8635@2x.jpg",
+      "banner_link": "https://link.coupang.com/a/iPkPEQj4Ee",
+      "origin_price": 29800,
+      "discount_rate": 44,
+      "image_at": "2026-11-20"
+    },
+    {
+      "key": "도마가위",
+      "name": "도마 가위 (도마 일체형 만능가위)",
+      "search": "도마가위 만능가위",
+      "match": [
+        "도마가위",
+        "도마 가위",
+        "만능가위",
+        "캠핑가위"
+      ],
+      "coupang_url": "https://link.coupang.com/a/iDHQ0umksC",
+      "price_band": "1만 이하",
+      "note": "일반 배송 — 이 품목군에 로켓 상품이 없다(11/13 전수 확인)",
+      "updated": "2026-11-13",
+      "banner_alt": "전참시 이국주 가위 도마가위 만능가위 캠핑가위 K405, 상품상세 설명 참조",
+      "price": 5490,
+      "price_at": "2026-11-20",
+      "merchant": "coupang",
+      "channel": "pickdamblog",
+      "image": "https://img3c.coupangcdn.com/image/affiliate/banner/b83e373d57c237e704899fd86c1c9bf4@2x.jpg",
+      "banner_link": "https://link.coupang.com/a/iPkLZgzkZg",
+      "origin_price": 7900,
+      "discount_rate": 30,
+      "image_at": "2026-11-20"
+    },
+    {
+      "key": "자동섞이는컵",
+      "name": "자동 섞이는 컵 (충전식 회전 믹스컵)",
+      "search": "자동 회전 믹스컵 충전식",
+      "match": [
+        "자동 섞이는 컵",
+        "회전 믹스컵",
+        "자동 믹스컵",
+        "회전컵",
+        "자동 교반"
+      ],
+      "coupang_url": "https://link.coupang.com/a/iKaWfuhgZM",
+      "price_band": "1~3만",
+      "note": "일반 배송 — 이 품목군에 로켓 상품이 없다(11/17 전수 확인 — 로켓은 전부 수동 쉐이커)",
+      "updated": "2026-11-17",
+      "banner_alt": "ROYAI ONE 충전식 회전식 믹스컵 원터치 온도 커피컵 회전컵 머그컵, 1개, 블랙",
+      "price": 17900,
+      "price_at": "2026-11-20",
+      "merchant": "coupang",
+      "channel": "pickdamblog",
+      "image": "https://img4a.coupangcdn.com/image/affiliate/banner/b631319367702fa6d53e4086e2dd1a07@2x.jpg",
+      "banner_link": "https://link.coupang.com/a/iPlbJMkNTo",
+      "origin_price": 25000,
+      "discount_rate": 28,
+      "image_at": "2026-11-20"
+    },
+    {
+      "key": "자동디스펜서",
+      "name": "자동 디스펜서 (손 대면 나오는 세정기)",
+      "search": "자동 디스펜서 손세정기",
+      "match": [
+        "자동 디스펜서",
+        "디스펜서",
+        "손세정기",
+        "자동 세제"
+      ],
+      "coupang_url": "https://link.coupang.com/a/iKa0oIbDa0",
+      "price_band": "1~3만",
+      "note": "🚀 로켓배송",
+      "updated": "2026-11-17",
+      "banner_alt": "무아스 클린업 소프트버블 자동 손세정기 디스펜서 300ml, 화이트, 1개",
+      "price": 26500,
+      "price_at": "2026-11-20",
+      "merchant": "coupang",
+      "channel": "pickdamblog",
+      "image": "https://img5a.coupangcdn.com/image/affiliate/banner/e4b7c975b1340eb485feccc910a53d94@2x.jpg",
+      "banner_link": "https://link.coupang.com/a/iPkSW1GLeK",
+      "origin_price": 35900,
+      "discount_rate": 26,
+      "image_at": "2026-11-20"
+    },
+    {
+      "key": "접이식계량스푼",
+      "name": "접이식 계량스푼 (3-in-1 평면형)",
+      "search": "접이식 계량스푼",
+      "match": [
+        "접이식 계량스푼",
+        "계량스푼",
+        "계량 스푼",
+        "접이식 스푼"
+      ],
+      "coupang_url": "https://link.coupang.com/a/iKa3aP6jbE",
+      "price_band": "1~3만",
+      "note": "일반 배송 — 접이식은 로켓 상품이 없다(11/17 확인 — 로켓은 전부 일반 계량스푼)",
+      "updated": "2026-11-17",
+      "banner_alt": "[26년 신상] 접이식 계량스푼 3-in-1 평면 접이식 계량 스푼 요리 계량스푼 실리콘 스푼 계량 숟가락 조리도구 국자 베이킹 도구 계량컵 마그네틱 티스푼 서빙스푼 포장증정, 1세트, 블랙",
+      "price": 12800,
+      "price_at": "2026-11-20",
+      "merchant": "coupang",
+      "channel": "pickdamblog",
+      "image": "https://img1c.coupangcdn.com/image/affiliate/banner/b1e4ab73f457dd241cf867f3573936f9@2x.jpg",
+      "banner_link": "https://link.coupang.com/a/iPlhaTx9FY",
+      "origin_price": 60000,
+      "discount_rate": 78,
+      "image_at": "2026-11-20"
+    },
+    {
+      "key": "전동오일스프레이",
+      "name": "전동 오일 스프레이 (주방용 자동 분무)",
+      "search": "전동 오일 스프레이 주방",
+      "match": [
+        "전동 오일 스프레이",
+        "전동 스프레이",
+        "전동스프레이",
+        "전동 분무기",
+        "자동 오일 스프레이"
+      ],
+      "coupang_url": "https://link.coupang.com/a/iKbbfvUZMa",
+      "price_band": "1~3만",
+      "note": "일반 배송 — 전동은 로켓 상품이 없다(11/17 확인, 로켓은 전부 수동 분사형)",
+      "updated": "2026-11-17",
+      "banner_alt": "식품용 오일 분무기 스프레이 전동 공병 자동 200ml, 1개, 300ml black",
+      "price": 18500,
+      "price_at": "2026-11-17",
+      "merchant": "coupang",
+      "channel": "pickdamblog"
+    }
+  ],
+  "_note_주의": "note는 상품 카드에 독자에게 그대로 보이는 문구다. 내부 메모는 절대 여기 쓰지 말고 _memo에 쓸 것(2026-09-08 사고).",
+  "_주의_match": "match는 '가장 긴 키워드'가 이긴다(products.find_for). 그래서 부속품 제품의 match를 넓게 잡으면 본체 글을 전부 빼앗아 간다 — 본체가 영원히 미매칭으로 남고 자동 주제배정이 같은 주제를 반복 생성한다(2026-09-09 실측: 비데 글 3편).",
+  "_match_주의": "match 어휘는 **흔한 말에 삼켜지지 않는 것**으로 쓴다. 공백을 지우고 부분문자열로 비교하기 때문이다. 2026-10-30 실측 사고: '전기요'가 '전기 요금'(→'전기요금')에 걸려, 욕실 온풍기 글 #663 이 전기장판으로 배정되고 본문에 **전기요 카드**가 붙었다. 동시에 전기장판은 '이미 다룬 품목'으로 빠져 겨울에 전용 글이 영영 안 나오고 있었다. 짧은 어휘를 넣을 때는 요금·비용·관리·교체 같은 말에 삼켜지는지 먼저 확인할 것.",
+  "_가격_읽는_법": "price/price_at/availability/rating 은 세션이 사용자 크롬으로 쿠팡 상품 페이지를 열어 JSON-LD(script[type=application/ld+json] 의 @type=Product)에서 읽어 채운다 — offers.price(원), offers.availability(InStock/OutOfStock), aggregateRating.ratingValue. 2026-11-12 실측 확인. ⚠️ GitHub Actions 에서는 하지 않는다(쿠팡 봇 차단·약관). 그래서 글에는 반드시 price_at(조사일)을 함께 적는다. 쿠팡 파트너스 오픈API 는 누적 수익 15만 원 달성 후에만 발급되므로 그 전까지 이 경로가 유일하다.",
+  "_머천트_필드": "제품에 merchant:'linkprice' 와 link:'<링크프라이스 링크>' 를 넣으면 쿠팡 대신 그쪽으로 카드가 나간다. ① 대가성 문구가 '이 포스팅은 제휴마케팅이 포함된 광고로 커미션을 지급 받습니다.' 로 바뀐다(머천트 상세 실측). ② ⚠️ 링크프라이스 링크에는 subid 를 붙이지 않는다 — 약관 제8조③7 이 '광고 링크를 임의로 가공·변형'하는 행위를 금지한다. ③ 링크프라이스 캠페인 글은 제17조① 에 따라 6개월간 삭제·숨김이 금지되므로 merge_posts 가 자동으로 보호한다. ④ 등록 매체(pickdam.com) 외에서는 쓰지 않는다(제8조③15). 조건 비교(2026-11-13 실측): 레노버 5.6%·쿠키 30일 / 하이마트 1.26%·0일 / 링크프라이스 쿠팡 3.15%·1일(단 생성형 AI 홍보 금지 조항 있음 → 쓰지 않는다)."
 }
