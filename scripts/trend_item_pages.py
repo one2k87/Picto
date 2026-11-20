@@ -323,7 +323,9 @@ def main():
     links = {k: v.get("url") for k, v in posts.items() if isinstance(v, dict) and v.get("url")}
 
     os.makedirs(DRAFTS, exist_ok=True)
-    arts = []
+    # 비교 글을 먼저 만들고 먼저 발행한다. 아이템 페이지가 비교 글 주소를 받아
+    # "톱3 비교 보기" 링크를 달아야 하는데, 순서를 바꾸면 첫 발행에서 링크가 빈다.
+    picked = []
     for key, it in items.items():
         if only and key != only:
             continue
@@ -335,9 +337,14 @@ def main():
         no_img = [e["name"] for e in top3 if not e.get("image")]
         if no_img:
             print(f"  · {key}: 사진 없는 제품 {len(no_img)}개 — {no_img[0][:30]}…")
-        arts.append(build_item(key, it, top3, links))
+        picked.append((key, it, top3))
+
+    arts = []
+    for key, it, top3 in picked:
         if len(top3) >= 2:
             arts.append(build_compare(key, it, top3, links))
+    for key, it, top3 in picked:
+        arts.append(build_item(key, it, top3, links))
 
     if not arts:
         print("::warning::만들 글이 없다")
@@ -359,7 +366,21 @@ def main():
     if not wp.get("enabled"):
         print("::warning::wordpress.enabled 가 False — 발행 생략")
         return 0
+    done_cmp = False
     for a in arts:
+        # 비교 글을 다 올린 다음, 그 주소를 들고 아이템 페이지를 다시 짓는다.
+        if not a["slug"].endswith("-top3") and not done_cmp:
+            done_cmp = True
+            links.update({k: v.get("url") for k, v in posts.items()
+                          if isinstance(v, dict) and v.get("url")})
+            rebuilt = {}
+            for key, it, top3 in picked:
+                r = build_item(key, it, top3, links)
+                rebuilt[r["slug"]] = r
+            for i, x in enumerate(arts):
+                if x["slug"] in rebuilt:
+                    arts[i] = rebuilt[x["slug"]]
+            a = arts[arts.index(next(x for x in arts if x["slug"] == a["slug"]))]
         res = publisher.publish_to_wordpress(a, wp)
         print(f"[wp] {a['slug']} → {res}")
         url = (res or {}).get("link") if isinstance(res, dict) else None
