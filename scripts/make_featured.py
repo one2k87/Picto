@@ -121,6 +121,80 @@ def compose(title, shots, sub, lines_right=None):
     return img
 
 
+# 2026-11-20 사용자 지시: "상품 사진만 빼서 세 개의 상품 사진이 중앙 좌우로
+# 마치 순위 경쟁을 하는 듯하게".
+# 파트너스 배너(240x480)는 구조가 일정하다. 세로 비율로 재면
+#   0.00~0.11 쿠팡 로고 / 0.12~0.16 여백 / **0.165~0.615 상품 사진**
+#   0.62 여백 / 0.63~0.80 상품명·배지 / 0.82~0.95 쇼핑하기 버튼
+# 배너 3종을 재서 셋 다 같은 자리였다(11/20 실측). 그 구간만 떼어 쓴다.
+# 뗀 사진은 쿠팡이 파트너스 소재로 내준 것이므로 출처를 이미지 안에 적는다.
+SHOT_TOP, SHOT_BOT = 0.165, 0.615
+
+
+def crop_shot(im):
+    """배너에서 상품 사진 영역만 떼고, 둘레의 흰 여백을 잘라낸다."""
+    w, h = im.size
+    box = im.crop((0, int(h * SHOT_TOP), w, int(h * SHOT_BOT)))
+    try:
+        import numpy as np
+        a = np.asarray(box.convert("L"), dtype=float)
+        ys, xs = np.where(a < 243)
+        if len(ys) > 50:
+            m = 4
+            box = box.crop((max(0, xs.min() - m), max(0, ys.min() - m),
+                            min(box.width, xs.max() + m), min(box.height, ys.max() + m)))
+    except Exception:
+        pass
+    return box
+
+
+def podium(title, shots, sub, labels):
+    """1위를 가운데 높은 자리에, 2·3위를 좌우 낮은 자리에. 순위 경쟁처럼 보이게."""
+    img = Image.new("RGB", (W, H), BG)
+    d = ImageDraw.Draw(img)
+    ft, fs, fr, fp = font(52), font(26), font(34), font(32)
+    for i, ln in enumerate(wrap(d, title, ft, W - 120, lines=1)):
+        d.text((60, 46), ln, font=ft, fill=INK)
+    if sub:
+        d.text((60, 110), sub, font=fs, fill=SUB)
+
+    base = H - 118                     # 사진이 서는 바닥선(아래에 가격·출처 자리를 둔다)
+    # 1위가 한눈에 커 보여야 순위로 읽힌다. 가운데를 크게, 좌우를 작게.
+    # (가로중심, 최대높이, 최대너비)
+    order = [1, 0, 2][:len(shots)]     # 왼쪽 2위 · 가운데 1위 · 오른쪽 3위
+    slots = [(200, 265, 290), (610, 400, 400), (1010, 265, 290)][:len(shots)]
+    if len(shots) == 1:
+        order, slots = [0], [(600, 400, 430)]
+    elif len(shots) == 2:
+        order, slots = [0, 1], [(420, 400, 400), (830, 290, 310)]
+
+    rank_bg = [(222, 170, 44), (160, 170, 182), (176, 131, 94)]
+    for pos, idx in enumerate(order):
+        if idx >= len(shots):
+            continue
+        im = shots[idx]
+        cx, maxh, maxw = slots[pos]
+        s = min(maxw / im.width, maxh / im.height)
+        w2, h2 = int(im.width * s), int(im.height * s)
+        y0 = base - h2
+        img.paste(im.resize((w2, h2), Image.LANCZOS), (cx - w2 // 2, y0))
+        # 순위 뱃지
+        r = 24
+        bx, by = cx - w2 // 2 - 6, y0 - 10
+        d.ellipse([bx - r, by - r, bx + r, by + r], fill=rank_bg[min(idx, 2)])
+        n = str(idx + 1)
+        tw = d.textlength(n, font=fr)
+        d.text((bx - tw / 2, by - 22), n, font=fr, fill=(255, 255, 255))
+        if idx < len(labels) and labels[idx]:
+            lw = d.textlength(labels[idx], font=fp)
+            d.text((cx - lw / 2, base + 12), labels[idx], font=fp,
+                   fill=INK if idx == 0 else SUB)
+    # 출처는 왼쪽 아래에. 오른쪽에 두면 3위 가격과 겹친다(11/20 실측).
+    fsrc = font(20)
+    d.text((60, H - 36), "이미지: 쿠팡 파트너스 제공", font=fsrc, fill=(170, 178, 189))
+    return img
+
+
 def resolve(entry):
     out = dict(entry)
     k = entry.get("product_key")
@@ -151,25 +225,25 @@ def main():
             if not e.get("image"):
                 need_link.append((disp, e.get("name") or "(이름 없음)"))
 
-        shots = [s for s in (fetch(e["image"]) for e in top3 if e.get("image")) if s]
-        if not shots:
+        withimg = [e for e in top3 if e.get("image")]
+        raw = [(e, fetch(e["image"])) for e in withimg]
+        pairs = [(e, crop_shot(im)) for e, im in raw if im]
+        if not pairs:
             print(f"  ✗ {disp}: 쓸 수 있는 상품 사진이 하나도 없다 — 대표 이미지를 만들지 않는다")
             continue
         today = dt.date.today()
         asof = f"{today.year}년 {today.month}월 {today.day}일 기준 가격"
+        shots = [im for _, im in pairs]
+        labels = [(f"{int(e['price']):,}원" if e.get("price") else "") for e, _ in pairs]
 
-        head = next((e for e in top3 if e.get("image")), {})
-        right = [head.get("name") or ""]
-        if head.get("price"):
-            right.append(f"{int(head['price']):,}원")
         p1 = os.path.join(OUT, base + ".png")
-        compose(f"{disp}, 지금 얼마에 살 수 있나", shots[:1], asof, right).save(p1)
+        podium(f"{disp}, 지금 얼마에 살 수 있나", shots[:1], asof, labels[:1]).save(p1)
         made.append((base, p1))
         print(f"  ✓ {p1}  (상품 사진 1장)")
 
         if len(shots) >= 2:
             p2 = os.path.join(OUT, base + "-top3.png")
-            compose(f"{disp} 톱3 비교", shots[:3], asof).save(p2)
+            podium(f"{disp} 톱3 비교", shots[:3], asof, labels[:3]).save(p2)
             made.append((base + "-top3", p2))
             print(f"  ✓ {p2}  (상품 사진 {len(shots[:3])}장)")
 
