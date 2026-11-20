@@ -384,16 +384,18 @@ def section(i, r, days, slug):
     alt = (pr.get("banner_alt") or "").strip()
     if alt and not card:
         h.append(f"<p>이 글에서 고른 제품: {html.escape(alt)}</p>")
-    if r.get("price"):
+    if r.get("price") and not card:
         h.append(f"<p><strong>{int(r['price']):,}원</strong>"
                  + (f" ({html.escape(str(r['price_at']))} 기준)" if r.get("price_at") else "") + "</p>")
-    elif r.get("price_band"):
+    elif r.get("price_band") and not card:
         h.append(f"<p>가격대는 {html.escape(str(r['price_band']))}입니다.</p>")
     ref = r.get("ref")
     if ref:
         h.append(f"<p>한국소비자원 참가격 조사에서는 평균 {ref['avg']:,}원, 최저 {ref['min']:,}원으로 "
                  f"잡힙니다({ref['n']}건). 온라인 가격이 이보다 낮은지 보면 됩니다.</p>")
-    if r.get("link"):
+    # 상품 카드에 이미 가격·링크·로켓 표시가 들어 있다. 카드가 있으면 같은 말을
+    # 아래에 또 적지 않는다(2026-11-20 라이브에서 세 줄이 중복으로 찍혔다).
+    if r.get("link") and not card:
         url = products_mod.with_subid(r["link"], products_mod.safe_subid(slug, keyword=r["keyword"]))
         h.append(f'<p><a href="{url}" target="_blank" rel="nofollow sponsored noopener">'
                  f'{name} 쿠팡에서 보기</a></p>')
