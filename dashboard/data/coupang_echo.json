@@ -4,5 +4,21 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false
+ "file_enabled": false,
+ "apply_trace": [
+  {
+   "stage": "진입",
+   "title": "LP판 냉장고 자석 레트로 소품, 50g 무게를 버",
+   "enabled": false,
+   "widget_len": 211,
+   "h2": 5
+  },
+  {
+   "stage": "중단:enabled=False",
+   "title": "LP판 냉장고 자석 레트로 소품, 50g 무게를 버",
+   "enabled": false,
+   "widget_len": 211,
+   "h2": 5
+  }
+ ]
 }

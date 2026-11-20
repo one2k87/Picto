@@ -144,7 +144,8 @@
       "category": "생활·주방",
       "intent": "revenue",
       "date": "2026-09-06",
-      "series_id": ""
+      "series_id": "",
+      "last_refreshed": "2026-11-20"
     },
     {
       "title": "음식물처리기 렌탈 36개월 약정, 위약금 50만원 피하려면 이사 전 2가지 조건부터 확인해야 합니다",
@@ -833,6 +834,19 @@
       "category": "생활·주방",
       "intent": "revenue",
       "date": "2026-11-18",
+      "series_id": ""
+    },
+    {
+      "title": "LP판 냉장고 자석 레트로 소품, 50g 무게를 버티지 못하고 떨어질 때 네오디움 자석으로 해결하는 조건",
+      "slug": "lp-retro-magnet-kitchen-interior",
+      "url": "https://pickdam.com/lp-retro-magnet-kitchen-interior/",
+      "post_id": 832,
+      "status": "게시됨",
+      "kind": "long",
+      "keyword": "LP판 냉장고 자석 레트로, 1인가구 주방 인테리어 소품으로 붙일 때 자력 약해 떨어지지 않는 조건",
+      "category": "생활·주방",
+      "intent": "evergreen",
+      "date": "2026-11-20",
       "series_id": ""
     }
   ],
