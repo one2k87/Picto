@@ -1,0 +1,32 @@
+{
+ "title": "탄소매트 퀸 3종 비교 — 가격·표기 기준으로 고르면 이렇게 갈립니다",
+ "slug": "compare-ep01-20261120",
+ "meta": "탄소매트 퀸 3종을 가격과 쿠팡 「필수 표기 정보」 기준으로 나란히 비교했습니다. 표기 없음은 기능이 없다는 뜻이 아닙니다.",
+ "category": "비교",
+ "wp_category": "비교",
+ "placeholders": [
+  "{{가격1}}",
+  "{{가격2}}",
+  "{{가격3}}",
+  "{{링크1}}",
+  "{{링크2}}",
+  "{{링크3}}"
+ ],
+ "products": [
+  {
+   "n": 1,
+   "name": "나비엔 숙면 DC 카본매트 EME520-QP 퀸(145x195cm)",
+   "url": "https://www.coupang.com/vp/products/7582799968"
+  },
+  {
+   "n": 2,
+   "name": "귀뚜라미 카본매트 KDM-922 Q(150x200cm)",
+   "url": "https://www.coupang.com/vp/products/8397528461"
+  },
+  {
+   "n": 3,
+   "name": "일신한일의료기 두툼한 탄소매트 2인용 퀸(150x200cm)",
+   "url": "https://www.coupang.com/vp/products/9727152538"
+  }
+ ]
+}
