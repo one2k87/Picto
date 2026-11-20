@@ -13,6 +13,10 @@ on:
         description: "true면 선정·미리보기만(링크 요청 블록 출력), false면 발행까지"
         required: false
         default: "true"
+      update_id:
+        description: "이미 올라간 리포트의 글 ID. 넣으면 새 글 대신 그 글의 본문만 갈아끼운다"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -51,7 +55,9 @@ jobs:
           # COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
           # COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
         run: |
-          if [ "${{ github.event.inputs.dry_run }}" = "false" ] || [ "${{ github.event_name }}" = "schedule" ]; then
+          if [ -n "${{ github.event.inputs.update_id }}" ]; then
+            python scripts/weekly_trend_report.py --update ${{ github.event.inputs.update_id }}
+          elif [ "${{ github.event.inputs.dry_run }}" = "false" ] || [ "${{ github.event_name }}" = "schedule" ]; then
             python scripts/weekly_trend_report.py --publish
           else
             python scripts/weekly_trend_report.py

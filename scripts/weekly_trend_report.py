@@ -452,6 +452,13 @@ def link_block(rows):
 # ─── 실행 ────────────────────────────────────────────────────────────────────
 def main():
     publish = "--publish" in sys.argv
+    # 2026-11-20: 이미 올라간 리포트에 상품 사진을 넣으려면 본문만 갈아끼워야 한다.
+    # 새 글로 또 올리면 같은 내용이 두 편이 되어 색인에서 서로 깎아먹는다.
+    update_id = 0
+    if "--update" in sys.argv:
+        i = sys.argv.index("--update")
+        if i + 1 < len(sys.argv):
+            update_id = int(sys.argv[i + 1])
     cfg = load_config()
     if not price_ref.ready():
         print("[price_ref] PRICE_REF_API_KEY 없음 — 소비자원 기준가 줄은 생략한다")
@@ -489,7 +496,7 @@ def main():
     print(link_block(rows))
     print("-" * 60)
 
-    if not publish:
+    if not (publish or update_id):
         return 0
     if art["_linked"] < MIN_PUBLISH_LINKS:
         print(f"::error::링크가 {art['_linked']}개뿐이다(하한 {MIN_PUBLISH_LINKS}) — "
@@ -500,6 +507,10 @@ def main():
     if not wp.get("enabled"):
         print("::warning::wordpress.enabled 가 False — 발행 생략")
         return 0
+    if update_id:
+        okx = publisher.update_post_content(wp, update_id, art["html"])
+        print(f"[wp] #{update_id} 본문 갱신: {okx}")
+        return 0 if okx else 5
     print(f"[wp] 발행: {publisher.publish_to_wordpress(art, wp)}")
     return 0
 
