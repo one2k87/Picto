@@ -131,10 +131,36 @@ def compose(title, shots, sub, lines_right=None):
 SHOT_TOP, SHOT_BOT = 0.165, 0.615
 
 
+def photo_band(im):
+    """배너에서 상품 사진이 실제로 차지하는 세로 구간을 찾는다.
+
+    2026-11-22 사용자 지적("1등 보면 글자가 잘려 있어")으로 재 보니, 고정 비율의
+    위 경계 0.165 가 사진이 시작되는 자리(약 0.15)보다 **아래**였다. 실측:
+      계량스푼 1위 0.165 줄의 내용 비율 0.84 · 도마가위 1위 0.93 (한가운데를 지난다)
+      디스펜서 1위 0.01 (여백이라 티가 안 났다)
+    480px 기준 약 7px 을 날려, 가장자리까지 꽉 찬 상세컷만 글자가 잘렸다.
+    그래서 비율로 자르지 않고, 로고 아래부터 상품명 위까지 훑어 **내용이 시작되고
+    끝나는 줄**을 찾는다. 배너마다 사진 크기가 달라도 사진만 정확히 잡힌다.
+    """
+    h = im.size[1]
+    try:
+        import numpy as np
+        a = np.asarray(im.convert("L"), dtype=float)
+        ink = (a < 238).mean(axis=1)
+        lo, hi = int(h * 0.115), int(h * 0.655)     # 로고 아래 ~ 상품명 위
+        idx = np.where(ink[lo:hi] > 0.02)[0]
+        if len(idx) >= 5:
+            return max(0, lo + int(idx[0]) - 2), min(h, lo + int(idx[-1]) + 3)
+    except Exception:
+        pass
+    return int(h * SHOT_TOP), int(h * SHOT_BOT)     # 못 찾으면 옛 비율로
+
+
 def crop_shot(im):
     """배너에서 상품 사진 영역만 떼고, 둘레의 흰 여백을 잘라낸다."""
     w, h = im.size
-    box = im.crop((0, int(h * SHOT_TOP), w, int(h * SHOT_BOT)))
+    top, bot = photo_band(im)
+    box = im.crop((0, top, w, bot))
     # 배너 바깥 테두리선을 먼저 깎는다. 11/20 실측: 좌우 맨 1열의 평균 밝기가 224 이고
     # 그 안쪽은 254~255 였다. 이 선을 남기면 ①비백색으로 잡혀 여백 제거가 통째로 빗나가고
     # ②테두리 흰색 비율이 0.52 로 떨어져 흰 배경 판정이 깨진다. 둘 다 "잘린 자국"으로 보인다.
@@ -312,7 +338,14 @@ def main():
         today = dt.date.today()
         # 2026-11-20 사용자 지시로 대표 이미지에서 가격을 뺐다. 상품만 보이게 한다.
         # 가격은 본문 상품 카드에 날짜와 함께 적혀 있다.
-        asof = f"{today.year}년 {today.month}월 {today.day}일 기준"
+        # 날짜는 **오늘이 아니라 가격을 확인한 날**을 쓴다. 오늘로 찍으면 확인하지 않은
+        # 날짜가 글에 박힌다(11/22 실측 — 가격은 11/20 에 본 값인데 11/22 로 나왔다).
+        seen = sorted({e.get("price_at") for e, _ in pairs if e.get("price_at")})
+        if seen:
+            y, m, dd = (seen[-1].split("-") + ["", "", ""])[:3]
+            asof = f"{y}년 {int(m)}월 {int(dd)}일 기준"
+        else:
+            asof = f"{today.year}년 {today.month}월 {today.day}일 기준"
         shots = [im for _, im in pairs]
 
         p1 = os.path.join(OUT, base + ".png")
