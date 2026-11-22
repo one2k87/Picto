@@ -380,9 +380,14 @@ def main():
         """이미 올라간 글이면 (id, link). 중복 발행을 막고 기록만 채운다."""
         try:
             base = wp["site_url"].rstrip("/")
+            # status 를 붙이면 안 된다. publish 외의 상태는 인증이 필요해
+            # 인증 없는 조회가 통째로 400 으로 떨어지고, 그러면 '없음'으로 읽혀
+            # 같은 글을 또 올린다(11/22 에 이것으로 5편이 두 벌 올라갔다).
             r = _rq.get(f"{base}/wp-json/wp/v2/posts",
-                        params={"slug": slug, "_fields": "id,link", "status": "publish,draft"},
-                        timeout=30)
+                        params={"slug": slug, "_fields": "id,link"}, timeout=30)
+            if r.status_code != 200:
+                print(f"::warning::{slug} 중복 확인 실패 {r.status_code} — 발행을 건너뛴다")
+                return -1, None          # 확인 못 하면 올리지 않는다(중복이 더 나쁘다)
             j = r.json()
             if isinstance(j, list) and j:
                 return j[0].get("id"), j[0].get("link")
@@ -406,6 +411,8 @@ def main():
                     arts[i] = rebuilt[x["slug"]]
             a = arts[arts.index(next(x for x in arts if x["slug"] == a["slug"]))]
         pid, url = find_posted(a["slug"])
+        if pid == -1:
+            continue                      # 확인 실패 — 이번 실행에서는 건드리지 않는다
         if url:
             # 같은 슬러그가 이미 라이브에 있다. 다시 올리면 같은 글이 두 편이 된다.
             print(f"[wp] {a['slug']} — 이미 있음 #{pid}, 발행 건너뛰고 기록만 채운다")
