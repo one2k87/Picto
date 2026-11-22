@@ -374,6 +374,22 @@ def main():
     if not wp.get("enabled"):
         print("::warning::wordpress.enabled 가 False — 발행 생략")
         return 0
+    import requests as _rq
+
+    def find_posted(slug):
+        """이미 올라간 글이면 (id, link). 중복 발행을 막고 기록만 채운다."""
+        try:
+            base = wp["site_url"].rstrip("/")
+            r = _rq.get(f"{base}/wp-json/wp/v2/posts",
+                        params={"slug": slug, "_fields": "id,link", "status": "publish,draft"},
+                        timeout=30)
+            j = r.json()
+            if isinstance(j, list) and j:
+                return j[0].get("id"), j[0].get("link")
+        except Exception:
+            pass
+        return None, None
+
     done_cmp = False
     for a in arts:
         # 비교 글을 다 올린 다음, 그 주소를 들고 아이템 페이지를 다시 짓는다.
@@ -389,10 +405,19 @@ def main():
                 if x["slug"] in rebuilt:
                     arts[i] = rebuilt[x["slug"]]
             a = arts[arts.index(next(x for x in arts if x["slug"] == a["slug"]))]
-        res = publisher.publish_to_wordpress(a, wp)
-        print(f"[wp] {a['slug']} → {res}")
-        url = (res or {}).get("link") if isinstance(res, dict) else None
-        pid = (res or {}).get("id") if isinstance(res, dict) else None
+        pid, url = find_posted(a["slug"])
+        if url:
+            # 같은 슬러그가 이미 라이브에 있다. 다시 올리면 같은 글이 두 편이 된다.
+            print(f"[wp] {a['slug']} — 이미 있음 #{pid}, 발행 건너뛰고 기록만 채운다")
+        else:
+            res = publisher.publish_to_wordpress(a, wp)
+            # publish_to_wordpress 는 **URL 문자열**을 돌려준다(dict 아님).
+            # 11/22 에 dict 로 받으려다 기록이 비었고, 그래서 대표 이미지가 안 붙었다.
+            url = res if isinstance(res, str) else ((res or {}).get("link")
+                                                    if isinstance(res, dict) else None)
+            print(f"[wp] {a['slug']} → {url}")
+            if url:
+                pid, _ = find_posted(a["slug"])
         if url:
             posts[a["slug"]] = {"url": url, "id": pid,
                                 "at": dt.date.today().isoformat(), "title": a["title"]}

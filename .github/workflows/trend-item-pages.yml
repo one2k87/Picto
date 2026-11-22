@@ -48,6 +48,13 @@ jobs:
           [ "${{ github.event.inputs.compare_only }}" = "true" ] && ARGS="$ARGS --compare-only"
           [ -n "${{ github.event.inputs.only }}" ] && ARGS="$ARGS --only ${{ github.event.inputs.only }}"
           python scripts/trend_item_pages.py $ARGS
+      - name: 한글 폰트 설치
+        # 대표 이미지에 제목이 한글로 들어간다. 폰트가 없으면 글자가 통째로 빠진다
+        # (2026-11-13 에 같은 누락으로 라이브 9장이 빈 배경으로 나갔다).
+        if: ${{ github.event.inputs.publish == 'true' }}
+        run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+        timeout-minutes: 5
+        continue-on-error: true
       - name: 대표 이미지 올리기
         if: ${{ github.event.inputs.publish == 'true' }}
         run: pip install pillow numpy -q && python scripts/make_featured.py --upload
