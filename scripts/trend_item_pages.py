@@ -313,6 +313,9 @@ def load_config():
 
 def main():
     publish = "--publish" in sys.argv
+    # 2026-11-22 사용자 선택("나눠서 발행"): 하루에 8편을 쏟으면 신규 도메인에서
+    # 색인에 불리하다. 비교 글을 먼저 올리고 아이템 페이지는 다음 차례에 올린다.
+    compare_only = "--compare-only" in sys.argv
     only = None
     if "--only" in sys.argv:
         i = sys.argv.index("--only")
@@ -347,8 +350,9 @@ def main():
     for key, it, top3 in picked:
         if len(top3) >= 2:
             arts.append(build_compare(key, it, top3, links))
-    for key, it, top3 in picked:
-        arts.append(build_item(key, it, top3, links))
+    if not compare_only:
+        for key, it, top3 in picked:
+            arts.append(build_item(key, it, top3, links))
 
     if not arts:
         print("::warning::만들 글이 없다")

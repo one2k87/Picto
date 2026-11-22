@@ -13,6 +13,10 @@ on:
         description: "한 품목만 처리할 때 그 키(비우면 전체). 예: 자동디스펜서"
         default: ""
         required: false
+      compare_only:
+        description: "true 면 톱3 비교 글만(아이템 페이지는 다음 차례로)"
+        default: "false"
+        required: false
 
 jobs:
   pages:
@@ -41,8 +45,12 @@ jobs:
         run: |
           ARGS=""
           [ "${{ github.event.inputs.publish }}" = "true" ] && ARGS="--publish"
+          [ "${{ github.event.inputs.compare_only }}" = "true" ] && ARGS="$ARGS --compare-only"
           [ -n "${{ github.event.inputs.only }}" ] && ARGS="$ARGS --only ${{ github.event.inputs.only }}"
           python scripts/trend_item_pages.py $ARGS
+      - name: 대표 이미지 올리기
+        if: ${{ github.event.inputs.publish == 'true' }}
+        run: pip install pillow numpy -q && python scripts/make_featured.py --upload
       - name: 발행 기록 커밋
         if: ${{ github.event.inputs.publish == 'true' }}
         run: |
