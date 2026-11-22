@@ -253,6 +253,10 @@ def build_compare(key, it, top3, links):
              f'가격·배송·쓰임으로 갈라 놓았습니다. 아래 표만 봐도 고를 수 있습니다.</p>')
     h.append("<h2>한눈에</h2>")
     h.append(compare_table(top3))
+    # 가격이 실제로 얼마나 움직이는지 숫자로 보여 주면 "구매 전 확인" 이 공허한 말이 아니게 된다.
+    if it.get("why_extra"):
+        h.append(f'<p style="padding:12px 14px;background:#fff8f0;border-left:4px solid #e8a33d;'
+                 f'border-radius:4px">{esc(it["why_extra"])}</p>')
 
     h.append("<h2>하나씩</h2>")
     for i, e in enumerate(top3, 1):
