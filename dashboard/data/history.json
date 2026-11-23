@@ -158,7 +158,8 @@
       "category": "생활·주방",
       "intent": "evergreen",
       "date": "2026-09-07",
-      "series_id": ""
+      "series_id": "",
+      "last_refreshed": "2026-11-23"
     },
     {
       "title": "포장이사 비용 20% 줄이려면, 짐 부피 측정부터 계약서 특약 3가지 확인해야 하는 이유",
@@ -847,6 +848,19 @@
       "category": "생활·주방",
       "intent": "evergreen",
       "date": "2026-11-20",
+      "series_id": ""
+    },
+    {
+      "title": "미니 식기세척기 3인용, 무동력 회전 모델과 온수 가열 기능 제품 중 어떤 게 전기료와 세척력에서 유리할까",
+      "slug": "mini-dishwasher-3pin-comparison",
+      "url": "https://pickdam.com/mini-dishwasher-3pin-comparison/",
+      "post_id": 901,
+      "status": "게시됨",
+      "kind": "long",
+      "keyword": "미니 식기세척기 3인용, 무동력 회전 모델과 온수 가열 기능 제품 중 어떤 게 전기료와 세척력에서 유리할까",
+      "category": "생활·주방",
+      "intent": "evergreen",
+      "date": "2026-11-23",
       "series_id": ""
     }
   ],
