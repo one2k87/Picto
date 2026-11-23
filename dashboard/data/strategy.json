@@ -1,9 +1,9 @@
 {
-  "updated": "2026-11-16 01:41",
-  "next_review": "2026-11-23",
+  "updated": "2026-11-23 02:23",
+  "next_review": "2026-11-30",
   "data_status": "ok",
   "verdict": "실측 데이터로 조정했습니다. evergreen 80% · revenue 20%",
-  "matched_posts": 21,
+  "matched_posts": 20,
   "intent_ratio": {
     "evergreen": 0.8,
     "revenue": 0.2
@@ -50,15 +50,13 @@
   },
   "winners": [
     "정수기 필터 교체",
+    "정수기 필터 교체 주기",
     "가전 가구 결합 무이자 할부",
-    "무드등과 스탠드 조명의 분위기 차이를 비교하고, 아늑한 거실이나 침실에 적합한 제품을 추천해줘",
-    "음식물 처리기 필터 교체 주기",
-    "정수기 필터 교체 주기"
+    "무드등과 스탠드 조명의 분위기 차이를 비교하고, 아늑한 거실이나 침실에 적합한 제품을 추천해줘"
   ],
   "weak_queries": [
     "가전 가구 결합 무이자 할부",
     "무드등과 스탠드 조명의 분위기 차이를 비교하고, 아늑한 거실이나 침실에 적합한 제품을 추천해줘",
-    "음식물 처리기 필터 교체 주기",
     "정수기 필터 교체",
     "정수기 필터 교체 주기"
   ],
@@ -66,28 +64,28 @@
     {
       "category": "생활·주방",
       "intent": "revenue",
-      "posts": 21,
-      "clicks": 4,
-      "impressions": 132,
+      "posts": 22,
+      "clicks": 3,
+      "impressions": 139,
       "scored": 7,
-      "est_value": 4.0,
-      "value_per_post": 0.19,
-      "ctr": 3.03
+      "est_value": 3.0,
+      "value_per_post": 0.14,
+      "ctr": 2.16
     },
     {
       "category": "생활·주방",
       "intent": "evergreen",
-      "posts": 27,
-      "clicks": 5,
-      "impressions": 187,
-      "scored": 14,
-      "est_value": 2.8,
-      "value_per_post": 0.1,
-      "ctr": 2.67
+      "posts": 29,
+      "clicks": 3,
+      "impressions": 126,
+      "scored": 13,
+      "est_value": 1.7,
+      "value_per_post": 0.06,
+      "ctr": 2.38
     }
   ],
   "actions": [
-    "노출은 있는데 클릭이 0인 검색어 5건 — 해당 글 제목을 다시 쓰세요."
+    "노출은 있는데 클릭이 0인 검색어 4건 — 해당 글 제목을 다시 쓰세요."
   ],
   "note": "글별 수익은 애드센스 API로 조회할 수 없어 '클릭 × 의도별 RPM 배수'로 추정한 값입니다."
 }
