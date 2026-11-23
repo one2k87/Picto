@@ -1,0 +1,562 @@
+{
+ "at": "2026-11-23 02:48",
+ "site": "pickdam.com",
+ "seed_collected": "2026-11-23",
+ "posts": [
+  {
+   "post_id": 63,
+   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "impr": 288,
+   "clicks": 12,
+   "gap_impr": 274,
+   "gap_keywords": [
+    {
+     "keyword": "가전구독 렌탈이모 1위 최저가격",
+     "impr": 159,
+     "cover": 0.08,
+     "missing": [
+      "가전구독",
+      "렌탈이모",
+      "1위",
+      "최저가격"
+     ]
+    },
+    {
+     "keyword": "가전 할부 최대",
+     "impr": 63,
+     "cover": 0.4,
+     "missing": [
+      "최대"
+     ]
+    },
+    {
+     "keyword": "가전 렌트 할부 비교",
+     "impr": 22,
+     "cover": 0.29,
+     "missing": [
+      "렌트",
+      "비교"
+     ]
+    },
+    {
+     "keyword": "전자기기 구독 할부 차이",
+     "impr": 18,
+     "cover": 0.11,
+     "missing": [
+      "전자기기",
+      "구독",
+      "차이"
+     ]
+    },
+    {
+     "keyword": "전자제품할부구매방법",
+     "impr": 12,
+     "cover": 0.11,
+     "missing": [
+      "전자제품할부구매방법"
+     ]
+    }
+   ],
+   "gap_share": 0.95
+  },
+  {
+   "post_id": 325,
+   "title": "통돌이 미니세탁기 삶음 기능, 3kg와 5kg 중 어느 쪽을 포기해야 하나",
+   "link": "https://pickdam.com/single-household-mini-washer-boil-wash/",
+   "impr": 128,
+   "clicks": 4,
+   "gap_impr": 45,
+   "gap_keywords": [
+    {
+     "keyword": "1인가구 세탁기",
+     "impr": 33,
+     "cover": 0.33,
+     "missing": [
+      "1인가구"
+     ]
+    },
+    {
+     "keyword": "1인 세탁기 추천",
+     "impr": 12,
+     "cover": 0.33,
+     "missing": [
+      "1인",
+      "추천"
+     ]
+    }
+   ],
+   "gap_share": 0.35
+  },
+  {
+   "post_id": 211,
+   "title": "비데 설치 비용 아끼는 자가 설치, 분기밸브부터 확인하세요",
+   "link": "https://pickdam.com/bidet-self-installation-check-valve/",
+   "impr": 312,
+   "clicks": 8,
+   "gap_impr": 41,
+   "gap_keywords": [
+    {
+     "keyword": "비데설치기사부르는법",
+     "impr": 34,
+     "cover": 0.33,
+     "missing": [
+      "비데설치기사부르는법"
+     ]
+    },
+    {
+     "keyword": "비데설치기사",
+     "impr": 7,
+     "cover": 0.6,
+     "missing": [
+      "비데설치기사"
+     ]
+    }
+   ],
+   "gap_share": 0.13
+  },
+  {
+   "post_id": 332,
+   "title": "콘센트형 현관 센서등 vs 건전지형, 월 500원 전기료와 3개월 교체 중 어느 쪽",
+   "link": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
+   "impr": 105,
+   "clicks": 9,
+   "gap_impr": 5,
+   "gap_keywords": [
+    {
+     "keyword": "현관문에부착하는2m감지센서등",
+     "impr": 5,
+     "cover": 0.21,
+     "missing": [
+      "현관문에부착하는2m감지센서등"
+     ]
+    }
+   ],
+   "gap_share": 0.05
+  },
+  {
+   "post_id": 455,
+   "title": "셀프 싱크대 문 교체, 35mm 컵홀 경첩 한 개당 15분이면 끝나는 순서",
+   "link": "https://pickdam.com/sink-door-hinge-replace-cost/",
+   "impr": 41,
+   "clicks": 1,
+   "gap_impr": 0,
+   "gap_keywords": [],
+   "gap_share": 0.0
+  },
+  {
+   "post_id": 348,
+   "title": "오일 스프레이, 유리 500ml vs 플라스틱 200ml, 주방 환경과 보관 온도 25도를 고려해야 하는 조건",
+   "link": "https://pickdam.com/sprayer-glass-plastic-kitchen/",
+   "impr": 2,
+   "clicks": 1,
+   "gap_impr": 0,
+   "gap_keywords": [],
+   "gap_share": 0.0
+  }
+ ],
+ "keywords": [
+  {
+   "keyword": "비데설치비용",
+   "impr": 189,
+   "clicks": 3,
+   "post_id": 211,
+   "matched": "지정",
+   "title": "비데 설치 비용 아끼는 자가 설치, 분기밸브부터 확인하세요",
+   "link": "https://pickdam.com/bidet-self-installation-check-valve/",
+   "cover": 1.0,
+   "verdict": "제목에 있음",
+   "missing": []
+  },
+  {
+   "keyword": "비데설치기사부르는법",
+   "impr": 34,
+   "clicks": 2,
+   "post_id": 211,
+   "matched": "지정",
+   "title": "비데 설치 비용 아끼는 자가 설치, 분기밸브부터 확인하세요",
+   "link": "https://pickdam.com/bidet-self-installation-check-valve/",
+   "cover": 0.33,
+   "verdict": "제목에 없음",
+   "missing": [
+    "비데설치기사부르는법"
+   ]
+  },
+  {
+   "keyword": "가전 장기할부",
+   "impr": 2,
+   "clicks": 2,
+   "post_id": 63,
+   "matched": "지정",
+   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "cover": 0.8,
+   "verdict": "제목에 있음",
+   "missing": [
+    "장기할부"
+   ]
+  },
+  {
+   "keyword": "현관 배터리센서등",
+   "impr": 2,
+   "clicks": 2,
+   "post_id": 332,
+   "matched": "지정",
+   "title": "콘센트형 현관 센서등 vs 건전지형, 월 500원 전기료와 3개월 교체 중 어느 쪽",
+   "link": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
+   "cover": 0.43,
+   "verdict": "일부만",
+   "missing": [
+    "배터리센서등"
+   ]
+  },
+  {
+   "keyword": "콘센트형 센서",
+   "impr": 2,
+   "clicks": 2,
+   "post_id": 332,
+   "matched": "지정",
+   "title": "콘센트형 현관 센서등 vs 건전지형, 월 500원 전기료와 3개월 교체 중 어느 쪽",
+   "link": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
+   "cover": 0.8,
+   "verdict": "제목에 있음",
+   "missing": []
+  },
+  {
+   "keyword": "가전구독 렌탈이모 1위 최저가격",
+   "impr": 159,
+   "clicks": 1,
+   "post_id": 63,
+   "matched": "지정",
+   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "cover": 0.08,
+   "verdict": "제목에 없음",
+   "missing": [
+    "가전구독",
+    "렌탈이모",
+    "1위",
+    "최저가격"
+   ]
+  },
+  {
+   "keyword": "콘센트형 센서등",
+   "impr": 83,
+   "clicks": 1,
+   "post_id": 332,
+   "matched": "지정",
+   "title": "콘센트형 현관 센서등 vs 건전지형, 월 500원 전기료와 3개월 교체 중 어느 쪽",
+   "link": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
+   "cover": 0.83,
+   "verdict": "제목에 있음",
+   "missing": []
+  },
+  {
+   "keyword": "통돌이 삶음 기능",
+   "impr": 81,
+   "clicks": 1,
+   "post_id": 325,
+   "matched": "지정",
+   "title": "통돌이 미니세탁기 삶음 기능, 3kg와 5kg 중 어느 쪽을 포기해야 하나",
+   "link": "https://pickdam.com/single-household-mini-washer-boil-wash/",
+   "cover": 0.83,
+   "verdict": "제목에 있음",
+   "missing": []
+  },
+  {
+   "keyword": "비데 설치 비용",
+   "impr": 78,
+   "clicks": 1,
+   "post_id": 211,
+   "matched": "지정",
+   "title": "비데 설치 비용 아끼는 자가 설치, 분기밸브부터 확인하세요",
+   "link": "https://pickdam.com/bidet-self-installation-check-valve/",
+   "cover": 1.0,
+   "verdict": "제목에 있음",
+   "missing": []
+  },
+  {
+   "keyword": "가전 할부 최대",
+   "impr": 63,
+   "clicks": 1,
+   "post_id": 63,
+   "matched": "지정",
+   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "cover": 0.4,
+   "verdict": "일부만",
+   "missing": [
+    "최대"
+   ]
+  },
+  {
+   "keyword": "셀프싱크대문교체",
+   "impr": 41,
+   "clicks": 1,
+   "post_id": 455,
+   "matched": "지정",
+   "title": "셀프 싱크대 문 교체, 35mm 컵홀 경첩 한 개당 15분이면 끝나는 순서",
+   "link": "https://pickdam.com/sink-door-hinge-replace-cost/",
+   "cover": 1.0,
+   "verdict": "제목에 있음",
+   "missing": []
+  },
+  {
+   "keyword": "1인가구 세탁기",
+   "impr": 33,
+   "clicks": 1,
+   "post_id": 325,
+   "matched": "지정",
+   "title": "통돌이 미니세탁기 삶음 기능, 3kg와 5kg 중 어느 쪽을 포기해야 하나",
+   "link": "https://pickdam.com/single-household-mini-washer-boil-wash/",
+   "cover": 0.33,
+   "verdict": "제목에 없음",
+   "missing": [
+    "1인가구"
+   ]
+  },
+  {
+   "keyword": "가전 렌트 할부 비교",
+   "impr": 22,
+   "clicks": 1,
+   "post_id": 63,
+   "matched": "지정",
+   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "cover": 0.29,
+   "verdict": "제목에 없음",
+   "missing": [
+    "렌트",
+    "비교"
+   ]
+  },
+  {
+   "keyword": "전자기기 구독 할부 차이",
+   "impr": 18,
+   "clicks": 1,
+   "post_id": 63,
+   "matched": "지정",
+   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "cover": 0.11,
+   "verdict": "제목에 없음",
+   "missing": [
+    "전자기기",
+    "구독",
+    "차이"
+   ]
+  },
+  {
+   "keyword": "전자제품할부구매방법",
+   "impr": 12,
+   "clicks": 1,
+   "post_id": 63,
+   "matched": "지정",
+   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "cover": 0.11,
+   "verdict": "제목에 없음",
+   "missing": [
+    "전자제품할부구매방법"
+   ]
+  },
+  {
+   "keyword": "1인 세탁기 추천",
+   "impr": 12,
+   "clicks": 1,
+   "post_id": 325,
+   "matched": "지정",
+   "title": "통돌이 미니세탁기 삶음 기능, 3kg와 5kg 중 어느 쪽을 포기해야 하나",
+   "link": "https://pickdam.com/single-household-mini-washer-boil-wash/",
+   "cover": 0.33,
+   "verdict": "제목에 없음",
+   "missing": [
+    "1인",
+    "추천"
+   ]
+  },
+  {
+   "keyword": "센서등 콘센트형",
+   "impr": 8,
+   "clicks": 1,
+   "post_id": 332,
+   "matched": "지정",
+   "title": "콘센트형 현관 센서등 vs 건전지형, 월 500원 전기료와 3개월 교체 중 어느 쪽",
+   "link": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
+   "cover": 0.83,
+   "verdict": "제목에 있음",
+   "missing": []
+  },
+  {
+   "keyword": "비데설치기사",
+   "impr": 7,
+   "clicks": 1,
+   "post_id": 211,
+   "matched": "지정",
+   "title": "비데 설치 비용 아끼는 자가 설치, 분기밸브부터 확인하세요",
+   "link": "https://pickdam.com/bidet-self-installation-check-valve/",
+   "cover": 0.6,
+   "verdict": "일부만",
+   "missing": [
+    "비데설치기사"
+   ]
+  },
+  {
+   "keyword": "현관문에부착하는2m감지센서등",
+   "impr": 5,
+   "clicks": 1,
+   "post_id": 332,
+   "matched": "지정",
+   "title": "콘센트형 현관 센서등 vs 건전지형, 월 500원 전기료와 3개월 교체 중 어느 쪽",
+   "link": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
+   "cover": 0.21,
+   "verdict": "제목에 없음",
+   "missing": [
+    "현관문에부착하는2m감지센서등"
+   ]
+  },
+  {
+   "keyword": "무전원 비데 방문설치비용",
+   "impr": 4,
+   "clicks": 1,
+   "post_id": 211,
+   "matched": "지정",
+   "title": "비데 설치 비용 아끼는 자가 설치, 분기밸브부터 확인하세요",
+   "link": "https://pickdam.com/bidet-self-installation-check-valve/",
+   "cover": 0.4,
+   "verdict": "일부만",
+   "missing": [
+    "무전원",
+    "방문설치비용"
+   ]
+  },
+  {
+   "keyword": "가전 24개월 무이자",
+   "impr": 3,
+   "clicks": 1,
+   "post_id": 63,
+   "matched": "지정",
+   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "cover": 0.75,
+   "verdict": "일부만",
+   "missing": []
+  },
+  {
+   "keyword": "200만원 24개월 할부",
+   "impr": 3,
+   "clicks": 1,
+   "post_id": 63,
+   "matched": "지정",
+   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "cover": 0.8,
+   "verdict": "제목에 있음",
+   "missing": []
+  },
+  {
+   "keyword": "현관 센서 종류",
+   "impr": 3,
+   "clicks": 1,
+   "post_id": 332,
+   "matched": "지정",
+   "title": "콘센트형 현관 센서등 vs 건전지형, 월 500원 전기료와 3개월 교체 중 어느 쪽",
+   "link": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
+   "cover": 0.6,
+   "verdict": "일부만",
+   "missing": [
+    "종류"
+   ]
+  },
+  {
+   "keyword": "미니세탁기 3kg 빨래량",
+   "impr": 2,
+   "clicks": 1,
+   "post_id": 325,
+   "matched": "지정",
+   "title": "통돌이 미니세탁기 삶음 기능, 3kg와 5kg 중 어느 쪽을 포기해야 하나",
+   "link": "https://pickdam.com/single-household-mini-washer-boil-wash/",
+   "cover": 0.6,
+   "verdict": "일부만",
+   "missing": [
+    "빨래량"
+   ]
+  },
+  {
+   "keyword": "드럼세탁기 장기할부",
+   "impr": 2,
+   "clicks": 1,
+   "post_id": 63,
+   "matched": "지정",
+   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "cover": 0.25,
+   "verdict": "제목에 없음",
+   "missing": [
+    "드럼세탁기",
+    "장기할부"
+   ]
+  },
+  {
+   "keyword": "세탁기 24개월 할부",
+   "impr": 2,
+   "clicks": 1,
+   "post_id": 63,
+   "matched": "지정",
+   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "cover": 0.5,
+   "verdict": "일부만",
+   "missing": [
+    "세탁기"
+   ]
+  },
+  {
+   "keyword": "콘센트로 연결된 센서",
+   "impr": 2,
+   "clicks": 1,
+   "post_id": 332,
+   "matched": "지정",
+   "title": "콘센트형 현관 센서등 vs 건전지형, 월 500원 전기료와 3개월 교체 중 어느 쪽",
+   "link": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
+   "cover": 0.38,
+   "verdict": "제목에 없음",
+   "missing": [
+    "콘센트로",
+    "연결된"
+   ]
+  },
+  {
+   "keyword": "올리브유 스프레이 용기",
+   "impr": 2,
+   "clicks": 1,
+   "post_id": 348,
+   "matched": "지정",
+   "title": "오일 스프레이, 유리 500ml vs 플라스틱 200ml, 주방 환경과 보관 온도 25도를 고려해야 하는 조건",
+   "link": "https://pickdam.com/sprayer-glass-plastic-kitchen/",
+   "cover": 0.33,
+   "verdict": "제목에 없음",
+   "missing": [
+    "올리브유",
+    "용기"
+   ]
+  },
+  {
+   "keyword": "가전제품 할부구입 구독구입 차이",
+   "impr": 2,
+   "clicks": 1,
+   "post_id": 63,
+   "matched": "지정",
+   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
+   "cover": 0.17,
+   "verdict": "제목에 없음",
+   "missing": [
+    "가전제품",
+    "할부구입",
+    "구독구입",
+    "차이"
+   ]
+  }
+ ]
+}

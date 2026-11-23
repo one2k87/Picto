@@ -10,7 +10,8 @@
 키워드를 어디서 가져오나 (있는 것만 쓴다 — 다른 레포에 복사해도 그대로 돈다)
   1) data/naver_seed_keywords.json        서치어드바이저에서 유입이 확인된 말(사람이 갱신)
   2) dashboard/data/keyword_volume_audit.json  글마다 잡은 대표 키워드
-  3) 위 둘이 다 없으면 워드프레스 공개 REST 의 최근 글 제목에서 뽑는다
+  3) data/retitle_queue.txt                    제목 교체 대기열의 포커스 키워드
+  4) 위가 다 없으면 워드프레스 공개 REST 의 최근 글 제목 앞 세 낱말
 
 환경변수
   NAVER_HUB_KEY_ID / NAVER_HUB_KEY   필수(없으면 아무것도 쓰지 않고 끝낸다)
@@ -70,12 +71,22 @@ def gather(domain, limit):
     audit = _load(os.path.join("dashboard", "data", "keyword_volume_audit.json")) or {}
     for r in sorted(audit.get("rows") or [], key=lambda x: -(x.get("volume") or 0)):
         add(r.get("keyword"), source="글 대표 키워드", post_id=r.get("id"), volume=r.get("volume"))
+    # 제목 교체 대기열에 적힌 포커스 키워드('글ID=새 제목##포커스 키워드'). 그 파일을 쓰는 레포에서만 잡힌다.
+    try:
+        for line in open(os.path.join("data", "retitle_queue.txt"), encoding="utf-8"):
+            if "##" in line and "=" in line and not line.lstrip().startswith("#"):
+                pid, focus = line.split("=", 1)[0].strip(), line.rsplit("##", 1)[1].strip()
+                add(focus, source="포커스 키워드", post_id=int(pid) if pid.isdigit() else None)
+    except Exception:
+        pass
     if not rows and domain:
         try:
             j = requests.get(f"https://{domain}/wp-json/wp/v2/posts",
                              params={"per_page": 50, "_fields": "id,title"}, timeout=30).json()
             for p in j if isinstance(j, list) else []:
-                add((p.get("title") or {}).get("rendered"), source="글 제목", post_id=p.get("id"))
+                # 제목은 문장이라 그대로 넣으면 추이가 안 잡힌다. 쉼표 앞 구절의 첫 세 낱말만 쓴다.
+                t = nh.clean_keyword((p.get("title") or {}).get("rendered"))
+                add(" ".join(t.split()[:3]), source="글 제목", post_id=p.get("id"))
         except Exception as e:
             print(f"::warning::글 제목 조회 실패 {type(e).__name__}")
     return rows[:limit]

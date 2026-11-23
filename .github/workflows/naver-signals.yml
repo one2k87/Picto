@@ -1,4 +1,4 @@
-name: 네이버 신호 수집(추이·순위)
+name: 네이버 신호 수집(추이·제목 격차)
 
 # 읽기 전용. 키워드마다 데이터랩 검색 추이를 재서 에버그린/급상승/시즌형으로 가른다.
 # 발행·수정은 하지 않는다. 서치어드바이저 노출·클릭은 API 가 없어 여기서 못 잰다
@@ -6,6 +6,9 @@ name: 네이버 신호 수집(추이·순위)
 on:
   schedule:
     - cron: "17 21 * * 0"        # 매주 월요일 06:17 KST
+  push:
+    branches: [main]
+    paths: ["data/naver_seed_keywords.json"]   # 유입 검색어를 갱신해 올리면 바로 다시 잰다
   workflow_dispatch:
     inputs:
       rank_check:
@@ -37,11 +40,15 @@ jobs:
           SITE_DOMAIN: pickdam.com
           RANK_CHECK: ${{ github.event.inputs.rank_check || 'false' }}
         run: python scripts/naver_signals.py
+      - name: 제목 격차
+        env:
+          SITE_DOMAIN: pickdam.com
+        run: python scripts/naver_title_gap.py
       - name: 결과 커밋
         run: |
           git config user.name  "picto-bot"
           git config user.email "picto-bot@users.noreply.github.com"
-          git add dashboard/data/naver_signals.json data/naver_signals.md || true
+          git add dashboard/data/naver_signals.json data/naver_signals.md dashboard/data/naver_title_gap.json data/naver_title_gap.md 2>/dev/null || true
           git diff --cached --quiet || git commit -m "네이버 신호 수집 결과"
           git pull --rebase -q || true
           git push
