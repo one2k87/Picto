@@ -783,6 +783,31 @@
       "image": "https://img4a.coupangcdn.com/image/affiliate/banner/1ed89137ec52a7d4db1f80f20e3eb652@2x.jpg",
       "banner_link": "https://link.coupang.com/a/iT7HzW67jw",
       "image_at": "2026-11-23"
+    },
+    {
+      "key": "드럼세탁기",
+      "name": "드럼세탁기 19kg (방문설치)",
+      "search": "드럼세탁기",
+      "match": [
+        "드럼세탁기",
+        "드럼 세탁기",
+        "세탁기 할부",
+        "세탁기 렌탈"
+      ],
+      "coupang_url": "https://link.coupang.com/a/iT8jyQTK1I",
+      "price_band": "30만 이상",
+      "note": "방문설치 상품 — 세탁기는 로켓배송 표시가 없다(11/23 파트너스 화면). 검색어 '드럼세탁기' 쿠팡랭킹순 1위",
+      "updated": "2026-11-23",
+      "banner_alt": "삼성전자 그랑데 드럼 세탁기 19kg 방문설치, WF19T6000KW, 화이트",
+      "price": 797050,
+      "price_at": "2026-11-23",
+      "merchant": "coupang",
+      "channel": "pickdamblog",
+      "image": "https://image15.coupangcdn.com/image/affiliate/banner/930a272b391c1a3c927ff9112b696fb8@2x.jpg",
+      "banner_link": "https://link.coupang.com/a/iT8jSaD7Ia",
+      "origin_price": 839010,
+      "discount_rate": 5,
+      "image_at": "2026-11-23"
     }
   ],
   "_note_주의": "note는 상품 카드에 독자에게 그대로 보이는 문구다. 내부 메모는 절대 여기 쓰지 말고 _memo에 쓸 것(2026-09-08 사고).",
