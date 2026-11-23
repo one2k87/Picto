@@ -1,0 +1,44 @@
+[
+ {
+  "_why": "사용자 지시(2026-11-23): 각도조절 쌀통은 영상 속 그 상품이 쿠팡에 없고 링크도 없어 품목 자체를 내린다. #816 을 휴지통으로 보내기 전에, 그 글로 가는 '함께 보면 좋은 글' 줄을 먼저 뺀다(끊어진 내부 링크가 남지 않게).",
+  "post_id": 951,
+  "replace": [
+   {
+    "old": "<li><a href=\"https://pickdam.com/rice-dispenser-capacity-comparison/\">기울어진 쌀통 10kg와 20kg 용량 비교, 1인 가구와 4인 가족 주방 크기에 따른 회전형 계량 쌀통 선택 기준</a></li>\n",
+    "new": ""
+   },
+   {
+    "old": "<li><a href=\"https://pickdam.com/rice-dispenser-capacity-comparison/\">기울어진 쌀통 10kg와 20kg 용량 비교, 1인 가구와 4인 가족 주방 크기에 따른 회전형 계량 쌀통 선택 기준</a></li>",
+    "new": ""
+   }
+  ]
+ },
+ {
+  "_why": "사용자 지시(2026-11-23): 각도조절 쌀통은 영상 속 그 상품이 쿠팡에 없고 링크도 없어 품목 자체를 내린다. #816 을 휴지통으로 보내기 전에, 그 글로 가는 '함께 보면 좋은 글' 줄을 먼저 뺀다(끊어진 내부 링크가 남지 않게).",
+  "post_id": 901,
+  "replace": [
+   {
+    "old": "<li><a href=\"https://pickdam.com/rice-dispenser-capacity-comparison/\">기울어진 쌀통 10kg와 20kg 용량 비교, 1인 가구와 4인 가족 주방 크기에 따른 회전형 계량 쌀통 선택 기준</a></li>\n",
+    "new": ""
+   },
+   {
+    "old": "<li><a href=\"https://pickdam.com/rice-dispenser-capacity-comparison/\">기울어진 쌀통 10kg와 20kg 용량 비교, 1인 가구와 4인 가족 주방 크기에 따른 회전형 계량 쌀통 선택 기준</a></li>",
+    "new": ""
+   }
+  ]
+ },
+ {
+  "_why": "사용자 지시(2026-11-23): 각도조절 쌀통은 영상 속 그 상품이 쿠팡에 없고 링크도 없어 품목 자체를 내린다. #816 을 휴지통으로 보내기 전에, 그 글로 가는 '함께 보면 좋은 글' 줄을 먼저 뺀다(끊어진 내부 링크가 남지 않게).",
+  "post_id": 832,
+  "replace": [
+   {
+    "old": "<li><a href=\"https://pickdam.com/rice-dispenser-capacity-comparison/\">기울어진 쌀통 10kg와 20kg 용량 비교, 1인 가구와 4인 가족 주방 크기에 따른 회전형 계량 쌀통 선택 기준</a></li>\n",
+    "new": ""
+   },
+   {
+    "old": "<li><a href=\"https://pickdam.com/rice-dispenser-capacity-comparison/\">기울어진 쌀통 10kg와 20kg 용량 비교, 1인 가구와 4인 가족 주방 크기에 따른 회전형 계량 쌀통 선택 기준</a></li>",
+    "new": ""
+   }
+  ]
+ }
+]

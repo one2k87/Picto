@@ -829,15 +829,17 @@
     {
       "title": "기울어진 쌀통 10kg와 20kg 용량 비교, 1인 가구와 4인 가족 주방 크기에 따른 회전형 계량 쌀통 선택 기준",
       "slug": "rice-dispenser-capacity-comparison",
-      "url": "https://pickdam.com/rice-dispenser-capacity-comparison/",
-      "post_id": 816,
-      "status": "게시됨",
+      "url": "",
+      "post_id": null,
+      "status": "폐기",
       "kind": "long",
       "keyword": "기울어진 쌀통 10kg와 20kg 용량 비교, 1인 가구와 4인 가족 주방 크기에 따른 회전형 계량 쌀통 선택 기준",
       "category": "생활·주방",
       "intent": "revenue",
       "date": "2026-11-18",
-      "series_id": ""
+      "series_id": "",
+      "removed": "2026-11-23 사용자 지시 — 영상 속 상품이 쿠팡에 없음",
+      "removed_post_id": 816
     },
     {
       "title": "LP판 냉장고 자석 레트로 소품, 50g 무게를 버티지 못하고 떨어질 때 네오디움 자석으로 해결하는 조건",
