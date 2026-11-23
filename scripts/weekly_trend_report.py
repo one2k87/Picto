@@ -526,6 +526,26 @@ def main():
         print(f"::error::링크가 {art['_linked']}개뿐이다(하한 {MIN_PUBLISH_LINKS}) — "
               f"링크 없는 리포트는 수익이 0이라 발행하지 않는다")
         return 4
+    # 같은 주에 두 번 올리지 않는다(2026-11-23). 주소가 날짜로 정해져(weekly-trend-YYYYMMDD) 손으로 한 번
+    # 올린 다음 날 예약 실행이 돌면 **같은 내용이 다른 주소로 한 편 더** 올라간다.
+    # 확인 자체가 실패하면 올리지 않는다 — 중복이 더 나쁘다(11/22 에 중복 5편을 낸 것과 같은 원칙).
+    _base = (dict(cfg.get("wordpress") or {}).get("site_url") or "").rstrip("/")
+    if _base:
+        _slugs = [f"weekly-trend-{dt.date.today() - dt.timedelta(days=i):%Y%m%d}" for i in range(0, 5)]
+        try:
+            import requests as _rq
+            _r = _rq.get(f"{_base}/wp-json/wp/v2/posts",
+                         params=[("slug[]", x) for x in _slugs] + [("_fields", "id,link,slug")], timeout=30)
+            if _r.status_code != 200:
+                print(f"::warning::최근 리포트 확인 실패 {_r.status_code} — 중복을 피하려고 발행을 건너뜁니다")
+                return 0
+            _hit = _r.json() if isinstance(_r.json(), list) else []
+            if _hit:
+                print(f"[skip] 이번 주 리포트가 이미 있다: #{_hit[0].get('id')} {_hit[0].get('link')} — 다시 올리지 않습니다")
+                return 0
+        except Exception as e:
+            print(f"::warning::최근 리포트 확인 예외({type(e).__name__}) — 중복을 피하려고 발행을 건너뜁니다")
+            return 0
     import publisher
     wp = dict(cfg.get("wordpress") or {})
     if not wp.get("enabled"):
