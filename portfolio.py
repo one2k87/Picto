@@ -148,16 +148,20 @@ def expand(hint_list, cfg, titles):
             kw, k = (r.get("keyword") or "").strip(), norm(r.get("keyword"))
             if not k or k in seen or not (lo <= int(r.get("volume") or 0) <= hi) or r.get("comp") in block:
                 continue
-            if not all(t in k for t in toks) and cover(h, kw) < 0.6:
-                continue                        # 키워드도구는 느슨한 연관어도 준다(미니세탁기 → 세탁기건조기세트). 힌트의 낱말을 다 품은 것만
+            hit = sum(1 for t in toks if t in k)
+            # 키워드도구는 느슨한 연관어도 준다(미니세탁기 → 세탁기건조기세트).
+            # 한 낱말 힌트는 그 낱말을 통째로 품어야 하고, 두 낱말 이상이면 하나는 품어야 한다(가전 할부 → 냉장고 할부).
+            if (len(toks) == 1 and not hit and cover(h, kw) < 0.6) or (len(toks) >= 2 and not hit):
+                continue
             if covered(kw, titles):
                 continue
             seen.add(k)
-            out.append({"keyword": kw, "volume": int(r.get("volume") or 0), "comp": r.get("comp") or "", "hint": h})
+            out.append({"keyword": kw, "volume": int(r.get("volume") or 0), "comp": r.get("comp") or "", "hint": h,
+                        "_hit": hit})
     # 힌트를 돌아가며 하나씩 뽑는다. 검색량순으로만 자르면 큰 주제군 하나(세탁기)가 씨앗을 다 차지하고
     # 정작 유입이 가장 넓은 주제군(가전 할부)이 밀려난다 — 2026-11-23 첫 미리보기에서 실제로 그랬다.
     by_hint = {}
-    for o in sorted(out, key=lambda x: -x["volume"]):
+    for o in sorted(out, key=lambda x: (-x.pop("_hit", 0), -x["volume"])):   # 힌트 낱말을 더 많이 품은 것부터
         by_hint.setdefault(o["hint"], []).append(o)
     mixed, i = [], 0
     while any(by_hint.values()):
