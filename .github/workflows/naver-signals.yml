@@ -1,0 +1,47 @@
+name: 네이버 신호 수집(추이·순위)
+
+# 읽기 전용. 키워드마다 데이터랩 검색 추이를 재서 에버그린/급상승/시즌형으로 가른다.
+# 발행·수정은 하지 않는다. 서치어드바이저 노출·클릭은 API 가 없어 여기서 못 잰다
+# (data/naver_seed_keywords.json 을 사람이 갱신하면 그 말들에 추이·순위를 붙인다).
+on:
+  schedule:
+    - cron: "17 21 * * 0"        # 매주 월요일 06:17 KST
+  workflow_dispatch:
+    inputs:
+      rank_check:
+        description: "true면 웹문서 검색에서 내 사이트 순위도 본다(약관 확인 뒤 켤 것)"
+        default: "false"
+        required: false
+
+# 결과 파일을 레포에 남긴다 — 없으면 push 가 거부되고 조용히 사라진다(11/23 실측).
+permissions:
+  contents: write
+
+jobs:
+  signals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install requests
+      - name: 신호 수집
+        env:
+          NAVER_HUB_KEY_ID: ${{ secrets.NAVER_HUB_KEY_ID }}
+          NAVER_HUB_KEY: ${{ secrets.NAVER_HUB_KEY }}
+          BLOG_URL: ${{ secrets.BLOG_URL }}
+          WP_SITE: ${{ secrets.WP_SITE }}
+          SITE_DOMAIN: pickdam.com
+          RANK_CHECK: ${{ github.event.inputs.rank_check || 'false' }}
+        run: python scripts/naver_signals.py
+      - name: 결과 커밋
+        run: |
+          git config user.name  "picto-bot"
+          git config user.email "picto-bot@users.noreply.github.com"
+          git add dashboard/data/naver_signals.json data/naver_signals.md || true
+          git diff --cached --quiet || git commit -m "네이버 신호 수집 결과"
+          git pull --rebase -q || true
+          git push
