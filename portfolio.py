@@ -8,7 +8,7 @@
   (#448·#663 욕실 온풍기) 새 키워드가 발굴되지 않는다. 그래서 **비율로 묶는다.**
 
     A 강화      40%  이미 유입이 확인된 말의 연관 검색어(네이버 키워드도구)
-    B 에버그린  30%  연관어 중 검색량 1,000↑ · 경쟁 낮음 · 1년 내내 고른 것(데이터랩 추이)
+    B 에버그린  30%  연관어 중 검색량 1,000↑ · 1년 내내 고른 것(데이터랩 추이)
     C 핫이슈    15%  지금 뜨는 말(급상승·시즌진입)의 연관 검색어
     D 실험      15%  아직 다루지 않은 주제군 — 새 광맥을 찾는 몫. **10% 아래로 내리지 않는다.**
 
@@ -148,13 +148,24 @@ def expand(hint_list, cfg, titles):
             kw, k = (r.get("keyword") or "").strip(), norm(r.get("keyword"))
             if not k or k in seen or not (lo <= int(r.get("volume") or 0) <= hi) or r.get("comp") in block:
                 continue
-            if not any(t in k for t in toks) and cover(h, kw) < 0.5:
-                continue                        # 키워드도구는 느슨한 연관어도 준다(비데 → 정수기렌탈). 낱말을 나눈 것만
+            if not all(t in k for t in toks) and cover(h, kw) < 0.6:
+                continue                        # 키워드도구는 느슨한 연관어도 준다(미니세탁기 → 세탁기건조기세트). 힌트의 낱말을 다 품은 것만
             if covered(kw, titles):
                 continue
             seen.add(k)
             out.append({"keyword": kw, "volume": int(r.get("volume") or 0), "comp": r.get("comp") or "", "hint": h})
-    return sorted(out, key=lambda x: -x["volume"])
+    # 힌트를 돌아가며 하나씩 뽑는다. 검색량순으로만 자르면 큰 주제군 하나(세탁기)가 씨앗을 다 차지하고
+    # 정작 유입이 가장 넓은 주제군(가전 할부)이 밀려난다 — 2026-11-23 첫 미리보기에서 실제로 그랬다.
+    by_hint = {}
+    for o in sorted(out, key=lambda x: -x["volume"]):
+        by_hint.setdefault(o["hint"], []).append(o)
+    mixed, i = [], 0
+    while any(by_hint.values()):
+        for h in hint_list:
+            if by_hint.get(h):
+                mixed.append(by_hint[h].pop(0))
+        i += 1
+    return mixed
 
 
 def seeds_for(lane, cfg, titles, log=print):
@@ -173,8 +184,10 @@ def seeds_for(lane, cfg, titles, log=print):
     pool = expand(hs, cfg, titles)
     if lane == "A":
         return pool[:6]
-    # B: 검색량 1,000 이상 · 경쟁 낮음 · 추이가 고른 것
-    cand = [p for p in pool if p["volume"] >= 1000 and p["comp"] == "낮음"]
+    # B: 검색량 1,000 이상 · 추이가 고른 것
+    # 경쟁 '낮음'까지 요구하면 씨앗이 하나도 안 남는다(첫 미리보기 실측 — 살 물건이 있는 말은 거의 '중간').
+    # '높음'은 expand 에서 이미 걸렀으니, 여기서는 검색량과 추이만 본다.
+    cand = [p for p in pool if p["volume"] >= 1000]
     try:
         import naver_hub as nh
         if nh.available():
