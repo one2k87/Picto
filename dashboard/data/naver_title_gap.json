@@ -1,11 +1,11 @@
 {
- "at": "2026-11-23 12:00",
+ "at": "2026-11-23 12:34",
  "site": "pickdam.com",
  "seed_collected": "2026-11-23",
  "posts": [
   {
    "post_id": 63,
-   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "title": "가전 장기 무이자 할부 24개월, 200만원 조건과 구독·렌탈 총액 비교",
    "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
    "impr": 288,
    "clicks": 12,
@@ -14,7 +14,7 @@
     {
      "keyword": "가전구독 렌탈이모 1위 최저가격",
      "impr": 159,
-     "cover": 0.08,
+     "cover": 0.31,
      "missing": [
       "가전구독",
       "렌탈이모",
@@ -33,19 +33,17 @@
     {
      "keyword": "가전 렌트 할부 비교",
      "impr": 22,
-     "cover": 0.29,
+     "cover": 0.43,
      "missing": [
-      "렌트",
-      "비교"
+      "렌트"
      ]
     },
     {
      "keyword": "전자기기 구독 할부 차이",
      "impr": 18,
-     "cover": 0.11,
+     "cover": 0.22,
      "missing": [
       "전자기기",
-      "구독",
       "차이"
      ]
     },
@@ -188,7 +186,7 @@
    "clicks": 2,
    "post_id": 63,
    "matched": "지정",
-   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "title": "가전 장기 무이자 할부 24개월, 200만원 조건과 구독·렌탈 총액 비교",
    "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
    "cover": 0.8,
    "verdict": "제목에 있음",
@@ -228,9 +226,9 @@
    "clicks": 1,
    "post_id": 63,
    "matched": "지정",
-   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "title": "가전 장기 무이자 할부 24개월, 200만원 조건과 구독·렌탈 총액 비교",
    "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
-   "cover": 0.08,
+   "cover": 0.31,
    "verdict": "제목에 없음",
    "missing": [
     "가전구독",
@@ -281,7 +279,7 @@
    "clicks": 1,
    "post_id": 63,
    "matched": "지정",
-   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "title": "가전 장기 무이자 할부 24개월, 200만원 조건과 구독·렌탈 총액 비교",
    "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
    "cover": 0.4,
    "verdict": "일부만",
@@ -321,13 +319,12 @@
    "clicks": 1,
    "post_id": 63,
    "matched": "지정",
-   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "title": "가전 장기 무이자 할부 24개월, 200만원 조건과 구독·렌탈 총액 비교",
    "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
-   "cover": 0.29,
-   "verdict": "제목에 없음",
+   "cover": 0.43,
+   "verdict": "일부만",
    "missing": [
-    "렌트",
-    "비교"
+    "렌트"
    ]
   },
   {
@@ -336,13 +333,12 @@
    "clicks": 1,
    "post_id": 63,
    "matched": "지정",
-   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "title": "가전 장기 무이자 할부 24개월, 200만원 조건과 구독·렌탈 총액 비교",
    "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
-   "cover": 0.11,
+   "cover": 0.22,
    "verdict": "제목에 없음",
    "missing": [
     "전자기기",
-    "구독",
     "차이"
    ]
   },
@@ -352,7 +348,7 @@
    "clicks": 1,
    "post_id": 63,
    "matched": "지정",
-   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "title": "가전 장기 무이자 할부 24개월, 200만원 조건과 구독·렌탈 총액 비교",
    "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
    "cover": 0.11,
    "verdict": "제목에 없음",
@@ -436,7 +432,7 @@
    "clicks": 1,
    "post_id": 63,
    "matched": "지정",
-   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "title": "가전 장기 무이자 할부 24개월, 200만원 조건과 구독·렌탈 총액 비교",
    "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
    "cover": 0.75,
    "verdict": "일부만",
@@ -448,7 +444,7 @@
    "clicks": 1,
    "post_id": 63,
    "matched": "지정",
-   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "title": "가전 장기 무이자 할부 24개월, 200만원 조건과 구독·렌탈 총액 비교",
    "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
    "cover": 0.8,
    "verdict": "제목에 있음",
@@ -488,7 +484,7 @@
    "clicks": 1,
    "post_id": 63,
    "matched": "지정",
-   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "title": "가전 장기 무이자 할부 24개월, 200만원 조건과 구독·렌탈 총액 비교",
    "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
    "cover": 0.25,
    "verdict": "제목에 없음",
@@ -503,7 +499,7 @@
    "clicks": 1,
    "post_id": 63,
    "matched": "지정",
-   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "title": "가전 장기 무이자 할부 24개월, 200만원 조건과 구독·렌탈 총액 비교",
    "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
    "cover": 0.5,
    "verdict": "일부만",
@@ -547,9 +543,9 @@
    "clicks": 1,
    "post_id": 63,
    "matched": "지정",
-   "title": "새 가전 장기 무이자 할부, 24개월 조건 충족하려면 최소 200만원 이상 결제해야 하는 이유",
+   "title": "가전 장기 무이자 할부 24개월, 200만원 조건과 구독·렌탈 총액 비교",
    "link": "https://pickdam.com/new-appliance-installment-plan-comparison/",
-   "cover": 0.17,
+   "cover": 0.25,
    "verdict": "제목에 없음",
    "missing": [
     "가전제품",
