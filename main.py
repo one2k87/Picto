@@ -113,6 +113,17 @@ def _split_dup_topics(cands, ref):
     return kept, hits
 
 
+def _portfolio_text(cfg, lane, depth):
+    """키워드 배분 블록(portfolio.py). 저경쟁 갈래의 첫 요청에만 넣는다 — 재요청은 중복 회피가 목적이라 뺀다."""
+    if lane != "long" or depth or not cfg.get("_portfolio"):
+        return ""
+    try:
+        import portfolio as _pf
+        return _pf.prompt_block(cfg["_portfolio"])
+    except Exception:
+        return ""
+
+
 def collect_lane(cfg, cat, lane, n_slots, exclude, dup_ref=None, _depth=0):
     """
     한 카테고리(cat) 안에서 한 갈래(lane)의 주제를 n_slots개 확보한다.
@@ -125,7 +136,8 @@ def collect_lane(cfg, cat, lane, n_slots, exclude, dup_ref=None, _depth=0):
     raw = chat(topics.build_topic_prompt(cat["name"], cat["desc"], lane, pool, exclude=exclude,
                                          winners=cfg.get("_insight_hints"),
                                          intent=cfg.get("_today_intent"),
-                                         must_products=cfg.get("_pending_products")),
+                                         must_products=cfg.get("_pending_products"),
+                                         portfolio_text=_portfolio_text(cfg, lane, _depth)),
                cfg["llm"], max_tokens=900, temperature=0.9)
     cand = topics.parse_topics(raw, pool)
     # 금지·위험 주제 필터(성인/도박/과장의료/저작권/전쟁 등 자동 제외)
@@ -177,7 +189,18 @@ def collect_lane(cfg, cat, lane, n_slots, exclude, dup_ref=None, _depth=0):
     # 키가 없거나 조회가 실패하면 아무것도 거르지 않는다 — 발행이 멈추면 안 되니까.
     try:
         import demand as _demand
-        cand, _vol, _cut = _demand.filter_by_demand(cand, cfg)
+        # 키워드 배분의 씨앗을 품은 후보는 게이트를 면제한다. 씨앗 자체가 키워드도구에서 검색량을
+        # 확인한 말(또는 운영자가 지정한 글감)인데, 주제는 문장이라 그대로 조회하면 '월 0회'로 떨어진다.
+        _seeded = []
+        if lane == "long" and cfg.get("_portfolio"):
+            try:
+                import portfolio as _pf
+                _seeded = [c for c in cand if _pf.match_seed(c.get("keyword"), cfg["_portfolio"])]
+            except Exception:
+                _seeded = []
+        _rest = [c for c in cand if not any(c is x for x in _seeded)]
+        _rest, _vol, _cut = _demand.filter_by_demand(_rest, cfg) if _rest else ([], {}, 0)
+        cand = _seeded + _rest
         if _vol:
             _top = sorted(_vol.items(), key=lambda kv: -kv[1])[:3]
             print(f"  · 검색 수요 확인: {len(_vol)}개 조회 · {_cut}개 제외 "
@@ -239,6 +262,13 @@ def collect_lane(cfg, cat, lane, n_slots, exclude, dup_ref=None, _depth=0):
         ordered = picked
 
     sel = ordered[:n_slots]
+    # 키워드 배분: 씨앗을 품은 후보가 선별에서 밀렸으면 첫 자리에 되돌린다(실패해도 기존 결과 그대로).
+    if lane == "long" and cfg.get("_portfolio"):
+        try:
+            import portfolio as _pf
+            sel = _pf.prefer(sel, ordered, cfg["_portfolio"], n_slots)
+        except Exception as e:
+            print(f"  · [배분] 선별 보정 건너뜀({str(e)[:60]})")
     # 상위노출 강화 대상 표시: 검색량 몫으로 뽑혔거나 경쟁도 중간/높음이면 강화 글로 작성
     for kw in sel:
         comp = str(kw.get("competition", ""))
@@ -531,6 +561,12 @@ def _run_category(cfg, cat, hist, auto_publish, img_budget=None):
         print(f"[{label}] 슬롯 {need[lane]}개용 주제 확보…")
         got = collect_lane(cfg, cat, lane, need[lane], exclude, dup_ref=dup_ref)
         topic_q[lane] = got
+        if lane == "long" and cfg.get("_portfolio"):
+            try:
+                import portfolio as _pf
+                _pf.record(got, cfg["_portfolio"], category=name)
+            except Exception as e:
+                print(f"  · [배분] 기록 건너뜀({str(e)[:60]})")
         print(f"  · 주제:", [t["keyword"] for t in got])
         exclude += [t["keyword"] for t in got]
 
@@ -1179,6 +1215,14 @@ def run():
         raise SystemExit(1)
 
     hist = load_history()
+    # 키워드 배분(2026-11-23): 이번 회차를 강화·에버그린·핫이슈·실험 중 어느 몫으로 쓸지 정하고 씨앗을 뽑는다.
+    # 실패하면 None — 그러면 아래 흐름이 예전 그대로 돈다.
+    try:
+        import portfolio as _pf
+        cfg["_portfolio"] = _pf.plan(cfg, [a.get("title", "") for a in (hist.get("articles") or [])])
+    except Exception as e:
+        cfg["_portfolio"] = None
+        print(f"[배분] 계획 건너뜀({str(e)[:80]})")
     # 링크는 있는데 글이 없는 제품을 주제 생성에 자동 주입한다(사람이 매번 지시하지 않게).
     try:
         cfg["_pending_products"] = products.pending(hist.get("articles"))

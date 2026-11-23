@@ -58,7 +58,7 @@ INTENT_GUIDE = {
 
 
 def build_topic_prompt(category, category_desc, kind, count, exclude=None, today=None,
-                       winners=None, intent=None, must_products=None):
+                       winners=None, intent=None, must_products=None, portfolio_text=""):
     exclude = exclude or []
     ex_text = "\n".join(f"- {t}" for t in exclude[:60]) or "(없음)"
     winners = winners or []
@@ -86,7 +86,7 @@ def build_topic_prompt(category, category_desc, kind, count, exclude=None, today
     common = f"""당신은 '{category}' 카테고리에 집중하는 **쿠팡파트너스 커머스 블로그**의 주제 기획자입니다.
 이 블로그는 '{category}' 미니사이트로 운영되며, 아래 세부 분야를 다룹니다:
 {category_desc}
-{must_text}
+{must_text}{portfolio_text or ""}
 [독자 = 일반 개인(가장 중요)]
 - 이 블로그의 독자는 '평범한 일반인'이다. 회사 실무자·투자 전문가·기업 담당자가 아니다.
 - 그래서 **일반인이 실제로 검색하고 클릭할 '내 생활·내 돈·내 문제'와 직결된 주제**만 뽑는다.

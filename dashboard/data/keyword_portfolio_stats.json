@@ -1,0 +1,63 @@
+{
+ "updated": "2026-11-23",
+ "shares": {
+  "A": 40,
+  "B": 30,
+  "C": 15,
+  "D": 15
+ },
+ "lanes": {
+  "A": {
+   "posts": 0,
+   "mature": 0,
+   "impr": 0,
+   "clicks": 0,
+   "per_post": null
+  },
+  "B": {
+   "posts": 0,
+   "mature": 0,
+   "impr": 0,
+   "clicks": 0,
+   "per_post": null
+  },
+  "C": {
+   "posts": 0,
+   "mature": 0,
+   "impr": 0,
+   "clicks": 0,
+   "per_post": null
+  },
+  "D": {
+   "posts": 0,
+   "mature": 0,
+   "impr": 0,
+   "clicks": 0,
+   "per_post": null
+  },
+  "X": {
+   "posts": 0,
+   "mature": 0,
+   "impr": 0,
+   "clicks": 0,
+   "per_post": null
+  },
+  "P": {
+   "posts": 0,
+   "mature": 0,
+   "impr": 0,
+   "clicks": 0,
+   "per_post": null
+  }
+ },
+ "promoted": [],
+ "retired": [],
+ "snapshots": [],
+ "notes": [],
+ "next_order": [
+  "A",
+  "B",
+  "C",
+  "D"
+ ]
+}
