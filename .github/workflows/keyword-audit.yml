@@ -5,6 +5,11 @@ name: 키워드 검색량 감사
 on:
   workflow_dispatch:
 
+# 결과 파일을 레포에 남긴다 — 이 선언이 없으면 push 가 거부되고
+# `git push || true` 때문에 성공처럼 보인 채 결과가 사라진다(11/23 실측).
+permissions:
+  contents: write
+
 jobs:
   audit:
     runs-on: ubuntu-latest
