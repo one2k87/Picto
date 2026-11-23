@@ -1,0 +1,36 @@
+name: 키워드 검색량 감사
+
+# 읽기 전용. 글이 잡고 있는 키워드의 실제 검색량을 재고 순위와 맞춰 본다.
+# 발행·수정은 하지 않는다.
+on:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install requests
+      - name: 설정 생성
+        env:
+          LLM_PROVIDER: ${{ secrets.LLM_PROVIDER }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          METRICS_PROVIDER: ${{ secrets.METRICS_PROVIDER }}
+          NAVER_API_KEY: ${{ secrets.NAVER_AD_API_KEY }}
+          NAVER_SECRET_KEY: ${{ secrets.NAVER_AD_SECRET }}
+          NAVER_CUSTOMER_ID: ${{ secrets.NAVER_AD_CUSTOMER_ID }}
+          BLOG_URL: ${{ secrets.BLOG_URL }}
+          WP_SITE: ${{ secrets.WP_SITE }}
+        run: python build_config.py
+      - name: 감사 실행
+        run: python scripts/keyword_volume_audit.py
+      - name: 결과 커밋
+        run: |
+          git config user.name  "picto-bot"
+          git config user.email "picto-bot@users.noreply.github.com"
+          git add data/keyword_volume_audit.md dashboard/data/keyword_volume_audit.json || true
+          git diff --cached --quiet || git commit -m "키워드 검색량 감사 결과"
+          git push || true
