@@ -1,7 +1,9 @@
 {
- "at": "2026-11-24 09:52",
+ "at": "2026-11-24 09:57",
  "site": "pickdam.com",
  "rank_check": true,
+ "rank_fails": 5,
+ "rank_err": "HTTP 401 401 요청한 API는 이 Application에서 활성화되어 있지 않습니다. ",
  "count": {
   "시즌형": 11,
   "자료부족": 56,
