@@ -848,18 +848,21 @@ def _convert_markers(html_body, insert_ads, resolver=None, fallback_desc=""):
                  ("photo", f"{fallback_desc} — 집에서 실제로 쓰는 생활 장면")]
         # 소제목 뒤에 하나씩 흩어 넣는다(같은 자리에 몰리면 그것대로 단조롭다)
         _spots = [m.end() for m in re.finditer(r"</h2>", html_body)]
-        _added = 0
+        _ins = []                          # (넣을 자리, 순서, 그림 html)
         for _i in range(counter[0], IMG_PER_POST):
             _style, _desc = _fill[_i % len(_fill)]
             _html = resolver(f"{_style}|{_desc}", _i + 1)
             if not _html:
                 continue
             if _spots:
-                _at = _spots[min(_added, len(_spots) - 1)] + len(_html) * _added
-                html_body = html_body[:_at] + _html + html_body[_at:]
+                _ins.append((_spots[min(len(_ins), len(_spots) - 1)], len(_ins), _html))
             else:
                 html_body += _html
-            _added += 1
+        # 뒤 자리부터 넣는다 — 앞에서부터 넣으면 뒤 자리의 위치가 밀린다. 예전엔 밀린 만큼을
+        # "지금 그림 길이 × 이미 넣은 장수"로 어림했는데, 그림마다 설명 길이가 달라 낱말 한가운데에
+        # 꽂혔다(2026-11-23 #951 '계약을 서두[그림]르면').
+        for _at, _n, _html in sorted(_ins, key=lambda x: (-x[0], -x[1])):
+            html_body = html_body[:_at] + _html + html_body[_at:]
     if insert_ads and _ad_slot():          # 코드가 없으면 아무것도 넣지 않는다
         if "[[AD]]" in html_body:
             html_body = html_body.replace("[[AD]]", _ad_slot())
