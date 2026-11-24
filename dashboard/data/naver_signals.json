@@ -1,9 +1,9 @@
 {
- "at": "2026-11-24 09:57",
+ "at": "2026-11-24 10:18",
  "site": "pickdam.com",
  "rank_check": true,
- "rank_fails": 5,
- "rank_err": "HTTP 401 401 요청한 API는 이 Application에서 활성화되어 있지 않습니다. ",
+ "rank_fails": 0,
+ "rank_err": "",
  "count": {
   "시즌형": 11,
   "자료부족": 56,
@@ -31,6 +31,9 @@
    "recur": 0.32,
    "recent": 56.1,
    "n": 104,
+   "rank": 5,
+   "total": 563680,
+   "url": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
    "lane": "철 1~2달 전에"
   },
   {
@@ -41,6 +44,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 104,
+   "rank": null,
+   "total": 558,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -51,6 +57,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 104,
+   "rank": 19,
+   "total": 997019,
+   "url": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -61,6 +70,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 104,
+   "rank": 12,
+   "total": 15059,
+   "url": "https://pickdam.com/single-household-mini-washer-boil-wash/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -80,6 +92,9 @@
    "recur": 0.32,
    "recent": 56.1,
    "n": 104,
+   "rank": 5,
+   "total": 563680,
+   "url": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
    "lane": "철 1~2달 전에"
   },
   {
@@ -90,6 +105,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 104,
+   "rank": null,
+   "total": 13919263,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -109,6 +127,9 @@
    "recur": null,
    "recent": 46.9,
    "n": 104,
+   "rank": 79,
+   "total": 75880,
+   "url": "https://pickdam.com/sink-door-hinge-replace-cost/",
    "lane": "쓰지 않는다"
   },
   {
@@ -119,6 +140,9 @@
    "sa_clicks": 2,
    "label": "자료부족",
    "n": 104,
+   "rank": 4,
+   "total": 39008,
+   "url": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -138,6 +162,9 @@
    "recur": 0.3,
    "recent": 26.1,
    "n": 104,
+   "rank": null,
+   "total": 4819123,
+   "url": null,
    "lane": "B 에버그린"
   },
   {
@@ -148,6 +175,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 28050,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -158,6 +188,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 1678565,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -168,6 +201,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 27660883,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -178,6 +214,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 104,
+   "rank": null,
+   "total": 12787234,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -188,6 +227,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 104,
+   "rank": 26,
+   "total": 997024,
+   "url": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -199,6 +241,9 @@
    "label": "자료부족",
    "n": 104,
    "why": "직전 12주 검색이 거의 없다",
+   "rank": 13,
+   "total": 198644,
+   "url": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -209,6 +254,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 104,
+   "rank": null,
+   "total": 396099,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -219,6 +267,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 1359118,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -229,6 +280,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 0,
+   "rank": 6,
+   "total": 9379701,
+   "url": "https://pickdam.com/new-appliance-installment-plan-comparison/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -239,6 +293,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 0,
+   "rank": 3,
+   "total": 688494,
+   "url": "https://pickdam.com/new-appliance-installment-plan-comparison/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -249,6 +306,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 153867,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -259,6 +319,9 @@
    "sa_clicks": 2,
    "label": "자료부족",
    "n": 104,
+   "rank": 100,
+   "total": 726237,
+   "url": "https://pickdam.com/new-appliance-installment-plan-comparison/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -269,6 +332,9 @@
    "sa_clicks": 2,
    "label": "자료부족",
    "n": 0,
+   "rank": 19,
+   "total": 159849,
+   "url": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -279,6 +345,9 @@
    "sa_clicks": 2,
    "label": "자료부족",
    "n": 0,
+   "rank": 85,
+   "total": 1016861,
+   "url": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -289,6 +358,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 0,
+   "rank": 25,
+   "total": 1820251,
+   "url": "https://pickdam.com/single-household-mini-washer-boil-wash/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -299,6 +371,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 600591,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -309,6 +384,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 0,
+   "rank": 8,
+   "total": 16620550,
+   "url": "https://pickdam.com/new-appliance-installment-plan-comparison/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -319,6 +397,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 0,
+   "rank": 20,
+   "total": 117367,
+   "url": "https://pickdam.com/entryway-sensor-light-electricity-cost/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -329,6 +410,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 104,
+   "rank": null,
+   "total": 40042,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -339,6 +423,9 @@
    "sa_clicks": 1,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 1694632,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -357,6 +444,9 @@
    "recur": 0.74,
    "recent": 38.4,
    "n": 104,
+   "rank": null,
+   "total": 34493910,
+   "url": null,
    "lane": "철 1~2달 전에"
   },
   {
@@ -375,6 +465,9 @@
    "recur": 0.89,
    "recent": 40.0,
    "n": 104,
+   "rank": null,
+   "total": 726734,
+   "url": null,
    "lane": "C 핫이슈(시즌 선점)"
   },
   {
@@ -393,6 +486,9 @@
    "recur": 0.79,
    "recent": 77.7,
    "n": 104,
+   "rank": null,
+   "total": 598393,
+   "url": null,
    "lane": "B 에버그린"
   },
   {
@@ -411,6 +507,9 @@
    "recur": 0.63,
    "recent": 68.4,
    "n": 104,
+   "rank": null,
+   "total": 3285359,
+   "url": null,
    "lane": "C 핫이슈"
   },
   {
@@ -429,6 +528,9 @@
    "recur": 0.69,
    "recent": 30.8,
    "n": 104,
+   "rank": null,
+   "total": 174114,
+   "url": null,
    "lane": "철 1~2달 전에"
   },
   {
@@ -447,6 +549,9 @@
    "recur": 0.67,
    "recent": 68.9,
    "n": 104,
+   "rank": null,
+   "total": 95395,
+   "url": null,
    "lane": "C 핫이슈"
   },
   {
@@ -465,6 +570,9 @@
    "recur": -0.06,
    "recent": 18.7,
    "n": 104,
+   "rank": null,
+   "total": 13844081,
+   "url": null,
    "lane": "철 1~2달 전에"
   },
   {
@@ -483,6 +591,9 @@
    "recur": 0.77,
    "recent": 21.5,
    "n": 104,
+   "rank": null,
+   "total": 2992874,
+   "url": null,
    "lane": "철 1~2달 전에"
   },
   {
@@ -501,6 +612,9 @@
    "recur": 0.88,
    "recent": 72.2,
    "n": 104,
+   "rank": null,
+   "total": 75188,
+   "url": null,
    "lane": "C 핫이슈(시즌 선점)"
   },
   {
@@ -519,6 +633,9 @@
    "recur": 0.26,
    "recent": 31.4,
    "n": 104,
+   "rank": null,
+   "total": 340220,
+   "url": null,
    "lane": "철 1~2달 전에"
   },
   {
@@ -537,6 +654,9 @@
    "recur": 0.05,
    "recent": 28.4,
    "n": 104,
+   "rank": null,
+   "total": 707123,
+   "url": null,
    "lane": "B 에버그린"
   },
   {
@@ -555,6 +675,9 @@
    "recur": 0.44,
    "recent": 26.5,
    "n": 104,
+   "rank": null,
+   "total": 2536823,
+   "url": null,
    "lane": "철 1~2달 전에"
   },
   {
@@ -573,6 +696,9 @@
    "recur": 0.18,
    "recent": 15.5,
    "n": 104,
+   "rank": null,
+   "total": 420138,
+   "url": null,
    "lane": "철 1~2달 전에"
   },
   {
@@ -591,6 +717,9 @@
    "recur": -0.03,
    "recent": 47.6,
    "n": 104,
+   "rank": null,
+   "total": 190396,
+   "url": null,
    "lane": "B 에버그린"
   },
   {
@@ -600,6 +729,9 @@
    "volume": 420,
    "label": "자료부족",
    "n": 104,
+   "rank": null,
+   "total": 419815,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -618,6 +750,9 @@
    "recur": 0.54,
    "recent": 5.5,
    "n": 104,
+   "rank": null,
+   "total": 351807,
+   "url": null,
    "lane": "철 1~2달 전에"
   },
   {
@@ -636,6 +771,9 @@
    "recur": 0.41,
    "recent": 26.9,
    "n": 104,
+   "rank": null,
+   "total": 433273,
+   "url": null,
    "lane": "철 1~2달 전에"
   },
   {
@@ -654,6 +792,9 @@
    "recur": 0.16,
    "recent": 5.6,
    "n": 104,
+   "rank": null,
+   "total": 66693,
+   "url": null,
    "lane": "C 핫이슈(터질 때만)"
   },
   {
@@ -672,6 +813,9 @@
    "recur": 0.11,
    "recent": 2.0,
    "n": 104,
+   "rank": null,
+   "total": 188417,
+   "url": null,
    "lane": "쓰지 않는다"
   },
   {
@@ -681,6 +825,9 @@
    "volume": 30,
    "label": "자료부족",
    "n": 104,
+   "rank": null,
+   "total": 596235,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -690,6 +837,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 2262,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -699,6 +849,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 10859655,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -708,6 +861,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": 4,
+   "total": 682915,
+   "url": "https://pickdam.com/new-appliance-installment-plan-comparison/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -717,6 +873,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 29276538,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -726,6 +885,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 1333288,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -735,6 +897,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 102743,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -744,6 +909,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 45497801,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -753,6 +921,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 336368,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -762,6 +933,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 307064,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -771,6 +945,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 177618,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -780,6 +957,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 134803,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -789,6 +969,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 215037,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -798,6 +981,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 27154,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -807,6 +993,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": 34,
+   "total": 138,
+   "url": "https://pickdam.com/sink-door-hinge-replace-cost/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -816,6 +1005,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": 71,
+   "total": 6052,
+   "url": "https://pickdam.com/sink-door-hinge-replace-cost/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -825,6 +1017,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 104,
+   "rank": null,
+   "total": 66854,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -834,6 +1029,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 6101969,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -843,6 +1041,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 23289,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -852,6 +1053,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 5810672,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -861,6 +1065,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": 75,
+   "total": 9422,
+   "url": "https://pickdam.com/bidet-self-installation-cost-saving-tips/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -870,6 +1077,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 125084,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -879,6 +1089,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 1,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -888,6 +1101,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": 14,
+   "total": 24376141,
+   "url": "https://pickdam.com/single-household-mini-washer-boil-wash/",
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -897,6 +1113,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 92020,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -906,6 +1125,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 18137586,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -915,6 +1137,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 6772664,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -924,6 +1149,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 104,
+   "rank": null,
+   "total": 366837,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -933,6 +1161,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 228241,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   },
   {
@@ -942,6 +1173,9 @@
    "volume": 20,
    "label": "자료부족",
    "n": 0,
+   "rank": null,
+   "total": 4852023,
+   "url": null,
    "lane": "D 실험(수요 미확인)"
   }
  ]
