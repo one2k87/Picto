@@ -13,8 +13,8 @@ on:
   workflow_dispatch:
     inputs:
       rank_check:
-        description: "true면 웹문서 검색에서 내 사이트 순위도 본다(약관 확인 뒤 켤 것)"
-        default: "false"
+        description: "true면 웹문서 검색에서 내 사이트 순위도 본다(끄려면 false)"
+        default: "true"
         required: false
 
 # 결과 파일을 레포에 남긴다 — 없으면 push 가 거부되고 조용히 사라진다(11/23 실측).
@@ -39,7 +39,9 @@ jobs:
           BLOG_URL: ${{ secrets.BLOG_URL }}
           WP_SITE: ${{ secrets.WP_SITE }}
           SITE_DOMAIN: pickdam.com
-          RANK_CHECK: ${{ github.event.inputs.rank_check || 'false' }}
+          # 2026-11-24 사용자 결정으로 켰다(예약·push 실행도 순위를 본다). 순위 숫자·총 문서 수·내 글 주소만 남기고
+          # 남의 글 제목·본문은 저장하지 않는다. 끄려면 아래 'true' 를 'false' 로 되돌린다.
+          RANK_CHECK: ${{ github.event.inputs.rank_check || 'true' }}
         run: python scripts/naver_signals.py
       - name: 제목 격차
         env:
