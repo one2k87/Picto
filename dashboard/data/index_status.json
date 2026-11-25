@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-25T13:44:32",
+ "updated_at": "2026-11-25T14:32:31",
  "site": "https://pickdam.com",
  "checked": 46,
  "indexed": 23,
@@ -9,7 +9,7 @@
  "intended": 46,
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-11-25T13:38:14\",\"link\":\"https:\\/\\/pickdam.com\\/new-appliance-installment-plan-comparison\\/\"},{\"modifi"
+  "body_head": "[{\"modified\":\"2026-11-25T13:45:45\",\"link\":\"https:\\/\\/pickdam.com\\/weekly-trend-20261117\\/\"},{\"modified\":\"2026-11-25T13:4"
  },
  "posts_n": 60,
  "results": [
@@ -20,21 +20,27 @@
    "lastCrawl": "2026-11-18"
   },
   {
+   "url": "https://pickdam.com/weekly-trend-20261117/",
+   "verdict": "NEUTRAL",
+   "state": "URL is unknown to Google",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/manual-bidet-vs-installed-bidet-cost/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
    "url": "https://pickdam.com/new-appliance-installment-plan-comparison/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
    "lastCrawl": "2026-09-28"
   },
   {
-   "url": "https://pickdam.com/manual-bidet-vs-installed-bidet-cost/",
-   "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
-   "lastCrawl": ""
-  },
-  {
    "url": "https://pickdam.com/trend-cutting-board-scissors/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -46,7 +52,7 @@
   {
    "url": "https://pickdam.com/mini-dishwasher-3pin-comparison/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -62,15 +68,9 @@
    "lastCrawl": ""
   },
   {
-   "url": "https://pickdam.com/weekly-trend-20261117/",
-   "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
-   "lastCrawl": ""
-  },
-  {
    "url": "https://pickdam.com/weekly-trend-20261123/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -112,7 +112,7 @@
   {
    "url": "https://pickdam.com/trend-carbon-mat-top3/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -214,13 +214,13 @@
   {
    "url": "https://pickdam.com/standby-power-cutoff-multi-tap-4-way/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/direct-water-purifier-cost-comparison/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
