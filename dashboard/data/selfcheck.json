@@ -1,6 +1,6 @@
 {
- "at": "2026-11-24T18:44:31",
- "posts": 59,
+ "at": "2026-11-25T17:19:35",
+ "posts": 60,
  "pass": 13,
  "fail": 2,
  "checks": [
@@ -8,7 +8,7 @@
    "key": "sitemap",
    "title": "사이트맵이 모든 글을 담고 있는가",
    "ok": true,
-   "evidence": "사이트맵 60개 · 발행 59편 · 누락 0",
+   "evidence": "사이트맵 61개 · 발행 60편 · 누락 0",
    "fix": "",
    "fix_by": "user"
   },
@@ -32,7 +32,7 @@
    "key": "cards",
    "title": "상품 카드가 글마다 하나인가",
    "ok": true,
-   "evidence": "59편 전부 카드 1개 이하",
+   "evidence": "60편 전부 카드 1개 이하",
    "fix": "",
    "fix_by": "auto"
   },
@@ -40,7 +40,7 @@
    "key": "index",
    "title": "색인 검사가 모든 글을 보고 있는가",
    "ok": false,
-   "evidence": "색인 22/46 (48%)",
+   "evidence": "색인 23/46 (50%)",
    "fix": "미색인 글에 내부링크 보강 + 사이트맵 확인",
    "fix_by": "auto"
   },
@@ -48,7 +48,7 @@
    "key": "publish",
    "title": "예정된 발행일에 글이 나갔는가",
    "ok": true,
-   "evidence": "예정 발행일 3일 · 게시 4 · 폐기 0",
+   "evidence": "예정 발행일 3일 · 게시 3 · 폐기 0",
    "fix": "",
    "fix_by": "auto"
   },
@@ -72,7 +72,7 @@
    "key": "disclosure",
    "title": "대가성 고지가 모든 글에 있는가",
    "ok": true,
-   "evidence": "59편 전부 보유",
+   "evidence": "60편 전부 보유",
    "fix": "",
    "fix_by": "auto"
   },
@@ -96,7 +96,7 @@
    "key": "silent_errors",
    "title": "매일 실행에 조용히 죽은 단계가 없는가",
    "ok": true,
-   "evidence": "마지막 실행(2026-11-24T14:37) 로그 18줄에 예외 흔적 없음",
+   "evidence": "마지막 실행(2026-11-25T14:33) 로그 73줄에 예외 흔적 없음",
    "fix": "",
    "fix_by": "me"
   },
@@ -120,7 +120,7 @@
    "key": "llm_block",
    "title": "글 생성이 결제·한도로 막혀 있지 않은가",
    "ok": true,
-   "evidence": "2026-11-06T10:50 차단(unknown) 이후 2026-11-23T12:52 에 발행됨 — 해소",
+   "evidence": "2026-11-06T10:50 차단(unknown) 이후 2026-11-25T13:37 에 발행됨 — 해소",
    "fix": "",
    "fix_by": "user"
   }
