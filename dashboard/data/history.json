@@ -200,7 +200,8 @@
       "category": "생활·주방",
       "intent": "revenue",
       "date": "2026-09-07",
-      "series_id": ""
+      "series_id": "",
+      "last_refreshed": "2026-11-25"
     },
     {
       "title": "환기 시스템 렌탈과 구매 고민이라면, 2026년 9월 설치 전 우리 집 최적 비용부터 따져야 합니다",
@@ -878,6 +879,19 @@
       "category": "생활·주방",
       "intent": "revenue",
       "date": "2026-11-23",
+      "series_id": ""
+    },
+    {
+      "title": "무전원 비데 vs 방문설치 렌탈, 연간 유지비 12만 원 아끼려면 수압 0.7kgf부터 확인해야 하는 이유",
+      "slug": "manual-bidet-vs-installed-bidet-cost",
+      "url": "https://pickdam.com/manual-bidet-vs-installed-bidet-cost/",
+      "post_id": 970,
+      "status": "게시됨",
+      "kind": "long",
+      "keyword": "비데 방문설치 비용과 전기 없이 쓰는 비데의 유지비 차이",
+      "category": "생활·주방",
+      "intent": "revenue",
+      "date": "2026-11-25",
       "series_id": ""
     }
   ],

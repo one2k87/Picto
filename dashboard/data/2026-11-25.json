@@ -1,0 +1,114 @@
+{
+  "generated_at": "2026-11-25T13:38:19",
+  "categories": [
+    "생활·주방"
+  ],
+  "auto_publish": true,
+  "per_category": {
+    "생활·주방": 1
+  },
+  "total_all": 68,
+  "articles": [
+    {
+      "keyword": "비데 방문설치 비용과 전기 없이 쓰는 비데의 유지비 차이",
+      "kind": "long",
+      "lang": "ko",
+      "category": "생활·주방",
+      "title": "무전원 비데 vs 방문설치 렌탈, 연간 유지비 12만 원 아끼려면 수압 0.7kgf부터 확인해야 하는 이유",
+      "meta": "전기 없이 쓰는 비데 유지비와 방문설치 비용, 2026년 기준 0원부터 10만 원대까지 실제 유지비 차이를 확인하세요.",
+      "slug": "manual-bidet-vs-installed-bidet-cost",
+      "seo_title": "전기 없는 비데 유지비 vs 방문설치 비용 비교",
+      "focus_keyword": "비데 방문설치 비용과 전기 없이 쓰는 비데의 유지비 차이",
+      "tags": [
+        "비데유지비",
+        "무전원비데",
+        "비데방문설치",
+        "수압식비데",
+        "욕실인테리어"
+      ],
+      "faqs": [
+        {
+          "q": "전기 없이 쓰는 비데는 온수가 나오나요?",
+          "a": "보일러와 연결된 온수 배관을 직접 쓰기 때문에 별도의 전기 가열 장치 없이 온수를 사용할 수 있습니다. 다만 수압에 따라 온수가 도달하는 속도가 조금씩 다를 수 있습니다."
+        },
+        {
+          "q": "방문설치 비데와 자가 설치 비데의 관리 차이는 무엇인가요?",
+          "a": "방문설치 제품은 주기적으로 기사님이 방문해 노즐 스팀 청소와 필터 교체를 진행합니다. 반면 무전원 비데는 사용자가 직접 필터를 분리해 세척하거나 교체해야 합니다."
+        },
+        {
+          "q": "수압이 약한 집에서도 무전원 비데를 쓸 수 있나요?",
+          "a": "수압식 비데는 수도 압력으로 작동하므로 수압이 너무 낮으면 세정력이 떨어질 수 있습니다. 구매 전 우리 집 화장실 수압을 먼저 확인하는 것이 좋습니다."
+        },
+        {
+          "q": "무전원 비데 필터 교체 주기는 어떻게 되나요?",
+          "a": "사용 환경과 수질에 따라 다르지만 보통 4개월에서 6개월 주기로 교체합니다. 필터 가격은 개당 5천 원에서 1만 원대 사이로 형성되어 있습니다."
+        },
+        {
+          "q": "전기 없는 비데를 설치할 때 공구가 따로 필요한가요?",
+          "a": "대부분 제품에 원터치 T밸브가 포함되어 있어 스패너 하나로 직접 연결할 수 있습니다. 별도의 전기 공사는 필요하지 않아 설치 시간이 20분 내외로 짧습니다."
+        }
+      ],
+      "kokpick": {
+        "price_band": "3만~15만 원대",
+        "condition_branch": [
+          "욕실 콘센트가 멀다면 무전원 비데가 유리합니다",
+          "정기적인 방문 케어를 원한다면 방문설치가 낫습니다"
+        ],
+        "size_install": "변기 홀 간격 130~170mm 확인 필요",
+        "maintenance": {
+          "cycle": "4~6개월",
+          "cost_per_year": "1만~3만 원",
+          "consumable_url": ""
+        },
+        "cautions": [
+          "수압이 너무 약하면 정상 작동하지 않을 수 있습니다"
+        ],
+        "alt_uses": [],
+        "alt_uses_source": ""
+      },
+      "html": "<p data-cp-notice=\"top\" style=\"margin:0 0 14px;padding:9px 12px;border-left:3px solid #ff6b35;background:#fff6f2;color:#5b5563;font-size:13px;line-height:1.6\">이 게시물은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p><p class=\"hook\" style=\"font-size:17px;font-weight:600\">매달 나가는 비데 렌탈료와 전기세, 아낄 방법은 없을까요?</p><p class=\"byline\" style=\"font-size:12px;color:#98a2b3;margin:2px 0 12px\">✍️ 편집부 · 최종 업데이트 2026년 11월 25일</p><p class=\"ai-notice\" style=\"margin:2px 0 12px;padding:8px 12px;border-left:3px solid #98a2b3;background:#f6f7f9;color:#667085;font-size:12px;line-height:1.6\">⚠️ 본 콘텐츠(텍스트·이미지)는 생성형 AI를 통해 작성되었습니다. 정확성을 위해 검증 과정을 거치지만, 실제 적용 전 공식 출처로 최종 확인하시길 권합니다.</p><nav class=\"toc\" aria-label=\"목차\"><strong>목차</strong><ul><li style=\"margin-left:0px\"><a href=\"#sec-1\">전기 없이 쓰는 비데의 구조와 실제 유지비</a></li><li style=\"margin-left:0px\"><a href=\"#sec-2\">방문설치 비데의 렌탈 비용과 관리 주기</a></li><li style=\"margin-left:0px\"><a href=\"#sec-3\">흔히 겪는 실수와 설치 전 체크할 점</a></li><li style=\"margin-left:0px\"><a href=\"#sec-4\">어떤 방식을 골라야 지갑이 편할까</a></li><li style=\"margin-left:0px\"><a href=\"#sec-5\">유지비를 아끼려다 생기는 문제</a></li></ul></nav>\n\n<p>욕실 환경을 정비할 때 매달 고정으로 지출되는 비용을 줄이기 위해 많은 이들이 대안을 찾습니다. 특히 비데 방문설치 비용과 전기 없이 사용하는 무전원 비데의 유지비 차이를 비교하면, 연간 관리비에서 최소 10만 원에서 최대 15만 원 이상의 격차가 벌어집니다. 하지만 단순히 비용만 보고 무작정 저렴한 방식을 택했다가 화장실 구조나 수압 문제로 낭패를 보는 사례가 적지 않습니다. 예를 들어 구축 아파트나 빌라의 경우 수압이 최저 기준에 미치지 못해 제품을 설치하고도 물이 제대로 분사되지 않는 상황이 발생합니다. 반대로 전기가 필요한 렌탈 제품은 매월 1만 5천 원에서 3만 원에 달하는 요금이 청구되므로 3년 약정 기간 동안 총 50만 원을 훌쩍 넘는 금액이 지출됩니다. 따라서 우리 집 욕실의 콘센트 위치와 수압 상태, 그리고 자가 관리의 번거로움을 감수할 수 있는지 여부를 꼼꼼히 따져본 뒤 방식을 결정해야 합니다.</p>\n\n<!--picklink--><p class=\"coupang-notice\" style=\"font-size:12px;color:#98a2b3;margin:10px 0 4px;padding:8px 12px;background:#fafbfc;border-left:3px solid #ff5a5f\">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p><div class=\"pick-product\" style=\"margin:22px 0;padding:14px 16px;border:1px solid #e5e7eb;border-radius:12px;background:#fafbfc\"><div style=\"font-size:12px;color:#98a2b3;margin-bottom:10px\">이 글에서 다룬 제품</div><div style=\"display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap\"><a href=\"https://link.coupang.com/a/hzLrqCV8mG?subid=manual_bidet_vs_installed_bidet_cost\" target=\"_blank\" rel=\"sponsored nofollow noopener\" referrerpolicy=\"unsafe-url\" style=\"flex:0 0 auto\"><img src=\"https://img5c.coupangcdn.com/image/affiliate/banner/6b59a7a3b268e3416f54631c7f2bd00e@2x.jpg\" alt=\"노비타 컴팩트 플러스 실속형 리모컨 전자식 위생 비데 자가설치, BD-SD600\" width=\"120\" height=\"240\" loading=\"lazy\" style=\"display:block;border-radius:8px;max-width:100%;height:auto\"></a><div style=\"flex:1 1 220px;min-width:200px\"><div style=\"font-weight:700;font-size:15px;margin-bottom:2px\">비데 본체</div><div style=\"font-size:13px;color:#667085;margin:6px 0 10px\">가격·재고는 수시로 바뀌므로 구매 전 상세페이지에서 확인하세요.</div><a href=\"https://link.coupang.com/a/hzLrqCV8mG?subid=manual_bidet_vs_installed_bidet_cost\" target=\"_blank\" rel=\"sponsored nofollow noopener\" referrerpolicy=\"unsafe-url\" style=\"display:inline-block;padding:9px 16px;border-radius:9px;background:#2e9e6b;color:#fff;font-size:14px;font-weight:600;text-decoration:none\">쿠팡에서 가격 확인</a></div></div></div><!--/picklink--><h2 id=\"sec-1\">전기 없이 쓰는 비데의 구조와 실제 유지비</h2><figure style=\"margin:22px 0;text-align:center\"><img src=\"https://pickdam.com/wp-content/uploads/2026/11/img_1795581448290_3.jpg\" alt=\"전기 없이 쓰는 비데 유지비, 방문설치 비용보다 무조건 이득일까 — 집에서 실제로 쓰는 생활 장면\" loading=\"lazy\" style=\"max-width:100%;height:auto;border-radius:10px\"><figcaption style=\"font-size:13px;color:#98a2b3;margin-top:6px\">전기 없이 쓰는 비데 유지비, 방문설치 비용보다 무조건 이득일까 — 집에서 실제로 쓰는 생활 장면 — 특정 제품의 사진이 아니라, 이해를 돕기 위해 AI로 그린 그림입니다</figcaption></figure>\n<p>오직 수압만으로 작동하는 무전원 비데는 월 전기세가 0원으로 고정 지출을 극단적으로 줄여주는 장점이 있습니다. 내부를 데우는 온열 시트나 온수 가열 장치가 없기 때문에 전력 소모 자체가 발생하지 않습니다. 대신 소모품인 정수 필터를 주기적으로 교체해야 하는데, 필터 가격은 개당 5천 원에서 1만 원대 사이로 형성되어 있으며 연간 총 유지비는 1만 원에서 3만 원대 수준으로 유지됩니다. <figure style=\"margin:22px 0;text-align:center\"><img src=\"https://pickdam.com/wp-content/uploads/2026/11/img_1795581420106_1.jpg\" alt=\"하얀색 수압식 무전원 비데 본체와 조절 레버 클로즈업, 타일 욕실 바닥\" loading=\"lazy\" style=\"max-width:100%;height:auto;border-radius:10px\"><figcaption style=\"font-size:13px;color:#98a2b3;margin-top:6px\">하얀색 수압식 무전원 비데 본체와 조절 레버 클로즈업, 타일 욕실 바닥 — 특정 제품의 사진이 아니라, 이해를 돕기 위해 AI로 그린 그림입니다</figcaption></figure> 다만 사용자가 직접 필터를 분리하고 세척해야 하므로 손길이 번거롭다는 단점이 있습니다. 만약 관리 주기를 놓쳐 필터 내부나 노즐에 이물질이 쌓이게 되면 세정력이 급격히 떨어지므로 4개월에서 6개월 사이의 교체 주기를 반드시 준수해야 합니다.</p>\n\n<h2 id=\"sec-2\">방문설치 비데의 렌탈 비용과 관리 주기</h2>\n<p>대기업 브랜드의 방문설치형 전자식 비데는 통상적으로 월 1만 5천 원에서 3만 원대의 요금이 부과됩니다. 3년 약정 계약을 기준으로 총비용을 산산이 조각 내어 계산해 보면 기계값과 인건비가 포함되어 50만 원에서 100만 원에 육박하는 목돈이 지출되는 셈입니다. 이 비용 속에는 전용 기사님이 4개월마다 정기적으로 방문하여 노즐을 스팀 살균하고 내부 부품을 점검해 주는 서비스 비용이 고스란히 녹아 있습니다. 전기를 상시 연결하여 온수를 즉시 데워 쓰고 시트를 따뜻하게 유지할 수 있는 편의성이 제공되지만, 매달 통장에서 빠져나가는 렌탈료와 소모되는 전기세는 가계 경제에 적지 않은 부담으로 작용합니다. 특히 약정 기간 내에 계약을 해지할 경우 위산 청구와 철거 비용까지 추가로 발생하므로 신중한 선택이 요구됩니다.</p>\n\n<h2 id=\"sec-3\">흔히 겪는 실수와 설치 전 체크할 점</h2>\n<p>욕실 인테리어나 설비를 고려하지 않고 무작정 제품을 구매했다가 낭패를 보는 경우가 많습니다. 가장 대표적인 실패 시나리오는 변기 주변에 콘센트가 없어서 전기 없는 무전원 비데를 구매했으나, 우리 집 화장실 수압이 너무 약해 노즐이 정상적으로 솟아오르지 않는 상황입니다. 수압식 모델은 최저 0.7 kgf/cm² 이상의 수압이 받쳐줘야 원활한 작동이 가능한데, 수압이 이 기준에 미치지 못하면 물줄기가 끊기거나 세정이 불가능합니다. 또한 자가 설치를 진행할 때 동봉된 T밸브를 스패너로 너무 강하게 조이면 도자기 변기나 플라스틱 나사산이 깨져 누수가 발생하므로 적당한 토크로 체결해야 합니다. 반대로 벽이 타일이 아닌 특수 마감재이거나 배관 구조가 복잡한 구축 주택이라면 자가 설치 과정에서 호스가 꺾여 온수가 역류하는 사고도 빈번하게 일어납니다.</p>\n\n<h2 id=\"sec-4\">어떤 방식을 골라야 지갑이 편할까</h2>\n<p>욕실 내부에 콘센트가 가깝게 위치해 있고 겨울철 차가운 시트나 즉각적인 온수를 포기할 수 없으며, 세균 번식이 걱정되어 전문가의 스팀 살균 관리를 받고 싶다면 방문설치 렌탈 방식이 유리합니다. 반면에 화장실 콘센트가 너무 멀리 있거나 멀티탭을 끌어다 쓰기 위험한 구조이며, 매달 고정으로 나가는 지출을 0원으로 줄이고 싶다면 5만 원대 전용 무전원 제품을 직접 구매하여 설치하는 편이 훨씬 경제적입니다. <figure style=\"margin:22px 0;text-align:center\"><img src=\"https://pickdam.com/wp-content/uploads/2026/11/img_1795581435075_2.jpg\" alt=\"무전원 비데와 방문설치 렌탈 비데의 연간 비용 및 관리 방식 비교 도해\" loading=\"lazy\" style=\"max-width:100%;height:auto;border-radius:10px\"><figcaption style=\"font-size:13px;color:#98a2b3;margin-top:6px\">무전원 비데와 방문설치 렌탈 비데의 연간 비용 및 관리 방식 비교 도해 — 이해를 돕기 위한 도해입니다</figcaption></figure> 자가 설치형은 초기 구매 비용 외에 추가 장기 약정이 없기 때문에 언제든 부담 없이 교체할 수 있다는 강점이 있습니다. 따라서 사용 빈도와 거주 형태가 전세인지 자가인지에 따라 렌탈과 구매 중 현명한 노선을 택해야 합니다.</p>\n\n<h2 id=\"sec-5\">유지비를 아끼려다 생기는 문제</h2>\n<p>지출을 줄이겠다는 목적으로 무전원 비데를 도입했으나 필터 교체 시기를 수개월 동안 방치하면 내부 노즐과 유로에 물때와 곰팡이가 심각하게 증식하게 됩니다. 이 상태가 지속되면 세정 불량은 물론이고 악취까지 발생하여 결국 본체 전체를 폐기하고 새로운 제품으로 교체해야 하는 더 큰 지출로 이어집니다. 초기 관리 비용을 아끼려다 부품 전체를 교체하는 상황을 막으려면, 스마트폰 알람 등을 활용하여 6개월 주기를 엄수하는 것이 필수적입니다. 또한 수질이 좋지 않은 지역에서는 필터 내부에 이물질이 빠르게 쌓여 수압이 급격히 저하되므로, 거주 지역의 수질 상태에 따라 권장 주기보다 1~2개월 앞당겨 소모품을 점검하는 습관이 요구됩니다.</p>\n\n<h2>자주 묻는 질문</h2>\n<h3>전기 없이 쓰는 비데는 온수가 나오나요?</h3>\n<p>보일러와 연결된 온수 배관을 직접 쓰기 때문에 별도의 전기 가열 장치 없이 온수를 사용할 수 있습니다. 다만 수압에 따라 온수가 도달하는 속도가 조금씩 다를 수 있습니다.</p>\n\n<h3>방문설치 비데와 자가 설치 비데의 관리 차이는 무엇인가요?</h3>\n<p>방문설치 제품은 주기적으로 기사님이 방문해 노즐 스팀 청소와 필터 교체를 진행합니다. 반면 무전원 비데는 사용자가 직접 필터를 분리해 세척하거나 교체해야 합니다.</p>\n\n<h3>수압이 약한 집에서도 무전원 비데를 쓸 수 있나요?</h3>\n<p>수압식 비데는 수도 압력으로 작동하므로 수압이 너무 낮으면 세정력이 떨어질 수 있습니다. 구매 전 우리 집 화장실 수압을 먼저 확인하는 것이 좋습니다.</p>\n\n<h3>무전원 비데 필터 교체 주기는 어떻게 되나요?</h3>\n<p>사용 환경과 수질에 따라 다르지만 보통 4개월에서 6개월 주기로 교체합니다. 필터 가격은 개당 5천 원에서 1만 원대 사이로 형성되어 있습니다.</p>\n\n<h3>전기 없는 비데를 설치할 때 공구가 따로 필요한가요?</h3>\n<p>대부분 제품에 원터치 T밸브가 포함되어 있어 스패너 하나로 직접 연결할 수 있습니다. 별도의 전기 공사는 필요하지 않아 설치 시간이 20분 내외로 짧습니다.</p>\n\n<p class=\"verified\" style=\"margin-top:14px;padding:9px 12px;border-left:3px solid #cfc6e8;background:#faf9fe;color:#6b6386;font-size:12px;line-height:1.6\">🔎 2026년 11월 25일 기준으로 내용을 확인했습니다.</p><p class=\"freshness\" style=\"margin-top:16px;padding:10px 14px;border-left:3px solid #7c5cff;background:#f6f4ff;color:#5b53a8;font-size:13px;line-height:1.6\">🗓️ <b>기준: 2026년 11월</b> · 정책·요금은 수시로 변경됩니다. 진행 전 공식 출처로 최신값을 꼭 확인하세요.</p><p class=\"disclaimer\" style=\"margin-top:22px;padding:12px 14px;border-left:3px solid #d8dbe0;background:#fafbfc;color:#6b7280;font-size:13px;line-height:1.6\">ℹ️ 정보 제공을 목적으로 작성했습니다. 실제 적용 시 최신 내용을 한 번 더 확인하세요.</p><h2>함께 보면 좋은 글</h2><ul class=\"related\"><li><a href=\"https://pickdam.com/washer-rental-vs-installment-comparison/\">3가지 기준 비교로 끝내는 세탁기 24개월 할부 렌탈과 총액 비교, 드럼세탁기 장기할부와 냉장고 렌탈 사은품 차이</a></li><li><a href=\"https://pickdam.com/mini-dishwasher-3pin-comparison/\">미니 식기세척기 3인용, 무동력 회전 모델과 온수 가열 기능 제품 중 어떤 게 전기료와 세척력에서 유리할까</a></li><li><a href=\"https://pickdam.com/lp-retro-magnet-kitchen-interior/\">LP판 냉장고 자석 레트로 소품, 50g 무게를 버티지 못하고 떨어질 때 네오디움 자석으로 해결하는 조건</a></li></ul><script type=\"application/ld+json\">{\"@context\": \"https://schema.org\", \"@type\": \"BlogPosting\", \"headline\": \"무전원 비데 vs 방문설치 렌탈, 연간 유지비 12만 원 아끼려면 수압 0.7kgf부터 확인해야 하는 이유\", \"description\": \"전기 없이 쓰는 비데 유지비와 방문설치 비용, 2026년 기준 0원부터 10만 원대까지 실제 유지비 차이를 확인하세요.\", \"inLanguage\": \"ko\", \"datePublished\": \"2026-11-25\", \"dateModified\": \"2026-11-25\", \"author\": {\"@type\": \"Organization\", \"name\": \"편집부\"}, \"mainEntityOfPage\": {\"@type\": \"WebPage\"}}</script><script type=\"application/ld+json\">{\"@context\": \"https://schema.org\", \"@type\": \"FAQPage\", \"mainEntity\": [{\"@type\": \"Question\", \"name\": \"전기 없이 쓰는 비데는 온수가 나오나요?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"보일러와 연결된 온수 배관을 직접 쓰기 때문에 별도의 전기 가열 장치 없이 온수를 사용할 수 있습니다. 다만 수압에 따라 온수가 도달하는 속도가 조금씩 다를 수 있습니다.\"}}, {\"@type\": \"Question\", \"name\": \"방문설치 비데와 자가 설치 비데의 관리 차이는 무엇인가요?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"방문설치 제품은 주기적으로 기사님이 방문해 노즐 스팀 청소와 필터 교체를 진행합니다. 반면 무전원 비데는 사용자가 직접 필터를 분리해 세척하거나 교체해야 합니다.\"}}, {\"@type\": \"Question\", \"name\": \"수압이 약한 집에서도 무전원 비데를 쓸 수 있나요?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"수압식 비데는 수도 압력으로 작동하므로 수압이 너무 낮으면 세정력이 떨어질 수 있습니다. 구매 전 우리 집 화장실 수압을 먼저 확인하는 것이 좋습니다.\"}}, {\"@type\": \"Question\", \"name\": \"무전원 비데 필터 교체 주기는 어떻게 되나요?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"사용 환경과 수질에 따라 다르지만 보통 4개월에서 6개월 주기로 교체합니다. 필터 가격은 개당 5천 원에서 1만 원대 사이로 형성되어 있습니다.\"}}, {\"@type\": \"Question\", \"name\": \"전기 없는 비데를 설치할 때 공구가 따로 필요한가요?\", \"acceptedAnswer\": {\"@type\": \"Answer\", \"text\": \"대부분 제품에 원터치 T밸브가 포함되어 있어 스패너 하나로 직접 연결할 수 있습니다. 별도의 전기 공사는 필요하지 않아 설치 시간이 20분 내외로 짧습니다.\"}}]}</script>\n\n<!--KOKPICK\n{\n  \"product\": \"비데 본체\",\n  \"price_band\": \"3만~15만 원대\",\n  \"condition_branch\": [\n    \"욕실 콘센트가 멀다면 무전원 비데가 유리합니다\",\n    \"정기적인 방문 케어를 원한다면 방문설치가 낫습니다\"\n  ],\n  \"size_install\": \"변기 홀 간격 130~170mm 확인 필요\",\n  \"maintenance\": {\n    \"cycle\": \"4~6개월\",\n    \"cost_per_year\": \"1만~3만 원\",\n    \"consumable_url\": \"\"\n  },\n  \"cautions\": [\n    \"수압이 너무 약하면 정상 작동하지 않을 수 있습니다\"\n  ],\n  \"alt_uses\": [],\n  \"alt_uses_source\": \"\",\n  \"coupang_url\": \"https://link.coupang.com/a/hzLrqCV8mG?subid=manual_bidet_vs_installed_bidet_cost\"\n}\nKOKPICK-->\n",
+      "links": [],
+      "wp_category": "생활·주방",
+      "wp_category_slug": "living-kitchen",
+      "volume": null,
+      "competition": "",
+      "steadiness": null,
+      "interest": null,
+      "lane_reason": "계절과 무관하게 꾸준히 발생하는 설치 및 유지비 비교 검색 수요",
+      "quality": "통과",
+      "quality_reason": "",
+      "accuracy": "ok",
+      "ongoing": "진행중",
+      "accuracy_issues": [],
+      "accuracy_fix": "현재 내용이 2026년 11월 기준의 일반적인 시장 상황을 잘 반영하고 있으므로, 특정 브랜드의 렌탈 요금이나 필터 가격이 변동될 수 있다는 점만 주의 문구로 강조하면 충분합니다.",
+      "accuracy_summary": "ok·진행중",
+      "_product_key": "비데",
+      "kokpick_data": {
+        "product": "비데 본체",
+        "price_band": "3만~15만 원대",
+        "condition_branch": [
+          "욕실 콘센트가 멀다면 무전원 비데가 유리합니다",
+          "정기적인 방문 케어를 원한다면 방문설치가 낫습니다"
+        ],
+        "size_install": "변기 홀 간격 130~170mm 확인 필요",
+        "maintenance": {
+          "cycle": "4~6개월",
+          "cost_per_year": "1만~3만 원",
+          "consumable_url": ""
+        },
+        "cautions": [
+          "수압이 너무 약하면 정상 작동하지 않을 수 있습니다"
+        ],
+        "alt_uses": [],
+        "alt_uses_source": "",
+        "coupang_url": "https://link.coupang.com/a/hzLrqCV8mG?subid=manual_bidet_vs_installed_bidet_cost"
+      },
+      "kokpick_json": "{\"product\":\"비데 본체\",\"price_band\":\"3만~15만 원대\",\"condition_branch\":[\"욕실 콘센트가 멀다면 무전원 비데가 유리합니다\",\"정기적인 방문 케어를 원한다면 방문설치가 낫습니다\"],\"size_install\":\"변기 홀 간격 130~170mm 확인 필요\",\"maintenance\":{\"cycle\":\"4~6개월\",\"cost_per_year\":\"1만~3만 원\",\"consumable_url\":\"\"},\"cautions\":[\"수압이 너무 약하면 정상 작동하지 않을 수 있습니다\"],\"alt_uses\":[],\"alt_uses_source\":\"\",\"coupang_url\":\"https://link.coupang.com/a/hzLrqCV8mG?subid=manual_bidet_vs_installed_bidet_cost\"}",
+      "_schedule_date": "2026-11-25T13:37:42.634967",
+      "post_id": 970,
+      "status": "게시됨",
+      "post_url": "https://pickdam.com/manual-bidet-vs-installed-bidet-cost/",
+      "copy_file": "/home/runner/work/Picto/Picto/output/20261125_생활주방_long_비데 방문설치 비용과 전기 없이 쓰는 비데의 유지비 차이.html"
+    }
+  ]
+}
