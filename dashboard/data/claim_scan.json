@@ -1,34 +1,31 @@
 {
- "at": "2026-11-26 00:56",
+ "at": "2026-11-26 01:52",
  "site": "pickdam.com",
  "days": 30,
  "total": {
   "posts": 22,
   "source": 0,
   "experience": 0,
-  "money": 14,
-  "title_money": 1,
-  "clean": 8
+  "money": 13,
+  "title_money": 0,
+  "clean": 9
  },
  "rows": [
   {
    "id": 970,
    "date": "2026-11-25",
-   "title": "무전원 비데 vs 방문설치 렌탈, 연간 유지비 12만 원 아끼려면 수압 0.7kgf부터 확인해야 하는 이유",
+   "title": "무전원 비데 vs 방문설치 렌탈, 유지비 따지기 전에 수압부터 확인해야 하는 이유",
    "link": "https://pickdam.com/manual-bidet-vs-installed-bidet-cost/",
-   "title_money": true,
+   "title_money": false,
    "n": {
     "source": 0,
     "experience": 0,
-    "money": 7
+    "money": 0
    },
    "ex": {
     "source": [],
     "experience": [],
-    "money": [
-     "특히 비데 방문설치 비용과 전기 없이 사용하는 무전원 비데의 유지비 차이를 비교하면, 연간 관리비에서 최소 10만 원에서 최대 15만 원 이상의 격차가 벌어집니다",
-     "반대로 전기가 필요한 렌탈 제품은 매월 1만 5천 원에서 3만 원에 달하는 요금이 청구되므로 3년 약정 기간 동안 총 50만 원을 훌쩍 넘는 금액이 지출됩니다."
-    ]
+    "money": []
    }
   },
   {
