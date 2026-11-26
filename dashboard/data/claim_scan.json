@@ -1,0 +1,428 @@
+{
+ "at": "2026-11-26 00:56",
+ "site": "pickdam.com",
+ "days": 30,
+ "total": {
+  "posts": 22,
+  "source": 0,
+  "experience": 0,
+  "money": 14,
+  "title_money": 1,
+  "clean": 8
+ },
+ "rows": [
+  {
+   "id": 970,
+   "date": "2026-11-25",
+   "title": "무전원 비데 vs 방문설치 렌탈, 연간 유지비 12만 원 아끼려면 수압 0.7kgf부터 확인해야 하는 이유",
+   "link": "https://pickdam.com/manual-bidet-vs-installed-bidet-cost/",
+   "title_money": true,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 7
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": [
+     "특히 비데 방문설치 비용과 전기 없이 사용하는 무전원 비데의 유지비 차이를 비교하면, 연간 관리비에서 최소 10만 원에서 최대 15만 원 이상의 격차가 벌어집니다",
+     "반대로 전기가 필요한 렌탈 제품은 매월 1만 5천 원에서 3만 원에 달하는 요금이 청구되므로 3년 약정 기간 동안 총 50만 원을 훌쩍 넘는 금액이 지출됩니다."
+    ]
+   }
+  },
+  {
+   "id": 951,
+   "date": "2026-11-23",
+   "title": "세탁기 24개월 할부 vs 렌탈, 총액으로 따지면 어느 쪽이 쌀까",
+   "link": "https://pickdam.com/washer-rental-vs-installment-comparison/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 3
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": [
+     "예를 들어 약 80만 원짜리 제품이면 무이자 기준 월 3만 3천 원 안팎이고, 이자가 붙는 할부라면 그만큼 총액이 늘어납니다.",
+     "냉장고 렌탈 사은품으로 소형 가전이나 상품권을 받더라도, 의무 사용 기간인 3년 동안 내는 총 렌탈료가 인터넷 최저가 구매가보다 20만 원 이상 높다면 손해입니다"
+    ]
+   }
+  },
+  {
+   "id": 947,
+   "date": "2026-11-23",
+   "title": "이번 주 유행템 5가지 (11월 23일 집계)",
+   "link": "https://pickdam.com/weekly-trend-20261123/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 0
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": []
+   }
+  },
+  {
+   "id": 925,
+   "date": "2026-11-23",
+   "title": "탄소매트 퀸, 지금 얼마에 살 수 있나 (가격·배송 정리)",
+   "link": "https://pickdam.com/trend-carbon-mat/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 1
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": [
+     "귀뚜라미는 11월 20일에 227,640원이었는데 이틀 만에 197,100원으로 30,540원 내렸고, 나비엔은 277,070원에서 284,280원으로 7,210"
+    ]
+   }
+  },
+  {
+   "id": 924,
+   "date": "2026-11-23",
+   "title": "접이식 계량스푼, 지금 얼마에 살 수 있나 (가격·배송 정리)",
+   "link": "https://pickdam.com/trend-folding-measuring-spoon/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 0
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": []
+   }
+  },
+  {
+   "id": 923,
+   "date": "2026-11-23",
+   "title": "도마 가위, 지금 얼마에 살 수 있나 (가격·배송 정리)",
+   "link": "https://pickdam.com/trend-cutting-board-scissors/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 2
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": [
+     "캠핑 및 야외 활동 중심이라면: 부피가 작고 전용 케이스나 잠금 장치가 포함된 5,000원~7,000원대 모델을 선택하는 것이 유리합니다.",
+     "가정 내 상시 조리용이라면: 세척 주기 1주일 이내, 날 분리형 구조를 갖춘 10,000원대 이상의 제품이 위생 관리에 적합합니다."
+    ]
+   }
+  },
+  {
+   "id": 922,
+   "date": "2026-11-23",
+   "title": "자동 섞이는 컵, 지금 얼마에 살 수 있나 (가격·배송 정리)",
+   "link": "https://pickdam.com/trend-auto-mix-cup/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 2
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": [
+     "가격대는 12,000원~18,000원 사이가 일반적입니다.",
+     "가격대는 25,000원~35,000원 선을 형성합니다."
+    ]
+   }
+  },
+  {
+   "id": 921,
+   "date": "2026-11-23",
+   "title": "자동 디스펜서, 지금 얼마에 살 수 있나 (가격·배송 정리)",
+   "link": "https://pickdam.com/trend-auto-dispenser/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 0
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": []
+   }
+  },
+  {
+   "id": 901,
+   "date": "2026-11-23",
+   "title": "미니 식기세척기 3인용, 무동력 회전 모델과 온수 가열 기능 제품 중 어떤 게 전기료와 세척력에서 유리할까",
+   "link": "https://pickdam.com/mini-dishwasher-3pin-comparison/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 2
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": [
+     "가격대는 2026년 현재 무동력 회전 타입이 20만~35만 원대, 온수 가열 타입이 35만~60만 원대로 형성되어 있습니다.",
+     "하루 1~2회 꾸준히 쓰면 일반 모델보다 월 전기세가 3천 원에서 5천 원 정도 더 나올 수 있습니다."
+    ]
+   }
+  },
+  {
+   "id": 877,
+   "date": "2026-11-23",
+   "title": "탄소매트 퀸 톱3 비교 — 가격·배송·차이점",
+   "link": "https://pickdam.com/trend-carbon-mat-top3/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 1
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": [
+     "귀뚜라미는 11월 20일에 227,640원이었는데 이틀 만에 197,100원으로 30,540원 내렸고, 나비엔은 277,070원에서 284,280원으로 7,210"
+    ]
+   }
+  },
+  {
+   "id": 876,
+   "date": "2026-11-23",
+   "title": "접이식 계량스푼 톱3 비교 — 가격·배송·차이점",
+   "link": "https://pickdam.com/trend-folding-measuring-spoon-top3/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 2
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": [
+     "3세트 묶음이라 총액은 가장 높지만 1세트당 약 6,300원입니다.",
+     "다만 3세트는 19,000원이라 **1세트당 약 6,300원**입니다."
+    ]
+   }
+  },
+  {
+   "id": 875,
+   "date": "2026-11-23",
+   "title": "도마 가위 톱3 비교 — 가격·배송·차이점",
+   "link": "https://pickdam.com/trend-cutting-board-scissors-top3/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 0
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": []
+   }
+  },
+  {
+   "id": 874,
+   "date": "2026-11-23",
+   "title": "자동 섞이는 컵 톱3 비교 — 가격·배송·차이점",
+   "link": "https://pickdam.com/trend-auto-mix-cup-top3/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 0
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": []
+   }
+  },
+  {
+   "id": 873,
+   "date": "2026-11-23",
+   "title": "자동 디스펜서 톱3 비교 — 가격·배송·차이점",
+   "link": "https://pickdam.com/trend-auto-dispenser-top3/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 0
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": []
+   }
+  },
+  {
+   "id": 832,
+   "date": "2026-11-20",
+   "title": "LP판 냉장고 자석 레트로 소품, 50g 무게를 버티지 못하고 떨어질 때 네오디움 자석으로 해결하는 조건",
+   "link": "https://pickdam.com/lp-retro-magnet-kitchen-interior/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 1
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": [
+     "이때는 기존 고무 자석을 커터칼로 깔끔하게 떼어낸 뒤, 1만 원대 네오디움 원형 자석(지름 10mm, 두께 2mm 규격)을 순간접착제와 에폭시를 1대 1 비율로 "
+    ]
+   }
+  },
+  {
+   "id": 806,
+   "date": "2026-11-17",
+   "title": "이번 주 유행템 5가지 (11월 17일 집계)",
+   "link": "https://pickdam.com/weekly-trend-20261117/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 0
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": []
+   }
+  },
+  {
+   "id": 800,
+   "date": "2026-11-16",
+   "title": "직수 정수기 자가관리 무설치 모델, 유지비 총액 비교해보면 렌탈보다 낫습니다",
+   "link": "https://pickdam.com/direct-water-purifier-cost-comparison/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 5
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": [
+     "무설치 직수 정수기는 월 유지비가 1만~2만 원대로 렌탈보다 저렴합니다.",
+     "직수 정수기 자가관리 무설치 모델, 필터 교체 주기 4개월마다 따져야 하는 유지비 총액 비교 결과를 보면 렌탈 제품보다 3년 기준 약 30% 이상 비용을 아낄 수"
+    ]
+   }
+  },
+  {
+   "id": 746,
+   "date": "2026-11-13",
+   "title": "대기전력 차단 멀티탭 4구 개별 스위치, 대기전력 11% 줄이는 올바른 사용법과 고장 원인",
+   "link": "https://pickdam.com/standby-power-cutoff-multi-tap-4-way/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 0
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": []
+   }
+  },
+  {
+   "id": 738,
+   "date": "2026-11-11",
+   "title": "1인 가구 미니 세탁기 3kg, 통돌이와 드럼 선택 후회 막는 3가지 기준",
+   "link": "https://pickdam.com/mini-washing-machine-3kg-comparison/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 5
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": [
+     "통돌이 구조는 구조가 단순해 가격이 20만~30만원대로 저렴하고 세탁 시간이 30분 안팎으로 짧습니다.",
+     "반면에 드럼 구조는 온수 세탁이 가능하고 옷감 손상이 적지만, 가격대가 40만원대로 높고 탈수 시 회전 소음이 상대적으로 크게 발생할 수 있습니다."
+    ]
+   }
+  },
+  {
+   "id": 730,
+   "date": "2026-11-09",
+   "title": "창문 뽁뽁이 두께 4mm vs 8mm, 유리창 결로 막는 단열 에어캡 고르는 기준",
+   "link": "https://pickdam.com/window-insulation-bubble-wrap-4mm-8mm/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 7
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": [
+     "유리창 표면 온도가 10도 아래로 떨어지면 실내 난방열의 약 30%가 창문을 통해 그대로 빠져나갑니다.",
+     "시중에서 흔히 구하는 4mm 규격은 단층 필름 사이에 에어캡이 들어간 구조로, 1m x 10m 한 롤 기준 2026년 확인 시세로 약 7천 원에서 9천 원 사이에"
+    ]
+   }
+  },
+  {
+   "id": 724,
+   "date": "2026-11-02",
+   "title": "원룸 싱글 침대 전기장판 살 때 전자파 없는 EMF 인증과 세탁 가능 여부 안 따지면 후회할까?",
+   "link": "https://pickdam.com/one-room-single-electric-blanket-emf-washable/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 2
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": [
+     "원룸 주택용 저압 기준 기본 누진 구간 내에서는 월 전기요금이 3,000~5,000원 안팎으로 떨어집니다.",
+     "2026년 기준 4만 원대부터 9만 원대까지 다양한 제품이 있습니다."
+    ]
+   }
+  },
+  {
+   "id": 718,
+   "date": "2026-10-30",
+   "title": "원룸 싱글 전기장판, 일반 열선과 카본 매트 비교",
+   "link": "https://pickdam.com/studio-single-electric-blanket-carbon-mat/",
+   "title_money": false,
+   "n": {
+    "source": 0,
+    "experience": 0,
+    "money": 9
+   },
+   "ex": {
+    "source": [],
+    "experience": [],
+    "money": [
+     "초기 비용을 아끼려면 3만 원대 일반 열선 매트, 장기 내구성과 전자파 차단이 목적이면 10만 원대 카본 매트가 맞습니다.",
+     "싱글 기준 소비전력은 일반 열선 약 120W, 카본 매트 약 90W로 하루 8시간 가동 시 월 전기요금 차이는 1,500원 안팎입니다."
+    ]
+   }
+  }
+ ]
+}
