@@ -1,32 +1,50 @@
 {
- "updated_at": "2026-11-25T14:32:31",
+ "updated_at": "2026-11-27T12:56:54",
  "site": "https://pickdam.com",
- "checked": 46,
- "indexed": 23,
+ "checked": 47,
+ "indexed": 22,
  "ghosts": [],
  "site_form": "sc-domain:pickdam.com",
  "form_err": "https://pickdam.com/ → <HttpError 403 when requesting https://searchconsole.googleapis.com/v1/urlInspection/index:inspect?alt=json returned \"You do not own this site, or the inspected",
- "intended": 46,
+ "intended": 47,
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-11-25T13:45:45\",\"link\":\"https:\\/\\/pickdam.com\\/weekly-trend-20261117\\/\"},{\"modified\":\"2026-11-25T13:4"
+  "body_head": "[{\"modified\":\"2026-11-27T12:50:05\",\"link\":\"https:\\/\\/pickdam.com\\/vacuum-replacement-criteria\\/\"},{\"modified\":\"2026-11-2"
  },
- "posts_n": 60,
+ "posts_n": 61,
  "results": [
   {
    "url": "https://pickdam.com/",
    "verdict": "PASS",
    "state": "Submitted and indexed",
-   "lastCrawl": "2026-11-18"
+   "lastCrawl": "2026-11-25"
   },
   {
-   "url": "https://pickdam.com/weekly-trend-20261117/",
+   "url": "https://pickdam.com/vacuum-replacement-criteria/",
    "verdict": "NEUTRAL",
    "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
+   "url": "https://pickdam.com/trend-folding-measuring-spoon/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/trend-auto-dispenser/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
    "url": "https://pickdam.com/manual-bidet-vs-installed-bidet-cost/",
+   "verdict": "NEUTRAL",
+   "state": "Discovered - currently not indexed",
+   "lastCrawl": ""
+  },
+  {
+   "url": "https://pickdam.com/weekly-trend-20261117/",
    "verdict": "NEUTRAL",
    "state": "Discovered - currently not indexed",
    "lastCrawl": ""
@@ -40,7 +58,7 @@
   {
    "url": "https://pickdam.com/trend-cutting-board-scissors/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -70,7 +88,7 @@
   {
    "url": "https://pickdam.com/weekly-trend-20261123/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -86,21 +104,9 @@
    "lastCrawl": "2026-09-25"
   },
   {
-   "url": "https://pickdam.com/trend-auto-dispenser/",
-   "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
-   "lastCrawl": ""
-  },
-  {
-   "url": "https://pickdam.com/trend-folding-measuring-spoon/",
-   "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
-   "lastCrawl": ""
-  },
-  {
    "url": "https://pickdam.com/trend-carbon-mat/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -118,25 +124,25 @@
   {
    "url": "https://pickdam.com/trend-folding-measuring-spoon-top3/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/trend-cutting-board-scissors-top3/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/trend-auto-mix-cup-top3/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/trend-auto-dispenser-top3/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -255,8 +261,8 @@
   },
   {
    "url": "https://pickdam.com/one-person-seasoning-storage/",
-   "verdict": "PASS",
-   "state": "Submitted and indexed",
+   "verdict": "NEUTRAL",
+   "state": "Crawled - currently not indexed",
    "lastCrawl": "2026-11-02"
   },
   {
