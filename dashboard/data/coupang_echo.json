@@ -4,21 +4,5 @@
  "widget_len": 211,
  "env_COUPANG_ENABLED": "",
  "file_loaded": true,
- "file_enabled": false,
- "apply_trace": [
-  {
-   "stage": "진입",
-   "title": "3만 원으로 해결하는 무선물걸레청소기 배터리 수명,",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 7
-  },
-  {
-   "stage": "중단:enabled=False",
-   "title": "3만 원으로 해결하는 무선물걸레청소기 배터리 수명,",
-   "enabled": false,
-   "widget_len": 211,
-   "h2": 7
-  }
- ]
+ "file_enabled": false
 }

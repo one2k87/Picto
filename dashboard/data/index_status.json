@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-27T12:56:54",
+ "updated_at": "2026-11-27T14:08:44",
  "site": "https://pickdam.com",
  "checked": 47,
  "indexed": 22,
@@ -9,7 +9,7 @@
  "intended": 47,
  "posts_diag": {
   "http": 200,
-  "body_head": "[{\"modified\":\"2026-11-27T12:50:05\",\"link\":\"https:\\/\\/pickdam.com\\/vacuum-replacement-criteria\\/\"},{\"modified\":\"2026-11-2"
+  "body_head": "[{\"modified\":\"2026-11-27T12:58:00\",\"link\":\"https:\\/\\/pickdam.com\\/vacuum-replacement-criteria\\/\"},{\"modified\":\"2026-11-2"
  },
  "posts_n": 61,
  "results": [
@@ -22,13 +22,13 @@
   {
    "url": "https://pickdam.com/vacuum-replacement-criteria/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
    "url": "https://pickdam.com/trend-folding-measuring-spoon/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -70,7 +70,7 @@
   {
    "url": "https://pickdam.com/mini-dishwasher-3pin-comparison/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -82,7 +82,7 @@
   {
    "url": "https://pickdam.com/lp-retro-magnet-kitchen-interior/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -106,7 +106,7 @@
   {
    "url": "https://pickdam.com/trend-carbon-mat/",
    "verdict": "NEUTRAL",
-   "state": "URL is unknown to Google",
+   "state": "Discovered - currently not indexed",
    "lastCrawl": ""
   },
   {
@@ -136,7 +136,7 @@
   {
    "url": "https://pickdam.com/trend-auto-mix-cup-top3/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -160,7 +160,7 @@
   {
    "url": "https://pickdam.com/bathroom-mini-heater-tips/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
@@ -306,7 +306,7 @@
   {
    "url": "https://pickdam.com/privacy-policy/",
    "verdict": "NEUTRAL",
-   "state": "Discovered - currently not indexed",
+   "state": "URL is unknown to Google",
    "lastCrawl": ""
   },
   {
