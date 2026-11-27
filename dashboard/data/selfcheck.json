@@ -1,6 +1,6 @@
 {
- "at": "2026-11-26T17:04:29",
- "posts": 60,
+ "at": "2026-11-27T17:12:50",
+ "posts": 61,
  "pass": 13,
  "fail": 2,
  "checks": [
@@ -8,7 +8,7 @@
    "key": "sitemap",
    "title": "사이트맵이 모든 글을 담고 있는가",
    "ok": true,
-   "evidence": "사이트맵 61개 · 발행 60편 · 누락 0",
+   "evidence": "사이트맵 62개 · 발행 61편 · 누락 0",
    "fix": "",
    "fix_by": "user"
   },
@@ -32,7 +32,7 @@
    "key": "cards",
    "title": "상품 카드가 글마다 하나인가",
    "ok": true,
-   "evidence": "60편 전부 카드 1개 이하",
+   "evidence": "61편 전부 카드 1개 이하",
    "fix": "",
    "fix_by": "auto"
   },
@@ -40,7 +40,7 @@
    "key": "index",
    "title": "색인 검사가 모든 글을 보고 있는가",
    "ok": false,
-   "evidence": "색인 23/46 (50%)",
+   "evidence": "색인 22/47 (47%)",
    "fix": "미색인 글에 내부링크 보강 + 사이트맵 확인",
    "fix_by": "auto"
   },
@@ -72,7 +72,7 @@
    "key": "disclosure",
    "title": "대가성 고지가 모든 글에 있는가",
    "ok": true,
-   "evidence": "60편 전부 보유",
+   "evidence": "61편 전부 보유",
    "fix": "",
    "fix_by": "auto"
   },
@@ -96,7 +96,7 @@
    "key": "silent_errors",
    "title": "매일 실행에 조용히 죽은 단계가 없는가",
    "ok": true,
-   "evidence": "마지막 실행(2026-11-26T12:49) 로그 17줄에 예외 흔적 없음",
+   "evidence": "마지막 실행(2026-11-27T14:09) 로그 74줄에 예외 흔적 없음",
    "fix": "",
    "fix_by": "me"
   },
@@ -120,7 +120,7 @@
    "key": "llm_block",
    "title": "글 생성이 결제·한도로 막혀 있지 않은가",
    "ok": true,
-   "evidence": "2026-11-06T10:50 차단(unknown) 이후 2026-11-25T13:37 에 발행됨 — 해소",
+   "evidence": "2026-11-06T10:50 차단(unknown) 이후 2026-11-27T12:49 에 발행됨 — 해소",
    "fix": "",
    "fix_by": "user"
   }
